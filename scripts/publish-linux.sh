@@ -3,7 +3,7 @@
 set -euo pipefail
 ROOT="$(cd "$(dirname "$0")/.." && pwd)"
 OUT_DIR="$ROOT/artifacts/publish/linux-x64"
-dotnet publish "$ROOT/src/ioSender/ioSender.csproj" \
+dotnet publish "$ROOT/ioSender/ioSender.csproj" \
   -c Release \
   -r linux-x64 \
   --self-contained false \

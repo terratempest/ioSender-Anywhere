@@ -2,29 +2,37 @@
 
 ---
 
-### .NET 8 / Avalonia (`src/`)
+### .NET 8 / Avalonia (Windows and Linux)
 
-Cross-platform rewrite under `src/ioSender.net.sln`.
+Cross-platform build: `ioSender.net.sln` at the repository root.
 
 **Prerequisites:** [.NET 8 SDK](https://dotnet.microsoft.com/download/dotnet/8.0)
 
 ```bash
 # Restore and build
-dotnet restore src/ioSender.net.sln
-dotnet build src/ioSender.net.sln -c Release
+dotnet restore ioSender.net.sln
+dotnet build ioSender.net.sln -c Release
 
 # Run ioSender (from repo root)
-dotnet run --project src/ioSender/ioSender.csproj
+dotnet run --project ioSender/ioSender.csproj
 
 # Run standalone Grbl config host
-dotnet run --project src/GrblConfigApp/GrblConfigApp.csproj
+dotnet run --project GrblConfigApp/GrblConfigApp.csproj
 
 # Publish
 ./scripts/publish-linux.sh          # linux-x64 → artifacts/publish/linux-x64
 pwsh ./scripts/publish-windows.ps1  # win-x64   → artifacts/publish/win-x64
 ```
 
-On Windows, `ioSender` and `GrblConfigApp` use the platform-specific `CNC.Platform.Windows` project; on Linux, `CNC.Platform.Linux` is referenced instead.
+On Windows, `ioSender` and `GrblConfigApp` use `CNC.Platform.Windows`; on Linux, `CNC.Platform.Linux`.
+
+**Large layout** (formerly ioSender XL): View → Toggle large layout.
+
+**Linux serial:** add your user to `dialout` (`sudo usermod -aG dialout $USER`) and re-login.
+
+**Localization:** CSV files under `Locale/{culture}/`. Copied next to the executable on build. Override folder with `IOSENDER_LOCALE_ROOT`. Run with `-locale de-DE` or set `<Locale>` in app settings.
+
+Legacy WPF (.NET Framework) sources are no longer in this repository; see [docs/LEGACY_REFERENCE.md](docs/LEGACY_REFERENCE.md) for upstream reference.
 
 ---
 
