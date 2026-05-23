@@ -1,0 +1,302 @@
+using Avalonia;
+using Avalonia.Input;
+using Avalonia.Interactivity;
+using Avalonia.OpenGL;
+using Avalonia.OpenGL.Controls;
+using Avalonia.Threading;
+using CNC.App;
+using CNC.GCodeViewer.Avalonia.OpenGl;
+using NumericVector3 = System.Numerics.Vector3;
+
+namespace CNC.GCodeViewer.Avalonia.Views;
+
+/// <summary>Cross-platform OpenGL toolpath viewport (Windows + Linux).</summary>
+public class ToolpathGlControl : OpenGlControlBase
+{
+    readonly OpenGlLineRenderer _renderer = new();
+    readonly ViewerCamera _camera = new();
+    ViewerScene? _scene;
+    bool _sceneGpuDirty = true;
+    bool _blackBackground = true;
+    bool _initFailed;
+    string? _initFailureMessage;
+
+    bool _isMiddlePanning;
+    bool _isRightRotating;
+    Point _lastPanPoint;
+    PathBounds _bounds;
+
+    DispatcherTimer? _animationTimer;
+
+    public event EventHandler? InitializationFailed;
+    public event EventHandler? SceneApplied;
+    public event EventHandler? CameraChanged;
+
+    public ViewerCamera Camera => _camera;
+
+    public ToolpathGlControl()
+    {
+        Focusable = true;
+        IsHitTestVisible = false;
+        AttachedToVisualTree += OnAttachedToVisualTreeHandler;
+        DetachedFromVisualTree += OnDetachedFromVisualTreeHandler;
+    }
+
+    public void HandlePointerPressed(PointerPressedEventArgs e, Visual? inputElement = null) =>
+        OnPointerPressed(inputElement ?? this, e);
+
+    public void HandlePointerMoved(PointerEventArgs e, Visual? inputElement = null) =>
+        OnPointerMoved(inputElement ?? this, e);
+
+    public void HandlePointerReleased(PointerReleasedEventArgs e, Visual? inputElement = null) =>
+        OnPointerReleased(inputElement ?? this, e);
+
+    public void HandlePointerWheelChanged(PointerWheelEventArgs e, Visual? inputElement = null) =>
+        OnPointerWheelChanged(inputElement ?? this, e);
+
+    public void SetBackground(bool blackBackground)
+    {
+        _blackBackground = blackBackground;
+        RequestNextFrameRendering();
+    }
+
+    public void SetAnimationActive(bool active)
+    {
+        if (active)
+            StartAnimationTimer();
+        else
+            StopAnimationTimer();
+    }
+
+    public void SetScene(ViewerScene? scene, PathBounds bounds, bool resetView = false)
+    {
+        _scene = scene;
+        _bounds = bounds;
+        _sceneGpuDirty = true;
+
+        if (resetView && !bounds.IsEmpty)
+        {
+            _camera.ResetToTopView(bounds);
+            NotifyCameraChanged();
+        }
+
+        RequestNextFrameRendering();
+        SceneApplied?.Invoke(this, EventArgs.Empty);
+    }
+
+    public void UpdateDynamicLayers(ViewerLineLayer? toolMarker, ViewerLineLayer? executed)
+    {
+        if (_scene == null)
+            return;
+
+        var markerChanged = !ReferenceEquals(_scene.ToolMarker, toolMarker);
+        var executedChanged = !ReferenceEquals(_scene.Executed, executed);
+        _scene.ToolMarker = toolMarker;
+        _scene.Executed = executed;
+        if (markerChanged || executedChanged)
+            _sceneGpuDirty = true;
+        RequestNextFrameRendering();
+    }
+
+    public void ClearScene()
+    {
+        _scene = null;
+        _bounds = default;
+        _sceneGpuDirty = true;
+        RequestNextFrameRendering();
+    }
+
+    public void ResetView()
+    {
+        _camera.ResetToTopView(_bounds);
+        NotifyCameraChanged();
+        RequestNextFrameRendering();
+    }
+
+    public void OrientTo(NumericVector3 faceDirection)
+    {
+        _camera.OrientTo(faceDirection, _bounds);
+        NotifyCameraChanged();
+        RequestNextFrameRendering();
+    }
+
+    public void SaveCameraToConfig()
+    {
+        var cfg = GCodeViewerContext.AppConfig?.Base.GCodeViewer;
+        if (cfg == null)
+            return;
+        _camera.SaveToConfig(cfg);
+        if (cfg.ViewMode < 0)
+            cfg.ViewMode = 0;
+    }
+
+    protected override void OnOpenGlInit(GlInterface gl)
+    {
+        try
+        {
+            _initFailed = false;
+            _initFailureMessage = null;
+            _renderer.Initialize(gl);
+            gl.ClearColor(0.06f, 0.06f, 0.06f, 1f);
+            gl.Disable(GlConsts.GL_DEPTH_TEST);
+        }
+        catch (Exception ex)
+        {
+            _initFailed = true;
+            _initFailureMessage = ex.Message;
+            Dispatcher.UIThread.Post(() => InitializationFailed?.Invoke(this, EventArgs.Empty));
+        }
+    }
+
+    protected override void OnOpenGlDeinit(GlInterface gl)
+    {
+        _renderer.Deinitialize(gl);
+        _renderer.Dispose();
+    }
+
+    protected override void OnOpenGlRender(GlInterface gl, int fb)
+    {
+        if (_initFailed)
+            return;
+
+        var size = Bounds;
+        var w = Math.Max(1, (int)size.Width);
+        var h = Math.Max(1, (int)size.Height);
+        gl.Viewport(0, 0, w, h);
+
+        gl.ClearColor(_blackBackground ? 0.06f : 1f, _blackBackground ? 0.06f : 1f, _blackBackground ? 0.06f : 1f, 1f);
+        gl.Clear(GlConsts.GL_COLOR_BUFFER_BIT);
+
+        if (_scene == null)
+            return;
+
+        var layers = _scene.AllLayers().ToList();
+        if (layers.Count == 0)
+            return;
+
+        if (_sceneGpuDirty)
+        {
+            _renderer.SetScene(gl, layers);
+            _sceneGpuDirty = false;
+        }
+
+        var mvp = _camera.GetMvpMatrix(w, h);
+        _renderer.Draw(gl, mvp);
+    }
+
+    void OnAttachedToVisualTreeHandler(object? sender, VisualTreeAttachmentEventArgs e) =>
+        StartAnimationTimer();
+
+    void OnDetachedFromVisualTreeHandler(object? sender, VisualTreeAttachmentEventArgs e) =>
+        StopAnimationTimer();
+
+    void StartAnimationTimer()
+    {
+        _animationTimer ??= new DispatcherTimer { Interval = TimeSpan.FromMilliseconds(50) };
+        _animationTimer.Tick -= OnAnimationTick;
+        _animationTimer.Tick += OnAnimationTick;
+        if (!_animationTimer.IsEnabled)
+            _animationTimer.Start();
+    }
+
+    void StopAnimationTimer()
+    {
+        if (_animationTimer == null)
+            return;
+        _animationTimer.Stop();
+        _animationTimer.Tick -= OnAnimationTick;
+    }
+
+    void OnAnimationTick(object? sender, EventArgs e)
+    {
+        if (_scene != null && !_initFailed)
+            RequestNextFrameRendering();
+    }
+
+    void OnPointerPressed(object? sender, PointerPressedEventArgs e)
+    {
+        var inputElement = sender as Visual ?? this;
+        var point = e.GetCurrentPoint(inputElement);
+        if (point.Properties.IsMiddleButtonPressed)
+        {
+            _isMiddlePanning = true;
+            _lastPanPoint = point.Position;
+            e.Pointer.Capture(inputElement as IInputElement);
+            e.Handled = true;
+        }
+        else if (point.Properties.IsRightButtonPressed)
+        {
+            _isRightRotating = true;
+            _lastPanPoint = point.Position;
+            e.Pointer.Capture(inputElement as IInputElement);
+            e.Handled = true;
+        }
+    }
+
+    void OnPointerMoved(object? sender, PointerEventArgs e)
+    {
+        var inputElement = sender as Visual ?? this;
+        var point = e.GetCurrentPoint(inputElement);
+        if (_isMiddlePanning)
+        {
+            if (!point.Properties.IsMiddleButtonPressed)
+            {
+                _isMiddlePanning = false;
+                e.Pointer.Capture(null);
+                return;
+            }
+
+            _camera.PanPixels(point.Position - _lastPanPoint, Bounds.Width);
+            _lastPanPoint = point.Position;
+            NotifyCameraChanged();
+            RequestNextFrameRendering();
+            e.Handled = true;
+            return;
+        }
+
+        if (_isRightRotating)
+        {
+            if (!point.Properties.IsRightButtonPressed)
+            {
+                _isRightRotating = false;
+                e.Pointer.Capture(null);
+                return;
+            }
+
+            _camera.RotatePixels(point.Position - _lastPanPoint);
+            _lastPanPoint = point.Position;
+            NotifyCameraChanged();
+            RequestNextFrameRendering();
+            e.Handled = true;
+        }
+    }
+
+    void OnPointerReleased(object? sender, PointerReleasedEventArgs e)
+    {
+        var update = e.GetCurrentPoint(sender as Visual ?? this).Properties.PointerUpdateKind;
+        if (update == PointerUpdateKind.MiddleButtonReleased)
+        {
+            _isMiddlePanning = false;
+            e.Pointer.Capture(null);
+            e.Handled = true;
+        }
+        else if (update == PointerUpdateKind.RightButtonReleased)
+        {
+            _isRightRotating = false;
+            e.Pointer.Capture(null);
+            e.Handled = true;
+        }
+    }
+
+    void OnPointerWheelChanged(object? sender, PointerWheelEventArgs e)
+    {
+        var inputElement = sender as Visual ?? this;
+        var pointer = e.GetPosition(inputElement);
+        _camera.ZoomWheel(e.Delta.Y, pointer, inputElement.Bounds.Width, inputElement.Bounds.Height);
+        NotifyCameraChanged();
+        RequestNextFrameRendering();
+        e.Handled = true;
+    }
+
+    void NotifyCameraChanged() => CameraChanged?.Invoke(this, EventArgs.Empty);
+}

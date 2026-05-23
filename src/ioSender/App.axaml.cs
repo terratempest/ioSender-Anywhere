@@ -105,8 +105,6 @@ public partial class App : Application
         {
             CloseStartupBanner(startupBanner);
 
-            HelixViewportHost.ShutdownResources();
-
             appConfig.Shutdown();
             appConfig.Save();
         };

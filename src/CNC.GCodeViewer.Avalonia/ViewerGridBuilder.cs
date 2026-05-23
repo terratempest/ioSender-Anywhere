@@ -6,6 +6,7 @@ internal static class ViewerGridBuilder
 {
     const double MinorStep = 10d;
     const double MajorStep = 100d;
+    const double MajorThickness = 0.75d;
 
     public sealed record GridLines(List<NumericVector3> Minor, List<NumericVector3> Major);
 
@@ -25,10 +26,17 @@ internal static class ViewerGridBuilder
         var cx = bounds.Center.X;
         var cy = bounds.Center.Y;
         var z = 0d;
+        var minX = Floor(cx - halfW, MinorStep);
+        var maxX = Ceiling(cx + halfW, MinorStep);
+        var minY = Floor(cy - halfL, MinorStep);
+        var maxY = Ceiling(cy + halfL, MinorStep);
 
-        AddGridLines(minor, major, cx - halfW, cx + halfW, cy - halfL, cy + halfL, z);
+        AddGridLines(minor, major, minX, maxX, minY, maxY, z);
         return new GridLines(minor, major);
     }
+
+    public static List<NumericVector3> BuildMajorQuads(IReadOnlyList<NumericVector3> majorLines) =>
+        BuildQuads(majorLines, MajorThickness);
 
     static void AddGridLines(
         List<NumericVector3> minor,
@@ -39,13 +47,13 @@ internal static class ViewerGridBuilder
         double maxY,
         double z)
     {
-        for (var y = Floor(minY, MinorStep); y <= maxY + 1e-6; y += MinorStep)
+        for (var y = minY; y <= maxY + 1e-6; y += MinorStep)
         {
             var target = IsMajor(y) ? major : minor;
             AddSegment(target, (float)minX, (float)y, (float)z, (float)maxX, (float)y, (float)z);
         }
 
-        for (var x = Floor(minX, MinorStep); x <= maxX + 1e-6; x += MinorStep)
+        for (var x = minX; x <= maxX + 1e-6; x += MinorStep)
         {
             var target = IsMajor(x) ? major : minor;
             AddSegment(target, (float)x, (float)minY, (float)z, (float)x, (float)maxY, (float)z);
@@ -58,7 +66,41 @@ internal static class ViewerGridBuilder
         target.Add(new NumericVector3(x2, y2, z2));
     }
 
+    static List<NumericVector3> BuildQuads(IReadOnlyList<NumericVector3> lineSegments, double thickness)
+    {
+        var quads = new List<NumericVector3>(lineSegments.Count * 3);
+        var half = (float)(thickness / 2d);
+        for (var i = 0; i + 1 < lineSegments.Count; i += 2)
+        {
+            var a = lineSegments[i];
+            var b = lineSegments[i + 1];
+            var dx = b.X - a.X;
+            var dy = b.Y - a.Y;
+            var length = MathF.Sqrt(dx * dx + dy * dy);
+            if (length <= 1e-6f)
+                continue;
+
+            var px = -dy / length * half;
+            var py = dx / length * half;
+            var a0 = new NumericVector3(a.X + px, a.Y + py, a.Z);
+            var a1 = new NumericVector3(a.X - px, a.Y - py, a.Z);
+            var b0 = new NumericVector3(b.X + px, b.Y + py, b.Z);
+            var b1 = new NumericVector3(b.X - px, b.Y - py, b.Z);
+
+            quads.Add(a0);
+            quads.Add(b0);
+            quads.Add(b1);
+            quads.Add(a0);
+            quads.Add(b1);
+            quads.Add(a1);
+        }
+
+        return quads;
+    }
+
     static double Floor(double value, double step) => Math.Floor(value / step) * step;
+
+    static double Ceiling(double value, double step) => Math.Ceiling(value / step) * step;
 
     static bool IsMajor(double value) => Math.Abs(value / MajorStep - Math.Round(value / MajorStep)) < 1e-6;
 }

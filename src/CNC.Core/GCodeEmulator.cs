@@ -222,11 +222,14 @@ namespace CNC.Core
                     case Commands.G0:
                     case Commands.G1:
                         {
-                            var motion = token as GCLinearMotion;
-                            if (coordinateSystem.Rotation != 0d)
+                            var motion = token as GCAxisCommand9;
+                            if (motion == null)
+                                break;
+                            var rotation = GetRotation();
+                            if (rotation != 0d)
                             {
                                 var move = new GCLinearMotion(motion.Command, motion.LineNumber, motion.Values.ToArray(), motion.AxisFlags, motion.BlockDelete);
-                                var target = new Vector3(move.X + coordinateSystem.X, move.Y + coordinateSystem.Y, 0d).RotateZ(0d, 0d, coordinateSystem.Rotation);
+                                var target = new Vector3(move.X + coordinateSystem.X, move.Y + coordinateSystem.Y, 0d).RotateZ(0d, 0d, rotation);
                                 move.X = target.X;
                                 move.Y = target.Y;
                                 move.AxisFlags |= AxisFlags.XY;

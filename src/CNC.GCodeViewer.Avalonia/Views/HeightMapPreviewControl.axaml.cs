@@ -1,108 +1,105 @@
 using Avalonia.Controls;
+using Avalonia.Input;
 using Avalonia.Media;
 using CNC.Core.Geometry;
-using HelixToolkit.Avalonia.SharpDX;
-using HelixToolkit.SharpDX;
+using CNC.GCodeViewer.Avalonia.OpenGl;
 using AvaloniaColor = Avalonia.Media.Color;
 
 namespace CNC.GCodeViewer.Avalonia.Views;
 
 public partial class HeightMapPreviewControl : UserControl
 {
-    readonly List<LineGeometryModel3D> _lineModels = [];
-
     const float BoundaryThickness = 1.25f;
     const float GridThickness = 0.5f;
     const float MarkerThickness = 1f;
 
     public HeightMapPreviewControl()
     {
-        HelixThemeLoader.EnsureApplied();
         InitializeComponent();
-        AttachedToVisualTree += (_, _) => ApplyViewportChrome();
+        GlViewport.SetBackground(blackBackground: true);
+        ViewportInput.PointerPressed += (_, e) => GlViewport.HandlePointerPressed(e, ViewportInput);
+        ViewportInput.PointerMoved += (_, e) => GlViewport.HandlePointerMoved(e, ViewportInput);
+        ViewportInput.PointerReleased += (_, e) => GlViewport.HandlePointerReleased(e, ViewportInput);
+        ViewportInput.PointerWheelChanged += (_, e) => GlViewport.HandlePointerWheelChanged(e, ViewportInput);
     }
 
     public void Render(Point3D[] boundary, Point3D[] gridPoints, int sizeX, int sizeY, HeightMapSurfaceData? surface)
     {
-        ClearScene();
-        ApplyViewportChrome();
+        var layers = new List<ViewerLineLayer>();
+
+        void AddLayer(IReadOnlyList<System.Numerics.Vector3> points, Color color, float width)
+        {
+            var layer = ViewerLineLayerBuilder.FromPoints(points, color, width);
+            if (layer != null)
+                layers.Add(layer);
+        }
 
         if (boundary.Length >= 2)
-        {
-            var boundaryLines = HeightMapMeshBuilder.BuildBoundaryLines(boundary);
-            if (boundaryLines.Count > 1)
-            {
-                HelixLineHelper.AddLineModel(
-                    Viewport,
-                    _lineModels,
-                    HelixLineHelper.CreateLineModel(boundaryLines, Colors.Lime, BoundaryThickness));
-            }
-        }
+            AddLayer(HeightMapMeshBuilder.BuildBoundaryLines(boundary), Colors.Lime, BoundaryThickness);
 
         if (surface == null)
         {
             if (gridPoints.Length > 0 && sizeX >= 1 && sizeY >= 1)
             {
-                var markers = HeightMapMeshBuilder.BuildPointMarkers(gridPoints);
-                if (markers.Count > 1)
-                {
-                    HelixLineHelper.AddLineModel(
-                        Viewport,
-                        _lineModels,
-                        HelixLineHelper.CreateLineModel(markers, Colors.OrangeRed, MarkerThickness));
-                }
-
+                AddLayer(HeightMapMeshBuilder.BuildPointMarkers(gridPoints), Colors.OrangeRed, MarkerThickness);
                 if (sizeX >= 2 && sizeY >= 2)
                 {
-                    var gridLines = HeightMapMeshBuilder.BuildGridLines(gridPoints, sizeX, sizeY);
-                    if (gridLines.Count > 1)
-                    {
-                        HelixLineHelper.AddLineModel(
-                            Viewport,
-                            _lineModels,
-                            HelixLineHelper.CreateLineModel(gridLines, AvaloniaColor.FromArgb(200, 120, 120, 120), GridThickness));
-                    }
+                    AddLayer(
+                        HeightMapMeshBuilder.BuildGridLines(gridPoints, sizeX, sizeY),
+                        AvaloniaColor.FromArgb(200, 120, 120, 120),
+                        GridThickness);
                 }
             }
         }
         else
         {
-            var surfaceLines = HeightMapMeshBuilder.BuildSurfaceWireframe(surface);
-            if (surfaceLines.Count > 1)
-            {
-                HelixLineHelper.AddLineModel(
-                    Viewport,
-                    _lineModels,
-                    HelixLineHelper.CreateLineModel(surfaceLines, AvaloniaColor.FromArgb(220, 90, 180, 255), 1f));
-            }
-
-            if (boundary.Length >= 2)
-            {
-                var boundaryLines = HeightMapMeshBuilder.BuildBoundaryLines(boundary);
-                if (boundaryLines.Count > 1)
-                {
-                    HelixLineHelper.AddLineModel(
-                        Viewport,
-                        _lineModels,
-                        HelixLineHelper.CreateLineModel(boundaryLines, Colors.Lime, BoundaryThickness));
-                }
-            }
+            AddLayer(HeightMapMeshBuilder.BuildSurfaceWireframe(surface), AvaloniaColor.FromArgb(220, 90, 180, 255), 1f);
         }
 
-        if (_lineModels.Count > 0)
-            Viewport.ZoomExtents();
+        var bounds = ComputeBounds(boundary, gridPoints);
+        GlViewport.SetScene(new ViewerScene { ExtraLayers = layers }, bounds, resetView: true);
     }
 
-    public void ClearScene()
+    static PathBounds ComputeBounds(Point3D[] boundary, Point3D[] gridPoints)
     {
-        HelixLineHelper.ClearManaged(Viewport, _lineModels);
+        var has = false;
+        var minX = double.MaxValue;
+        var minY = double.MaxValue;
+        var minZ = double.MaxValue;
+        var maxX = double.MinValue;
+        var maxY = double.MinValue;
+        var maxZ = double.MinValue;
+
+        void Include(Point3D p)
+        {
+            has = true;
+            if (p.X < minX) minX = p.X;
+            if (p.Y < minY) minY = p.Y;
+            if (p.Z < minZ) minZ = p.Z;
+            if (p.X > maxX) maxX = p.X;
+            if (p.Y > maxY) maxY = p.Y;
+            if (p.Z > maxZ) maxZ = p.Z;
+        }
+
+        foreach (var p in boundary)
+            Include(p);
+        foreach (var p in gridPoints)
+            Include(p);
+
+        if (!has)
+            return new PathBounds();
+
+        return new PathBounds
+        {
+            MinX = minX,
+            MinY = minY,
+            MinZ = minZ,
+            MaxX = maxX,
+            MaxY = maxY,
+            MaxZ = maxZ,
+            HasValue = true,
+        };
     }
 
-    void ApplyViewportChrome()
-    {
-        HelixViewportHost.Configure(Viewport);
-        HelixViewportHost.ApplyBackground(Viewport, blackBackground: true);
-        Viewport.ShowCoordinateSystem = false;
-        Viewport.ShowViewCube = false;
-    }
+    public void ClearScene() => GlViewport.ClearScene();
 }

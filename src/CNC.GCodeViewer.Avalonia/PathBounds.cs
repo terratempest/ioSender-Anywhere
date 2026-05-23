@@ -3,7 +3,7 @@ using CNC.Core.Geometry;
 
 namespace CNC.GCodeViewer.Avalonia;
 
-internal readonly struct PathBounds
+public readonly struct PathBounds
 {
     public double MinX { get; init; }
     public double MinY { get; init; }

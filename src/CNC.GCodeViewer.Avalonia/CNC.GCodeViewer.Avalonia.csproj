@@ -1,28 +1,27 @@
-<Project Sdk="Microsoft.NET.Sdk">
-
-  <PropertyGroup>
-    <TargetFramework>net8.0</TargetFramework>
-    <ImplicitUsings>enable</ImplicitUsings>
-    <Nullable>enable</Nullable>
-    <RootNamespace>CNC.GCodeViewer.Avalonia</RootNamespace>
-    <AssemblyName>CNC.GCodeViewer.Avalonia</AssemblyName>
-    <AvaloniaUseCompiledBindingsByDefault>true</AvaloniaUseCompiledBindingsByDefault>
-  </PropertyGroup>
-
-  <ItemGroup>
-    <PackageReference Include="Avalonia" Version="$(AvaloniaVersion)" />
-    <PackageReference Include="HelixToolkit.Avalonia.SharpDX" Version="$(HelixVersion)" />
-    <PackageReference Include="HelixToolkit.SharpDX" Version="$(HelixVersion)" />
-    <PackageReference Include="SharpDX.Mathematics" Version="4.2.0" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <ProjectReference Include="..\CNC.App\CNC.App.csproj" />
-    <ProjectReference Include="..\CNC.Core\CNC.Core.csproj" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <AvaloniaResource Include="Themes\**"/>
-  </ItemGroup>
-
-</Project>
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net8.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+    <RootNamespace>CNC.GCodeViewer.Avalonia</RootNamespace>
+    <AssemblyName>CNC.GCodeViewer.Avalonia</AssemblyName>
+    <AvaloniaUseCompiledBindingsByDefault>true</AvaloniaUseCompiledBindingsByDefault>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Avalonia" Version="$(AvaloniaVersion)" />
+    <PackageReference Include="Avalonia.Desktop" Version="$(AvaloniaVersion)" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\CNC.App\CNC.App.csproj" />
+    <ProjectReference Include="..\CNC.Core\CNC.Core.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <AvaloniaResource Include="Themes\**"/>
+  </ItemGroup>
+
+</Project>

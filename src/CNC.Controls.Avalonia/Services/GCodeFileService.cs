@@ -12,6 +12,7 @@ public sealed class GCodeFileService
     private static readonly Lazy<GCodeFileService> InstanceHolder = new(() => new GCodeFileService());
 
     private readonly GCodeJob _program = new();
+    private Dialect? _savedLoadDialect;
 
     private GCodeFileService()
     {
@@ -42,7 +43,7 @@ public sealed class GCodeFileService
 
     public void Load(string filename)
     {
-        _program.LoadFile(filename, GrblInfo.UseLinenumbers);
+        RunWithLoadDialect(() => _program.LoadFile(filename, GrblInfo.UseLinenumbers));
         if (Model != null)
         {
             Model.FileName = filename;
@@ -56,14 +57,18 @@ public sealed class GCodeFileService
     {
         ArgumentNullException.ThrowIfNull(lines);
 
-        _program.AddBlock(displayName, Core.Action.New);
-        foreach (var line in lines)
+        RunWithLoadDialect(() =>
         {
-            if (!string.IsNullOrWhiteSpace(line))
-                _program.AddBlock(line.Trim(), Core.Action.Add);
-        }
+            _program.AddBlock(displayName, Core.Action.New);
+            foreach (var line in lines)
+            {
+                if (!string.IsNullOrWhiteSpace(line))
+                    _program.AddBlock(line.Trim(), Core.Action.Add);
+            }
 
-        _program.AddBlock(string.Empty, Core.Action.End);
+            _program.AddBlock(string.Empty, Core.Action.End);
+            return true;
+        });
 
         if (Model != null)
         {
@@ -89,7 +94,14 @@ public sealed class GCodeFileService
 
     public void AddBlock(string block, CNC.Core.Action action)
     {
+        if (action == CNC.Core.Action.New)
+            BeginLoadDialect();
+
         _program.AddBlock(block, action);
+
+        if (action == CNC.Core.Action.End)
+            EndLoadDialect();
+
         if (action == CNC.Core.Action.End)
             NotifyProgramChanged();
     }
@@ -118,5 +130,32 @@ public sealed class GCodeFileService
 
         Model.FileName = filename;
         Model.Blocks = Blocks;
+    }
+
+    private bool RunWithLoadDialect(Func<bool> load)
+    {
+        BeginLoadDialect();
+        try
+        {
+            return load();
+        }
+        finally
+        {
+            EndLoadDialect();
+        }
+    }
+
+    private void BeginLoadDialect()
+    {
+        _savedLoadDialect ??= Parser.Dialect;
+        Parser.Dialect = Dialect.GrblHAL;
+    }
+
+    private void EndLoadDialect()
+    {
+        if (_savedLoadDialect is not { } dialect)
+            return;
+        Parser.Dialect = dialect;
+        _savedLoadDialect = null;
     }
 }

@@ -3,9 +3,7 @@
     <LangVersion>latest</LangVersion>
     <Nullable>enable</Nullable>
     <ImplicitUsings>enable</ImplicitUsings>
-    <!-- HelixToolkit.Avalonia.SharpDX requires Avalonia 11.2 (uses Avalonia.Data.BindingBase). -->
     <AvaloniaVersion>11.2.0</AvaloniaVersion>
     <AvaloniaDataGridVersion>11.2.0</AvaloniaDataGridVersion>
-    <HelixVersion>3.1.2</HelixVersion>
   </PropertyGroup>
 </Project>

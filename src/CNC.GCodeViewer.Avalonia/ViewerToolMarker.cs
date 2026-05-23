@@ -13,14 +13,40 @@ internal enum ToolVisualizerMode
 
 internal static class ViewerToolMarker
 {
-    public static List<NumericVector3> Build(PathBounds bounds, Point3D toolPosition, ToolVisualizerMode mode, double toolDiameter)
+    const double ConeScale = 9d;
+    const double ConeBaseRadius = 0.5d;
+    const double ConeBaseHeight = 6d;
+
+    public static List<NumericVector3> Build(
+        PathBounds bounds,
+        Point3D toolPosition,
+        ToolVisualizerMode mode,
+        double toolDiameter,
+        bool autoScale = false,
+        double cameraDistance = 100d)
     {
         if (mode == ToolVisualizerMode.None)
             return [];
 
         var arm = Math.Max(bounds.MaxSize * 0.04d, 2d);
-        var radius = Math.Max(toolDiameter / 2d, 0.5d);
-        var height = Math.Max(arm * 1.5d, 3d);
+        var radius = mode == ToolVisualizerMode.Cone
+            ? Math.Max(toolDiameter / 2d, ConeBaseRadius)
+            : Math.Max(toolDiameter / 2d, 0.5d);
+        var height = mode == ToolVisualizerMode.Cone
+            ? ConeBaseHeight
+            : Math.Max(arm * 1.5d, 3d);
+        if (autoScale && mode == ToolVisualizerMode.Cone)
+        {
+            var scale = Math.Max(cameraDistance / 1250d, 0.05d);
+            height = Math.Max(height * scale, 0.5d);
+            radius = Math.Max(radius * scale, 0.25d);
+        }
+
+        if (mode == ToolVisualizerMode.Cone)
+        {
+            radius *= ConeScale;
+            height *= ConeScale;
+        }
 
         return mode switch
         {
@@ -54,12 +80,11 @@ internal static class ViewerToolMarker
     static List<NumericVector3> Cone(Point3D tip, double radius, double height)
     {
         var baseZ = tip.Z + height;
-        var lines = new List<NumericVector3>
-        {
-            V(tip.X, tip.Y, tip.Z), V(tip.X, tip.Y, baseZ)
-        };
+        var triangles = new List<NumericVector3>();
+        var baseCenter = V(tip.X, tip.Y, baseZ);
+        var tipPoint = V(tip.X, tip.Y, tip.Z);
 
-        const int segments = 12;
+        const int segments = 24;
         for (var i = 0; i < segments; i++)
         {
             var a0 = i * 2d * Math.PI / segments;
@@ -68,13 +93,19 @@ internal static class ViewerToolMarker
             var y0 = tip.Y + radius * Math.Sin(a0);
             var x1 = tip.X + radius * Math.Cos(a1);
             var y1 = tip.Y + radius * Math.Sin(a1);
-            lines.Add(V(x0, y0, baseZ));
-            lines.Add(V(x1, y1, baseZ));
-            lines.Add(V(tip.X, tip.Y, tip.Z));
-            lines.Add(V(x0, y0, baseZ));
+            var p0 = V(x0, y0, baseZ);
+            var p1 = V(x1, y1, baseZ);
+
+            triangles.Add(tipPoint);
+            triangles.Add(p0);
+            triangles.Add(p1);
+
+            triangles.Add(baseCenter);
+            triangles.Add(p1);
+            triangles.Add(p0);
         }
 
-        return lines;
+        return triangles;
     }
 
     static NumericVector3 V(double x, double y, double z) => new((float)x, (float)y, (float)z);

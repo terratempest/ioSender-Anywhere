@@ -137,6 +137,100 @@ public static class GCodePathBuilder
         return new GCodePathBuildResult { Segments = result, MotionCount = motionCount };
     }
 
+    /// <summary>Cut moves executed up to the given source line number (job progress highlight).</summary>
+    public static List<NumericVector3> BuildExecutedCut(
+        IReadOnlyList<GCodeToken> tokens,
+        Point3D start,
+        int throughLineNumber,
+        double arcResolution = 10d,
+        double minDistance = 0.05d,
+        CancellationToken cancellationToken = default)
+    {
+        var executed = new List<NumericVector3>();
+        if (tokens.Count == 0 || throughLineNumber <= 0)
+            return executed;
+
+        var tokenList = tokens as List<GCodeToken> ?? tokens.ToList();
+        var arcRes = ResolveArcResolution(tokenList.Count, arcResolution);
+        var emu = new GCodeEmulator(translate: true, syncMachineState: false);
+        emu.SetStartPosition(start);
+
+        var point0 = start;
+        var cutCount = 0;
+        var minDistanceSquared = minDistance > 0d ? minDistance * minDistance : 0d;
+
+        foreach (var cmd in emu.Execute(tokenList))
+        {
+            if (cmd.Token.LineNumber >= throughLineNumber)
+                break;
+
+            cancellationToken.ThrowIfCancellationRequested();
+
+            switch (cmd.Token.Command)
+            {
+                case Commands.G1:
+                    AddCutSegment(executed, ref cutCount, point0, cmd.End, minDistanceSquared);
+                    point0 = cmd.End;
+                    break;
+
+                case Commands.G2:
+                case Commands.G3:
+                    if (cmd.Token is GCArc arc)
+                    {
+                        var plane = emu.Plane;
+                        var relative = emu.DistanceMode == DistanceMode.Incremental;
+                        var startArr = ToArray(point0);
+                        var last = point0;
+                        foreach (var p in GenerateArcPreviewPoints(arc, plane, startArr, arcRes, relative, cancellationToken))
+                        {
+                            AddCutSegment(executed, ref cutCount, last, p, minDistanceSquared);
+                            last = p;
+                        }
+                        point0 = cmd.End;
+                    }
+                    break;
+
+                case Commands.G5:
+                    if (cmd.Token is GCCubicSpline cubic)
+                    {
+                        var last = point0;
+                        foreach (var p in LimitCurvePoints(
+                                     cubic.GeneratePoints(ToArray(point0), arcRes, emu.DistanceMode == DistanceMode.Incremental),
+                                     cancellationToken))
+                        {
+                            AddCutSegment(executed, ref cutCount, last, p, minDistanceSquared);
+                            last = p;
+                        }
+                        point0 = cmd.End;
+                    }
+                    break;
+
+                case Commands.G5_1:
+                    if (cmd.Token is GCQuadraticSpline quad)
+                    {
+                        var last = point0;
+                        foreach (var p in LimitCurvePoints(
+                                     quad.GeneratePoints(ToArray(point0), arcRes, emu.DistanceMode == DistanceMode.Incremental),
+                                     cancellationToken))
+                        {
+                            AddCutSegment(executed, ref cutCount, last, p, minDistanceSquared);
+                            last = p;
+                        }
+                        point0 = cmd.End;
+                    }
+                    break;
+
+                case Commands.G0:
+                    point0 = cmd.End;
+                    cutCount = 0;
+                    break;
+            }
+        }
+
+        DecimateInPlace(executed);
+        return executed;
+    }
+
     static IEnumerable<Point3D> GenerateArcPreviewPoints(
         GCArc arc,
         GCPlane plane,

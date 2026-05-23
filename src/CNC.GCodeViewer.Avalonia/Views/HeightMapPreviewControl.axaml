@@ -1,11 +1,15 @@
 <UserControl xmlns="https://github.com/avaloniaui"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-             xmlns:helix="using:HelixToolkit.Avalonia.SharpDX"
+             xmlns:views="using:CNC.GCodeViewer.Avalonia.Views"
              x:Class="CNC.GCodeViewer.Avalonia.Views.HeightMapPreviewControl">
-  <helix:Viewport3DX x:Name="Viewport"
-                     HorizontalAlignment="Stretch"
-                     VerticalAlignment="Stretch"
-                     Background="#101010"
-                     ShowCoordinateSystem="False"
-                     ShowViewCube="False"/>
+  <Grid>
+    <views:ToolpathGlControl x:Name="GlViewport"
+                             HorizontalAlignment="Stretch"
+                             VerticalAlignment="Stretch"/>
+    <Panel x:Name="ViewportInput"
+           Background="Transparent"
+           HorizontalAlignment="Stretch"
+           VerticalAlignment="Stretch"
+           Cursor="Hand"/>
+  </Grid>
 </UserControl>

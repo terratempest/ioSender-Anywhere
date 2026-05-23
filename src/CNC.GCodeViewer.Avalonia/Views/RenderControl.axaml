@@ -2,6 +2,7 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:views="using:CNC.GCodeViewer.Avalonia.Views"
              mc:Ignorable="d" d:DesignWidth="400" d:DesignHeight="335"
              x:Class="CNC.GCodeViewer.Avalonia.Views.RenderControl"
              MinWidth="200"
@@ -13,7 +14,23 @@
       <Button Content="Reset view" Click="OnResetViewClick" Padding="8,4"/>
     </StackPanel>
     <Grid x:Name="ViewportHost" Background="#101010">
+      <views:ToolpathGlControl x:Name="GlViewport"
+                               HorizontalAlignment="Stretch"
+                               VerticalAlignment="Stretch"/>
+      <Panel x:Name="ViewportInput"
+             Background="Transparent"
+             HorizontalAlignment="Stretch"
+             VerticalAlignment="Stretch"
+             Cursor="Hand"/>
+      <views:ViewCubeOverlay x:Name="ViewCube"
+                             Width="110"
+                             Height="110"
+                             HorizontalAlignment="Right"
+                             VerticalAlignment="Bottom"
+                             Margin="8"
+                             IsHitTestVisible="True"/>
       <Border x:Name="StatusPanel" HorizontalAlignment="Left" VerticalAlignment="Bottom" Margin="8"
+                             IsHitTestVisible="False"
               Background="#AA000000" Padding="8,4" CornerRadius="4">
         <TextBlock x:Name="StatusText"
                    Foreground="#CCCCCC"
@@ -23,7 +40,8 @@
                    Text="3D view — starting"/>
       </Border>
       <Border x:Name="OverlayPanel" HorizontalAlignment="Right" VerticalAlignment="Top" Margin="8"
-              Background="#AA000000" Padding="8,4" CornerRadius="4" IsVisible="False">
+              Background="#AA000000" Padding="8,4" CornerRadius="4" IsVisible="False"
+              IsHitTestVisible="False">
         <TextBlock x:Name="OverlayText"
                    Foreground="White"
                    FontSize="11"
