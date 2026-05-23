@@ -1,0 +1,85 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:conv="using:CNC.Controls.Avalonia.Converters"
+             xmlns:controls="using:CNC.Controls.Avalonia.Controls"
+             xmlns:local="using:CNC.Controls.Probing"
+             x:Class="CNC.Controls.Probing.CenterFinderControl"
+             Height="370" Width="625">
+  <UserControl.Resources>
+    <conv:LogicalNotConverter x:Key="IsNotRunningConverter"/>
+    <conv:BoolToVisibleConverter x:Key="ToVisibleConverter"/>
+    <conv:EnumValueToBooleanConverter x:Key="EnumToCenterConverter"/>
+    <ControlTheme x:Key="CenterRadioTheme" TargetType="RadioButton">
+      <Setter Property="Focusable" Value="False"/>
+      <Setter Property="BorderThickness" Value="0"/>
+      <Setter Property="Width" Value="120"/>
+      <Setter Property="Height" Value="120"/>
+      <Setter Property="Background" Value="Transparent"/>
+      <Setter Property="Opacity" Value="0.5"/>
+      <Style Selector="^:checked">
+        <Setter Property="Opacity" Value="1"/>
+      </Style>
+    </ControlTheme>
+  </UserControl.Resources>
+  <Grid>
+    <StackPanel Margin="5" Width="350" Spacing="4">
+      <StackPanel Orientation="Horizontal" Spacing="6">
+        <local:CsSelectControl/>
+        <Border BorderBrush="{DynamicResource ThemeBorderLowBrush}" BorderThickness="1" Padding="6" CornerRadius="2">
+          <StackPanel Spacing="4">
+            <TextBlock Text="Passes" FontWeight="SemiBold"
+                       ToolTip.Tip="More than one pass is usually needed to get accurate dimensions."/>
+            <Grid ColumnDefinitions="Auto,*">
+              <TextBlock Text="Passes:" VerticalAlignment="Center" Margin="0,0,6,0"/>
+              <controls:NumericTextBox Grid.Column="1" Value="{Binding Passes, Mode=TwoWay}" Format="0"/>
+            </Grid>
+          </StackPanel>
+        </Border>
+      </StackPanel>
+      <Border BorderBrush="{DynamicResource ThemeBorderLowBrush}" BorderThickness="1" Padding="6" CornerRadius="2">
+        <StackPanel Spacing="4">
+          <TextBlock Text="Workpiece dimensions" FontWeight="SemiBold"/>
+          <Grid ColumnDefinitions="Auto,*,Auto" RowDefinitions="Auto,Auto">
+            <TextBlock Grid.Row="0" Text="X size:" VerticalAlignment="Center" Margin="0,0,6,4"/>
+            <controls:NumericTextBox Grid.Row="0" Grid.Column="1" Value="{Binding WorkpieceSizeX, Mode=TwoWay}" Format="0.###" Margin="0,0,0,4"/>
+            <CheckBox Grid.RowSpan="2" Grid.Column="2" Content="Lock" VerticalAlignment="Center" Margin="8,0,0,0"
+                      IsChecked="{Binding WorkpiecLockXY, Mode=TwoWay}"
+                      ToolTip.Tip="Unlock and set X or Y size to 0 to probe in one direction only."/>
+            <TextBlock Grid.Row="1" Text="Y size:" VerticalAlignment="Center" Margin="0,0,6,0"/>
+            <controls:NumericTextBox Grid.Row="1" Grid.Column="1" Value="{Binding WorkpieceSizeY, Mode=TwoWay}" Format="0.###"/>
+          </Grid>
+        </StackPanel>
+      </Border>
+      <StackPanel Orientation="Horizontal" Spacing="5" ToolTip.Tip="Click to select probing action.">
+        <RadioButton Theme="{StaticResource CenterRadioTheme}" GroupName="center"
+                     IsChecked="{Binding ProbeCenter, Mode=TwoWay, Converter={StaticResource EnumToCenterConverter}, ConverterParameter=Inside}">
+          <Image Width="116" Height="116" Source="avares://CNC.Controls.Probing.Avalonia/Views/Resources/centerI.png"/>
+        </RadioButton>
+        <RadioButton Theme="{StaticResource CenterRadioTheme}" GroupName="center"
+                     IsChecked="{Binding ProbeCenter, Mode=TwoWay, Converter={StaticResource EnumToCenterConverter}, ConverterParameter=Outside}">
+          <Image Width="116" Height="116" Source="avares://CNC.Controls.Probing.Avalonia/Views/Resources/centerO.png"/>
+        </RadioButton>
+      </StackPanel>
+    </StackPanel>
+    <CheckBox Content="Preview" Margin="365,10,0,0" IsChecked="{Binding PreviewEnable, Mode=TwoWay}"/>
+    <Border Margin="365,30,0,0" BorderBrush="{DynamicResource ThemeBorderLowBrush}" BorderThickness="1" Padding="6" CornerRadius="2"
+            IsVisible="{Binding PreviewEnable, Converter={StaticResource ToVisibleConverter}}" VerticalAlignment="Top">
+      <StackPanel Spacing="4">
+        <TextBlock Text="Preview" FontWeight="SemiBold"/>
+        <TextBox IsReadOnly="True" Text="{Binding PreviewText, Mode=OneWay}" TextWrapping="NoWrap"
+                 Width="235" Height="300" FontSize="10" FontFamily="Verdana"
+                 ScrollViewer.VerticalScrollBarVisibility="Auto"
+                 ScrollViewer.HorizontalScrollBarVisibility="Auto"/>
+      </StackPanel>
+    </Border>
+    <StackPanel Margin="5,0,0,5" Orientation="Horizontal" HorizontalAlignment="Left" VerticalAlignment="Bottom" Spacing="4">
+      <Button Content="Start" Width="75"
+              IsEnabled="{Binding Grbl.IsJobRunning, Converter={StaticResource IsNotRunningConverter}}"
+              Click="OnStartClick"/>
+      <Button Content="Stop" Width="75"
+              IsEnabled="{Binding Grbl.IsJobRunning}"
+              Click="OnStopClick"/>
+      <Button Content="Use camera positions" IsEnabled="{Binding CanApplyTransform}" Click="OnCameraClick"/>
+    </StackPanel>
+  </Grid>
+</UserControl>

@@ -1,0 +1,57 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:conv="using:CNC.Controls.Avalonia.Converters"
+             xmlns:controls="using:CNC.Controls.Avalonia.Controls"
+             xmlns:views="using:CNC.Controls.Avalonia.Views"
+             x:Class="CNC.Controls.Avalonia.Views.DROBaseControl"
+             x:Name="Root"
+             HorizontalAlignment="Stretch"
+             VerticalAlignment="Stretch"
+             MinHeight="36">
+  <UserControl.Resources>
+    <conv:LogicalNotConverter x:Key="BooleanConverter"/>
+  </UserControl.Resources>
+  <Grid ColumnDefinitions="Auto,*,Auto" Margin="0,1">
+    <TextBlock x:Name="lblAxis" Grid.Column="0"
+               Text="{Binding Label, ElementName=Root}"
+               VerticalAlignment="Center" Margin="3,0,6,0" MinWidth="28"
+               FontSize="20" FontWeight="Bold" TextAlignment="Right"/>
+    <Border x:Name="readoutPanel" Grid.Column="1" Margin="0,0,3,0"
+            Background="{DynamicResource IoSenderDroReadoutBrush}"
+            BorderThickness="0" Padding="4,2"
+            VerticalAlignment="Stretch" HorizontalAlignment="Stretch">
+      <Grid RowDefinitions="*,*">
+        <Grid Grid.Row="0">
+          <Viewbox Stretch="Uniform" StretchDirection="DownOnly"
+                   HorizontalAlignment="Right" VerticalAlignment="Center">
+            <TextBlock x:Name="txtWorkDisplay" Text="XXX.XXX"
+                       FontSize="22" FontFamily="Consolas,Courier New,monospace"
+                       Foreground="#1A1A1A" Cursor="IBeam"
+                       TextAlignment="Right" Padding="0,0,2,0"/>
+          </Viewbox>
+          <controls:NumericTextBox x:Name="txtWork"
+                                   IsVisible="False"
+                                   Format="{Binding FormatSigned, RelativeSource={RelativeSource AncestorType=views:DROControl}}"
+                                   BorderThickness="0" Background="White"
+                                   Foreground="#1A1A1A"
+                                   FontSize="22"
+                                   VerticalAlignment="Stretch"
+                                   HorizontalAlignment="Stretch"
+                                   TextAlignment="Right" Padding="0,0,2,0"/>
+        </Grid>
+        <Viewbox Grid.Row="1" Stretch="Uniform" StretchDirection="DownOnly"
+                 HorizontalAlignment="Right" VerticalAlignment="Center" MaxHeight="24">
+          <TextBlock x:Name="txtMachineDisplay" Text="XXX.XXX"
+                     FontSize="14" FontFamily="Consolas,Courier New,monospace"
+                     Foreground="#1A1A1A" Opacity="0.75"
+                     TextAlignment="Right" Padding="0"/>
+        </Viewbox>
+      </Grid>
+    </Border>
+    <Button x:Name="btnZero" Grid.Column="2" Content="0"
+            MinWidth="36"
+            VerticalAlignment="Stretch" VerticalContentAlignment="Center"
+            IsEnabled="{Binding DataContext.IsJobRunning, RelativeSource={RelativeSource AncestorType=views:DROControl}, Converter={StaticResource BooleanConverter}}"
+            Focusable="False" Margin="0,0,2,0"/>
+  </Grid>
+</UserControl>

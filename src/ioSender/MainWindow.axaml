@@ -1,0 +1,163 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:vm="using:ioSender.ViewModels"
+        xmlns:views="using:ioSender.Views"
+        xmlns:cnc="using:CNC.Controls.Avalonia.Views"
+        xmlns:probing="using:CNC.Controls.Probing"
+        xmlns:config="using:CNC.Controls.Config"
+        xmlns:loc="using:CNC.Localization.Avalonia"
+        mc:Ignorable="d" d:DesignWidth="1020" d:DesignHeight="685"
+        x:Class="ioSender.MainWindow"
+        x:DataType="vm:MainWindowViewModel"
+        Title="ioSender"
+        MinWidth="1020" MinHeight="685"
+        Width="1020" Height="685"
+        Background="{DynamicResource ThemeBackgroundBrush}">
+
+  <DockPanel VerticalAlignment="Stretch" HorizontalAlignment="Stretch">
+    <Menu DockPanel.Dock="Top">
+      <MenuItem x:Name="MnuFile" Header="_File" loc:Localize.Key="ioSender.mainwindow.mnu_file">
+        <MenuItem x:Name="MnuFileOpen" Header="_Open G-code..." Click="OnOpenGCodeClick"
+                  loc:Localize.Key="ioSender.mainwindow.mnu_open"/>
+        <MenuItem x:Name="MnuTransform" Header="_Transform" IsEnabled="False"
+                  loc:Localize.Key="ioSender.mainwindow.mnu_transform" loc:Localize.Fallback="_Transform">
+          <MenuItem x:Name="MnuDragKnife" Header="Add drag knife moves" Click="OnDragKnifeTransformClick"
+                    loc:Localize.Key="ioSender.mainwindow.str_mnuDragKnife" loc:Localize.Fallback="Add drag knife moves"/>
+        </MenuItem>
+        <Separator/>
+        <MenuItem x:Name="MnuFileConnect" Header="_Connect..." Click="OnConnectClick"
+                  loc:Localize.Key="ioSender.mainwindow.mnu_connect" loc:Localize.Fallback="_Connect..."/>
+        <MenuItem x:Name="MnuFileExit" Header="_Exit" Click="OnExitClick"
+                  loc:Localize.Key="ioSender.mainwindow.mnu_exit"/>
+      </MenuItem>
+      <MenuItem x:Name="MnuView" Header="_View"
+                loc:Localize.Key="ioSender.mainwindow.mnu_view" loc:Localize.Fallback="_View">
+        <MenuItem x:Name="MnuCustomizeLayout" Header="_Customize layout" ToggleType="CheckBox"
+                  Click="OnCustomizeLayoutClick"
+                  loc:Localize.Key="ioSender.mainwindow.mnu_customizeLayout" loc:Localize.Fallback="_Customize layout"/>
+        <MenuItem x:Name="MnuResetLayout" Header="_Reset layout" Click="OnResetLayoutClick"
+                  loc:Localize.Key="ioSender.mainwindow.mnu_resetLayout" loc:Localize.Fallback="_Reset layout"/>
+        <MenuItem x:Name="MnuLayoutPreset" Header="Layout _preset"
+                  loc:Localize.Key="ioSender.mainwindow.mnu_layoutPreset" loc:Localize.Fallback="Layout _preset">
+          <MenuItem x:Name="MnuPresetCompact" Header="_Compact" Click="OnPresetCompactClick"
+                    loc:Localize.Key="ioSender.mainwindow.mnu_presetCompact" loc:Localize.Fallback="_Compact"/>
+          <MenuItem x:Name="MnuPresetExpanded" Header="_Expanded" Click="OnPresetExpandedClick"
+                    loc:Localize.Key="ioSender.mainwindow.mnu_presetExpanded" loc:Localize.Fallback="_Expanded"/>
+        </MenuItem>
+        <Separator/>
+        <MenuItem x:Name="MnuViewCamera" Header="_Camera..." Click="OnCameraClick"
+                  loc:Localize.Key="ioSender.mainwindow.mnu_camera"/>
+        <MenuItem x:Name="MnuRefreshPorts" Header="_Refresh serial ports" Click="OnRefreshPortsClick"
+                  loc:Localize.Key="ioSender.mainwindow.mnu_refreshPorts" loc:Localize.Fallback="_Refresh serial ports"/>
+      </MenuItem>
+      <MenuItem x:Name="MnuSettings" Header="_Settings"
+                loc:Localize.Key="ioSender.mainwindow.mnu_settings" loc:Localize.Fallback="_Settings">
+        <MenuItem x:Name="MnuGrblSettings" Header="Settings: _Grbl" Click="OnGrblSettingsClick"
+                  loc:Localize.Key="ioSender.mainwindow.mnu_grblSettings" loc:Localize.Fallback="Settings: _Grbl"/>
+        <MenuItem x:Name="MnuAppSettings" Header="Settings: _App" Click="OnAppSettingsClick"
+                  loc:Localize.Key="ioSender.mainwindow.mnu_appSettings" loc:Localize.Fallback="Settings: _App"/>
+      </MenuItem>
+    </Menu>
+
+    <Border DockPanel.Dock="Bottom" Padding="6,4"
+            Background="{DynamicResource ThemeControlLowBrush}"
+            BorderBrush="{DynamicResource ThemeBorderLowBrush}"
+            BorderThickness="0,1,0,0">
+      <Grid ColumnDefinitions="Auto,8,*,8,Auto,8,Auto">
+        <TextBlock Grid.Column="0" Text="{Binding Grbl.Blocks, StringFormat='Blocks: {0}'}"/>
+        <TextBlock Grid.Column="2" Text="{Binding Grbl.Message}" TextWrapping="NoWrap"/>
+        <TextBlock Grid.Column="4" Text="{Binding Grbl.RunTime, StringFormat='Run time: {0}'}"/>
+        <TextBlock Grid.Column="6" Text="{Binding Grbl.JogStep, StringFormat='Jog step: {0}'}"/>
+      </Grid>
+    </Border>
+
+    <Grid RowDefinitions="Auto,*">
+      <Grid Grid.Row="0" ColumnDefinitions="Auto,*"
+            Background="{DynamicResource ThemeControlLowBrush}">
+        <StackPanel Grid.Column="0" Orientation="Horizontal" Spacing="4" Margin="4,3,6,3"
+                    VerticalAlignment="Center">
+          <Button x:Name="BtnOpenProgram" Width="30" Height="28" Padding="5"
+                  ToolTip.Tip="Open program" Click="OnOpenGCodeClick">
+            <Viewbox Width="16" Height="16">
+              <Canvas Width="24" Height="24">
+                <Path Fill="{DynamicResource ThemeForegroundBrush}"
+                      Data="M3,6 L9,6 L11,8 L21,8 L21,19 L3,19 Z M5,10 L5,17 L19,17 L19,10 Z"/>
+              </Canvas>
+            </Viewbox>
+          </Button>
+          <Button x:Name="BtnReloadProgram" Width="30" Height="28" Padding="5"
+                  ToolTip.Tip="Reload current program" Click="OnReloadProgramClick">
+            <Viewbox Width="16" Height="16">
+              <Canvas Width="24" Height="24">
+                <Path Fill="{DynamicResource ThemeForegroundBrush}"
+                      Data="M12,4 C8.8,4 6.1,5.8 4.7,8.4 L7,8.4 L7,10.4 L1.8,10.4 L1.8,5.2 L3.8,5.2 L3.8,6.8 C5.6,3.9 8.6,2 12,2 C16.8,2 20.8,5.4 21.8,9.9 L19.8,9.9 C18.9,6.5 15.8,4 12,4 Z M22.2,13.6 L22.2,18.8 L20.2,18.8 L20.2,17.2 C18.4,20.1 15.4,22 12,22 C7.2,22 3.2,18.6 2.2,14.1 L4.2,14.1 C5.1,17.5 8.2,20 12,20 C15.2,20 17.9,18.2 19.3,15.6 L17,15.6 L17,13.6 Z"/>
+              </Canvas>
+            </Viewbox>
+          </Button>
+          <Button x:Name="BtnCloseProgram" Width="30" Height="28" Padding="6"
+                  ToolTip.Tip="Close current program" Click="OnCloseProgramClick">
+            <Viewbox Width="14" Height="14">
+              <Canvas Width="24" Height="24">
+                <Path Fill="{DynamicResource ThemeForegroundBrush}"
+                      Data="M5.6,4.2 L12,10.6 L18.4,4.2 L19.8,5.6 L13.4,12 L19.8,18.4 L18.4,19.8 L12,13.4 L5.6,19.8 L4.2,18.4 L10.6,12 L4.2,5.6 Z"/>
+              </Canvas>
+            </Viewbox>
+          </Button>
+          <Button x:Name="BtnServerStatus" Width="30" Height="28" Padding="6"
+                  ToolTip.Tip="Connect" Click="OnServerStatusClick">
+            <Viewbox Width="14" Height="14">
+              <Canvas Width="24" Height="24">
+                <Path Fill="{DynamicResource ThemeForegroundBrush}"
+                      Data="M12,3 C16.9,3 21,7.1 21,12 C21,16.9 16.9,21 12,21 C7.1,21 3,16.9 3,12 C3,7.1 7.1,3 12,3 Z M12,5 C8.2,5 5,8.2 5,12 C5,15.8 8.2,19 12,19 C15.8,19 19,15.8 19,12 C19,8.2 15.8,5 12,5 Z M11,7 L13,7 L13,13 L11,13 Z M11,15 L13,15 L13,17 L11,17 Z"/>
+              </Canvas>
+            </Viewbox>
+          </Button>
+        </StackPanel>
+
+        <TabControl x:Name="ShellTabs" Grid.Column="1" Background="Transparent"
+                    SelectionChanged="OnShellTabsSelectionChanged">
+          <TabItem x:Name="TabHome" Header="Home"
+                   loc:Localize.Key="ioSender.mainwindow.tab_home" loc:Localize.Fallback="Home">
+            <Grid/>
+          </TabItem>
+          <TabItem x:Name="TabProbing" Header="Probing"
+                   loc:Localize.Key="ioSender.mainwindow.tab_probing" loc:Localize.Fallback="Probing">
+            <Grid/>
+          </TabItem>
+          <TabItem x:Name="TabOffsets" Header="Offsets"
+                   loc:Localize.Key="ioSender.mainwindow.tab_offsets" loc:Localize.Fallback="Offsets">
+            <Grid/>
+          </TabItem>
+        </TabControl>
+      </Grid>
+
+      <Grid Grid.Row="1">
+        <views:JobView x:Name="JobViewControl"
+                       DataContext="{Binding Grbl}"
+                       HorizontalAlignment="Stretch"
+                       VerticalAlignment="Stretch"/>
+        <probing:ProbingView x:Name="ProbingViewControl"
+                             IsVisible="False"
+                             DataContext="{Binding Grbl}"
+                             HorizontalAlignment="Stretch"
+                             VerticalAlignment="Stretch"/>
+        <cnc:OffsetView x:Name="OffsetsViewControl"
+                        IsVisible="False"
+                        DataContext="{Binding Grbl}"
+                        HorizontalAlignment="Stretch"
+                        VerticalAlignment="Stretch"/>
+        <config:GrblConfigView x:Name="GrblConfigViewControl"
+                               IsVisible="False"
+                               DataContext="{Binding Grbl}"
+                               HorizontalAlignment="Stretch"
+                               VerticalAlignment="Stretch"/>
+        <config:AppConfigView x:Name="AppConfigViewControl"
+                              IsVisible="False"
+                              HorizontalAlignment="Stretch"
+                              VerticalAlignment="Stretch"/>
+      </Grid>
+    </Grid>
+  </DockPanel>
+</Window>

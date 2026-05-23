@@ -1,0 +1,94 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             x:Class="CNC.Controls.Avalonia.Views.MDITouchControl"
+             MinWidth="360"
+             MinHeight="250"
+             HorizontalAlignment="Stretch"
+             VerticalAlignment="Stretch">
+
+  <UserControl.Styles>
+    <Style Selector="Button.mdi-key">
+      <Setter Property="Background" Value="{DynamicResource ThemeControlHighBrush}"/>
+      <Setter Property="Foreground" Value="{DynamicResource ThemeForegroundBrush}"/>
+      <Setter Property="BorderBrush" Value="{DynamicResource ThemeBorderMidBrush}"/>
+      <Setter Property="BorderThickness" Value="1"/>
+      <Setter Property="CornerRadius" Value="3"/>
+      <Setter Property="MinWidth" Value="0"/>
+      <Setter Property="MinHeight" Value="0"/>
+      <Setter Property="HorizontalAlignment" Value="Stretch"/>
+      <Setter Property="VerticalAlignment" Value="Stretch"/>
+      <Setter Property="FontSize" Value="18"/>
+      <Setter Property="FontWeight" Value="SemiBold"/>
+      <Setter Property="HorizontalContentAlignment" Value="Center"/>
+      <Setter Property="VerticalContentAlignment" Value="Center"/>
+      <Setter Property="Focusable" Value="False"/>
+    </Style>
+    <Style Selector="Button.mdi-command-key">
+      <Setter Property="FontSize" Value="16"/>
+    </Style>
+    <Style Selector="Button.mdi-history-button">
+      <Setter Property="Background" Value="Transparent"/>
+      <Setter Property="BorderThickness" Value="0"/>
+      <Setter Property="Padding" Value="0"/>
+      <Setter Property="Focusable" Value="False"/>
+      <Setter Property="HorizontalContentAlignment" Value="Center"/>
+      <Setter Property="VerticalContentAlignment" Value="Center"/>
+    </Style>
+  </UserControl.Styles>
+
+  <Grid Margin="4" RowDefinitions="44,*,*,*,*" ColumnDefinitions="*,*,*,*,*,*"
+        HorizontalAlignment="Stretch" VerticalAlignment="Stretch">
+    <Grid Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="5" Margin="0,0,6,6">
+      <TextBox x:Name="MdiText"
+               Text="{Binding Command, RelativeSource={RelativeSource AncestorType=UserControl}, Mode=TwoWay}"
+               HorizontalAlignment="Stretch" VerticalAlignment="Stretch"
+               VerticalContentAlignment="Center"
+               Padding="8,0,34,0"
+               FontSize="18"
+               KeyDown="OnMdiKeyDown"/>
+      <Button x:Name="BtnHistory" Classes="mdi-history-button"
+              Width="28"
+              HorizontalAlignment="Right" VerticalAlignment="Stretch"
+              Click="OnHistoryClick">
+        <Path Data="M7,9 L12,14 L17,9 Z"
+              Fill="{DynamicResource ThemeForegroundBrush}"
+              Width="12" Height="8"
+              Stretch="Uniform"/>
+      </Button>
+    </Grid>
+
+    <Button x:Name="BtnSend" Grid.Row="0" Grid.Column="5" Content="Send"
+            HorizontalAlignment="Stretch" VerticalAlignment="Stretch"
+            Margin="0,0,0,6"
+            FontSize="16" FontWeight="SemiBold"
+            Click="OnSendClick"/>
+
+    <Button Grid.Row="1" Grid.Column="0" Classes="mdi-key" Content="7" Margin="0,0,2,2" Click="OnKeyClick"/>
+    <Button Grid.Row="1" Grid.Column="1" Classes="mdi-key" Content="8" Margin="2,0,2,2" Click="OnKeyClick"/>
+    <Button Grid.Row="1" Grid.Column="2" Classes="mdi-key" Content="9" Margin="2,0,2,2" Click="OnKeyClick"/>
+    <Button Grid.Row="1" Grid.Column="3" Classes="mdi-key" Content="+" Margin="2,0,2,2" Click="OnKeyClick"/>
+    <Button Grid.Row="1" Grid.Column="4" Classes="mdi-key mdi-command-key" Content="G" Margin="2,0,2,2" Click="OnKeyClick"/>
+    <Button Grid.Row="1" Grid.Column="5" Classes="mdi-key mdi-command-key" Content="M" Margin="2,0,0,2" Click="OnKeyClick"/>
+
+    <Button Grid.Row="2" Grid.Column="0" Classes="mdi-key" Content="4" Margin="0,2,2,2" Click="OnKeyClick"/>
+    <Button Grid.Row="2" Grid.Column="1" Classes="mdi-key" Content="5" Margin="2,2,2,2" Click="OnKeyClick"/>
+    <Button Grid.Row="2" Grid.Column="2" Classes="mdi-key" Content="6" Margin="2,2,2,2" Click="OnKeyClick"/>
+    <Button Grid.Row="2" Grid.Column="3" Classes="mdi-key" Content="-" Margin="2,2,2,2" Click="OnKeyClick"/>
+    <Button Grid.Row="2" Grid.Column="4" Classes="mdi-key mdi-command-key" Content="X" Margin="2,2,2,2" Click="OnKeyClick"/>
+    <Button Grid.Row="2" Grid.Column="5" Classes="mdi-key mdi-command-key" Content="T" Margin="2,2,0,2" Click="OnKeyClick"/>
+
+    <Button Grid.Row="3" Grid.Column="0" Classes="mdi-key" Content="1" Margin="0,2,2,2" Click="OnKeyClick"/>
+    <Button Grid.Row="3" Grid.Column="1" Classes="mdi-key" Content="2" Margin="2,2,2,2" Click="OnKeyClick"/>
+    <Button Grid.Row="3" Grid.Column="2" Classes="mdi-key" Content="3" Margin="2,2,2,2" Click="OnKeyClick"/>
+    <Button Grid.Row="3" Grid.Column="3" Classes="mdi-key mdi-command-key" Content="Enter" FontSize="10" Margin="2,2,2,2" Click="OnEnterClick"/>
+    <Button Grid.Row="3" Grid.Column="4" Classes="mdi-key mdi-command-key" Content="Y" Margin="2,2,2,2" Click="OnKeyClick"/>
+    <Button Grid.Row="3" Grid.Column="5" Classes="mdi-key mdi-command-key" Content="H" Margin="2,2,0,2" Click="OnKeyClick"/>
+
+    <Button Grid.Row="4" Grid.Column="0" Classes="mdi-key" Content="." Margin="0,2,2,0" Click="OnKeyClick"/>
+    <Button Grid.Row="4" Grid.Column="1" Classes="mdi-key" Content="0" Margin="2,2,2,0" Click="OnKeyClick"/>
+    <Button Grid.Row="4" Grid.Column="2" Classes="mdi-key mdi-command-key" Content="Space" FontSize="10" Margin="2,2,2,0" Click="OnSpaceClick"/>
+    <Button Grid.Row="4" Grid.Column="3" Classes="mdi-key mdi-command-key" Content="Delete" FontSize="10" Margin="2,2,2,0" Click="OnDeleteClick"/>
+    <Button Grid.Row="4" Grid.Column="4" Classes="mdi-key mdi-command-key" Content="Z" Margin="2,2,2,0" Click="OnKeyClick"/>
+    <Button Grid.Row="4" Grid.Column="5" Classes="mdi-key mdi-command-key" Content="$" Margin="2,2,0,0" Click="OnKeyClick"/>
+  </Grid>
+</UserControl>

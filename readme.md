@@ -2,6 +2,32 @@
 
 ---
 
+### .NET 8 / Avalonia (`src/`)
+
+Cross-platform rewrite under `src/ioSender.net.sln`.
+
+**Prerequisites:** [.NET 8 SDK](https://dotnet.microsoft.com/download/dotnet/8.0)
+
+```bash
+# Restore and build
+dotnet restore src/ioSender.net.sln
+dotnet build src/ioSender.net.sln -c Release
+
+# Run ioSender (from repo root)
+dotnet run --project src/ioSender/ioSender.csproj
+
+# Run standalone Grbl config host
+dotnet run --project src/GrblConfigApp/GrblConfigApp.csproj
+
+# Publish
+./scripts/publish-linux.sh          # linux-x64 → artifacts/publish/linux-x64
+pwsh ./scripts/publish-windows.ps1  # win-x64   → artifacts/publish/win-x64
+```
+
+On Windows, `ioSender` and `GrblConfigApp` use the platform-specific `CNC.Platform.Windows` project; on Linux, `CNC.Platform.Linux` is referenced instead.
+
+---
+
 Please check out the [Wiki](https://github.com/terjeio/Grbl-GCode-Sender/wiki) for further details.
 
 8-bit Arduino controllers needs _Toggle DTR_ selected in order to reset the controller on connect. Behaviour may be erratic if not set.

@@ -1,0 +1,53 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:loc="using:CNC.Localization.Avalonia"
+             xmlns:core="using:CNC.Core"
+             mc:Ignorable="d" d:DesignWidth="400" d:DesignHeight="335"
+             x:Class="CNC.Controls.Avalonia.Views.GCodeListControl"
+             x:Name="root"
+             x:DataType="core:GrblViewModel"
+             MinWidth="200"
+             MinHeight="120"
+             HorizontalAlignment="Stretch"
+             VerticalAlignment="Stretch">
+
+  <DataGrid x:Name="GCodeGrid"
+            Classes="gcode-program-grid"
+            HorizontalAlignment="Stretch"
+            VerticalAlignment="Stretch"
+            AutoGenerateColumns="False"
+            CanUserReorderColumns="False"
+            CanUserResizeColumns="True"
+            CanUserSortColumns="False"
+            IsReadOnly="True"
+            SelectionMode="Extended"
+            SelectionChanged="OnSelectionChanged"
+            LoadingRow="OnLoadingRow"
+            UnloadingRow="OnUnloadingRow">
+    <DataGrid.Columns>
+      <DataGridTextColumn Header="Block" Binding="{Binding Row}" Width="48"
+                          loc:Localize.Key="CNC.Controls.WPF.gcodelistcontrol.hdr_block" loc:Localize.Fallback="Block"/>
+      <DataGridTextColumn Header="Sts" Binding="{Binding Sent}" Width="48"/>
+      <DataGridTextColumn Header="Data" Binding="{Binding DisplayData}" Width="*"
+                          loc:Localize.Key="CNC.Controls.WPF.gcodelistcontrol.hdr_data" loc:Localize.Fallback="Data"/>
+    </DataGrid.Columns>
+    <DataGrid.ContextMenu>
+      <ContextMenu>
+        <MenuItem x:Name="MnuSendToController" Header="Send to controller" IsEnabled="{Binding MultipleSelected}"
+                  loc:Localize.Key="CNC.Controls.WPF.gcodelistcontrol.mnu_sendToController" loc:Localize.Fallback="Send to controller"
+                  Click="OnSendControllerClick"/>
+        <MenuItem x:Name="MnuStartFromHere" Header="Start from here" IsEnabled="{Binding SingleSelected}"
+                  loc:Localize.Key="CNC.Controls.WPF.gcodelistcontrol.mnu_startFromHere" loc:Localize.Fallback="Start from here"
+                  Click="OnStartHereClick"/>
+        <MenuItem x:Name="MnuCopyToMdi" Header="Copy to MDI" IsEnabled="{Binding SingleSelected}"
+                  loc:Localize.Key="CNC.Controls.WPF.gcodelistcontrol.mnu_copyToMDI" loc:Localize.Fallback="Copy to MDI"
+                  Click="OnCopyMdiClick"/>
+        <MenuItem x:Name="MnuToggleBreak" Header="Toggle Break" IsEnabled="{Binding SingleSelected}"
+                  loc:Localize.Key="CNC.Controls.WPF.gcodelistcontrol.mnu_ToggleBreak" loc:Localize.Fallback="Toggle Break"
+                  Click="OnToggleBreakClick"/>
+      </ContextMenu>
+    </DataGrid.ContextMenu>
+  </DataGrid>
+</UserControl>

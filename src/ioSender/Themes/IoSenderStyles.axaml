@@ -1,0 +1,47 @@
+<Styles xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+
+  <Styles.Resources>
+    <SolidColorBrush x:Key="IoSenderWarningBrush" Color="#EF5350"/>
+    <SolidColorBrush x:Key="IoSenderConnectedBrush" Color="#66BB6A"/>
+    <SolidColorBrush x:Key="IoSenderDisconnectedBrush" Color="#FFB74D"/>
+  </Styles.Resources>
+
+  <Style Selector="Border.panel-chrome">
+    <Setter Property="BorderBrush" Value="{DynamicResource ThemeBorderLowBrush}"/>
+    <Setter Property="BorderThickness" Value="1"/>
+    <Setter Property="Padding" Value="4"/>
+    <Setter Property="CornerRadius" Value="2"/>
+  </Style>
+
+  <Style Selector="TextBlock.warning-text">
+    <Setter Property="Foreground" Value="{StaticResource IoSenderWarningBrush}"/>
+    <Setter Property="FontWeight" Value="SemiBold"/>
+  </Style>
+
+  <Style Selector="TextBlock.status-connected">
+    <Setter Property="Foreground" Value="{StaticResource IoSenderConnectedBrush}"/>
+  </Style>
+
+  <Style Selector="TextBlock.status-disconnected">
+    <Setter Property="Foreground" Value="{StaticResource IoSenderDisconnectedBrush}"/>
+  </Style>
+
+  <Style Selector="Border.workspace-region-edit">
+    <Setter Property="BorderBrush" Value="{DynamicResource ThemeAccentBrush}"/>
+  </Style>
+
+  <Style Selector="Border.workspace-drop-target">
+    <Setter Property="BorderBrush" Value="{DynamicResource ThemeAccentBrushHigh}"/>
+    <Setter Property="BorderThickness" Value="2"/>
+  </Style>
+
+  <Style Selector="GridSplitter.workspace-splitter">
+    <Setter Property="Background" Value="{DynamicResource ThemeBorderLowBrush}"/>
+  </Style>
+
+  <Style Selector="GridSplitter.workspace-splitter:pointerover">
+    <Setter Property="Background" Value="{DynamicResource ThemeBorderMidBrush}"/>
+  </Style>
+
+</Styles>

@@ -1,0 +1,24 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:controls="using:CNC.Controls.Avalonia.Controls"
+             x:Class="CNC.Controls.Lathe.CssControl">
+  <Grid ColumnDefinitions="Auto,Auto,Auto">
+    <CheckBox x:Name="ChkCss" Grid.Column="0" Content="CSS (Constant Surface Speed)"
+              IsChecked="{Binding IsCssEnabled, RelativeSource={RelativeSource AncestorType=UserControl}}"/>
+    <StackPanel Grid.Column="1" Orientation="Horizontal" Spacing="4">
+      <TextBlock x:Name="SpeedLabel" Text="Spindle:" VerticalAlignment="Center"/>
+      <controls:NumericTextBox x:Name="SpeedBox" Width="72" Format="###0"
+                               Value="{Binding Speed, RelativeSource={RelativeSource AncestorType=UserControl}, Mode=TwoWay}"/>
+      <TextBlock x:Name="SpeedUnit" Text="RPM" VerticalAlignment="Center"/>
+    </StackPanel>
+    <ComboBox Grid.Column="2" x:Name="SpindleDirCombo" Width="60" Height="22"
+              ItemsSource="{Binding SpindleDirections, RelativeSource={RelativeSource AncestorType=UserControl}}"
+              SelectedItem="{Binding SpindleDirection, RelativeSource={RelativeSource AncestorType=UserControl}, Mode=TwoWay}">
+      <ComboBox.ItemTemplate>
+        <DataTemplate>
+          <TextBlock Text="{Binding Name}"/>
+        </DataTemplate>
+      </ComboBox.ItemTemplate>
+    </ComboBox>
+  </Grid>
+</UserControl>

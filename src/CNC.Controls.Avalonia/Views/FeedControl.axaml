@@ -1,0 +1,99 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:controls="using:CNC.Controls.Avalonia.Controls"
+             xmlns:primitives="using:Avalonia.Controls.Primitives"
+             xmlns:conv="using:CNC.Controls.Avalonia.Converters"
+             xmlns:loc="using:CNC.Localization.Avalonia"
+             xmlns:core="using:CNC.Core"
+             x:Class="CNC.Controls.Avalonia.Views.FeedControl"
+             x:DataType="core:GrblViewModel"
+             MinWidth="220"
+             MinHeight="200"
+             HorizontalAlignment="Stretch"
+             VerticalAlignment="Stretch">
+
+  <UserControl.Resources>
+    <ResourceDictionary>
+      <ResourceDictionary.MergedDictionaries>
+        <ResourceInclude Source="avares://CNC.Controls.Avalonia/Themes/Controls.axaml"/>
+      </ResourceDictionary.MergedDictionaries>
+      <conv:LogicalNotConverter x:Key="LogicalNotConverter"/>
+    </ResourceDictionary>
+  </UserControl.Resources>
+
+  <Grid Margin="4" RowDefinitions="Auto,Auto,Auto,Auto,Auto,Auto"
+        HorizontalAlignment="Stretch" VerticalAlignment="Stretch">
+
+    <!-- Feed rate -->
+    <Grid Grid.Row="0" ColumnDefinitions="Auto,*,Auto" VerticalAlignment="Center">
+      <TextBlock x:Name="LblFeedRate" Grid.Column="0" Text="Feed Rate:" VerticalAlignment="Center" Margin="0,0,4,0"
+                 Foreground="{DynamicResource ThemeForegroundBrush}"
+                 loc:Localize.Key="CNC.Controls.WPF.feedcontrol.lbl_feedrate" loc:Localize.Fallback="Feed Rate:"/>
+      <Border Grid.Column="1" MinHeight="26" HorizontalAlignment="Stretch" VerticalAlignment="Center"
+              Background="{DynamicResource ThemeControlLowBrush}"
+              BorderBrush="{DynamicResource ThemeBorderMidBrush}"
+              BorderThickness="1" CornerRadius="2" Padding="2,0">
+        <TextBox x:Name="cvFeedRate"
+                 HorizontalAlignment="Stretch" VerticalAlignment="Stretch"
+                 HorizontalContentAlignment="Center" VerticalContentAlignment="Center"
+                 Background="Transparent" BorderThickness="0" Padding="2,0"
+                 Foreground="{DynamicResource ThemeForegroundBrush}"
+                 TextAlignment="Center"
+                 Text="{Binding FeedRate, Mode=OneWay, StringFormat='{}{0:####0}'}"
+                 IsReadOnly="True" Focusable="False"/>
+      </Border>
+      <TextBlock Grid.Column="2" VerticalAlignment="Center" Margin="4,0,0,0"
+                 Foreground="{DynamicResource ThemeForegroundBrush}" FontSize="11">
+        <TextBlock.Text>
+          <MultiBinding StringFormat="{}{0} % {1:0}">
+            <Binding Path="FeedrateUnit"/>
+            <Binding Path="FeedOverride"/>
+          </MultiBinding>
+        </TextBlock.Text>
+      </TextBlock>
+    </Grid>
+
+    <Grid Grid.Row="1" ColumnDefinitions="*,*,*" Margin="0,4,0,0"
+          IsEnabled="{Binding FeedOverrideDisabled, Converter={StaticResource LogicalNotConverter}}">
+      <Button x:Name="BtnFeedOvrPlus" Grid.Column="0" Classes="spindle-action" Content="+"
+              HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Margin="0,0,2,0" Click="BtnFeedOvrPlus_Click"/>
+      <Button x:Name="BtnFeedOvrMinus" Grid.Column="1" Classes="spindle-action" Content="−"
+              HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Margin="2,0,2,0" Click="BtnFeedOvrMinus_Click"/>
+      <Button x:Name="BtnFeedOvrReset" Grid.Column="2" Classes="spindle-action" Content="↺"
+              HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Margin="2,0,0,0" Click="BtnFeedOvrReset_Click"/>
+    </Grid>
+
+    <Grid Grid.Row="2" ColumnDefinitions="*,*,*" VerticalAlignment="Center" Margin="0,4,0,0"
+          IsEnabled="{Binding FeedOverrideDisabled, Converter={StaticResource LogicalNotConverter}}">
+      <primitives:ToggleButton x:Name="RbFeedStepFine" Grid.Column="0" Classes="jog-option" Content="X1"
+                   HorizontalAlignment="Stretch" Margin="0,0,2,0" IsChecked="True"
+                   Click="FeedOvrStep_Click"/>
+      <primitives:ToggleButton x:Name="RbFeedStepCoarse" Grid.Column="1" Classes="jog-option" Content="X10"
+                   HorizontalAlignment="Stretch" Margin="2,0,2,0"
+                   Click="FeedOvrStep_Click"/>
+      <TextBlock Grid.Column="2" VerticalAlignment="Center" HorizontalAlignment="Right" Margin="2,0,0,0"
+                 Foreground="{DynamicResource ThemeForegroundBrush}" FontSize="11"
+                 Text="{Binding FeedOverride, StringFormat='Feed % {0:0}'}"/>
+    </Grid>
+
+    <!-- Rapids -->
+    <StackPanel Grid.Row="4" Orientation="Horizontal" Spacing="4" Margin="0,4,0,0">
+      <TextBlock x:Name="LblRapids" VerticalAlignment="Center"
+                 Foreground="{DynamicResource ThemeForegroundBrush}"
+                 loc:Localize.Key="CNC.Controls.WPF.feedcontrol.lbl_rapids" loc:Localize.Fallback="Rapids:"
+                 Text="Rapids:"/>
+      <TextBlock VerticalAlignment="Center"
+                 Foreground="{DynamicResource ThemeForegroundBrush}"
+                 Text="{Binding RapidsOverride, StringFormat='%{0:0}'}"/>
+    </StackPanel>
+
+    <Grid Grid.Row="5" ColumnDefinitions="*,*,*" Margin="0,4,0,0">
+      <Button x:Name="BtnRapidOvrPlus" Grid.Column="0" Classes="spindle-action" Content="+"
+              HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Margin="0,0,2,0" Click="BtnRapidOvrPlus_Click"/>
+      <Button x:Name="BtnRapidOvrMinus" Grid.Column="1" Classes="spindle-action" Content="−"
+              HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Margin="2,0,2,0" Click="BtnRapidOvrMinus_Click"/>
+      <Button x:Name="BtnRapidOvrReset" Grid.Column="2" Classes="spindle-action" Content="↺"
+              HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Margin="2,0,0,0" Click="BtnRapidOvrReset_Click"/>
+    </Grid>
+  </Grid>
+</UserControl>

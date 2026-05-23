@@ -1,0 +1,109 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:core="using:CNC.Core"
+             xmlns:cnc="using:CNC.Controls.Avalonia.Views"
+             xmlns:conv="using:CNC.Controls.Config"
+             mc:Ignorable="d"
+             d:DesignHeight="480" d:DesignWidth="980"
+             x:Class="CNC.Controls.Config.StepperCalibrationControl"
+             x:Name="root"
+             Loaded="OnLoaded">
+
+  <UserControl.Resources>
+    <conv:GrblStateToBooleanConverter x:Key="StateToBooleanConverter"/>
+    <conv:PositionToStringConverter x:Key="PositionConverter"/>
+    <conv:LogicalNotConverter x:Key="BooleanConverter"/>
+  </UserControl.Resources>
+
+  <Grid VerticalAlignment="Stretch">
+    <Grid.RowDefinitions>
+      <RowDefinition Height="*"/>
+      <RowDefinition Height="Auto"/>
+      <RowDefinition Height="Auto"/>
+    </Grid.RowDefinitions>
+    <Grid.ColumnDefinitions>
+      <ColumnDefinition Width="360"/>
+      <ColumnDefinition Width="*"/>
+    </Grid.ColumnDefinitions>
+
+    <StackPanel Grid.ColumnSpan="2" Orientation="Vertical" Margin="0,5,0,0" Width="360" HorizontalAlignment="Left">
+      <StackPanel Orientation="Horizontal" Spacing="4">
+        <TextBlock Text="Axis:" Width="70" HorizontalAlignment="Right" VerticalAlignment="Center"/>
+        <ComboBox x:Name="cbxAxis" Width="60" Height="22" Margin="0,2"
+                  ItemsSource="{Binding Axes}">
+          <ComboBox.IsEnabled>
+            <MultiBinding Converter="{StaticResource StateToBooleanConverter}">
+              <Binding Path="GrblState"/>
+              <Binding Source="{x:Static core:GrblStates.Idle}"/>
+            </MultiBinding>
+          </ComboBox.IsEnabled>
+        </ComboBox>
+      </StackPanel>
+
+      <StackPanel Orientation="Horizontal">
+        <cnc:NumericField Label="Distance:" Width="220"
+                          Value="{Binding #root.Distance, Mode=TwoWay}"
+                          Unit="{Binding #root.DistanceUnit}"/>
+        <Button Content="Go-" Tag="-" Margin="3,0" Width="50" Height="22" Click="OnButtonClick"
+                ToolTip.Tip="Press to move in the negative direction.">
+          <Button.IsEnabled>
+            <MultiBinding Converter="{StaticResource StateToBooleanConverter}">
+              <Binding Path="GrblState"/>
+              <Binding Source="{x:Static core:GrblStates.Idle}"/>
+            </MultiBinding>
+          </Button.IsEnabled>
+        </Button>
+        <Button Content="Go+" Tag="+" Margin="3,0" Width="50" Height="22" Click="OnButtonClick"
+                ToolTip.Tip="Press to move in the positive direction.">
+          <Button.IsEnabled>
+            <MultiBinding Converter="{StaticResource StateToBooleanConverter}">
+              <Binding Path="GrblState"/>
+              <Binding Source="{x:Static core:GrblStates.Idle}"/>
+            </MultiBinding>
+          </Button.IsEnabled>
+        </Button>
+      </StackPanel>
+
+      <cnc:NumericField Label="Measured:" Width="220"
+                        IsReadOnly="{Binding #root.CanUpdate, Converter={StaticResource BooleanConverter}}"
+                        Value="{Binding #root.ActualDistance, Mode=TwoWay}"
+                        Unit="{Binding #root.DistanceUnit}"/>
+
+      <StackPanel Orientation="Horizontal">
+        <cnc:NumericField Label="Resolution:" Width="220" IsReadOnly="True" Format="###0.000###"
+                          Value="{Binding #root.Resolution}"
+                          Unit="{Binding #root.ResolutionUnit}"/>
+        <Button Content="Save" Tag="save" Margin="3,0" Width="50" Height="22" Click="OnButtonClick"
+                IsEnabled="{Binding #root.CanUpdate}"/>
+      </StackPanel>
+
+      <Button Tag="stop" Content="Stop" HorizontalAlignment="Right" Margin="0,5,60,0" Width="75" Click="OnButtonClick">
+        <Button.IsEnabled>
+          <MultiBinding Converter="{StaticResource StateToBooleanConverter}">
+            <Binding Path="GrblState"/>
+            <Binding Source="{x:Static core:GrblStates.Run}"/>
+          </MultiBinding>
+        </Button.IsEnabled>
+      </Button>
+
+      <TextBlock x:Name="txtWarnings" Foreground="Red" Margin="5" TextWrapping="Wrap" Width="300" Height="50"/>
+    </StackPanel>
+
+    <TextBlock Grid.Row="1" Grid.ColumnSpan="2" Margin="5,0,0,0" HorizontalAlignment="Left">
+      <TextBlock.Text>
+        <MultiBinding Converter="{StaticResource PositionConverter}">
+          <Binding Path="Position"/>
+          <Binding Path="Format"/>
+        </MultiBinding>
+      </TextBlock.Text>
+    </TextBlock>
+
+    <cnc:JogControl x:Name="jogPanel" Grid.Row="2" Grid.ColumnSpan="2"
+                    MinWidth="280" Height="255" HorizontalAlignment="Stretch" VerticalAlignment="Bottom"/>
+
+    <TextBox x:Name="txtInstructions" Grid.Column="1" Background="{DynamicResource ThemeControlLowBrush}" IsReadOnly="True"
+             Margin="5,5,5,0" TextWrapping="Wrap" Height="190" VerticalAlignment="Top"/>
+  </Grid>
+</UserControl>

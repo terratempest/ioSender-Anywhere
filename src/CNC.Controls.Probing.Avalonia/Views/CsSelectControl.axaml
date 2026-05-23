@@ -1,0 +1,33 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:conv="using:CNC.Controls.Avalonia.Converters"
+             x:Class="CNC.Controls.Probing.CsSelectControl">
+  <UserControl.Resources>
+    <conv:EnumValueToBooleanConverter x:Key="EnumToCheckedConverter"/>
+    <conv:BoolToVisibleConverter x:Key="IsVisibleConverter"/>
+  </UserControl.Resources>
+  <Border BorderBrush="{DynamicResource ThemeBorderLowBrush}" BorderThickness="1" Padding="6" CornerRadius="2">
+    <StackPanel Spacing="4">
+      <TextBlock Text="Action" FontWeight="SemiBold"/>
+      <Grid ColumnDefinitions="*,Auto">
+        <RadioButton Content="Set coordinate system:"
+                     IsChecked="{Binding CoordinateMode, Mode=TwoWay, Converter={StaticResource EnumToCheckedConverter}, ConverterParameter=G10}"
+                     VerticalAlignment="Center"/>
+        <ComboBox Grid.Column="1" Width="55" Height="22"
+                  ItemsSource="{Binding CoordinateSystems}"
+                  DisplayMemberBinding="{Binding Code}"
+                  SelectedValue="{Binding CoordinateSystem, Mode=TwoWay}"
+                  SelectedValueBinding="{Binding Id}"/>
+      </Grid>
+      <Grid ColumnDefinitions="*,Auto">
+        <RadioButton Content="Set offset (G92)"
+                     IsChecked="{Binding CoordinateMode, Mode=TwoWay, Converter={StaticResource EnumToCheckedConverter}, ConverterParameter=G92}"
+                     VerticalAlignment="Center"/>
+        <Border Grid.Column="1" Background="Salmon" CornerRadius="2" Padding="2"
+                IsVisible="{Binding Grbl.IsG92Active, Converter={StaticResource IsVisibleConverter}}">
+          <Button Content="Clear" Width="55" Height="22" Click="OnClearG92Click"/>
+        </Border>
+      </Grid>
+    </StackPanel>
+  </Border>
+</UserControl>

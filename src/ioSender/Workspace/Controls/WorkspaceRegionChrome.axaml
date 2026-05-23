@@ -1,0 +1,29 @@
+<Border xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        x:Class="ioSender.Workspace.Controls.WorkspaceRegionChrome"
+        Classes="panel-chrome workspace-region"
+        BorderThickness="1"
+        Padding="0"
+        MinWidth="80"
+        MinHeight="60">
+  <DockPanel>
+    <Border x:Name="TitleBar" DockPanel.Dock="Top" Padding="6,4"
+            Background="{DynamicResource ThemeControlMidBrush}"
+            BorderBrush="{DynamicResource ThemeBorderLowBrush}"
+            BorderThickness="0,0,0,1"
+            Cursor="Hand">
+      <Grid ColumnDefinitions="*,Auto">
+        <TextBlock x:Name="TitleText" Grid.Column="0" VerticalAlignment="Center" FontWeight="SemiBold"/>
+        <TextBlock x:Name="EditHint" Grid.Column="1" Text="⋮⋮" Opacity="0.5" VerticalAlignment="Center"
+                   IsVisible="False" Margin="4,0,0,0"/>
+      </Grid>
+    </Border>
+    <ScrollViewer x:Name="EditorScroll"
+                  HorizontalScrollBarVisibility="Auto"
+                  VerticalScrollBarVisibility="Auto">
+      <ContentPresenter x:Name="EditorHost" Margin="2"
+                        HorizontalAlignment="Stretch"
+                        VerticalAlignment="Stretch"/>
+    </ScrollViewer>
+  </DockPanel>
+</Border>

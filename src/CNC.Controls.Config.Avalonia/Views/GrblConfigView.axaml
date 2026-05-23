@@ -1,0 +1,26 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:local="using:CNC.Controls.Config"
+             mc:Ignorable="d"
+             d:DesignHeight="515" d:DesignWidth="900"
+             x:Class="CNC.Controls.Config.GrblConfigView">
+
+  <TabControl x:Name="tabConfig" Background="Transparent"
+              HorizontalAlignment="Stretch" VerticalAlignment="Stretch"
+              SelectionChanged="OnTabSelectionChanged">
+    <TabItem x:Name="tabBasicConfig" Header="Basic settings">
+      <local:GrblConfigControl x:Name="basicConfig" DataContext="{Binding}"/>
+    </TabItem>
+    <TabItem x:Name="tabTrinamic" Header="Trinamic tuner">
+      <local:TrinamicControl x:Name="trinamicControl" DataContext="{Binding}"/>
+    </TabItem>
+    <TabItem x:Name="tabPIDTuner" Header="PID Tuner">
+      <local:PidTunerControl x:Name="pidTunerControl"/>
+    </TabItem>
+    <TabItem x:Name="tabStepperCalibration" Header="Stepper calibration">
+      <local:StepperCalibrationControl x:Name="stepperCalibration" DataContext="{Binding}"/>
+    </TabItem>
+  </TabControl>
+</UserControl>

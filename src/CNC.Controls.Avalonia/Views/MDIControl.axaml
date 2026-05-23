@@ -1,0 +1,28 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:local="using:CNC.Controls.Avalonia.Views"
+             xmlns:loc="using:CNC.Localization.Avalonia"
+             mc:Ignorable="d" d:DesignWidth="450" d:DesignHeight="50"
+             x:Class="CNC.Controls.Avalonia.Views.MDIControl"
+             x:DataType="local:MDIControl">
+  <Border BorderBrush="{DynamicResource ThemeBorderLowBrush}" BorderThickness="1" Padding="4" CornerRadius="4">
+    <StackPanel>
+      <TextBlock x:Name="LblMdi" Text="MDI" FontWeight="SemiBold" Margin="0,0,0,4"
+                 loc:Localize.Key="CNC.Controls.WPF.mdicontrol.grp_mdi" loc:Localize.Fallback="MDI"/>
+      <StackPanel Orientation="Horizontal" Spacing="6">
+        <ComboBox x:Name="MdiCombo"
+                  MinWidth="140"
+                  ItemsSource="{Binding Commands}"
+                  SelectionChanged="OnMdiSelectionChanged"/>
+        <TextBox x:Name="MdiText"
+                 MinWidth="300"
+                 Text="{Binding Command, Mode=TwoWay}"
+                 KeyDown="OnMdiKeyDown"/>
+        <Button x:Name="BtnSend" Content="Send" Width="50" Click="OnSendClick"
+                loc:Localize.Key="CNC.Controls.WPF.mdicontrol.btn_send" loc:Localize.Fallback="Send"/>
+      </StackPanel>
+    </StackPanel>
+  </Border>
+</UserControl>

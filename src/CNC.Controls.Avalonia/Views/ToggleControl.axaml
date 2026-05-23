@@ -1,0 +1,12 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             x:Class="CNC.Controls.Avalonia.Views.ToggleControl"
+             Height="26" Width="120">
+  <Grid ColumnDefinitions="Auto,*">
+    <CheckBox x:Name="tsw" Grid.Column="0" Margin="0,2,0,0"
+              IsChecked="{Binding IsChecked, RelativeSource={RelativeSource AncestorType=UserControl}, Mode=OneWay}"
+              Click="tsw_Click"/>
+    <TextBlock Grid.Column="1" Text="{Binding Label, RelativeSource={RelativeSource AncestorType=UserControl}}"
+               VerticalAlignment="Center" Margin="6,0,0,0"/>
+  </Grid>
+</UserControl>

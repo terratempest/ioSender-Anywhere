@@ -1,0 +1,40 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:conv="using:CNC.Controls.Avalonia.Converters"
+             xmlns:loc="using:CNC.Localization.Avalonia"
+             xmlns:core="using:CNC.Core"
+             x:Class="CNC.Controls.Avalonia.Views.StatusControl"
+             x:DataType="core:GrblViewModel"
+             MinWidth="216"
+             MinHeight="36"
+             HorizontalAlignment="Stretch"
+             VerticalAlignment="Stretch">
+
+  <UserControl.Resources>
+    <conv:GrblStateToColorConverter x:Key="ToColorConverter"/>
+  </UserControl.Resources>
+
+  <Grid Margin="4" ColumnDefinitions="Auto,*,Auto"
+        HorizontalAlignment="Stretch" VerticalAlignment="Stretch">
+    <TextBlock x:Name="LblState" Grid.Column="0" Text="State:" VerticalAlignment="Center"
+               Margin="0,0,4,0"
+               Foreground="{DynamicResource ThemeForegroundBrush}"
+               loc:Localize.Key="CNC.Controls.WPF.statuscontrol.lbl_state"/>
+
+    <TextBox x:Name="txtState" Grid.Column="1"
+             IsReadOnly="True" Focusable="False"
+             MinHeight="28"
+             HorizontalAlignment="Stretch" VerticalAlignment="Stretch"
+             HorizontalContentAlignment="Center" VerticalContentAlignment="Center"
+             TextAlignment="Center" FontWeight="SemiBold"
+             Foreground="Black"
+             Text="{Binding GrblStateDisplay, Mode=OneWay}"
+             Background="{Binding GrblState, Converter={StaticResource ToColorConverter}}"/>
+
+    <Button x:Name="btnReset" Grid.Column="2"
+            Content="Reset" ToolTip.Tip="Ctrl+Shift+R"
+            Width="72" MinHeight="28" Margin="4,0,0,0"
+            Focusable="False" Classes="danger"
+            loc:Localize.Key="CNC.Controls.WPF.statuscontrol.btn_reset"/>
+  </Grid>
+</UserControl>

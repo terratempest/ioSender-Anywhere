@@ -1,0 +1,46 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+
+
+  <PropertyGroup>
+
+    <TargetFramework>net8.0</TargetFramework>
+
+    <ImplicitUsings>enable</ImplicitUsings>
+
+    <Nullable>enable</Nullable>
+
+    <RootNamespace>CNC.Controls.Lathe</RootNamespace>
+
+    <AssemblyName>CNC.Controls.Lathe.Avalonia</AssemblyName>
+
+    <AvaloniaUseCompiledBindingsByDefault>false</AvaloniaUseCompiledBindingsByDefault>
+
+  </PropertyGroup>
+
+
+
+  <ItemGroup>
+
+    <PackageReference Include="Avalonia" Version="$(AvaloniaVersion)" />
+
+  </ItemGroup>
+
+
+
+  <ItemGroup>
+
+    <ProjectReference Include="..\CNC.App\CNC.App.csproj" />
+
+    <ProjectReference Include="..\CNC.Controls.Avalonia\CNC.Controls.Avalonia.csproj" />
+
+    <ProjectReference Include="..\CNC.Core\CNC.Core.csproj" />
+
+    <ProjectReference Include="..\CNC.Localization\CNC.Localization.csproj" />
+
+  </ItemGroup>
+
+
+
+</Project>
+

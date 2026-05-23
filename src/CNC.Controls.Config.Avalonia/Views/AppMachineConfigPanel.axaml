@@ -1,0 +1,32 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:cnc="using:CNC.Controls.Avalonia.Views"
+             xmlns:platform="using:CNC.Platform.Abstractions"
+             x:Class="CNC.Controls.Config.AppMachineConfigPanel"
+             Width="310">
+  <Border BorderBrush="{DynamicResource ThemeBorderLowBrush}"
+          BorderThickness="1" Padding="8" CornerRadius="2">
+    <StackPanel Spacing="4">
+      <TextBlock Text="Main" FontWeight="SemiBold"/>
+      <cnc:NumericField Label="Reset delay:" Unit="ms" Format="###0"
+                        Value="{Binding ResetDelay, Mode=TwoWay}"/>
+      <cnc:NumericField Label="Poll interval:" Unit="ms" Format="###0"
+                        Value="{Binding PollInterval, Mode=TwoWay}"/>
+      <cnc:NumericField Label="Max buffer:" Unit="bytes" Format="###0"
+                        Value="{Binding MaxBufferSize, Mode=TwoWay}"/>
+      <CheckBox Content="Aggressive buffering" IsChecked="{Binding UseBuffering, Mode=TwoWay}"
+                ToolTip.Tip="Buffers more than one G-code block (grblHAL)."/>
+      <CheckBox Content="Keep MDI focus" IsChecked="{Binding KeepMdiFocus, Mode=TwoWay}"/>
+      <CheckBox Content='Filter "ok" response' IsChecked="{Binding FilterOkResponse, Mode=TwoWay}"/>
+      <CheckBox Content="Auto-compress gcode on transforms" IsChecked="{Binding AutoCompress, Mode=TwoWay}"/>
+      <CheckBox Content="Restore last window size on startup" IsChecked="{Binding KeepWindowSize, Mode=TwoWay}"/>
+      <CheckBox Content="Send comments" IsChecked="{Binding SendComments, Mode=TwoWay}"/>
+      <CheckBox Content="Add line numbers" IsChecked="{Binding AddLineNumbers, Mode=TwoWay}"/>
+      <TextBlock Text="Layout" Margin="0,6,0,0"/>
+      <ComboBox SelectedItem="{Binding LayoutMode, Mode=TwoWay}">
+        <platform:UiLayoutMode>Compact</platform:UiLayoutMode>
+        <platform:UiLayoutMode>Expanded</platform:UiLayoutMode>
+      </ComboBox>
+    </StackPanel>
+  </Border>
+</UserControl>

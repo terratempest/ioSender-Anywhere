@@ -1,0 +1,7 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:workspace="using:ioSender.Workspace.Controls"
+             x:Class="ioSender.Views.JobView"
+             Focusable="True">
+  <workspace:WorkspaceHost x:Name="Workspace"/>
+</UserControl>

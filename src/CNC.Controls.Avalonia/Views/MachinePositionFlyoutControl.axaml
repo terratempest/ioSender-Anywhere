@@ -1,0 +1,85 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:views="using:CNC.Controls.Avalonia.Views"
+             xmlns:conv="using:CNC.Controls.Avalonia.Converters"
+             xmlns:gcode="using:CNC.GCode"
+             x:Class="CNC.Controls.Avalonia.Views.MachinePositionFlyoutControl"
+             Focusable="False"
+             IsVisible="False">
+  <UserControl.Resources>
+    <ResourceDictionary>
+      <ResourceDictionary.MergedDictionaries>
+        <ResourceInclude Source="avares://CNC.Controls.Avalonia/Themes/Controls.axaml"/>
+      </ResourceDictionary.MergedDictionaries>
+    </ResourceDictionary>
+  </UserControl.Resources>
+  <Border Classes="flyout-panel">
+    <Grid Width="275" Margin="10,0,0,8">
+      <Grid.RowDefinitions>
+        <RowDefinition Height="25"/>
+        <RowDefinition Height="30"/>
+        <RowDefinition Height="30"/>
+      </Grid.RowDefinitions>
+      <TextBlock Text="Machine Position" Margin="0,4,0,0"/>
+      <Button Classes="flyout-close" Content="×" HorizontalAlignment="Right" Margin="0,0,5,0"
+              VerticalAlignment="Top" Click="OnCloseClick"/>
+      <StackPanel Grid.Row="1" Orientation="Horizontal">
+        <views:NumericField Label="X:" Unit="" Width="85" IsReadOnly="True"
+                            Value="{Binding MachinePosition.X, Mode=OneWay}"
+                            Format="{Binding FormatSigned, Mode=OneWay}"/>
+        <views:NumericField Label="Y:" Unit="" Width="85" IsReadOnly="True" Margin="-8,0,0,0"
+                            Value="{Binding MachinePosition.Y, Mode=OneWay}"
+                            Format="{Binding FormatSigned, Mode=OneWay}">
+          <views:NumericField.IsVisible>
+            <MultiBinding Converter="{StaticResource IsAxisVisibleConverter}">
+              <Binding Path="AxisEnabledFlags"/>
+              <Binding Source="{x:Static gcode:AxisFlags.Y}"/>
+            </MultiBinding>
+          </views:NumericField.IsVisible>
+        </views:NumericField>
+        <views:NumericField Label="Z:" Unit="" Width="85" IsReadOnly="True" Margin="-8,0,0,0"
+                            Value="{Binding MachinePosition.Z, Mode=OneWay}"
+                            Format="{Binding FormatSigned, Mode=OneWay}">
+          <views:NumericField.IsVisible>
+            <MultiBinding Converter="{StaticResource IsAxisVisibleConverter}">
+              <Binding Path="AxisEnabledFlags"/>
+              <Binding Source="{x:Static gcode:AxisFlags.Z}"/>
+            </MultiBinding>
+          </views:NumericField.IsVisible>
+        </views:NumericField>
+      </StackPanel>
+      <StackPanel Grid.Row="2" Orientation="Horizontal">
+        <views:NumericField Label="A:" Unit="" Width="85" IsReadOnly="True"
+                            Value="{Binding MachinePosition.A, Mode=OneWay}"
+                            Format="{Binding FormatSigned, Mode=OneWay}">
+          <views:NumericField.IsVisible>
+            <MultiBinding Converter="{StaticResource IsAxisVisibleConverter}">
+              <Binding Path="AxisEnabledFlags"/>
+              <Binding Source="{x:Static gcode:AxisFlags.A}"/>
+            </MultiBinding>
+          </views:NumericField.IsVisible>
+        </views:NumericField>
+        <views:NumericField Label="B:" Unit="" Width="85" IsReadOnly="True" Margin="-8,0,0,0"
+                            Value="{Binding MachinePosition.B, Mode=OneWay}"
+                            Format="{Binding FormatSigned, Mode=OneWay}">
+          <views:NumericField.IsVisible>
+            <MultiBinding Converter="{StaticResource IsAxisVisibleConverter}">
+              <Binding Path="AxisEnabledFlags"/>
+              <Binding Source="{x:Static gcode:AxisFlags.B}"/>
+            </MultiBinding>
+          </views:NumericField.IsVisible>
+        </views:NumericField>
+        <views:NumericField Label="C:" Unit="" Width="85" IsReadOnly="True" Margin="-8,0,0,0"
+                            Value="{Binding MachinePosition.C, Mode=OneWay}"
+                            Format="{Binding FormatSigned, Mode=OneWay}">
+          <views:NumericField.IsVisible>
+            <MultiBinding Converter="{StaticResource IsAxisVisibleConverter}">
+              <Binding Path="AxisEnabledFlags"/>
+              <Binding Source="{x:Static gcode:AxisFlags.C}"/>
+            </MultiBinding>
+          </views:NumericField.IsVisible>
+        </views:NumericField>
+      </StackPanel>
+    </Grid>
+  </Border>
+</UserControl>

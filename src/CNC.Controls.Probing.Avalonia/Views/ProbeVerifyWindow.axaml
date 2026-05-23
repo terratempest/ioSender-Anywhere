@@ -1,0 +1,15 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        x:Class="CNC.Controls.Probing.ProbeVerifyWindow"
+        Title="ioSender"
+        Width="320" Height="110"
+        CanResize="False"
+        WindowStartupLocation="CenterOwner">
+  <Border Background="{DynamicResource ThemeBackgroundBrush}" Padding="12">
+    <TextBlock Text="Assert probe to verify connection."
+               HorizontalAlignment="Center"
+               VerticalAlignment="Center"
+               FontSize="16"
+               TextWrapping="Wrap"/>
+  </Border>
+</Window>

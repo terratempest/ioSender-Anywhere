@@ -1,0 +1,13 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:config="using:CNC.Controls.Config"
+        x:Class="GrblConfigApp.MainWindow"
+        Title="Grbl Config"
+        Width="900"
+        Height="600"
+        MinWidth="640"
+        MinHeight="480">
+  <config:GrblConfigView x:Name="configView"
+                         HorizontalAlignment="Stretch"
+                         VerticalAlignment="Stretch"/>
+</Window>

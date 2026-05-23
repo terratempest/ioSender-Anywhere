@@ -1,0 +1,64 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:gcode="using:CNC.GCode"
+             xmlns:views="using:CNC.Controls.Avalonia.Views"
+             mc:Ignorable="d"
+             x:Class="CNC.Controls.Avalonia.Views.ToolView"
+             x:Name="root"
+             d:DesignHeight="515" d:DesignWidth="875">
+  <UserControl.Resources>
+    <ResourceDictionary>
+      <ResourceDictionary.MergedDictionaries>
+        <ResourceInclude Source="avares://CNC.Controls.Avalonia/Themes/Controls.axaml"/>
+      </ResourceDictionary.MergedDictionaries>
+    </ResourceDictionary>
+  </UserControl.Resources>
+  <Grid ColumnDefinitions="Auto,Auto">
+    <DataGrid x:Name="dgrTools" Grid.Column="0" IsReadOnly="True" SelectionMode="Single"
+              AutoGenerateColumns="False" CanUserReorderColumns="False" CanUserResizeColumns="False"
+              CanUserSortColumns="False" Margin="10,10,0,0" HorizontalAlignment="Left"
+              VerticalAlignment="Top" SelectionChanged="dgrTools_SelectionChanged">
+      <DataGrid.Columns>
+        <DataGridTextColumn Header="Tool" Binding="{Binding Code}" Width="50"/>
+        <DataGridTextColumn Header="X" Binding="{Binding X}" Width="70"/>
+        <DataGridTextColumn Header="Y" Binding="{Binding Y}" Width="70">
+          <DataGridTextColumn.IsVisible>
+            <MultiBinding Converter="{StaticResource IsAxisVisibleConverter}">
+              <Binding Path="DataContext.AxisEnabledFlags" ElementName="root"/>
+              <Binding Source="{x:Static gcode:AxisFlags.Y}"/>
+            </MultiBinding>
+          </DataGridTextColumn.IsVisible>
+        </DataGridTextColumn>
+        <DataGridTextColumn Header="Z" Binding="{Binding Z}" Width="70"/>
+        <DataGridTextColumn Header="Name" Binding="{Binding Name}" Width="300"/>
+      </DataGrid.Columns>
+    </DataGrid>
+    <StackPanel Grid.Column="1" Margin="20,15,0,0" VerticalAlignment="Top">
+      <StackPanel Orientation="Horizontal">
+        <TextBlock Text="Tool:" VerticalAlignment="Center" Margin="37,0,4,0"/>
+        <TextBox x:Name="txtTool" Width="25" IsReadOnly="True" Height="23"/>
+      </StackPanel>
+      <views:CoordValueSetControl x:Name="cvXOffset" Label="X axis:" Tag="X" Click="cvOffset_Click"
+                                  Value="{Binding Offset.X, ElementName=root, Mode=TwoWay}"/>
+      <views:CoordValueSetControl x:Name="cvYOffset" Label="Y axis:" Tag="Y" Click="cvOffset_Click"
+                                  Value="{Binding Offset.Y, ElementName=root, Mode=TwoWay}">
+        <views:CoordValueSetControl.IsVisible>
+          <MultiBinding Converter="{StaticResource IsAxisVisibleConverter}">
+            <Binding Path="DataContext.AxisEnabledFlags" ElementName="root"/>
+            <Binding Source="{x:Static gcode:AxisFlags.Y}"/>
+          </MultiBinding>
+        </views:CoordValueSetControl.IsVisible>
+      </views:CoordValueSetControl>
+      <views:CoordValueSetControl x:Name="cvZOffset" Label="Z axis:" Tag="Z" Click="cvOffset_Click"
+                                  Value="{Binding Offset.Z, ElementName=root, Mode=TwoWay}"/>
+      <views:CoordValueSetControl x:Name="cvTipRadius" Label="Tip radius:" Tag="R" IsEnabled="False" Click="cvOffset_Click"/>
+      <StackPanel Orientation="Horizontal" Margin="5,5">
+        <Button Content="Get current position" Margin="3,0" Click="btnCurrPos_Click"/>
+        <Button Content="Clear all" Click="btnClearAll_Click"/>
+        <Button Content="Set all" Margin="3,0" Click="btnSetAll_Click"/>
+      </StackPanel>
+    </StackPanel>
+  </Grid>
+</UserControl>

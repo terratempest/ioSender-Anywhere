@@ -1,0 +1,78 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:conv="using:CNC.Controls.Avalonia.Converters"
+             xmlns:controls="using:CNC.Controls.Avalonia.Controls"
+             xmlns:local="using:CNC.Controls.Probing"
+             x:Class="CNC.Controls.Probing.ToolLengthControl"
+             Height="370" Width="510">
+  <UserControl.Resources>
+    <conv:LogicalNotConverter x:Key="IsNotRunningConverter"/>
+    <conv:LogicalNotConverter x:Key="IsNotVisibleConverter">
+      <conv:LogicalNotConverter.FinalConverter>
+        <conv:BoolToVisibleConverter/>
+      </conv:LogicalNotConverter.FinalConverter>
+    </conv:LogicalNotConverter>
+    <conv:BoolToVisibleConverter x:Key="IsVisibleConverter"/>
+  </UserControl.Resources>
+  <Grid>
+    <StackPanel Margin="5" HorizontalAlignment="Left" VerticalAlignment="Top" Spacing="4">
+      <StackPanel Orientation="Horizontal" Margin="10,10,0,0" Spacing="4">
+        <CheckBox Content="Probe fixture @ G59.3"
+                  IsEnabled="{Binding HasCoordinateSystem9}"
+                  IsChecked="{Binding ProbeFixture, Mode=TwoWay}"
+                  VerticalAlignment="Center"/>
+        <TextBlock Text="with tool:" VerticalAlignment="Center"/>
+        <ComboBox Margin="2" Width="56" Height="22"
+                  ItemsSource="{Binding Grbl.Tools}"
+                  DisplayMemberBinding="{Binding Code}"
+                  SelectedValue="{Binding Tool, Mode=TwoWay}"
+                  SelectedValueBinding="{Binding Code}"
+                  IsEnabled="{Binding HasToolTable}"/>
+      </StackPanel>
+      <CheckBox Content="Establish reference offset"
+                Margin="10,0,0,0"
+                IsChecked="{Binding ReferenceToolOffset, Mode=TwoWay}"
+                IsEnabled="{Binding CanReferenceToolOffsetBinding}"/>
+      <Border Margin="5,10,0,0" Background="Salmon" CornerRadius="2" Width="186" Height="28"
+              IsVisible="{Binding Grbl.IsToolOffsetActive, Converter={StaticResource IsVisibleConverter}}">
+        <Button Content="Clear tool length offset"
+                HorizontalAlignment="Center" VerticalAlignment="Center"
+                Width="180" Height="22" Click="OnClearToolOffsetClick"/>
+      </Border>
+      <Border Margin="5,5,0,0" BorderBrush="{DynamicResource ThemeBorderLowBrush}" BorderThickness="1" Padding="6" CornerRadius="2"
+              IsVisible="{Binding ProbeFixture, Converter={StaticResource IsNotVisibleConverter}}">
+        <StackPanel Spacing="4">
+          <TextBlock Text="Workpiece offset" FontWeight="SemiBold"/>
+          <CheckBox Content="Add offset" IsChecked="{Binding AddAction, Mode=TwoWay}" Margin="5,4,0,0"/>
+          <StackPanel Orientation="Horizontal" Spacing="6">
+            <local:CsSelectControl IsEnabled="{Binding AddAction}"/>
+            <Border BorderBrush="{DynamicResource ThemeBorderLowBrush}" BorderThickness="1" Padding="6" CornerRadius="2">
+              <StackPanel Spacing="4">
+                <TextBlock Text="Workpiece" FontWeight="SemiBold"/>
+                <Grid ColumnDefinitions="Auto,*">
+                  <TextBlock Text="Height:" VerticalAlignment="Center" Margin="0,0,6,0"/>
+                  <controls:NumericTextBox Grid.Column="1" Value="{Binding WorkpieceHeight, Mode=TwoWay}"
+                                           IsEnabled="{Binding AddAction}" Format="0.###"/>
+                </Grid>
+              </StackPanel>
+            </Border>
+          </StackPanel>
+        </StackPanel>
+      </Border>
+      <StackPanel Margin="10,5,0,0" Spacing="4"
+                  IsVisible="{Binding ProbeFixture, Converter={StaticResource IsVisibleConverter}}">
+        <CheckBox Content="Set coordinate system or offset" IsChecked="{Binding AddAction, Mode=TwoWay}"/>
+        <local:CsSelectControl IsEnabled="{Binding AddAction}"/>
+      </StackPanel>
+    </StackPanel>
+    <StackPanel Margin="5,0,0,5" Orientation="Horizontal"
+                HorizontalAlignment="Left" VerticalAlignment="Bottom" Spacing="4">
+      <Button Content="Start" Width="75"
+              IsEnabled="{Binding Grbl.IsJobRunning, Converter={StaticResource IsNotRunningConverter}}"
+              Click="OnStartClick"/>
+      <Button Content="Stop" Width="75"
+              IsEnabled="{Binding Grbl.IsJobRunning}"
+              Click="OnStopClick"/>
+    </StackPanel>
+  </Grid>
+</UserControl>

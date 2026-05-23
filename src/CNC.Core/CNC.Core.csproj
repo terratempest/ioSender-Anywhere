@@ -1,0 +1,41 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+
+
+  <PropertyGroup>
+
+    <TargetFramework>net8.0</TargetFramework>
+
+    <ImplicitUsings>enable</ImplicitUsings>
+
+    <Nullable>enable</Nullable>
+
+    <RootNamespace>CNC.Core</RootNamespace>
+
+    <AssemblyName>CNC.Core</AssemblyName>
+
+  </PropertyGroup>
+
+
+
+  <ItemGroup>
+
+    <ProjectReference Include="..\CNC.Platform.Abstractions\CNC.Platform.Abstractions.csproj" />
+
+  </ItemGroup>
+
+
+
+  <ItemGroup>
+
+    <PackageReference Include="System.IO.Ports" Version="8.0.0" />
+
+    <PackageReference Include="WebSocketSharp-netstandard" Version="1.0.1" />
+
+  </ItemGroup>
+
+
+
+</Project>
+
+

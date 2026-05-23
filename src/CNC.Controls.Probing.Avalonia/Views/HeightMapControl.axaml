@@ -1,0 +1,68 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:conv="using:CNC.Controls.Avalonia.Converters"
+             xmlns:controls="using:CNC.Controls.Avalonia.Controls"
+             xmlns:local="using:CNC.Controls.Probing"
+             xmlns:viewer="using:CNC.GCodeViewer.Avalonia.Views"
+             x:Class="CNC.Controls.Probing.HeightMapControl"
+             Height="370" Width="600">
+  <UserControl.Resources>
+    <conv:LogicalNotConverter x:Key="IsNotRunningConverter"/>
+  </UserControl.Resources>
+  <Grid>
+    <StackPanel Margin="5,5,0,0" Width="250" HorizontalAlignment="Left" VerticalAlignment="Top" Spacing="4">
+      <Border BorderBrush="{DynamicResource ThemeBorderLowBrush}" BorderThickness="1" Padding="6" CornerRadius="2">
+        <StackPanel Spacing="4">
+          <TextBlock Text="Area to probe" FontWeight="SemiBold"/>
+          <StackPanel Orientation="Horizontal" Spacing="4">
+            <TextBlock Text="X:" VerticalAlignment="Center"/>
+            <controls:NumericTextBox Value="{Binding HeightMap.MinX, Mode=TwoWay}" Format="-###0.0##" Width="70"/>
+            <TextBlock Text="W:" VerticalAlignment="Center"/>
+            <controls:NumericTextBox Value="{Binding HeightMap.Width, Mode=TwoWay}" Format="-###0.0##" Width="70"/>
+          </StackPanel>
+          <StackPanel Orientation="Horizontal" Spacing="4">
+            <TextBlock Text="Y:" VerticalAlignment="Center"/>
+            <controls:NumericTextBox Value="{Binding HeightMap.MinY, Mode=TwoWay}" Format="-###0.0##" Width="70"/>
+            <TextBlock Text="H:" VerticalAlignment="Center"/>
+            <controls:NumericTextBox Value="{Binding HeightMap.Height, Mode=TwoWay}" Format="-###0.0##" Width="70"/>
+          </StackPanel>
+          <Button Content="Set from program limits" IsEnabled="{Binding Grbl.IsFileLoaded}" Click="OnLimitsClick"/>
+        </StackPanel>
+      </Border>
+      <Border BorderBrush="{DynamicResource ThemeBorderLowBrush}" BorderThickness="1" Padding="6" CornerRadius="2">
+        <StackPanel Spacing="4">
+          <TextBlock Text="Gridsize" FontWeight="SemiBold"/>
+          <Grid ColumnDefinitions="Auto,*,Auto" RowDefinitions="Auto,Auto">
+            <TextBlock Grid.Row="0" Text="X:" VerticalAlignment="Center" Margin="0,0,6,4"/>
+            <controls:NumericTextBox Grid.Row="0" Grid.Column="1" Value="{Binding HeightMap.GridSizeX, Mode=TwoWay}" Format="0.###" Margin="0,0,0,4"/>
+            <CheckBox Grid.RowSpan="2" Grid.Column="2" Content="Lock" VerticalAlignment="Center" Margin="8,0,0,0"
+                      IsChecked="{Binding HeightMap.GridSizeLockXY, Mode=TwoWay}"/>
+            <TextBlock Grid.Row="1" Text="Y:" VerticalAlignment="Center" Margin="0,0,6,0"/>
+            <controls:NumericTextBox Grid.Row="1" Grid.Column="1" Value="{Binding HeightMap.GridSizeY, Mode=TwoWay}" Format="0.###"/>
+          </Grid>
+        </StackPanel>
+      </Border>
+      <CheckBox Content="Pause before probing" IsChecked="{Binding HeightMap.AddPause, Mode=TwoWay}"/>
+      <CheckBox Content="Set Z = 0 at X0Y0" IsChecked="{Binding HeightMap.SetToolOffset, Mode=TwoWay}"/>
+      <local:CsSelectControl IsEnabled="{Binding HeightMap.SetToolOffset}"/>
+    </StackPanel>
+    <Border Margin="280,10,0,0" Width="300" Height="300" HorizontalAlignment="Left" VerticalAlignment="Top"
+            BorderBrush="Gray" BorderThickness="1" ClipToBounds="True">
+      <viewer:HeightMapPreviewControl x:Name="Preview3D"/>
+    </Border>
+    <StackPanel Margin="5,0,0,5" Orientation="Horizontal" HorizontalAlignment="Left" VerticalAlignment="Bottom" Spacing="4">
+      <Button Content="Start" Width="75"
+              IsEnabled="{Binding Grbl.IsJobRunning, Converter={StaticResource IsNotRunningConverter}}"
+              Click="OnStartClick"/>
+      <Button Content="Probe" IsEnabled="{Binding IsPaused}" Width="75" Click="OnProbeClick"/>
+      <Button Content="Stop" Width="75" IsEnabled="{Binding Grbl.IsJobRunning}" Click="OnStopClick"/>
+      <Button Content="Load" Width="75"
+              IsEnabled="{Binding Grbl.IsJobRunning, Converter={StaticResource IsNotRunningConverter}}"
+              Click="OnLoadClick"/>
+      <Button Content="Save" Width="75"
+              IsEnabled="{Binding Grbl.IsJobRunning, Converter={StaticResource IsNotRunningConverter}}"
+              Click="OnSaveClick"/>
+      <Button Content="Apply" Width="75" IsEnabled="{Binding HeightMap.CanApply}" Click="OnApplyClick"/>
+    </StackPanel>
+  </Grid>
+</UserControl>

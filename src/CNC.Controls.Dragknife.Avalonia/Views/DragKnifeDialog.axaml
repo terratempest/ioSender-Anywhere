@@ -1,0 +1,33 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:controls="using:CNC.Controls.Avalonia.Views"
+        x:Class="CNC.Controls.DragKnife.DragKnifeDialog"
+        Title="Drag knife parameters"
+        SizeToContent="WidthAndHeight"
+        CanResize="False"
+        WindowStartupLocation="CenterOwner"
+        Background="{DynamicResource ThemeBackgroundBrush}">
+  <StackPanel Margin="10">
+    <Border Width="280" Margin="0,0,0,8" BorderBrush="{DynamicResource ThemeBorderLowBrush}" BorderThickness="1" CornerRadius="4" Padding="8">
+      <StackPanel Spacing="4">
+        <TextBlock Text="Knife" FontWeight="SemiBold"/>
+        <controls:NumericField Label="Tip offset:" Unit="mm" Format="#0.###" Value="{Binding KnifeTipOffset, Mode=TwoWay}"/>
+        <controls:NumericField Label="Cut depth:" Unit="mm" Format="-###0.###" Value="{Binding CutDepth, Mode=TwoWay}"/>
+        <controls:NumericField Label="Swivel angle:" Unit="deg" Format="##0" Value="{Binding SwivelAngle, Mode=TwoWay}"/>
+        <controls:NumericField Label="Dent length:" Unit="mm" Format="###0.###" Value="{Binding DentLength, Mode=TwoWay}"/>
+      </StackPanel>
+    </Border>
+    <Border Width="280" Margin="0,0,0,8" BorderBrush="{DynamicResource ThemeBorderLowBrush}" BorderThickness="1" CornerRadius="4" Padding="8">
+      <StackPanel Spacing="4">
+        <TextBlock Text="Retract" FontWeight="SemiBold"/>
+        <CheckBox Content="Retract enable" IsChecked="{Binding RetractEnable, Mode=TwoWay}" Margin="0,4,0,8"/>
+        <controls:NumericField Label="Retract angle:" Unit="deg" Format="##0" Value="{Binding RetractAngle, Mode=TwoWay}"/>
+        <controls:NumericField Label="Retract depth:" Unit="mm/min" Format="-###0.###" Value="{Binding RetractDepth, Mode=TwoWay}"/>
+      </StackPanel>
+    </Border>
+    <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" Margin="0,8,0,0">
+      <Button Content="Ok" Width="75" Click="OnOkClick"/>
+      <Button Content="Cancel" Width="75" Margin="8,0,0,0" Click="OnCancelClick"/>
+    </StackPanel>
+  </StackPanel>
+</Window>

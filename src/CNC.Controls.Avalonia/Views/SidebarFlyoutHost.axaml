@@ -1,0 +1,23 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:conv="using:CNC.Controls.Avalonia.Converters"
+             xmlns:views="using:CNC.Controls.Avalonia.Views"
+             x:Class="CNC.Controls.Avalonia.Views.SidebarFlyoutHost"
+             Width="22"
+             ClipToBounds="False"
+             Focusable="False"
+             Loaded="OnLoaded">
+  <UserControl.Resources>
+    <conv:LogicalNotConverter x:Key="BooleanConverter"/>
+  </UserControl.Resources>
+  <Panel ClipToBounds="False">
+    <Panel x:Name="FlyoutLayer" ClipToBounds="False" HorizontalAlignment="Right">
+      <views:JogFlyoutControl x:Name="JogFlyout"/>
+      <views:GotoFlyoutControl x:Name="GotoFlyout"/>
+      <views:OutlineFlyoutControl x:Name="OutlineFlyout"/>
+      <views:MachinePositionFlyoutControl x:Name="MachinePositionFlyout"/>
+    </Panel>
+    <StackPanel x:Name="RailButtons" Width="22" HorizontalAlignment="Right"
+                IsEnabled="{Binding IsJobRunning, Converter={StaticResource BooleanConverter}}"/>
+  </Panel>
+</UserControl>

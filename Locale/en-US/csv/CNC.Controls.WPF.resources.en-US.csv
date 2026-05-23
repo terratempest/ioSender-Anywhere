@@ -56,6 +56,7 @@ CNC.Controls.WPF.g.en-US.resources:statuscontrol.baml,btn_unlock:System.Windows.
 CNC.Controls.WPF.g.en-US.resources:steppercalibrationwizard.baml,btn_update:System.Windows.Controls.ContentControl.Content,Button,True,True,,Save
 CNC.Controls.WPF.g.en-US.resources:sdcardview.baml,btn_upload:System.Windows.Controls.ContentControl.Content,Button,True,True,,Upload
 CNC.Controls.WPF.g.en-US.resources:drocontrol.baml,btn_zeroAll:System.Windows.Controls.ContentControl.Content,Button,True,True,,Zero all
+CNC.Controls.WPF.g.en-US.resources:drocontrol.baml,btn_homeAll:System.Windows.Controls.ContentControl.Content,Button,True,True,,Home All
 CNC.Controls.WPF.g.en-US.resources:macroeditor.baml,chk_confirm:System.Windows.Controls.ContentControl.Content,CheckBox,True,True,,Confirm before executing
 CNC.Controls.WPF.g.en-US.resources:sdcardview.baml,chk_viewAll:System.Windows.Controls.ContentControl.Content,CheckBox,True,True,,List CNC files only
 CNC.Controls.WPF.g.en-US.resources:sdcardview.baml,dgr_sdcard:System.Windows.FrameworkElement.ToolTip,ToolTip,True,True,,"Right click for menu, double click to run file."
@@ -185,9 +186,12 @@ CNC.Controls.WPF.g.en-US.resources:portdialog.baml,lbl_onConnect:System.Windows.
 CNC.Controls.WPF.g.en-US.resources:overridecontrol.baml,lbl_override:System.Windows.Controls.ContentControl.Content,Label,True,True,,Override
 CNC.Controls.WPF.g.en-US.resources:workparameterscontrol.baml,lbl_probe:System.Windows.Controls.ContentControl.Content,Label,True,True,,Probe:
 CNC.Controls.WPF.g.en-US.resources:feedcontrol.baml,lbl_rapids:System.Windows.Controls.ContentControl.Content,Label,True,True,,Rapids:
+CNC.Controls.WPF.g.en-US.resources:feedcontrol.baml,lbl_feedrate:System.Windows.Controls.ContentControl.Content,Label,True,True,,Feed Rate:
+CNC.Controls.WPF.g.en-US.resources:feedcontrol.baml,lbl_rapids_fmt:System.Windows.Controls.ContentControl.Content,TextBlock,True,True,,Rapids: % {0}
 CNC.Controls.WPF.g.en-US.resources:basicconfigcontrol.baml,lbl_restoreWindowSize:System.Windows.Controls.ContentControl.Content,CheckBox,True,True,,Restore last window size on startup
 CNC.Controls.WPF.g.en-US.resources:basicconfigcontrol.baml,lbl_restoreWindowSize:System.Windows.FrameworkElement.ToolTip,ToolTip,True,True,,Restore window size on next startup.
 CNC.Controls.WPF.g.en-US.resources:spindlecontrol.baml,lbl_rpm:System.Windows.Controls.ContentControl.Content,Label,True,True,,RPM
+CNC.Controls.WPF.g.en-US.resources:spindlecontrol.baml,lbl_set_rpm:System.Windows.Controls.ContentControl.Content,Button,True,True,,Set RPM
 CNC.Controls.WPF.g.en-US.resources:basicconfigcontrol.baml,lbl_sendComments:System.Windows.Controls.ContentControl.Content,CheckBox,True,True,,Send comments
 CNC.Controls.WPF.g.en-US.resources:basicconfigcontrol.baml,lbl_sendComments:System.Windows.FrameworkElement.ToolTip,ToolTip,True,True,,Send complete comments.
 CNC.Controls.WPF.g.en-US.resources:portdialog.baml,lbl_serialBaud:System.Windows.Controls.ContentControl.Content,Label,True,True,,Baud rate:

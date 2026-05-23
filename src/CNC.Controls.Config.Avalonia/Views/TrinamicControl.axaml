@@ -1,0 +1,112 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:cnc="using:CNC.Controls.Avalonia.Views"
+             xmlns:conv="using:CNC.Controls.Avalonia.Converters"
+             xmlns:gcode="using:CNC.GCode"
+             mc:Ignorable="d"
+             d:DesignHeight="480" d:DesignWidth="875"
+             x:Class="CNC.Controls.Config.TrinamicControl"
+             x:Name="root"
+             Loaded="OnLoaded">
+
+  <UserControl.Resources>
+    <conv:IsAxisVisibleConverter x:Key="IsAxisVisibleConverter"/>
+    <conv:EnumValueToBooleanConverter x:Key="EnumToCheckedConverter"/>
+  </UserControl.Resources>
+
+  <DockPanel>
+    <DockPanel DockPanel.Dock="Left" Width="520" Margin="5,5,5,0">
+      <StackPanel DockPanel.Dock="Top">
+        <Border BorderBrush="{DynamicResource ThemeBorderLowBrush}" BorderThickness="1"
+                Width="514" Height="242" HorizontalAlignment="Left">
+          <Canvas x:Name="SgPlot" Background="{DynamicResource ThemeControlLowBrush}" Width="512" Height="240"/>
+        </Border>
+
+        <Grid Margin="0,4,0,0">
+          <StackPanel Orientation="Horizontal" Spacing="5">
+            <RadioButton x:Name="rbX" Content="X" GroupName="SgAxis" IsChecked="True" IsCheckedChanged="OnAxisChecked"/>
+            <RadioButton x:Name="rbY" Content="Y" GroupName="SgAxis" IsCheckedChanged="OnAxisChecked">
+              <RadioButton.IsVisible>
+                <MultiBinding Converter="{StaticResource IsAxisVisibleConverter}">
+                  <Binding Path="AxisEnabledFlags"/>
+                  <Binding Source="{x:Static gcode:AxisFlags.Y}"/>
+                </MultiBinding>
+              </RadioButton.IsVisible>
+            </RadioButton>
+            <RadioButton x:Name="rbZ" Content="Z" GroupName="SgAxis" IsCheckedChanged="OnAxisChecked">
+              <RadioButton.IsVisible>
+                <MultiBinding Converter="{StaticResource IsAxisVisibleConverter}">
+                  <Binding Path="AxisEnabledFlags"/>
+                  <Binding Source="{x:Static gcode:AxisFlags.Z}"/>
+                </MultiBinding>
+              </RadioButton.IsVisible>
+            </RadioButton>
+            <RadioButton x:Name="rbA" Content="A" GroupName="SgAxis" IsCheckedChanged="OnAxisChecked">
+              <RadioButton.IsVisible>
+                <MultiBinding Converter="{StaticResource IsAxisVisibleConverter}">
+                  <Binding Path="AxisEnabledFlags"/>
+                  <Binding Source="{x:Static gcode:AxisFlags.A}"/>
+                </MultiBinding>
+              </RadioButton.IsVisible>
+            </RadioButton>
+            <RadioButton x:Name="rbB" Content="B" GroupName="SgAxis" IsCheckedChanged="OnAxisChecked">
+              <RadioButton.IsVisible>
+                <MultiBinding Converter="{StaticResource IsAxisVisibleConverter}">
+                  <Binding Path="AxisEnabledFlags"/>
+                  <Binding Source="{x:Static gcode:AxisFlags.B}"/>
+                </MultiBinding>
+              </RadioButton.IsVisible>
+            </RadioButton>
+            <RadioButton x:Name="rbC" Content="C" GroupName="SgAxis" IsCheckedChanged="OnAxisChecked">
+              <RadioButton.IsVisible>
+                <MultiBinding Converter="{StaticResource IsAxisVisibleConverter}">
+                  <Binding Path="AxisEnabledFlags"/>
+                  <Binding Source="{x:Static gcode:AxisFlags.C}"/>
+                </MultiBinding>
+              </RadioButton.IsVisible>
+            </RadioButton>
+          </StackPanel>
+          <TextBlock Text="Load (SG_RESULT)" Foreground="Blue" HorizontalAlignment="Right" VerticalAlignment="Center"/>
+        </Grid>
+
+        <Border BorderBrush="{DynamicResource ThemeBorderLowBrush}" BorderThickness="1"
+                Margin="0,6,0,0" Padding="8" CornerRadius="2">
+          <StackPanel Spacing="6">
+            <TextBlock Text="stallGuard" FontWeight="SemiBold"/>
+            <StackPanel Orientation="Horizontal" Spacing="5">
+              <Slider x:Name="sgSlider" Width="169" Minimum="{Binding #root.SGValueMin}"
+                      Maximum="{Binding #root.SGValueMax}" Value="{Binding #root.SGValue, Mode=TwoWay}"
+                      PointerReleased="OnSgSliderReleased"/>
+              <TextBox Width="36" Text="{Binding #root.SGValue, StringFormat={}{0:0}}" IsReadOnly="True"
+                       HorizontalContentAlignment="Right"/>
+              <Button Content="Configure" Width="72" Click="OnConfigureSgClick"/>
+              <CheckBox Content="Enable filter (SFILT)" IsChecked="{Binding #root.SFiltEnabled, Mode=TwoWay}"
+                        Margin="8,0,0,0" VerticalAlignment="Center"/>
+            </StackPanel>
+          </StackPanel>
+        </Border>
+
+        <Grid Margin="0,5,0,0">
+          <cnc:StatusControl HorizontalAlignment="Left" VerticalAlignment="Bottom"/>
+          <cnc:SignalsControl HorizontalAlignment="Right" VerticalAlignment="Bottom"/>
+        </Grid>
+      </StackPanel>
+
+      <StackPanel DockPanel.Dock="Bottom" Margin="0,5,0,0">
+        <cnc:MDIControl x:Name="mdiControl"/>
+        <TextBlock x:Name="txtPosition" Margin="0,5,0,0" Width="235"/>
+      </StackPanel>
+    </DockPanel>
+
+    <Grid Margin="8,5,5,5" RowDefinitions="*,Auto">
+      <TextBox Grid.Row="0" Text="{Binding #root.DriverStatus}" IsReadOnly="True" AcceptsReturn="True"
+               TextWrapping="Wrap" FontFamily="Consolas,Courier New,monospace" FontSize="12"/>
+      <StackPanel Grid.Row="1" Orientation="Horizontal" Spacing="5" Margin="0,4,0,0">
+        <Button Content="Get status" Width="130" Click="OnGetStateClick"/>
+        <Button Content="Get status, all drivers" Width="170" Click="OnGetStateAllClick"/>
+      </StackPanel>
+    </Grid>
+  </DockPanel>
+</UserControl>

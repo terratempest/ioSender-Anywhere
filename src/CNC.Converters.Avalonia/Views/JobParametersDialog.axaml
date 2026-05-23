@@ -1,0 +1,52 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:controls="using:CNC.Controls.Avalonia.Views"
+        xmlns:conv="using:CNC.Controls.Avalonia.Converters"
+        x:Class="CNC.Converters.JobParametersDialog"
+        Title="Conversion parameters"
+        SizeToContent="WidthAndHeight"
+        CanResize="False"
+        WindowStartupLocation="CenterOwner"
+        Background="{DynamicResource ThemeBackgroundBrush}">
+  <Window.Resources>
+    <conv:BoolToVisibleConverter x:Key="IsVisibleConverter"/>
+  </Window.Resources>
+  <StackPanel Margin="10">
+    <Border Width="280" Margin="0,0,0,8" BorderBrush="{DynamicResource ThemeBorderLowBrush}" BorderThickness="1" CornerRadius="4" Padding="8">
+      <StackPanel Spacing="4">
+        <TextBlock Text="Z positions (relative to workpiece surface)" FontWeight="SemiBold"/>
+        <controls:NumericField Label="Tool change:" Unit="mm" Format="-###0.###" Value="{Binding ZHome, Mode=TwoWay}"/>
+        <controls:NumericField Label="Rapids:" Unit="mm" Format="-###0.###" Value="{Binding ZRapids, Mode=TwoWay}"/>
+        <controls:NumericField Label="Cut depth:" Unit="mm" Format="-###0.###" Value="{Binding ZMin, Mode=TwoWay}"/>
+      </StackPanel>
+    </Border>
+    <Border Width="280" Margin="0,0,0,8" BorderBrush="{DynamicResource ThemeBorderLowBrush}" BorderThickness="1" CornerRadius="4" Padding="8">
+      <StackPanel Spacing="4">
+        <TextBlock Text="Spindle and feed" FontWeight="SemiBold"/>
+        <controls:NumericField Label="RPM:" Unit="" Format="-###0.###" Value="{Binding RPM, Mode=TwoWay}"/>
+        <controls:NumericField Label="Feed rate:" Unit="mm/min" Format="-###0.###" Value="{Binding FeedRate, Mode=TwoWay}"/>
+        <controls:NumericField Label="Plunge rate:" Unit="mm/min" Format="-###0.###" Value="{Binding PlungeRate, Mode=TwoWay}"/>
+      </StackPanel>
+    </Border>
+    <Border Width="280" Margin="0,0,0,8" BorderBrush="{DynamicResource ThemeBorderLowBrush}" BorderThickness="1" CornerRadius="4" Padding="8">
+      <StackPanel Spacing="4">
+        <TextBlock Text="Scaling factors" FontWeight="SemiBold"/>
+        <controls:NumericField Label="X:" Unit="" Format="-###0.###" Value="{Binding ScaleX, Mode=TwoWay}"
+                               ToolTip.Tip="A negative factor flips the output."/>
+        <controls:NumericField Label="Y:" Unit="" Format="-###0.###" Value="{Binding ScaleY, Mode=TwoWay}"
+                               ToolTip.Tip="A negative factor flips the output."/>
+      </StackPanel>
+    </Border>
+    <Border Width="280" Margin="0,0,0,8" BorderBrush="{DynamicResource ThemeBorderLowBrush}" BorderThickness="1" CornerRadius="4" Padding="8"
+            IsVisible="{Binding EnableToolSelection, Converter={StaticResource IsVisibleConverter}}">
+      <StackPanel Spacing="4">
+        <TextBlock Text="Tool" FontWeight="SemiBold"/>
+        <controls:NumericField Label="Diameter:" Unit="mm" Format="##0.###" Value="{Binding ToolDiameter, Mode=TwoWay}"/>
+      </StackPanel>
+    </Border>
+    <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" Margin="0,8,0,0">
+      <Button Content="Ok" Width="75" Click="OnOkClick"/>
+      <Button Content="Cancel" Width="75" Margin="8,0,0,0" Click="OnCancelClick"/>
+    </StackPanel>
+  </StackPanel>
+</Window>

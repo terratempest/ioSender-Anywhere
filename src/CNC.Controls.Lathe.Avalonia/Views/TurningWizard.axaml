@@ -1,0 +1,86 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:controls="using:CNC.Controls.Avalonia.Controls"
+             xmlns:local="using:CNC.Controls.Lathe"
+             xmlns:conv="using:CNC.Controls.Lathe"
+             x:Class="CNC.Controls.Lathe.TurningWizard">
+  <ScrollViewer HorizontalScrollBarVisibility="Disabled" VerticalScrollBarVisibility="Auto">
+    <StackPanel Margin="10" Spacing="8">
+      <local:ProfileControl ItemsSource="{Binding Profiles}" SelectedProfile="{Binding Profile, Mode=TwoWay}"/>
+
+      <StackPanel Orientation="Horizontal" Spacing="12">
+        <StackPanel Spacing="2">
+          <TextBlock Text="Start Z:"/>
+          <controls:NumericTextBox Width="90" Value="{Binding ZStart, Mode=TwoWay}" Format="{Binding Format}"/>
+        </StackPanel>
+        <StackPanel Spacing="2">
+          <TextBlock Text="Length:"/>
+          <controls:NumericTextBox x:Name="LengthBox" Width="90" Value="{Binding ZLength, Mode=TwoWay}" Format="{Binding Format}"/>
+        </StackPanel>
+      </StackPanel>
+
+      <Border BorderBrush="{DynamicResource ThemeBorderLowBrush}" BorderThickness="1" Padding="8" CornerRadius="2">
+        <StackPanel Spacing="6">
+          <TextBlock Text="Diameter" FontWeight="SemiBold"/>
+          <StackPanel Orientation="Horizontal" Spacing="12">
+            <StackPanel Spacing="2">
+              <TextBlock Text="Current"/>
+              <controls:NumericTextBox Width="90" Value="{Binding XStart, Mode=TwoWay}" Format="{Binding Format}"/>
+            </StackPanel>
+            <StackPanel Spacing="2">
+              <TextBlock Text="Target"/>
+              <controls:NumericTextBox Width="90" Value="{Binding XTarget, Mode=TwoWay}" Format="{Binding Format}"/>
+            </StackPanel>
+            <StackPanel Spacing="2">
+              <TextBlock Text="Clearance"/>
+              <controls:NumericTextBox Width="90" Value="{Binding XClearance, Mode=TwoWay}" Format="{Binding Format}"/>
+            </StackPanel>
+          </StackPanel>
+          <local:TaperControl x:Name="Taper" Value="{Binding Taper, Mode=TwoWay}" IsTaperEnabled="{Binding IsTaperEnabled, Mode=TwoWay}"/>
+        </StackPanel>
+      </Border>
+
+      <Border BorderBrush="{DynamicResource ThemeBorderLowBrush}" BorderThickness="1" Padding="8" CornerRadius="2">
+        <StackPanel Spacing="6">
+          <TextBlock Text="Cut depths and feed rates" FontWeight="SemiBold"/>
+          <StackPanel Orientation="Horizontal" Spacing="12">
+            <StackPanel Spacing="2">
+              <TextBlock Text="Pass depth"/>
+              <controls:NumericTextBox Width="90" Value="{Binding Passdepth, Mode=TwoWay}" Format="{Binding Format}"/>
+            </StackPanel>
+            <StackPanel Spacing="2">
+              <TextBlock Text="Feed rate"/>
+              <controls:NumericTextBox Width="90" Value="{Binding FeedRate, Mode=TwoWay}" Format="{Binding Format}"/>
+            </StackPanel>
+            <local:SpringPassControl Passes="{Binding SpringPasses}" IsPassesEnabled="{Binding IsSpringPassesEnabled, Mode=TwoWay}"/>
+          </StackPanel>
+          <StackPanel Orientation="Horizontal" Spacing="12">
+            <StackPanel Spacing="2">
+              <TextBlock Text="Last pass depth"/>
+              <controls:NumericTextBox Width="90" Value="{Binding PassdepthLastPass, Mode=TwoWay}" Format="{Binding Format}"/>
+            </StackPanel>
+            <StackPanel Spacing="2">
+              <TextBlock Text="Last pass feed"/>
+              <controls:NumericTextBox Width="90" Value="{Binding FeedRateLastPass, Mode=TwoWay}" Format="{Binding Format}"/>
+            </StackPanel>
+          </StackPanel>
+        </StackPanel>
+      </Border>
+
+      <local:CssControl IsCssEnabled="{Binding IsCssEnabled, Mode=TwoWay}" Speed="{Binding CssSpeed}"
+                        CssUnit="{Binding CssUnit}" SpindleDirection="{Binding SpindleDir, Mode=TwoWay}"
+                        SpindleDirections="{Binding SpindleDirections}"/>
+
+      <TextBox IsReadOnly="True" AcceptsReturn="True" TextWrapping="Wrap" MinHeight="120" MaxHeight="200">
+        <TextBox.Text>
+          <MultiBinding Converter="{x:Static conv:LatheConverters.StringCollectionToText}">
+            <Binding Path="gCode"/>
+            <Binding Path="gCode.Count"/>
+          </MultiBinding>
+        </TextBox.Text>
+      </TextBox>
+
+      <local:LatheOutputActions x:Name="OutputActions" SourceLabel="turning.nc"/>
+    </StackPanel>
+  </ScrollViewer>
+</UserControl>

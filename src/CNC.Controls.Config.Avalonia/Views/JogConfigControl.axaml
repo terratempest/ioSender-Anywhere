@@ -1,0 +1,37 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:cnc="using:CNC.Controls.Avalonia.Views"
+             x:Class="CNC.Controls.Config.JogConfigControl"
+             x:Name="root"
+             Width="310"
+             Loaded="OnLoaded">
+  <Border BorderBrush="{DynamicResource ThemeBorderLowBrush}"
+          BorderThickness="1" Padding="8" CornerRadius="2">
+    <StackPanel Spacing="4">
+      <TextBlock Text="Keyboard jogging" FontWeight="SemiBold"/>
+
+      <StackPanel x:Name="pnlKeyboardEnable" Orientation="Horizontal" Spacing="5"
+                  IsVisible="{Binding #root.ShowKeyboardWarning}">
+        <CheckBox Content="Enable" IsChecked="{Binding Jog.KeyboardEnable, Mode=TwoWay}" Margin="160,3,0,3"/>
+        <TextBlock Text="!" Foreground="OrangeRed" VerticalAlignment="Center"
+                   ToolTip.Tip="Warning! - Grbl has outstanding bug(s) in jog cancel (on key up)."/>
+      </StackPanel>
+
+      <cnc:NumericField Label="Fast feedrate:" Unit="mm/min" Format="###0"
+                        Value="{Binding Jog.FastFeedrate, Mode=TwoWay}"/>
+      <cnc:NumericField Label="Fast distance:"
+                        Value="{Binding Jog.FastDistance, Mode=TwoWay}"/>
+      <cnc:NumericField Label="Slow feedrate:" Unit="mm/min" Format="###0"
+                        Value="{Binding Jog.SlowFeedrate, Mode=TwoWay}"/>
+      <cnc:NumericField Label="Slow distance:"
+                        Value="{Binding Jog.SlowDistance, Mode=TwoWay}"/>
+      <cnc:NumericField Label="Step feedrate:" Unit="mm/min" Format="###0"
+                        Value="{Binding Jog.StepFeedrate, Mode=TwoWay}"/>
+      <CheckBox Content="Link step distance to UI jogging"
+                IsChecked="{Binding Jog.LinkStepJogToUI, Mode=TwoWay}" Margin="50,3,0,3"/>
+      <cnc:NumericField Label="Step distance:"
+                        Value="{Binding Jog.StepDistance, Mode=TwoWay}"
+                        IsReadOnly="{Binding Jog.LinkStepJogToUI}"/>
+    </StackPanel>
+  </Border>
+</UserControl>

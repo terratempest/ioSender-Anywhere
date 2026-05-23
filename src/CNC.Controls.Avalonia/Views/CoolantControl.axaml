@@ -1,0 +1,25 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:conv="using:CNC.Controls.Avalonia.Converters"
+             xmlns:views="using:CNC.Controls.Avalonia.Views"
+             xmlns:loc="using:CNC.Localization.Avalonia"
+             x:Class="CNC.Controls.Avalonia.Views.CoolantControl"
+             Width="250" Height="80">
+  <UserControl.Resources>
+    <conv:BoolToVisibleConverter x:Key="IsVisibleConverter"/>
+  </UserControl.Resources>
+  <Border Classes="panel-chrome" BorderThickness="1" Padding="4" Width="250">
+    <StackPanel>
+      <TextBlock x:Name="LblCoolant" Text="Coolant" FontWeight="Bold" Margin="0,0,0,4"
+                 loc:Localize.Key="CNC.Controls.WPF.coolantcontrol.grp_coolant" loc:Localize.Fallback="Coolant"/>
+      <views:ToggleControl x:Name="tswFlood" Tag="Flood" Label="Flood"
+                           IsChecked="{Binding Flood, Mode=OneWay}" Margin="8,0,0,0" Click="chkCoolant_Click"/>
+      <views:ToggleControl x:Name="tswMist" Tag="Mist" Label="Mist"
+                           IsChecked="{Binding Mist, Mode=OneWay}" Margin="8,0,0,0" Click="chkCoolant_Click"/>
+      <views:ToggleControl x:Name="tswFan" Tag="Fan" Label="Fan"
+                           IsChecked="{Binding Fan0, Mode=OneWay}"
+                           IsVisible="{Binding HasFans, Mode=OneWay, Converter={StaticResource IsVisibleConverter}}"
+                           Margin="8,0,0,0" Click="chkCoolant_Click"/>
+    </StackPanel>
+  </Border>
+</UserControl>

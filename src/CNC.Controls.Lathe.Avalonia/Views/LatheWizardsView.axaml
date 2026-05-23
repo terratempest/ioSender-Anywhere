@@ -1,0 +1,44 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:local="using:CNC.Controls.Lathe"
+             xmlns:loc="using:CNC.Localization.Avalonia"
+             mc:Ignorable="d"
+             d:DesignHeight="515" d:DesignWidth="900"
+             x:Class="CNC.Controls.Lathe.LatheWizardsView">
+
+  <Grid>
+    <TabControl x:Name="tab" Background="Transparent"
+                HorizontalAlignment="Stretch" VerticalAlignment="Stretch"
+                SelectionChanged="OnTabSelectionChanged">
+      <TabItem x:Name="tabTurning" Header="Turning"
+               loc:Localize.Key="ioSender.mainwindow.tab_turning" loc:Localize.Fallback="Turning">
+        <local:TurningWizard x:Name="turningWizard"/>
+      </TabItem>
+      <TabItem x:Name="tabParting" Header="Parting"
+               loc:Localize.Key="ioSender.mainwindow.tab_parting" loc:Localize.Fallback="Parting">
+        <local:PartingWizard x:Name="partingWizard"/>
+      </TabItem>
+      <TabItem x:Name="tabFacing" Header="Facing"
+               loc:Localize.Key="ioSender.mainwindow.tab_facing" loc:Localize.Fallback="Facing">
+        <local:FacingWizard x:Name="facingWizard"/>
+      </TabItem>
+      <TabItem x:Name="tabThreading" Header="Threading"
+               loc:Localize.Key="ioSender.mainwindow.tab_threading" loc:Localize.Fallback="Threading">
+        <local:ThreadingWizard x:Name="threadingWizard"/>
+      </TabItem>
+    </TabControl>
+
+    <Border x:Name="DisconnectedOverlay" Classes="disconnected-overlay"
+            IsVisible="False" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" ZIndex="10">
+      <StackPanel VerticalAlignment="Center" HorizontalAlignment="Center" Spacing="8" Margin="24">
+        <TextBlock Text="Not connected to controller" FontSize="16" FontWeight="SemiBold"
+                   Classes="overlay-message"/>
+        <TextBlock Text="Connect from the toolbar to use lathe wizards with live machine settings."
+                   TextWrapping="Wrap" MaxWidth="420" Classes="overlay-message" Opacity="0.9"
+                   loc:Localize.Key="ioSender.lathe.str_notConnected" loc:Localize.Fallback="Connect from the toolbar to use lathe wizards with live machine settings."/>
+      </StackPanel>
+    </Border>
+  </Grid>
+</UserControl>

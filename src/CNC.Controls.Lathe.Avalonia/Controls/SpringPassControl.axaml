@@ -1,0 +1,12 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:controls="using:CNC.Controls.Avalonia.Controls"
+             x:Class="CNC.Controls.Lathe.SpringPassControl">
+  <StackPanel Orientation="Horizontal" Spacing="6">
+    <CheckBox x:Name="ChkPasses" Content="Spring passes:"
+              IsChecked="{Binding IsPassesEnabled, RelativeSource={RelativeSource AncestorType=UserControl}}"/>
+    <controls:NumericTextBox x:Name="PassesBox" Width="48" Format="#0"
+                             IsEnabled="{Binding IsPassesEnabled, RelativeSource={RelativeSource AncestorType=UserControl}}"
+                             Value="{Binding Passes, RelativeSource={RelativeSource AncestorType=UserControl}, Mode=TwoWay}"/>
+  </StackPanel>
+</UserControl>

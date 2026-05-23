@@ -1,0 +1,13 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:controls="using:CNC.Controls.Avalonia.Controls"
+             x:Class="CNC.Controls.Lathe.TaperControl">
+  <StackPanel Orientation="Horizontal" Spacing="6">
+    <CheckBox x:Name="ChkTaper" Content="Taper:"
+              IsChecked="{Binding IsTaperEnabled, RelativeSource={RelativeSource AncestorType=UserControl}}"/>
+    <controls:NumericTextBox x:Name="TaperBox" Width="64" Format="##0"
+                             IsEnabled="{Binding IsTaperEnabled, RelativeSource={RelativeSource AncestorType=UserControl}}"
+                             Value="{Binding Value, RelativeSource={RelativeSource AncestorType=UserControl}, Mode=TwoWay}"/>
+    <TextBlock Text="deg" VerticalAlignment="Center"/>
+  </StackPanel>
+</UserControl>

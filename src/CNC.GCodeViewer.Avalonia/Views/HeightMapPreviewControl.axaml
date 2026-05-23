@@ -1,0 +1,11 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:helix="using:HelixToolkit.Avalonia.SharpDX"
+             x:Class="CNC.GCodeViewer.Avalonia.Views.HeightMapPreviewControl">
+  <helix:Viewport3DX x:Name="Viewport"
+                     HorizontalAlignment="Stretch"
+                     VerticalAlignment="Stretch"
+                     Background="#101010"
+                     ShowCoordinateSystem="False"
+                     ShowViewCube="False"/>
+</UserControl>

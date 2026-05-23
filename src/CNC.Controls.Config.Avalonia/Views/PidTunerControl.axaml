@@ -1,0 +1,40 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             mc:Ignorable="d"
+             d:DesignHeight="480" d:DesignWidth="875"
+             x:Class="CNC.Controls.Config.PidTunerControl">
+
+  <Grid RowDefinitions="*,Auto">
+    <Grid Grid.Row="0" ColumnDefinitions="Auto,Auto">
+      <Border Grid.Column="0" BorderBrush="{DynamicResource ThemeBorderLowBrush}"
+              BorderThickness="1" Margin="10,5,0,0" Width="642" Height="432">
+        <Canvas x:Name="PidPlot" Background="{DynamicResource ThemeControlLowBrush}" Width="640" Height="430"/>
+      </Border>
+      <StackPanel Grid.Column="1" Margin="8,12,0,0" Width="70" Spacing="30">
+        <TextBlock Text="{Binding GridLabel4, StringFormat={}{0:0} µm}" Foreground="Red"/>
+        <TextBlock Text="{Binding GridLabel3, StringFormat={}{0:0} µm}" Foreground="Red"/>
+        <TextBlock Text="{Binding GridLabel2, StringFormat={}{0:0} µm}" Foreground="Red"/>
+        <TextBlock Text="{Binding GridLabel1, StringFormat={}{0:0} µm}" Foreground="Red"/>
+        <TextBlock Text="0" Foreground="Red"/>
+        <TextBlock Text="{Binding GridLabel1, StringFormat=-{0:0} µm}" Foreground="Red"/>
+        <TextBlock Text="{Binding GridLabel2, StringFormat=-{0:0} µm}" Foreground="Red"/>
+        <TextBlock Text="{Binding GridLabel3, StringFormat=-{0:0} µm}" Foreground="Red"/>
+        <TextBlock Text="{Binding GridLabel4, StringFormat=-{0:0} µm}" Foreground="Red"/>
+      </StackPanel>
+    </Grid>
+
+    <Grid Grid.Row="1" ColumnDefinitions="Auto,*,Auto" Margin="10,4,10,8">
+      <Button x:Name="btnGetPidData" Content="Get data" Width="75" Height="25" Click="OnGetPidDataClick"/>
+      <StackPanel Grid.Column="1" Orientation="Horizontal" HorizontalAlignment="Center" Spacing="12">
+        <TextBlock Text="Target" Foreground="Green" VerticalAlignment="Center"/>
+        <TextBlock Text="Actual" Foreground="Blue" VerticalAlignment="Center"/>
+        <TextBlock Text="Error" Foreground="Red" VerticalAlignment="Center"/>
+      </StackPanel>
+      <Slider Grid.Column="2" Minimum="0" Maximum="5" TickFrequency="1" IsSnapToTickEnabled="True"
+              Value="{Binding ErrorScale, Mode=TwoWay}"
+              Width="169" ValueChanged="OnErrorScaleChanged"/>
+    </Grid>
+  </Grid>
+</UserControl>

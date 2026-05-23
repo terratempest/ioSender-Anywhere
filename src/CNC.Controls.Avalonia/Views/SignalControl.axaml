@@ -1,0 +1,11 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             x:Class="CNC.Controls.Avalonia.Views.SignalControl"
+             MinWidth="14" MinHeight="30">
+  <StackPanel Height="30" HorizontalAlignment="Center">
+    <Border x:Name="btnLED" Width="10" Height="10" Margin="0,2,0,0" HorizontalAlignment="Center"
+            Background="LightGray" CornerRadius="5"/>
+    <TextBlock x:Name="btnLabel" Text="{Binding Label, RelativeSource={RelativeSource AncestorType=UserControl}}"
+               HorizontalAlignment="Center" Margin="0,3,0,0" FontSize="10"/>
+  </StackPanel>
+</UserControl>

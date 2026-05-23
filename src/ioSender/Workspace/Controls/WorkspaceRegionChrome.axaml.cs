@@ -1,0 +1,257 @@
+using Avalonia;
+using Avalonia.Controls;
+using Avalonia.Input;
+using Avalonia.Layout;
+using Avalonia.Threading;
+using CNC.App.Workspace;
+using CNC.Localization.Avalonia;
+using ioSender.Workspace.Editors;
+
+namespace ioSender.Workspace.Controls;
+
+public partial class WorkspaceRegionChrome : Border
+{
+    const double SignalsCompactHeaderHeight = 70d;
+
+    public static readonly StyledProperty<WorkspaceEditorId> EditorIdProperty =
+        AvaloniaProperty.Register<WorkspaceRegionChrome, WorkspaceEditorId>(nameof(EditorId));
+
+    public static readonly StyledProperty<bool> IsEditModeProperty =
+        AvaloniaProperty.Register<WorkspaceRegionChrome, bool>(nameof(IsEditMode));
+
+    public event EventHandler<WorkspaceRegionChrome>? DragStarted;
+    public event EventHandler<WorkspaceRegionChrome>? DropCompleted;
+
+    public event EventHandler? SplitHorizontalRequested;
+    public event EventHandler? SplitVerticalRequested;
+    public event EventHandler? JoinRequested;
+    public event EventHandler<WorkspaceEditorId>? ChangeEditorRequested;
+
+    bool _isDropTarget;
+
+    public WorkspaceRegionChrome()
+    {
+        InitializeComponent();
+        BuildContextMenu();
+        TitleBar.PointerPressed += OnTitleBarPointerPressed;
+        TitleBar.PointerReleased += OnTitleBarPointerReleased;
+        PointerEntered += OnPointerEntered;
+        PointerExited += OnPointerExited;
+        SizeChanged += OnSizeChanged;
+    }
+
+    public WorkspaceEditorId EditorId
+    {
+        get => GetValue(EditorIdProperty);
+        set => SetValue(EditorIdProperty, value);
+    }
+
+    public bool IsEditMode
+    {
+        get => GetValue(IsEditModeProperty);
+        set => SetValue(IsEditModeProperty, value);
+    }
+
+    public WorkspaceNode? LayoutNode { get; set; }
+
+    protected override void OnPropertyChanged(AvaloniaPropertyChangedEventArgs change)
+    {
+        base.OnPropertyChanged(change);
+        if (change.Property == EditorIdProperty)
+        {
+            RefreshTitle();
+            UpdateTitleBarVisibility();
+        }
+        if (change.Property == IsEditModeProperty)
+        {
+            UpdateEditChrome();
+            UpdateTitleBarVisibility();
+        }
+    }
+
+    public static void DetachEditor(Control content)
+    {
+        while (content.Parent is Control parent)
+        {
+            var detached = false;
+            switch (parent)
+            {
+                case Panel panel:
+                    panel.Children.Remove(content);
+                    detached = true;
+                    break;
+                case ContentControl cc when ReferenceEquals(cc.Content, content):
+                    cc.Content = null;
+                    detached = true;
+                    break;
+                case Decorator decorator when ReferenceEquals(decorator.Child, content):
+                    decorator.Child = null;
+                    detached = true;
+                    break;
+            }
+
+            if (!detached)
+                break;
+        }
+    }
+
+    public void ClearEditorHost()
+    {
+        if (EditorHost.Content is Control previous)
+            DetachEditor(previous);
+        EditorHost.Content = null;
+    }
+
+    public void SetEditorContent(Control content)
+    {
+        if (EditorHost.Content is Control previous && !ReferenceEquals(previous, content))
+            DetachEditor(previous);
+        DetachEditor(content);
+        EditorHost.Content = content;
+
+        var fills = WorkspaceEditorCatalog.Get(EditorId).FillsWorkspace;
+        content.HorizontalAlignment = fills
+            ? Avalonia.Layout.HorizontalAlignment.Stretch
+            : Avalonia.Layout.HorizontalAlignment.Left;
+        content.VerticalAlignment = fills
+            ? Avalonia.Layout.VerticalAlignment.Stretch
+            : Avalonia.Layout.VerticalAlignment.Top;
+
+        if (fills && content is Layoutable layoutable)
+        {
+            layoutable.Width = double.NaN;
+            layoutable.Height = double.NaN;
+        }
+
+        if (fills)
+        {
+            EditorScroll.HorizontalScrollBarVisibility = Avalonia.Controls.Primitives.ScrollBarVisibility.Disabled;
+            EditorScroll.VerticalScrollBarVisibility = Avalonia.Controls.Primitives.ScrollBarVisibility.Disabled;
+            EditorHost.Margin = new Thickness(0);
+        }
+        else
+        {
+            EditorScroll.HorizontalScrollBarVisibility = Avalonia.Controls.Primitives.ScrollBarVisibility.Auto;
+            EditorScroll.VerticalScrollBarVisibility = Avalonia.Controls.Primitives.ScrollBarVisibility.Auto;
+            EditorHost.Margin = new Thickness(2);
+        }
+    }
+
+    public void RefreshTitle()
+    {
+        var desc = WorkspaceEditorCatalog.Get(EditorId);
+        TitleText.Text = Localize.T(desc.TitleKey, desc.TitleFallback);
+    }
+
+    void UpdateEditChrome()
+    {
+        EditHint.IsVisible = IsEditMode;
+        Classes.Set("workspace-region-edit", IsEditMode);
+    }
+
+    void OnSizeChanged(object? sender, SizeChangedEventArgs e) => UpdateTitleBarVisibility();
+
+    void UpdateTitleBarVisibility()
+    {
+        TitleBar.IsVisible = EditorId != WorkspaceEditorId.Signals
+            || IsEditMode
+            || Bounds.Height >= SignalsCompactHeaderHeight;
+    }
+
+    void OnTitleBarPointerPressed(object? sender, PointerPressedEventArgs e)
+    {
+        if (!IsEditMode)
+            return;
+
+        if (!e.GetCurrentPoint(this).Properties.IsLeftButtonPressed)
+            return;
+
+        WorkspaceDragBroker.Source = this;
+        DragStarted?.Invoke(this, this);
+        e.Pointer.Capture(TitleBar);
+        e.Handled = true;
+    }
+
+    void OnTitleBarPointerReleased(object? sender, PointerReleasedEventArgs e)
+    {
+        if (!IsEditMode)
+            return;
+
+        if (_isDropTarget && WorkspaceDragBroker.Source is { } source && !ReferenceEquals(source, this))
+            DropCompleted?.Invoke(this, this);
+
+        ClearDropTarget();
+        WorkspaceDragBroker.Clear();
+        e.Pointer.Capture(null);
+        e.Handled = true;
+    }
+
+    void OnPointerEntered(object? sender, PointerEventArgs e)
+    {
+        if (!IsEditMode || WorkspaceDragBroker.Source is not { } source || ReferenceEquals(source, this))
+            return;
+
+        _isDropTarget = true;
+        Classes.Add("workspace-drop-target");
+    }
+
+    void OnPointerExited(object? sender, PointerEventArgs e) => ClearDropTarget();
+
+    public void ClearDropTarget()
+    {
+        if (!_isDropTarget)
+            return;
+        _isDropTarget = false;
+        Classes.Remove("workspace-drop-target");
+    }
+
+    public void BuildContextMenu()
+    {
+        var menu = new ContextMenu();
+        menu.Items.Add(MakeItem("Split horizontally", () => RequestSplit(SplitHorizontalRequested)));
+        menu.Items.Add(MakeItem("Split vertically", () => RequestSplit(SplitVerticalRequested)));
+        menu.Items.Add(MakeItem("Join with neighbor", () => RequestJoin()));
+        menu.Items.Add(new Separator());
+
+        var change = new MenuItem { Header = "Change panel" };
+        foreach (var desc in WorkspaceEditorCatalog.LayoutPickableDescriptors)
+        {
+            var id = desc.Id;
+            change.Items.Add(MakeItem(
+                Localize.T(desc.TitleKey, desc.TitleFallback),
+                () => ChangeEditorRequested?.Invoke(this, id)));
+        }
+        menu.Items.Add(change);
+        ContextMenu = null;
+        TitleBar.ContextMenu = menu;
+    }
+
+    void RequestSplit(EventHandler? handler)
+    {
+        CloseTitleBarMenu();
+        Dispatcher.UIThread.Post(
+            () => handler?.Invoke(this, EventArgs.Empty),
+            DispatcherPriority.Loaded);
+    }
+
+    void RequestJoin()
+    {
+        CloseTitleBarMenu();
+        Dispatcher.UIThread.Post(
+            () => JoinRequested?.Invoke(this, EventArgs.Empty),
+            DispatcherPriority.Loaded);
+    }
+
+    void CloseTitleBarMenu()
+    {
+        if (TitleBar.ContextMenu is { } menu)
+            menu.Close();
+    }
+
+    static MenuItem MakeItem(string header, Action action)
+    {
+        var item = new MenuItem { Header = header };
+        item.Click += (_, _) => action();
+        return item;
+    }
+}

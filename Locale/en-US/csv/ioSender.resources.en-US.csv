@@ -50,3 +50,48 @@ ioSender.g.en-US.resources:mainwindow.baml,tab_sdCard:System.Windows.Controls.He
 ioSender.g.en-US.resources:mainwindow.baml,tab_threading:System.Windows.Controls.HeaderedContentControl.Header,Label,True,True,,Threading
 ioSender.g.en-US.resources:mainwindow.baml,tab_tools:System.Windows.Controls.HeaderedContentControl.Header,Label,True,True,,Tools
 ioSender.g.en-US.resources:mainwindow.baml,tab_turning:System.Windows.Controls.HeaderedContentControl.Header,Label,True,True,,Turning
+ioSender.g.en-US.resources:mainwindow.baml,mnu_connect:System.Windows.Controls.HeaderedItemsControl.Header,Menu,True,True,,_Connect...
+ioSender.g.en-US.resources:mainwindow.baml,mnu_view:System.Windows.Controls.HeaderedItemsControl.Header,Menu,True,True,,_View
+ioSender.g.en-US.resources:mainwindow.baml,mnu_toggleLayout:System.Windows.Controls.HeaderedItemsControl.Header,Menu,True,True,,Toggle _large layout
+ioSender.g.en-US.resources:mainwindow.baml,mnu_refreshPorts:System.Windows.Controls.HeaderedItemsControl.Header,Menu,True,True,,_Refresh serial ports
+ioSender.g.en-US.resources:mainwindow.baml,btn_connect:System.Windows.Controls.ContentControl.Content,Button,True,True,,Connect
+ioSender.g.en-US.resources:mainwindow.baml,btn_disconnect:System.Windows.Controls.ContentControl.Content,Button,True,True,,Disconnect
+ioSender.g.en-US.resources:mainwindow.baml,str_connected:System.String.$Content,None,True,True,,Connected: {0}
+ioSender.g.en-US.resources:mainwindow.baml,tab_sectionMachine:System.Windows.Controls.HeaderedContentControl.Header,Label,True,True,,Machine
+ioSender.g.en-US.resources:mainwindow.baml,tab_sectionWorkflows:System.Windows.Controls.HeaderedContentControl.Header,Label,True,True,,Workflows
+ioSender.g.en-US.resources:mainwindow.baml,tab_sectionSettings:System.Windows.Controls.HeaderedContentControl.Header,Label,True,True,,Settings
+ioSender.g.en-US.resources:lathe.baml,btn_loadProgram:System.Windows.Controls.ContentControl.Content,Button,True,True,,Load in program
+ioSender.g.en-US.resources:lathe.baml,btn_saveFile:System.Windows.Controls.ContentControl.Content,Button,True,True,,Save as...
+ioSender.g.en-US.resources:lathe.baml,str_warning:System.String.$Content,None,True,True,,Warning! Use with care - only lightly tested!
+ioSender.g.en-US.resources:lathe.baml,str_notConnected:System.String.$Content,None,True,True,,Connect from the toolbar to use lathe wizards with live machine settings.
+ioSender.g.en-US.resources:probing.baml,str_notConnectedTitle:System.String.$Content,None,True,True,,Not connected to controller
+ioSender.g.en-US.resources:probing.baml,str_notConnectedBody:System.String.$Content,None,True,True,,Connect from the toolbar before running probing cycles.
+ioSender.g.en-US.resources:appconfig.baml,btn_save:System.Windows.Controls.ContentControl.Content,Button,True,True,,Save settings
+ioSender.g.en-US.resources:appconfig.baml,tab_jog:System.Windows.Controls.HeaderedContentControl.Header,Label,True,True,,Jog
+ioSender.g.en-US.resources:appconfig.baml,tab_appearance:System.Windows.Controls.HeaderedContentControl.Header,Label,True,True,,Appearance
+ioSender.g.en-US.resources:appconfig.baml,tab_machine:System.Windows.Controls.HeaderedContentControl.Header,Label,True,True,,Machine
+ioSender.g.en-US.resources:appconfig.baml,tab_viewer:System.Windows.Controls.HeaderedContentControl.Header,Label,True,True,,G-code viewer
+ioSender.g.en-US.resources:appconfig.baml,tab_strip:System.Windows.Controls.HeaderedContentControl.Header,Label,True,True,,Program strip
+ioSender.g.en-US.resources:appconfig.baml,tab_keyboard:System.Windows.Controls.HeaderedContentControl.Header,Label,True,True,,Keyboard
+ioSender.g.en-US.resources:mainwindow.baml,mnu_customizeLayout:System.Windows.Controls.HeaderedItemsControl.Header,Menu,True,True,,_Customize layout
+ioSender.g.en-US.resources:mainwindow.baml,mnu_resetLayout:System.Windows.Controls.HeaderedItemsControl.Header,Menu,True,True,,_Reset layout
+ioSender.g.en-US.resources:mainwindow.baml,mnu_layoutPreset:System.Windows.Controls.HeaderedItemsControl.Header,Menu,True,True,,Layout _preset
+ioSender.g.en-US.resources:mainwindow.baml,mnu_presetCompact:System.Windows.Controls.HeaderedItemsControl.Header,Menu,True,True,,_Compact
+ioSender.g.en-US.resources:mainwindow.baml,mnu_presetExpanded:System.Windows.Controls.HeaderedItemsControl.Header,Menu,True,True,,_Expanded
+ioSender.g.en-US.resources:workspace.baml,editor_program:System.String.$Content,None,True,True,,Program
+ioSender.g.en-US.resources:workspace.baml,editor_viewer3d:System.String.$Content,None,True,True,,3D View
+ioSender.g.en-US.resources:workspace.baml,editor_console:System.String.$Content,None,True,True,,Console
+ioSender.g.en-US.resources:workspace.baml,editor_signals:System.String.$Content,None,True,True,,Signals
+ioSender.g.en-US.resources:workspace.baml,editor_status:System.String.$Content,None,True,True,,Status
+ioSender.g.en-US.resources:workspace.baml,editor_jog:System.String.$Content,None,True,True,,Jog
+ioSender.g.en-US.resources:workspace.baml,editor_outline:System.String.$Content,None,True,True,,Outline
+ioSender.g.en-US.resources:workspace.baml,editor_goto:System.String.$Content,None,True,True,,Goto
+ioSender.g.en-US.resources:workspace.baml,editor_workparams:System.String.$Content,None,True,True,,Work Parameters
+ioSender.g.en-US.resources:workspace.baml,editor_spindle:System.String.$Content,None,True,True,,Spindle
+ioSender.g.en-US.resources:workspace.baml,editor_coolant:System.String.$Content,None,True,True,,Coolant
+ioSender.g.en-US.resources:workspace.baml,editor_feed:System.String.$Content,None,True,True,,Feed
+ioSender.g.en-US.resources:workspace.baml,editor_jobbar:System.String.$Content,None,True,True,,Job
+ioSender.g.en-US.resources:mainwindow.baml,tab_home:System.Windows.Controls.HeaderedContentControl.Header,Label,True,True,,Home
+ioSender.g.en-US.resources:mainwindow.baml,mnu_settings:System.Windows.Controls.HeaderedItemsControl.Header,Menu,True,True,,_Settings
+ioSender.g.en-US.resources:mainwindow.baml,mnu_grblSettings:System.Windows.Controls.HeaderedItemsControl.Header,Menu,True,True,,Settings: _Grbl
+ioSender.g.en-US.resources:mainwindow.baml,mnu_appSettings:System.Windows.Controls.HeaderedItemsControl.Header,Menu,True,True,,Settings: _App

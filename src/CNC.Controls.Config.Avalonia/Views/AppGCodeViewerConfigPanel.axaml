@@ -1,0 +1,46 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:cnc="using:CNC.Controls.Avalonia.Views"
+             x:Class="CNC.Controls.Config.AppGCodeViewerConfigPanel"
+             Width="310">
+  <Border BorderBrush="{DynamicResource ThemeBorderLowBrush}"
+          BorderThickness="1" Padding="8" CornerRadius="2">
+    <StackPanel Spacing="4">
+      <TextBlock Text="G-code viewer" FontWeight="SemiBold"/>
+      <CheckBox Content="Enable" IsChecked="{Binding GCodeViewer.IsEnabled, Mode=TwoWay}"/>
+      <cnc:NumericField Label="Arc resolution:" Unit="segments" Format="#0"
+                        Value="{Binding GCodeViewer.ArcResolution, Mode=TwoWay}"/>
+      <cnc:NumericField Label="Min distance:"
+                        Value="{Binding GCodeViewer.MinDistance, Mode=TwoWay}"/>
+      <cnc:NumericField Label="Tool diameter:" Unit="mm" Format="###0.0"
+                        Value="{Binding GCodeViewer.ToolDiameter, Mode=TwoWay}"/>
+      <CheckBox Content="Black background" Margin="0,4,0,0"
+                IsChecked="{Binding GCodeViewer.BlackBackground, Mode=TwoWay}"
+                IsEnabled="{Binding GCodeViewer.IsEnabled}"/>
+      <CheckBox Content="Show grid" IsChecked="{Binding GCodeViewer.ShowGrid, Mode=TwoWay}"
+                IsEnabled="{Binding GCodeViewer.IsEnabled}"/>
+      <CheckBox Content="Show axes" IsChecked="{Binding GCodeViewer.ShowAxes, Mode=TwoWay}"
+                IsEnabled="{Binding GCodeViewer.IsEnabled}"/>
+      <CheckBox Content="Show work envelope"
+                IsChecked="{Binding GCodeViewer.ShowWorkEnvelope, Mode=TwoWay}"
+                IsEnabled="{Binding GCodeViewer.IsHomingEnabled}"/>
+      <CheckBox Content="Show bounding box"
+                IsChecked="{Binding GCodeViewer.ShowBoundingBox, Mode=TwoWay}"
+                IsEnabled="{Binding GCodeViewer.IsEnabled}"/>
+      <CheckBox Content="Show ViewCube" IsChecked="{Binding GCodeViewer.ShowViewCube, Mode=TwoWay}"
+                IsEnabled="{Binding GCodeViewer.IsEnabled}"/>
+      <CheckBox Content="Show coordinate system"
+                IsChecked="{Binding GCodeViewer.ShowCoordinateSystem, Mode=TwoWay}"
+                IsEnabled="{Binding GCodeViewer.IsEnabled}"/>
+      <CheckBox Content="Show text overlay"
+                IsChecked="{Binding GCodeViewer.ShowTextOverlay, Mode=TwoWay}"
+                IsEnabled="{Binding GCodeViewer.IsEnabled}"/>
+      <CheckBox Content="Auto scale tool"
+                IsChecked="{Binding GCodeViewer.ToolAutoScale, Mode=TwoWay}"
+                IsEnabled="{Binding GCodeViewer.IsEnabled}"/>
+      <CheckBox Content="Highlight completed cuts"
+                IsChecked="{Binding GCodeViewer.RenderExecuted, Mode=TwoWay}"
+                IsEnabled="{Binding GCodeViewer.IsEnabled}"/>
+    </StackPanel>
+  </Border>
+</UserControl>

@@ -1,0 +1,34 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:local="using:CNC.Controls.Probing"
+        x:Class="CNC.Controls.Probing.MacroDialog"
+        Title="Probing macros"
+        Width="475" Height="255"
+        CanResize="False"
+        WindowStartupLocation="CenterOwner">
+  <Grid RowDefinitions="32,*,30" ColumnDefinitions="*,*">
+    <StackPanel Grid.Row="0" Grid.ColumnSpan="2" Orientation="Horizontal" Margin="5,5,0,0" Spacing="8">
+      <ComboBox x:Name="MacroCombo" Width="175" Height="22"
+                ItemsSource="{Binding Macros}"
+                SelectedItem="{Binding SelectedMacro, Mode=TwoWay}"
+                DisplayMemberBinding="{Binding Name}"/>
+      <CheckBox Content="Run once" VerticalAlignment="Center" IsChecked="{Binding RunOnce, Mode=TwoWay}"/>
+      <Button x:Name="ActionMenuBtn" Width="24" Height="24" Click="OnActionMenuClick"
+              ToolTip.Tip="Macro actions">
+        <Image Width="22" Height="22" Source="avares://CNC.Controls.Probing.Avalonia/Views/Resources/menu_22x22.png"/>
+      </Button>
+    </StackPanel>
+    <StackPanel Grid.Row="1" Grid.Column="0" Margin="5,0,2,0" Spacing="4">
+      <TextBlock Text="Pre job:"/>
+      <TextBox x:Name="PreMacroBox" Height="125" AcceptsReturn="True" TextWrapping="Wrap"
+               ToolTip.Tip="Commands to run before probing starts."/>
+    </StackPanel>
+    <StackPanel Grid.Row="1" Grid.Column="1" Margin="2,0,5,0" Spacing="4">
+      <TextBlock Text="Post job:"/>
+      <TextBox x:Name="PostMacroBox" Height="125" AcceptsReturn="True" TextWrapping="Wrap"
+               ToolTip.Tip="Commands to run after probing completes."/>
+    </StackPanel>
+    <Button Grid.Row="2" Grid.ColumnSpan="2" Content="Close" Width="100" HorizontalAlignment="Center"
+            Margin="0,0,0,5" Click="OnCloseClick"/>
+  </Grid>
+</Window>

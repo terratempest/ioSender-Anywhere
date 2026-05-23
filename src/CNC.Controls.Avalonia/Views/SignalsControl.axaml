@@ -1,0 +1,531 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+
+             xmlns:views="using:CNC.Controls.Avalonia.Views"
+
+             xmlns:core="using:CNC.Core"
+
+             xmlns:gcode="using:CNC.GCode"
+
+             x:Class="CNC.Controls.Avalonia.Views.SignalsControl"
+
+             x:DataType="core:GrblViewModel"
+
+             MinWidth="216" MinHeight="34">
+
+  <UserControl.Resources>
+
+    <ResourceDictionary>
+
+      <ResourceDictionary.MergedDictionaries>
+
+        <ResourceInclude Source="avares://CNC.Controls.Avalonia/Themes/Controls.axaml"/>
+
+      </ResourceDictionary.MergedDictionaries>
+
+    </ResourceDictionary>
+
+  </UserControl.Resources>
+
+  <UserControl.Styles>
+
+    <Style Selector="views|SignalControl">
+
+      <Setter Property="HorizontalAlignment" Value="Stretch"/>
+
+
+
+      <Setter Property="VerticalAlignment" Value="Center"/>
+
+    </Style>
+
+  </UserControl.Styles>
+  <UniformGrid Rows="1" Margin="4,2" VerticalAlignment="Center" HorizontalAlignment="Stretch">
+
+        <views:SignalControl Label="X">
+
+          <views:SignalControl.IsSet>
+
+            <MultiBinding Converter="{StaticResource EnumFlagsHasFlagConverter}">
+
+              <Binding Path="Signals"/>
+
+              <Binding Source="{x:Static core:Signals.LimitX}"/>
+
+            </MultiBinding>
+
+          </views:SignalControl.IsSet>
+
+        </views:SignalControl>
+
+        <views:SignalControl Label="Y">
+
+          <views:SignalControl.IsSet>
+
+            <MultiBinding Converter="{StaticResource EnumFlagsHasFlagConverter}">
+
+              <Binding Path="Signals"/>
+
+              <Binding Source="{x:Static core:Signals.LimitY}"/>
+
+            </MultiBinding>
+
+          </views:SignalControl.IsSet>
+
+          <views:SignalControl.IsVisible>
+
+            <MultiBinding Converter="{StaticResource IsAxisVisibleConverter}">
+
+              <Binding Path="AxisEnabledFlags"/>
+
+              <Binding Source="{x:Static gcode:AxisFlags.Y}"/>
+
+            </MultiBinding>
+
+          </views:SignalControl.IsVisible>
+
+        </views:SignalControl>
+
+        <views:SignalControl Label="Z">
+
+          <views:SignalControl.IsSet>
+
+            <MultiBinding Converter="{StaticResource EnumFlagsHasFlagConverter}">
+
+              <Binding Path="Signals"/>
+
+              <Binding Source="{x:Static core:Signals.LimitZ}"/>
+
+            </MultiBinding>
+
+          </views:SignalControl.IsSet>
+
+          <views:SignalControl.IsVisible>
+
+            <MultiBinding Converter="{StaticResource IsAxisVisibleConverter}">
+
+              <Binding Path="AxisEnabledFlags"/>
+
+              <Binding Source="{x:Static gcode:AxisFlags.Z}"/>
+
+            </MultiBinding>
+
+          </views:SignalControl.IsVisible>
+
+        </views:SignalControl>
+
+        <views:SignalControl Label="{Binding AxisLetter.A}">
+
+          <views:SignalControl.IsSet>
+
+            <MultiBinding Converter="{StaticResource EnumFlagsHasFlagConverter}">
+
+              <Binding Path="Signals"/>
+
+              <Binding Source="{x:Static core:Signals.LimitA}"/>
+
+            </MultiBinding>
+
+          </views:SignalControl.IsSet>
+
+          <views:SignalControl.IsVisible>
+
+            <MultiBinding Converter="{StaticResource IsAxisVisibleConverter}">
+
+              <Binding Path="AxisEnabledFlags"/>
+
+              <Binding Source="{x:Static gcode:AxisFlags.A}"/>
+
+            </MultiBinding>
+
+          </views:SignalControl.IsVisible>
+
+        </views:SignalControl>
+
+        <views:SignalControl Label="{Binding AxisLetter.B}">
+
+          <views:SignalControl.IsSet>
+
+            <MultiBinding Converter="{StaticResource EnumFlagsHasFlagConverter}">
+
+              <Binding Path="Signals"/>
+
+              <Binding Source="{x:Static core:Signals.LimitB}"/>
+
+            </MultiBinding>
+
+          </views:SignalControl.IsSet>
+
+          <views:SignalControl.IsVisible>
+
+            <MultiBinding Converter="{StaticResource IsAxisVisibleConverter}">
+
+              <Binding Path="AxisEnabledFlags"/>
+
+              <Binding Source="{x:Static gcode:AxisFlags.B}"/>
+
+            </MultiBinding>
+
+          </views:SignalControl.IsVisible>
+
+        </views:SignalControl>
+
+        <views:SignalControl Label="{Binding AxisLetter.C}">
+
+          <views:SignalControl.IsSet>
+
+            <MultiBinding Converter="{StaticResource EnumFlagsHasFlagConverter}">
+
+              <Binding Path="Signals"/>
+
+              <Binding Source="{x:Static core:Signals.LimitC}"/>
+
+            </MultiBinding>
+
+          </views:SignalControl.IsSet>
+
+          <views:SignalControl.IsVisible>
+
+            <MultiBinding Converter="{StaticResource IsAxisVisibleConverter}">
+
+              <Binding Path="AxisEnabledFlags"/>
+
+              <Binding Source="{x:Static gcode:AxisFlags.C}"/>
+
+            </MultiBinding>
+
+          </views:SignalControl.IsVisible>
+
+        </views:SignalControl>
+
+        <views:SignalControl Label="U">
+
+          <views:SignalControl.IsSet>
+
+            <MultiBinding Converter="{StaticResource EnumFlagsHasFlagConverter}">
+
+              <Binding Path="Signals"/>
+
+              <Binding Source="{x:Static core:Signals.LimitU}"/>
+
+            </MultiBinding>
+
+          </views:SignalControl.IsSet>
+
+          <views:SignalControl.IsVisible>
+
+            <MultiBinding Converter="{StaticResource IsAxisVisibleConverter}">
+
+              <Binding Path="AxisEnabledFlags"/>
+
+              <Binding Source="{x:Static gcode:AxisFlags.U}"/>
+
+            </MultiBinding>
+
+          </views:SignalControl.IsVisible>
+
+        </views:SignalControl>
+
+        <views:SignalControl Label="V">
+
+          <views:SignalControl.IsSet>
+
+            <MultiBinding Converter="{StaticResource EnumFlagsHasFlagConverter}">
+
+              <Binding Path="Signals"/>
+
+              <Binding Source="{x:Static core:Signals.LimitV}"/>
+
+            </MultiBinding>
+
+          </views:SignalControl.IsSet>
+
+          <views:SignalControl.IsVisible>
+
+            <MultiBinding Converter="{StaticResource IsAxisVisibleConverter}">
+
+              <Binding Path="AxisEnabledFlags"/>
+
+              <Binding Source="{x:Static gcode:AxisFlags.V}"/>
+
+            </MultiBinding>
+
+          </views:SignalControl.IsVisible>
+
+        </views:SignalControl>
+
+        <views:SignalControl Label="W">
+
+          <views:SignalControl.IsSet>
+
+            <MultiBinding Converter="{StaticResource EnumFlagsHasFlagConverter}">
+
+              <Binding Path="Signals"/>
+
+              <Binding Source="{x:Static core:Signals.LimitW}"/>
+
+            </MultiBinding>
+
+          </views:SignalControl.IsSet>
+
+          <views:SignalControl.IsVisible>
+
+            <MultiBinding Converter="{StaticResource IsAxisVisibleConverter}">
+
+              <Binding Path="AxisEnabledFlags"/>
+
+              <Binding Source="{x:Static gcode:AxisFlags.W}"/>
+
+            </MultiBinding>
+
+          </views:SignalControl.IsVisible>
+
+        </views:SignalControl>
+<views:SignalControl Label="W" ToolTip.Tip="Motor warning">
+
+          <views:SignalControl.IsSet>
+
+            <MultiBinding Converter="{StaticResource EnumFlagsHasFlagConverter}">
+
+              <Binding Path="Signals"/>
+
+              <Binding Source="{x:Static core:Signals.MotorWarning}"/>
+
+            </MultiBinding>
+
+          </views:SignalControl.IsSet>
+
+          <views:SignalControl.IsVisible>
+
+            <MultiBinding Converter="{StaticResource IsSignalVisibleConverter}">
+
+              <Binding Path="OptionalSignals"/>
+
+              <Binding Source="{x:Static core:Signals.MotorWarning}"/>
+
+            </MultiBinding>
+
+          </views:SignalControl.IsVisible>
+
+        </views:SignalControl>
+
+        <views:SignalControl Label="F" ToolTip.Tip="Motor fault">
+
+          <views:SignalControl.IsSet>
+
+            <MultiBinding Converter="{StaticResource EnumFlagsHasFlagConverter}">
+
+              <Binding Path="Signals"/>
+
+              <Binding Source="{x:Static core:Signals.MotorFault}"/>
+
+            </MultiBinding>
+
+          </views:SignalControl.IsSet>
+
+          <views:SignalControl.IsVisible>
+
+            <MultiBinding Converter="{StaticResource IsSignalVisibleConverter}">
+
+              <Binding Path="OptionalSignals"/>
+
+              <Binding Source="{x:Static core:Signals.MotorFault}"/>
+
+            </MultiBinding>
+
+          </views:SignalControl.IsVisible>
+
+        </views:SignalControl>
+
+        <views:SignalControl Label="B" ToolTip.Tip="Block delete">
+
+          <views:SignalControl.IsSet>
+
+            <MultiBinding Converter="{StaticResource EnumFlagsHasFlagConverter}">
+
+              <Binding Path="Signals"/>
+
+              <Binding Source="{x:Static core:Signals.BlockDelete}"/>
+
+            </MultiBinding>
+
+          </views:SignalControl.IsSet>
+
+          <views:SignalControl.IsVisible>
+
+            <MultiBinding Converter="{StaticResource IsSignalVisibleConverter}">
+
+              <Binding Path="OptionalSignals"/>
+
+              <Binding Source="{x:Static core:Signals.BlockDelete}"/>
+
+            </MultiBinding>
+
+          </views:SignalControl.IsVisible>
+
+        </views:SignalControl>
+
+        <views:SignalControl Label="O" ToolTip.Tip="Optional stop">
+
+          <views:SignalControl.IsSet>
+
+            <MultiBinding Converter="{StaticResource EnumFlagsHasFlagConverter}">
+
+              <Binding Path="Signals"/>
+
+              <Binding Source="{x:Static core:Signals.OptionalStop}"/>
+
+            </MultiBinding>
+
+          </views:SignalControl.IsSet>
+
+          <views:SignalControl.IsVisible>
+
+            <MultiBinding Converter="{StaticResource IsSignalVisibleConverter}">
+
+              <Binding Path="OptionalSignals"/>
+
+              <Binding Source="{x:Static core:Signals.OptionalStop}"/>
+
+            </MultiBinding>
+
+          </views:SignalControl.IsVisible>
+
+        </views:SignalControl>
+
+        <views:SignalControl Label="H" ToolTip.Tip="Feed hold">
+
+          <views:SignalControl.IsSet>
+
+            <MultiBinding Converter="{StaticResource EnumFlagsHasFlagConverter}">
+
+              <Binding Path="Signals"/>
+
+              <Binding Source="{x:Static core:Signals.Hold}"/>
+
+            </MultiBinding>
+
+          </views:SignalControl.IsSet>
+
+        </views:SignalControl>
+
+        <views:SignalControl Label="S" ToolTip.Tip="Cycle start">
+
+          <views:SignalControl.IsSet>
+
+            <MultiBinding Converter="{StaticResource EnumFlagsHasFlagConverter}">
+
+              <Binding Path="Signals"/>
+
+              <Binding Source="{x:Static core:Signals.CycleStart}"/>
+
+            </MultiBinding>
+
+          </views:SignalControl.IsSet>
+
+        </views:SignalControl>
+
+        <views:SignalControl Label="R" ToolTip.Tip="Reset">
+
+          <views:SignalControl.IsSet>
+
+            <MultiBinding Converter="{StaticResource EnumFlagsHasFlagConverter}">
+
+              <Binding Path="Signals"/>
+
+              <Binding Source="{x:Static core:Signals.Reset}"/>
+
+            </MultiBinding>
+
+          </views:SignalControl.IsSet>
+
+          <views:SignalControl.IsVisible>
+
+            <MultiBinding Converter="{StaticResource IsSignalVisibleConverter}">
+
+              <Binding Path="OptionalSignals"/>
+
+              <Binding Source="{x:Static core:Signals.Reset}"/>
+
+            </MultiBinding>
+
+          </views:SignalControl.IsVisible>
+
+        </views:SignalControl>
+
+        <views:SignalControl Label="E" ToolTip.Tip="E-Stop">
+
+          <views:SignalControl.IsSet>
+
+            <MultiBinding Converter="{StaticResource EnumFlagsHasFlagConverter}">
+
+              <Binding Path="Signals"/>
+
+              <Binding Source="{x:Static core:Signals.EStop}"/>
+
+            </MultiBinding>
+
+          </views:SignalControl.IsSet>
+
+          <views:SignalControl.IsVisible>
+
+            <MultiBinding Converter="{StaticResource IsSignalVisibleConverter}">
+
+              <Binding Path="OptionalSignals"/>
+
+              <Binding Source="{x:Static core:Signals.EStop}"/>
+
+            </MultiBinding>
+
+          </views:SignalControl.IsVisible>
+
+        </views:SignalControl>
+
+        <views:SignalControl Label="D" ToolTip.Tip="Safety door">
+
+          <views:SignalControl.IsSet>
+
+            <MultiBinding Converter="{StaticResource EnumFlagsHasFlagConverter}">
+
+              <Binding Path="Signals"/>
+
+              <Binding Source="{x:Static core:Signals.SafetyDoor}"/>
+
+            </MultiBinding>
+
+          </views:SignalControl.IsSet>
+
+          <views:SignalControl.IsVisible>
+
+            <MultiBinding Converter="{StaticResource IsSignalVisibleConverter}">
+
+              <Binding Path="OptionalSignals"/>
+
+              <Binding Source="{x:Static core:Signals.SafetyDoor}"/>
+
+            </MultiBinding>
+
+          </views:SignalControl.IsVisible>
+
+        </views:SignalControl>
+
+        <views:SignalControl Label="P" ToolTip.Tip="Probe">
+
+          <views:SignalControl.IsSet>
+
+            <MultiBinding Converter="{StaticResource EnumFlagsHasFlagConverter}">
+
+              <Binding Path="Signals"/>
+
+              <Binding Source="{x:Static core:Signals.Probe}"/>
+
+            </MultiBinding>
+
+          </views:SignalControl.IsSet>
+
+        </views:SignalControl>
+  </UniformGrid>
+</UserControl>
+
+

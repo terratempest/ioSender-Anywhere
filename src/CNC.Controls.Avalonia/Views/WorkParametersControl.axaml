@@ -1,0 +1,66 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:conv="using:CNC.Controls.Avalonia.Converters"
+             xmlns:views="using:CNC.Controls.Avalonia.Views"
+             xmlns:loc="using:CNC.Localization.Avalonia"
+             xmlns:core="using:CNC.Core"
+             x:Class="CNC.Controls.Avalonia.Views.WorkParametersControl"
+             x:DataType="core:GrblViewModel"
+             MinWidth="200"
+             MinHeight="72"
+             HorizontalAlignment="Stretch"
+             VerticalAlignment="Stretch">
+
+  <UserControl.Resources>
+    <conv:LogicalNotConverter x:Key="BooleanConverter"/>
+    <conv:BoolToVisibleConverter x:Key="IsVisibleConverter"/>
+  </UserControl.Resources>
+
+  <Grid Margin="4" ColumnDefinitions="Auto,*,Auto,*" RowDefinitions="28,28"
+        HorizontalAlignment="Stretch" VerticalAlignment="Stretch">
+
+    <TextBlock x:Name="LblOffset" Grid.Row="0" Grid.Column="0" Text="Offset:" Height="24"
+               VerticalAlignment="Center" Foreground="{DynamicResource ThemeForegroundBrush}"
+               loc:Localize.Key="CNC.Controls.WPF.workparameterscontrol.lbl_offset" loc:Localize.Fallback="Offset:"/>
+    <ComboBox x:Name="cbxOffset" Grid.Row="0" Grid.Column="1" Height="24"
+              HorizontalAlignment="Stretch" VerticalAlignment="Center"
+              ItemsSource="{Binding CoordinateSystems}"
+              SelectedValue="{Binding WorkCoordinateSystem, Mode=OneWay}"
+              SelectedValueBinding="{Binding Code}"
+              IsEnabled="{Binding IsJobRunning, Converter={StaticResource BooleanConverter}}"
+              SelectionChanged="cbxOffset_SelectionChanged">
+      <ComboBox.ItemTemplate>
+        <DataTemplate>
+          <TextBlock Text="{Binding Code}"/>
+        </DataTemplate>
+      </ComboBox.ItemTemplate>
+    </ComboBox>
+
+    <TextBlock x:Name="LblTool" Grid.Row="0" Grid.Column="2" Text="Tool:" Height="24"
+               VerticalAlignment="Center" Foreground="{DynamicResource ThemeForegroundBrush}"
+               loc:Localize.Key="CNC.Controls.WPF.workparameterscontrol.lbl_tool" loc:Localize.Fallback="Tool:"/>
+    <ComboBox x:Name="cbxTool" Grid.Row="0" Grid.Column="3" Height="24"
+              HorizontalAlignment="Stretch" VerticalAlignment="Center"
+              ItemsSource="{Binding Tools}"
+              SelectedValue="{Binding Tool, Mode=OneWay}"
+              SelectedValueBinding="{Binding Code}"
+              IsEnabled="{Binding IsJobRunning, Converter={StaticResource BooleanConverter}}"
+              SelectionChanged="cbxTool_SelectionChanged">
+      <ComboBox.ItemTemplate>
+        <DataTemplate>
+          <TextBlock Text="{Binding Code}"/>
+        </DataTemplate>
+      </ComboBox.ItemTemplate>
+    </ComboBox>
+
+    <StackPanel Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="4"
+                Orientation="Horizontal" Spacing="12"
+                HorizontalAlignment="Right" VerticalAlignment="Center" Height="28">
+      <views:LEDControl x:Name="LedTlo" Label="TLO" Height="28"
+                        IsSet="{Binding IsToolOffsetActive, Mode=OneWay}"
+                        IsVisible="{Binding IsParserStateLive, Converter={StaticResource IsVisibleConverter}}"/>
+      <views:LEDControl x:Name="LedTloRef" Label="TLO ref'd" Height="28"
+                        IsSet="{Binding IsTloReferenceSet, Mode=OneWay}"/>
+    </StackPanel>
+  </Grid>
+</UserControl>

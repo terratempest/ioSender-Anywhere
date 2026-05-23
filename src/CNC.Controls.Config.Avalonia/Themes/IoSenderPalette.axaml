@@ -1,0 +1,65 @@
+<ResourceDictionary xmlns="https://github.com/avaloniaui"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+  <!-- Soft dark / light palette overrides for FluentTheme (reduces harsh black/white contrast). -->
+  <ResourceDictionary.ThemeDictionaries>
+  <ResourceDictionary x:Key="Dark">
+    <SolidColorBrush x:Key="ThemeBackgroundBrush" Color="#1E1E1E"/>
+    <SolidColorBrush x:Key="ThemeForegroundBrush" Color="#D4D4D4"/>
+    <SolidColorBrush x:Key="ThemeControlLowBrush" Color="#252526"/>
+    <SolidColorBrush x:Key="ThemeControlMidBrush" Color="#2D2D30"/>
+    <SolidColorBrush x:Key="ThemeControlHighBrush" Color="#3C3C3C"/>
+    <SolidColorBrush x:Key="ThemeControlHighlightLowBrush" Color="#3E3E42"/>
+    <SolidColorBrush x:Key="ThemeControlHighlightMidBrush" Color="#454545"/>
+    <SolidColorBrush x:Key="ThemeControlHighlightHighBrush" Color="#505050"/>
+    <SolidColorBrush x:Key="ThemeBorderLowBrush" Color="#3F3F46"/>
+    <SolidColorBrush x:Key="ThemeBorderMidBrush" Color="#505050"/>
+    <SolidColorBrush x:Key="ThemeBorderHighBrush" Color="#6A6A6A"/>
+    <SolidColorBrush x:Key="ThemeAccentBrush" Color="#3794FF"/>
+    <SolidColorBrush x:Key="ThemeAccentBrushLow" Color="#264F78"/>
+    <SolidColorBrush x:Key="ThemeAccentBrushHigh" Color="#4DA3FF"/>
+    <Color x:Key="ThemeAccentColor">#3794FF</Color>
+    <Color x:Key="ThemeAccentColor1">#3794FF</Color>
+    <Color x:Key="ThemeAccentColor2">#264F78</Color>
+    <Color x:Key="ThemeAccentColor3">#4DA3FF</Color>
+    <SolidColorBrush x:Key="IoSenderReadOnlyBrush" Color="#2A2A2E"/>
+    <SolidColorBrush x:Key="IoSenderOverlayBrush" Color="#99000000"/>
+    <SolidColorBrush x:Key="IoSenderDangerBrush" Color="#C62828"/>
+    <SolidColorBrush x:Key="IoSenderDangerForegroundBrush" Color="#F5F5F5"/>
+    <SolidColorBrush x:Key="IoSenderHomedBrush" Color="#2E7D32"/>
+    <SolidColorBrush x:Key="IoSenderNotHomedBrush" Color="#B71C1C"/>
+    <SolidColorBrush x:Key="IoSenderDroReadoutBrush" Color="#F5F5F5"/>
+    <SolidColorBrush x:Key="IoSenderDroReadoutForegroundBrush" Color="#1A1A1A"/>
+    <SolidColorBrush x:Key="IoSenderJogSelectedBrush" Color="#90EE90"/>
+  </ResourceDictionary>
+
+  <ResourceDictionary x:Key="Light">
+    <SolidColorBrush x:Key="ThemeBackgroundBrush" Color="#F3F3F3"/>
+    <SolidColorBrush x:Key="ThemeForegroundBrush" Color="#1E1E1E"/>
+    <SolidColorBrush x:Key="ThemeControlLowBrush" Color="#EEEEEE"/>
+    <SolidColorBrush x:Key="ThemeControlMidBrush" Color="#E4E4E4"/>
+    <SolidColorBrush x:Key="ThemeControlHighBrush" Color="#D6D6D6"/>
+    <SolidColorBrush x:Key="ThemeControlHighlightLowBrush" Color="#D0D0D0"/>
+    <SolidColorBrush x:Key="ThemeControlHighlightMidBrush" Color="#C8C8C8"/>
+    <SolidColorBrush x:Key="ThemeControlHighlightHighBrush" Color="#BEBEBE"/>
+    <SolidColorBrush x:Key="ThemeBorderLowBrush" Color="#D0D0D0"/>
+    <SolidColorBrush x:Key="ThemeBorderMidBrush" Color="#B8B8B8"/>
+    <SolidColorBrush x:Key="ThemeBorderHighBrush" Color="#9E9E9E"/>
+    <SolidColorBrush x:Key="ThemeAccentBrush" Color="#0066B8"/>
+    <SolidColorBrush x:Key="ThemeAccentBrushLow" Color="#CCE4F7"/>
+    <SolidColorBrush x:Key="ThemeAccentBrushHigh" Color="#005A9E"/>
+    <Color x:Key="ThemeAccentColor">#0066B8</Color>
+    <Color x:Key="ThemeAccentColor1">#0066B8</Color>
+    <Color x:Key="ThemeAccentColor2">#CCE4F7</Color>
+    <Color x:Key="ThemeAccentColor3">#005A9E</Color>
+    <SolidColorBrush x:Key="IoSenderReadOnlyBrush" Color="#F0F0F0"/>
+    <SolidColorBrush x:Key="IoSenderOverlayBrush" Color="#66000000"/>
+    <SolidColorBrush x:Key="IoSenderDangerBrush" Color="#C62828"/>
+    <SolidColorBrush x:Key="IoSenderDangerForegroundBrush" Color="#FFFFFF"/>
+    <SolidColorBrush x:Key="IoSenderHomedBrush" Color="#A5D6A7"/>
+    <SolidColorBrush x:Key="IoSenderNotHomedBrush" Color="#FFCDD2"/>
+    <SolidColorBrush x:Key="IoSenderDroReadoutBrush" Color="#FFFFFF"/>
+    <SolidColorBrush x:Key="IoSenderDroReadoutForegroundBrush" Color="#1A1A1A"/>
+    <SolidColorBrush x:Key="IoSenderJogSelectedBrush" Color="#4CAF50"/>
+  </ResourceDictionary>
+  </ResourceDictionary.ThemeDictionaries>
+</ResourceDictionary>

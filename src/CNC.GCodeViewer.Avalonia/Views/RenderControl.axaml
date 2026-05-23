@@ -1,0 +1,36 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             mc:Ignorable="d" d:DesignWidth="400" d:DesignHeight="335"
+             x:Class="CNC.GCodeViewer.Avalonia.Views.RenderControl"
+             MinWidth="200"
+             MinHeight="160"
+             HorizontalAlignment="Stretch"
+             VerticalAlignment="Stretch">
+  <DockPanel>
+    <StackPanel DockPanel.Dock="Bottom" Orientation="Horizontal" HorizontalAlignment="Right" Spacing="4" Margin="0,4,0,0">
+      <Button Content="Reset view" Click="OnResetViewClick" Padding="8,4"/>
+    </StackPanel>
+    <Grid x:Name="ViewportHost" Background="#101010">
+      <Border x:Name="StatusPanel" HorizontalAlignment="Left" VerticalAlignment="Bottom" Margin="8"
+              Background="#AA000000" Padding="8,4" CornerRadius="4">
+        <TextBlock x:Name="StatusText"
+                   Foreground="#CCCCCC"
+                   FontSize="10"
+                   TextWrapping="Wrap"
+                   MaxWidth="280"
+                   Text="3D view — starting"/>
+      </Border>
+      <Border x:Name="OverlayPanel" HorizontalAlignment="Right" VerticalAlignment="Top" Margin="8"
+              Background="#AA000000" Padding="8,4" CornerRadius="4" IsVisible="False">
+        <TextBlock x:Name="OverlayText"
+                   Foreground="White"
+                   FontSize="11"
+                   TextWrapping="Wrap"
+                   MaxWidth="220"
+                   Text=""/>
+      </Border>
+    </Grid>
+  </DockPanel>
+</UserControl>

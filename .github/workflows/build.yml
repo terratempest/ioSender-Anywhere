@@ -1,0 +1,62 @@
+name: Build
+
+on:
+  push:
+    branches: [main, master]
+  pull_request:
+    branches: [main, master]
+
+jobs:
+  build:
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [windows-latest, ubuntu-22.04]
+    runs-on: ${{ matrix.os }}
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: "8.0.x"
+
+      - name: Restore
+        run: dotnet restore src/ioSender.net.sln
+
+      - name: Build
+        run: dotnet build src/ioSender.net.sln -c Release --no-restore
+
+      - name: Test
+        run: dotnet test src/ioSender.net.sln -c Release --no-build
+
+      - name: Publish ioSender
+        shell: bash
+        run: |
+          if [ "${{ runner.os }}" = "Windows" ]; then
+            RID=win-x64
+          else
+            RID=linux-x64
+          fi
+          dotnet publish src/ioSender/ioSender.csproj -c Release -r "$RID" --self-contained false -o "artifacts/publish/$RID"
+
+      - name: Publish GrblConfigApp
+        shell: bash
+        run: |
+          if [ "${{ runner.os }}" = "Windows" ]; then
+            RID=win-x64
+          else
+            RID=linux-x64
+          fi
+          dotnet publish src/GrblConfigApp/GrblConfigApp.csproj -c Release -r "$RID" --self-contained false -o "artifacts/publish/grbl-config-$RID"
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: ioSender-${{ matrix.os }}
+          path: artifacts/publish
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: GrblConfigApp-${{ matrix.os }}
+          path: artifacts/publish/grbl-config-*

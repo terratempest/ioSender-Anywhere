@@ -1,0 +1,18 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             x:Class="CNC.Controls.Lathe.ProfileControl">
+  <Grid ColumnDefinitions="Auto,*,Auto">
+    <TextBlock Grid.Column="0" Text="Profile:" VerticalAlignment="Center" Margin="0,0,6,0"/>
+    <ComboBox Grid.Column="1" x:Name="ProfileCombo" Height="22"
+              ItemsSource="{Binding ItemsSource, RelativeSource={RelativeSource AncestorType=UserControl}}"
+              SelectedItem="{Binding SelectedProfile, RelativeSource={RelativeSource AncestorType=UserControl}, Mode=TwoWay}">
+      <ComboBox.ItemTemplate>
+        <DataTemplate>
+          <TextBlock Text="{Binding Name}"/>
+        </DataTemplate>
+      </ComboBox.ItemTemplate>
+    </ComboBox>
+    <Button Grid.Column="2" x:Name="ProfileMenuBtn" Content="..." Width="22" Height="22" Margin="4,0,0,0"
+            Click="OnProfileMenuClick" ToolTip.Tip="Profile options"/>
+  </Grid>
+</UserControl>

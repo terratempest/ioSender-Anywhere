@@ -1,0 +1,12 @@
+<Project>
+  <ItemGroup>
+    <PackageReference Update="Avalonia" Version="$(AvaloniaVersion)" />
+    <PackageReference Update="Avalonia.Desktop" Version="$(AvaloniaVersion)" />
+    <PackageReference Update="Avalonia.Themes.Fluent" Version="$(AvaloniaVersion)" />
+    <PackageReference Update="Avalonia.Themes.Simple" Version="$(AvaloniaVersion)" />
+    <PackageReference Update="Avalonia.Fonts.Inter" Version="$(AvaloniaVersion)" />
+    <PackageReference Update="Avalonia.Controls.ColorPicker" Version="$(AvaloniaVersion)" />
+    <PackageReference Update="Avalonia.Diagnostics" Version="$(AvaloniaVersion)" />
+    <PackageReference Update="Avalonia.Controls.DataGrid" Version="$(AvaloniaDataGridVersion)" />
+  </ItemGroup>
+</Project>

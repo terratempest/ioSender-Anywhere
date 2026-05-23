@@ -1,0 +1,143 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:controls="using:CNC.Controls.Avalonia.Controls"
+             xmlns:local="using:CNC.Controls.Lathe"
+             xmlns:conv="using:CNC.Controls.Lathe"
+             x:Class="CNC.Controls.Lathe.ThreadingWizard">
+  <ScrollViewer HorizontalScrollBarVisibility="Disabled" VerticalScrollBarVisibility="Auto">
+    <StackPanel Margin="10" Spacing="8">
+      <local:ProfileControl ItemsSource="{Binding Profiles}" SelectedProfile="{Binding Profile, Mode=TwoWay}"/>
+
+      <Grid ColumnDefinitions="Auto,*" RowDefinitions="Auto,Auto,Auto">
+        <TextBlock Grid.Row="0" Grid.Column="0" Text="Type:" VerticalAlignment="Center"/>
+        <ComboBox Grid.Row="0" Grid.Column="1" x:Name="ThreadTypeCombo" Height="22"/>
+
+        <TextBlock Grid.Row="1" Grid.Column="0" Text="Size:" VerticalAlignment="Center"/>
+        <ComboBox Grid.Row="1" Grid.Column="1" x:Name="ThreadSizeCombo" Height="22"
+                  ItemsSource="{Binding Thread.ThreadSizes}"
+                  SelectedItem="{Binding Thread.ThreadSize, Mode=TwoWay}">
+          <ComboBox.ItemTemplate>
+            <DataTemplate>
+              <TextBlock Text="{Binding Name}"/>
+            </DataTemplate>
+          </ComboBox.ItemTemplate>
+        </ComboBox>
+
+        <StackPanel Grid.Row="2" Grid.Column="1" Orientation="Horizontal" Spacing="10">
+          <RadioButton x:Name="OutsideRadio" Content="Outside"
+                       IsChecked="{Binding Thread.Side, Mode=TwoWay, Converter={x:Static conv:LatheConverters.SideToOutsideBool}}"/>
+          <RadioButton Content="Inside"
+                       IsChecked="{Binding Thread.Side, Mode=TwoWay, Converter={x:Static conv:LatheConverters.SideToInsideBool}}"/>
+        </StackPanel>
+      </Grid>
+
+      <Border BorderBrush="{DynamicResource ThemeBorderLowBrush}" BorderThickness="1" Padding="8" CornerRadius="2">
+        <Grid ColumnDefinitions="*,Auto">
+          <StackPanel Spacing="6">
+            <StackPanel Spacing="2">
+              <TextBlock Text="Lead"/>
+              <controls:NumericTextBox Value="{Binding Thread.Lead, Mode=TwoWay}" Format="{Binding Thread.Format}" Width="120"/>
+            </StackPanel>
+            <StackPanel Spacing="2">
+              <TextBlock Text="Starts"/>
+              <controls:NumericTextBox Value="{Binding Thread.Starts, Mode=TwoWay}" Format="0" Width="60"
+                                       IsReadOnly="{Binding Thread.OneLead}"/>
+            </StackPanel>
+            <StackPanel Spacing="2">
+              <TextBlock Text="Size (nominal)"/>
+              <controls:NumericTextBox Value="{Binding Thread.DiameterNominal, Mode=TwoWay}" Format="{Binding Thread.Format}" Width="120"/>
+            </StackPanel>
+            <StackPanel Orientation="Horizontal" Spacing="12">
+              <StackPanel Spacing="2">
+                <TextBlock Text="Z Start"/>
+                <controls:NumericTextBox Value="{Binding ZStart, Mode=TwoWay}" Format="{Binding Format}" Width="90"/>
+              </StackPanel>
+              <StackPanel Spacing="2">
+                <TextBlock Text="Length"/>
+                <controls:NumericTextBox Value="{Binding ZLength, Mode=TwoWay}" Format="{Binding Format}" Width="90"
+                                         IsReadOnly="{Binding Thread.FixedLength}"/>
+              </StackPanel>
+            </StackPanel>
+          </StackPanel>
+          <StackPanel Grid.Column="1" Spacing="4">
+            <controls:NumericTextBox Value="{Binding Thread.TPI, Mode=TwoWay}" Format="{Binding Thread.TpiFormat}" Width="70"/>
+            <TextBlock Text="{Binding Thread.TpiLabel}"/>
+            <controls:NumericTextBox Value="{Binding Inch.Whole, Mode=TwoWay}" Format="###0" Width="70"/>
+            <controls:NumericTextBox Value="{Binding Inch.Numerator, Mode=TwoWay}" Format="###0" Width="70"/>
+            <controls:NumericTextBox Value="{Binding Inch.Denominator, Mode=TwoWay}" Format="###0" Width="70"/>
+          </StackPanel>
+        </Grid>
+      </Border>
+
+      <Border BorderBrush="{DynamicResource ThemeBorderLowBrush}" BorderThickness="1" Padding="8" CornerRadius="2"
+              IsVisible="{Binding Thread.IsTaperControlsVisible}">
+        <StackPanel Spacing="4">
+          <TextBlock Text="Tapered thread" FontWeight="SemiBold"/>
+          <controls:NumericTextBox Value="{Binding Thread.Taper, Mode=OneWay}" Format="##0.##" Width="80" IsReadOnly="True"/>
+        </StackPanel>
+      </Border>
+
+      <Border BorderBrush="{DynamicResource ThemeBorderLowBrush}" BorderThickness="1" Padding="8" CornerRadius="2">
+        <StackPanel Spacing="6">
+          <TextBlock Text="linuxCNC options" FontWeight="SemiBold"/>
+          <StackPanel Orientation="Horizontal" Spacing="8">
+            <TextBlock Text="Taper" VerticalAlignment="Center"/>
+            <ComboBox Width="80" ItemsSource="{Binding Thread.TaperTypes}" SelectedItem="{Binding Thread.TaperType, Mode=TwoWay}"/>
+            <controls:NumericTextBox Value="{Binding Thread.TaperLength, Mode=TwoWay}" Format="##0.###" Width="80"
+                                     IsEnabled="{Binding Thread.TaperType, Converter={x:Static conv:LatheConverters.TaperTypeToBool}}"/>
+          </StackPanel>
+          <StackPanel Orientation="Horizontal" Spacing="8">
+            <TextBlock Text="Compound angle" VerticalAlignment="Center"/>
+            <ComboBox Width="80" ItemsSource="{Binding Thread.CompoundAngles}" SelectedItem="{Binding Thread.CompoundAngle, Mode=TwoWay}"/>
+          </StackPanel>
+          <StackPanel Orientation="Horizontal" Spacing="8">
+            <TextBlock Text="Depth degression" VerticalAlignment="Center"/>
+            <ComboBox x:Name="DepthDegressionCombo" Width="80" ItemsSource="{Binding Thread.DepthDegressions}"
+                      SelectedItem="{Binding Thread.DepthDegression, Mode=TwoWay}"/>
+          </StackPanel>
+        </StackPanel>
+      </Border>
+
+      <Border BorderBrush="{DynamicResource ThemeBorderLowBrush}" BorderThickness="1" Padding="8" CornerRadius="2">
+        <StackPanel Spacing="6">
+          <TextBlock Text="Tool" FontWeight="SemiBold"/>
+          <StackPanel Orientation="Horizontal" Spacing="10">
+            <RadioButton Content="Radius" IsChecked="{Binding Tool.Shape, Mode=TwoWay, Converter={x:Static conv:LatheConverters.ToolToRoundedBool}}"/>
+            <RadioButton Content="Chamfer" IsChecked="{Binding Tool.Shape, Mode=TwoWay, Converter={x:Static conv:LatheConverters.ToolToChamferedBool}}"/>
+          </StackPanel>
+          <StackPanel Spacing="2">
+            <TextBlock Text="{Binding Tool.Shape, Converter={x:Static conv:LatheConverters.ToolToLabelString}}"/>
+            <controls:NumericTextBox Value="{Binding Tool.Tip, Mode=TwoWay}" Format="{Binding Format}" Width="90"/>
+          </StackPanel>
+          <StackPanel Orientation="Horizontal" Spacing="12">
+            <StackPanel Spacing="2">
+              <TextBlock Text="Spindle RPM"/>
+              <controls:NumericTextBox Value="{Binding RPM, Mode=TwoWay}" Format="####0" Width="90"/>
+            </StackPanel>
+            <local:SpringPassControl Passes="{Binding SpringPasses}" IsPassesEnabled="{Binding IsSpringPassesEnabled, Mode=TwoWay}"/>
+          </StackPanel>
+        </StackPanel>
+      </Border>
+
+      <TextBox IsReadOnly="True" AcceptsReturn="True" TextWrapping="Wrap" MinHeight="60" MaxHeight="100">
+        <TextBox.Text>
+          <MultiBinding Converter="{x:Static conv:LatheConverters.StringCollectionToText}">
+            <Binding Path="PassData"/>
+            <Binding Path="PassData.Count"/>
+          </MultiBinding>
+        </TextBox.Text>
+      </TextBox>
+
+      <TextBox IsReadOnly="True" AcceptsReturn="True" TextWrapping="Wrap" MinHeight="80" MaxHeight="140">
+        <TextBox.Text>
+          <MultiBinding Converter="{x:Static conv:LatheConverters.StringCollectionToText}">
+            <Binding Path="gCode"/>
+            <Binding Path="gCode.Count"/>
+          </MultiBinding>
+        </TextBox.Text>
+      </TextBox>
+
+      <local:LatheOutputActions x:Name="OutputActions" SourceLabel="threading.nc"/>
+    </StackPanel>
+  </ScrollViewer>
+</UserControl>

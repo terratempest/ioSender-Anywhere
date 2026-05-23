@@ -1,0 +1,30 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:conv="using:CNC.Controls.Avalonia.Converters"
+             xmlns:local="using:CNC.Controls.Probing"
+             x:Class="CNC.Controls.Probing.OriginPickerControl"
+             Width="42" Height="42">
+  <UserControl.Resources>
+    <conv:EnumValueToBooleanConverter x:Key="EnumToOriginConverter"/>
+  </UserControl.Resources>
+  <Grid RowDefinitions="14,14,14" ColumnDefinitions="14,14,14">
+    <RadioButton GroupName="origin" Width="14" Height="14"
+                 IsChecked="{Binding Value, RelativeSource={RelativeSource AncestorType=local:OriginPickerControl}, Mode=TwoWay, Converter={StaticResource EnumToOriginConverter}, ConverterParameter=D}"/>
+    <RadioButton Grid.Column="1" GroupName="origin" Width="14" Height="14"
+                 IsChecked="{Binding Value, RelativeSource={RelativeSource AncestorType=local:OriginPickerControl}, Mode=TwoWay, Converter={StaticResource EnumToOriginConverter}, ConverterParameter=CD}"/>
+    <RadioButton Grid.Column="2" GroupName="origin" Width="14" Height="14"
+                 IsChecked="{Binding Value, RelativeSource={RelativeSource AncestorType=local:OriginPickerControl}, Mode=TwoWay, Converter={StaticResource EnumToOriginConverter}, ConverterParameter=C}"/>
+    <RadioButton Grid.Row="1" GroupName="origin" Width="14" Height="14"
+                 IsChecked="{Binding Value, RelativeSource={RelativeSource AncestorType=local:OriginPickerControl}, Mode=TwoWay, Converter={StaticResource EnumToOriginConverter}, ConverterParameter=AD}"/>
+    <RadioButton Grid.Row="1" Grid.Column="1" GroupName="origin" Width="14" Height="14"
+                 IsChecked="{Binding Value, RelativeSource={RelativeSource AncestorType=local:OriginPickerControl}, Mode=TwoWay, Converter={StaticResource EnumToOriginConverter}, ConverterParameter=Center}"/>
+    <RadioButton Grid.Row="1" Grid.Column="2" GroupName="origin" Width="14" Height="14"
+                 IsChecked="{Binding Value, RelativeSource={RelativeSource AncestorType=local:OriginPickerControl}, Mode=TwoWay, Converter={StaticResource EnumToOriginConverter}, ConverterParameter=CB}"/>
+    <RadioButton Grid.Row="2" GroupName="origin" Width="14" Height="14"
+                 IsChecked="{Binding Value, RelativeSource={RelativeSource AncestorType=local:OriginPickerControl}, Mode=TwoWay, Converter={StaticResource EnumToOriginConverter}, ConverterParameter=A}"/>
+    <RadioButton Grid.Row="2" Grid.Column="1" GroupName="origin" Width="14" Height="14"
+                 IsChecked="{Binding Value, RelativeSource={RelativeSource AncestorType=local:OriginPickerControl}, Mode=TwoWay, Converter={StaticResource EnumToOriginConverter}, ConverterParameter=AB}"/>
+    <RadioButton Grid.Row="2" Grid.Column="2" GroupName="origin" Width="14" Height="14"
+                 IsChecked="{Binding Value, RelativeSource={RelativeSource AncestorType=local:OriginPickerControl}, Mode=TwoWay, Converter={StaticResource EnumToOriginConverter}, ConverterParameter=B}"/>
+  </Grid>
+</UserControl>

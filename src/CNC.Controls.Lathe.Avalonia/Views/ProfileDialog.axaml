@@ -1,0 +1,85 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:views="using:CNC.Controls.Avalonia.Views"
+        xmlns:local="using:CNC.Controls.Lathe"
+        xmlns:conv="using:CNC.Controls.Lathe"
+        x:Class="CNC.Controls.Lathe.ProfileDialog"
+        Title="Lathe Profile"
+        Width="430" Height="375"
+        CanResize="False"
+        WindowStartupLocation="CenterOwner">
+  <Grid Margin="10" RowDefinitions="Auto,Auto,Auto,Auto,Auto,Auto,Auto,Auto">
+    <StackPanel Grid.Row="0" Orientation="Horizontal" Spacing="6" Margin="0,0,0,8">
+      <TextBlock Text="Profile:" VerticalAlignment="Center"/>
+      <ComboBox x:Name="ProfileCombo" Width="280"
+                ItemsSource="{Binding Profiles}"
+                SelectedItem="{Binding SelectedProfile, Mode=TwoWay}">
+        <ComboBox.ItemTemplate>
+          <DataTemplate>
+            <TextBlock Text="{Binding Name}"/>
+          </DataTemplate>
+        </ComboBox.ItemTemplate>
+      </ComboBox>
+      <Button x:Name="BtnAddProfile" Content="Add" Width="46" IsEnabled="False" Click="OnAddProfileClick"/>
+    </StackPanel>
+
+    <Border Grid.Row="1" BorderBrush="{DynamicResource ThemeBorderLowBrush}" BorderThickness="1" Padding="8" Margin="0,0,0,8">
+      <StackPanel Spacing="6">
+        <TextBlock Text="Cut depths" FontWeight="SemiBold"/>
+        <StackPanel Orientation="Horizontal" Spacing="12">
+          <views:NumericField Label="(First) pass:" Value="{Binding PassDepthFirst, Mode=TwoWay}" Width="175"/>
+          <views:NumericField x:Name="FeedFirstField" Label="Feedrate:" Value="{Binding Feedrate, Mode=TwoWay}" Width="175"
+                              IsVisible="{Binding ShowFeedFields}"/>
+        </StackPanel>
+        <StackPanel Orientation="Horizontal" Spacing="12">
+          <views:NumericField Label="Last pass:" Value="{Binding PassDepthLast, Mode=TwoWay}" Width="175"/>
+          <views:NumericField x:Name="FeedLastField" Label="Feedrate:" Value="{Binding FeedrateLast, Mode=TwoWay}" Width="175"
+                              IsVisible="{Binding ShowFeedFields}"/>
+        </StackPanel>
+        <views:NumericField Label="Min:" Value="{Binding PassDepthMin, Mode=TwoWay}" Width="175"/>
+      </StackPanel>
+    </Border>
+
+    <Border Grid.Row="2" BorderBrush="{DynamicResource ThemeBorderLowBrush}" BorderThickness="1" Padding="8" Margin="0,0,0,8">
+      <StackPanel Spacing="6">
+        <TextBlock Text="Clearance" FontWeight="SemiBold"/>
+        <StackPanel Orientation="Horizontal" Spacing="12">
+          <views:NumericField Label="X-axis:" Value="{Binding XClearance, Mode=TwoWay}" Width="175"/>
+          <views:NumericField Label="Z-Axis:" Value="{Binding ZClearance, Mode=TwoWay}" Width="175"/>
+        </StackPanel>
+      </StackPanel>
+    </Border>
+
+    <views:NumericField Grid.Row="3" x:Name="RpmField" Label="Spindle:" Format="###0" Unit="RPM"
+                        Value="{Binding RPM, Mode=TwoWay}" Width="175" Margin="200,0,0,8"
+                        IsVisible="{Binding ShowRpmField}"/>
+
+    <local:CssControl Grid.Row="4" x:Name="CssPanel" Margin="0,0,0,8"
+                      IsVisible="{Binding ShowFeedFields}"
+                      IsCssEnabled="{Binding CSS, Mode=TwoWay}"
+                      Speed="{Binding RPM, Mode=TwoWay}"
+                      SpindleDirection="{Binding SpindleDir, Mode=TwoWay}"/>
+
+    <views:NumericField Grid.Row="5" Label="Max:" Format="###0" Unit="RPM"
+                        Value="{Binding CSSMaxRPM, Mode=TwoWay}" Width="175" Margin="200,0,0,8"/>
+
+    <Border Grid.Row="6" BorderBrush="{DynamicResource ThemeBorderLowBrush}" BorderThickness="1" Padding="8" Margin="0,0,0,8">
+      <StackPanel Spacing="6">
+        <TextBlock Text="X-axis" FontWeight="SemiBold"/>
+        <StackPanel Orientation="Horizontal" Spacing="20">
+          <RadioButton Content="Radius mode"
+                       IsEnabled="{Binding XModeEnabled}"
+                       IsChecked="{Binding XMode, Mode=TwoWay, Converter={x:Static conv:LatheConverters.LatheModeRadiusBool}}"/>
+          <RadioButton Content="Diameter mode"
+                       IsEnabled="{Binding XModeEnabled}"
+                       IsChecked="{Binding XMode, Mode=TwoWay, Converter={x:Static conv:LatheConverters.LatheModeDiameterBool}}"/>
+        </StackPanel>
+      </StackPanel>
+    </Border>
+
+    <StackPanel Grid.Row="7" Orientation="Horizontal" HorizontalAlignment="Center" Spacing="24" Margin="0,8,0,0">
+      <Button Content="Ok" Width="75" Click="OnOkClick"/>
+      <Button Content="Cancel" Width="75" Click="OnCancelClick"/>
+    </StackPanel>
+  </Grid>
+</Window>

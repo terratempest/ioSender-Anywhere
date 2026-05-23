@@ -1,0 +1,64 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:local="using:CNC.Controls.Config"
+             xmlns:probing="using:CNC.Controls.Probing"
+             xmlns:loc="using:CNC.Localization.Avalonia"
+             mc:Ignorable="d"
+             d:DesignHeight="550" d:DesignWidth="875"
+             x:Class="CNC.Controls.Config.AppConfigView">
+
+  <DockPanel>
+    <StackPanel DockPanel.Dock="Bottom" Orientation="Horizontal" Spacing="5" Margin="5">
+      <Button x:Name="btnSave" Content="Save settings" MinWidth="90" Height="22" Click="OnSaveClick"
+              loc:Localize.Key="ioSender.appconfig.btn_save" loc:Localize.Fallback="Save settings"/>
+    </StackPanel>
+
+    <TabControl DockPanel.Dock="Top" Margin="5">
+      <TabItem Header="Probing" loc:Localize.Key="ioSender.mainwindow.tab_probing" loc:Localize.Fallback="Probing">
+        <ScrollViewer>
+          <probing:ProbingSettingsControl DataContext="{Binding}" Margin="5"/>
+        </ScrollViewer>
+      </TabItem>
+      <TabItem Header="Jog" loc:Localize.Key="ioSender.appconfig.tab_jog" loc:Localize.Fallback="Jog">
+        <ScrollViewer>
+          <StackPanel Margin="5" Spacing="5">
+            <local:JogUiConfigControl x:Name="jogUiConfig" DataContext="{Binding}"/>
+            <local:JogConfigControl x:Name="jogConfig" DataContext="{Binding}"/>
+          </StackPanel>
+        </ScrollViewer>
+      </TabItem>
+      <TabItem Header="Appearance" loc:Localize.Key="ioSender.appconfig.tab_appearance" loc:Localize.Fallback="Appearance">
+        <ScrollViewer>
+          <local:AppAppearanceConfigPanel DataContext="{Binding}" Margin="5"/>
+        </ScrollViewer>
+      </TabItem>
+      <TabItem Header="Machine" loc:Localize.Key="ioSender.appconfig.tab_machine" loc:Localize.Fallback="Machine">
+        <ScrollViewer>
+          <local:AppMachineConfigPanel DataContext="{Binding}" Margin="5"/>
+        </ScrollViewer>
+      </TabItem>
+      <TabItem Header="Camera" loc:Localize.Key="ioSender.mainwindow.mnu_camera" loc:Localize.Fallback="Camera">
+        <ScrollViewer>
+          <local:AppCameraConfigPanel DataContext="{Binding}" Margin="5"/>
+        </ScrollViewer>
+      </TabItem>
+      <TabItem Header="G-code viewer" loc:Localize.Key="ioSender.appconfig.tab_viewer" loc:Localize.Fallback="G-code viewer">
+        <ScrollViewer>
+          <local:AppGCodeViewerConfigPanel DataContext="{Binding}" Margin="5"/>
+        </ScrollViewer>
+      </TabItem>
+      <TabItem Header="Program strip" loc:Localize.Key="ioSender.appconfig.tab_strip" loc:Localize.Fallback="Program strip">
+        <ScrollViewer>
+          <local:AppGCodeStripConfigPanel DataContext="{Binding}" Margin="5"/>
+        </ScrollViewer>
+      </TabItem>
+      <TabItem Header="Keyboard" loc:Localize.Key="ioSender.appconfig.tab_keyboard" loc:Localize.Fallback="Keyboard">
+        <ScrollViewer>
+          <local:AppKeyboardConfigPanel DataContext="{Binding}" Margin="5"/>
+        </ScrollViewer>
+      </TabItem>
+    </TabControl>
+  </DockPanel>
+</UserControl>

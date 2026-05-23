@@ -1,0 +1,40 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:conv="using:CNC.Controls.Avalonia.Converters"
+             xmlns:loc="using:CNC.Localization.Avalonia"
+             xmlns:media="using:Avalonia.Media"
+             x:Class="CNC.Controls.Avalonia.Views.OverrideControl"
+             Height="30" Width="240">
+  <UserControl.Resources>
+    <conv:EncoderModeToColorConverter x:Key="EncoderModeConverter"/>
+    <conv:BoolToBrushConverter x:Key="ToColorConverter"/>
+  </UserControl.Resources>
+  <StackPanel Orientation="Horizontal" Height="30" Width="240" VerticalAlignment="Center">
+    <TextBlock x:Name="lblOverride" Text="Override" VerticalAlignment="Center" Width="75" TextAlignment="Right"
+               loc:Localize.Key="CNC.Controls.WPF.overridecontrol.lbl_override" loc:Localize.Fallback="Override"/>
+    <Slider x:Name="slider" Width="100" TickPlacement="TopLeft" IsSnapToTickEnabled="True"
+            SmallChange="1" LargeChange="10"
+            Value="{Binding SliderValue, RelativeSource={RelativeSource AncestorType=UserControl}}"
+            Ticks="{Binding Ticks, RelativeSource={RelativeSource AncestorType=UserControl}}"
+            TickFrequency="{Binding TickFrequency, RelativeSource={RelativeSource AncestorType=UserControl}}"
+            Minimum="{Binding Minimum, RelativeSource={RelativeSource AncestorType=UserControl}}"
+            Maximum="{Binding Maximum, RelativeSource={RelativeSource AncestorType=UserControl}}"/>
+    <TextBox x:Name="txtOverride" IsReadOnly="True" Height="24" Width="37" Margin="4,0,0,0"
+             VerticalAlignment="Center" TextAlignment="Right">
+      <TextBox.Background>
+        <MultiBinding Converter="{StaticResource EncoderModeConverter}">
+          <Binding Path="OverrideEncoderMode" Mode="OneWay"/>
+          <Binding Path="EncoderMode" RelativeSource="{RelativeSource AncestorType=UserControl}" Mode="OneWay"/>
+        </MultiBinding>
+      </TextBox.Background>
+      <TextBox.Foreground>
+        <MultiBinding Converter="{StaticResource ToColorConverter}">
+          <Binding Path="OverrideDisabled" RelativeSource="{RelativeSource AncestorType=UserControl}"/>
+          <Binding Source="{x:Static media:Brushes.Red}"/>
+          <Binding Source="{x:Static media:Brushes.Black}"/>
+        </MultiBinding>
+      </TextBox.Foreground>
+    </TextBox>
+    <Button x:Name="btnOvReset" Content="↺" Focusable="False" Margin="2,0,0,0" Height="22" Width="22"/>
+  </StackPanel>
+</UserControl>

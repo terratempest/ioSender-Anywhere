@@ -1,0 +1,14 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:views="using:CNC.Controls.Avalonia.Views"
+             x:Class="CNC.Controls.Avalonia.Views.CoordValueSetControl"
+             Height="30" Width="230">
+  <Grid ColumnDefinitions="*,Auto">
+    <views:NumericField x:Name="cvValue" Margin="3,2,0,2"
+                        Format="{Binding DataContext.FormatSigned, RelativeSource={RelativeSource AncestorType=UserControl}}"
+                        Value="{Binding Value, RelativeSource={RelativeSource AncestorType=UserControl}, Mode=TwoWay}"
+                        Label="{Binding Label, RelativeSource={RelativeSource AncestorType=UserControl}, Mode=OneWay}"/>
+    <Button x:Name="btnSet" Grid.Column="1" Content="Set" Padding="8,0" Height="22" Margin="4,4"
+            Click="btnSet_Click"/>
+  </Grid>
+</UserControl>

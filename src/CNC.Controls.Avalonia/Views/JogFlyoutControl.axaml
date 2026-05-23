@@ -1,0 +1,15 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:views="using:CNC.Controls.Avalonia.Views"
+             x:Class="CNC.Controls.Avalonia.Views.JogFlyoutControl"
+             Focusable="False"
+             IsVisible="False"
+             Loaded="OnLoaded">
+  <Border Classes="flyout-panel" MinWidth="280">
+    <Grid>
+      <views:JogBaseControl x:Name="jogBase" Margin="8,8,8,8"/>
+      <Button Classes="flyout-close" Content="×" HorizontalAlignment="Right" Margin="0,0,5,0"
+              VerticalAlignment="Top" Click="OnCloseClick"/>
+    </Grid>
+  </Border>
+</UserControl>
