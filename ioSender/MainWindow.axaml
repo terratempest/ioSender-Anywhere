@@ -12,6 +12,7 @@
         x:Class="ioSender.MainWindow"
         x:DataType="vm:MainWindowViewModel"
         Title="ioSender"
+        Icon="/Assets/iosendericon.ico"
         MinWidth="1020" MinHeight="685"
         Width="1020" Height="685"
         Background="{DynamicResource ThemeBackgroundBrush}">
