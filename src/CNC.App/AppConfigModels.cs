@@ -414,7 +414,7 @@ public class BaseConfig : ViewModelBase
 {
     private int _pollInterval = 200;
     private int _maxBufferSize = 300;
-    private bool _useBuffering, _keepMdiFocus = true, _filterOkResponse, _saveWindowSize, _autoCompress, _sendComments, _addLineNumbers;
+    private bool _useBuffering, _keepMdiFocus = true, _filterOkResponse, _saveWindowSize = true, _autoCompress, _sendComments, _addLineNumbers;
     private CommandIgnoreState _ignoreM6 = CommandIgnoreState.No, _ignoreM7 = CommandIgnoreState.No, _ignoreM8 = CommandIgnoreState.No;
     private CommandIgnoreState _ignoreG61G64 = CommandIgnoreState.Strip;
     private string _theme = "Dark";
@@ -488,6 +488,9 @@ public class BaseConfig : ViewModelBase
 
     public double WindowWidth { get; set; } = 925;
     public double WindowHeight { get; set; } = 660;
+    public double WindowLeft { get; set; } = -1;
+    public double WindowTop { get; set; } = -1;
+    public bool WindowMaximized { get; set; }
     public int OutlineFeedRate { get; set; } = 500;
 
     public int MaxBufferSize

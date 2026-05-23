@@ -1,4 +1,5 @@
 using System.Collections.ObjectModel;
+using System.Diagnostics;
 using CNC.Controls.Avalonia.Services;
 using CNC.Core;
 using CNC.GCodeViewer.Avalonia;
@@ -26,7 +27,6 @@ public sealed class MainWindowViewModel
         GCodeFileService.Instance.Model = Grbl;
         GCodeViewerContext.Grbl = Grbl;
         _current = this;
-        RefreshPorts();
     }
 
     public PlatformServices Platform { get; }
@@ -62,9 +62,11 @@ public sealed class MainWindowViewModel
 
     public void RefreshPorts()
     {
+        var sw = Stopwatch.StartNew();
         SerialPorts.Clear();
         foreach (var port in Platform.SerialPortDiscovery.GetPorts())
             SerialPorts.Add(port);
+        StartupTrace.Mark($"Serial port refresh completed in {sw.ElapsedMilliseconds} ms ({SerialPorts.Count} ports)");
     }
 
     public void ToggleLayoutMode()

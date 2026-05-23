@@ -4,6 +4,7 @@ using Avalonia.Input;
 using Avalonia.Layout;
 using Avalonia.Threading;
 using CNC.App.Workspace;
+using CNC.Controls.Avalonia.Views;
 using CNC.Localization.Avalonia;
 using ioSender.Workspace.Editors;
 
@@ -29,6 +30,7 @@ public partial class WorkspaceRegionChrome : Border
 
     bool _isDropTarget;
     ContextMenu? _editContextMenu;
+    JogControl? _jogHeaderStatusSource;
 
     public WorkspaceRegionChrome()
     {
@@ -98,6 +100,7 @@ public partial class WorkspaceRegionChrome : Border
 
     public void ClearEditorHost()
     {
+        DetachHeaderStatusSource();
         if (EditorHost.Content is Control previous)
             DetachEditor(previous);
         EditorHost.Content = null;
@@ -109,6 +112,7 @@ public partial class WorkspaceRegionChrome : Border
             DetachEditor(previous);
         DetachEditor(content);
         EditorHost.Content = content;
+        AttachHeaderStatusSource(content);
 
         var fills = WorkspaceEditorCatalog.Get(EditorId).FillsWorkspace;
         content.HorizontalAlignment = fills
@@ -149,6 +153,48 @@ public partial class WorkspaceRegionChrome : Border
         EditHint.IsVisible = IsEditMode;
         Classes.Set("workspace-region-edit", IsEditMode);
         TitleBar.ContextMenu = IsEditMode ? _editContextMenu : null;
+    }
+
+    void AttachHeaderStatusSource(Control content)
+    {
+        DetachHeaderStatusSource();
+
+        if (content is not JogControl jog)
+        {
+            UpdateHeaderStatus(string.Empty, false);
+            return;
+        }
+
+        _jogHeaderStatusSource = jog;
+        jog.HeaderStatusChanged += OnJogHeaderStatusChanged;
+        RefreshJogHeaderStatus();
+    }
+
+    void DetachHeaderStatusSource()
+    {
+        if (_jogHeaderStatusSource != null)
+            _jogHeaderStatusSource.HeaderStatusChanged -= OnJogHeaderStatusChanged;
+        _jogHeaderStatusSource = null;
+        UpdateHeaderStatus(string.Empty, false);
+    }
+
+    void OnJogHeaderStatusChanged() => RefreshJogHeaderStatus();
+
+    void RefreshJogHeaderStatus()
+    {
+        if (_jogHeaderStatusSource == null)
+        {
+            UpdateHeaderStatus(string.Empty, false);
+            return;
+        }
+
+        UpdateHeaderStatus(_jogHeaderStatusSource.HeaderStatusText, _jogHeaderStatusSource.IsHeaderStatusVisible);
+    }
+
+    void UpdateHeaderStatus(string text, bool visible)
+    {
+        HeaderStatusText.Text = text;
+        HeaderStatusText.IsVisible = visible;
     }
 
     void OnSizeChanged(object? sender, SizeChangedEventArgs e) => UpdateTitleBarVisibility();

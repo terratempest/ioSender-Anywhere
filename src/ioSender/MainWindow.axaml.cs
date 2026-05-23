@@ -1,7 +1,10 @@
+using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Interactivity;
 using Avalonia.Media;
 using Avalonia.Platform.Storage;
+using Avalonia.Threading;
+using CNC.App;
 using CNC.Converters;
 using CNC.Controls.Avalonia.Services;
 using CNC.Controls.Avalonia.Views;
@@ -29,12 +32,19 @@ public partial class MainWindow : Window
     private bool _shellReady;
     private bool _suppressShellEvents;
     private ShellPage _activePage = ShellPage.Home;
+    private ProbingView? _probingView;
+    private OffsetView? _offsetsView;
+    private GrblConfigView? _grblConfigView;
+    private AppConfigView? _appConfigView;
+    private bool _restoringPlacement;
 
     public MainWindow()
     {
+        using var _ = StartupTrace.Measure("MainWindow constructor");
         InitializeComponent();
-        AppConfigViewControl.DataContext = AppHostContext.AppConfig.Base;
-        ApplyLocalization();
+        RestoreWindowPlacement();
+        using (StartupTrace.Measure("MainWindow localization"))
+            ApplyLocalization();
         var platform = AppHostContext.Platform;
         _connectionService = new ConnectionService(platform.SerialPortDiscovery, platform.UiDispatcher);
         _connectionCoordinator = new MachineConnectionCoordinator(_connectionService);
@@ -54,6 +64,7 @@ public partial class MainWindow : Window
         MnuLayouts.SubmenuOpened += (_, _) => RebuildLayoutsMenu();
         Opened += OnMainWindowOpened;
         Closing += OnMainWindowClosing;
+        PositionChanged += (_, _) => SaveWindowPlacement();
     }
 
     void WireShellTabHeaders()
@@ -74,12 +85,18 @@ public partial class MainWindow : Window
     private async void OnMainWindowOpened(object? sender, EventArgs e)
     {
         Opened -= OnMainWindowOpened;
+        StartupTrace.Mark("MainWindow.OnOpened");
         _shellReady = true;
-        JobViewControl.SetLayoutReady(true);
         JobViewControl.WorkspaceHost.IsEditMode = MnuLockLayout.IsChecked != true;
         JobViewControl.WorkspaceHost.LayoutChanged += (_, _) => UpdateLayoutMenuEnabled();
         RegisterGCodeExtensions();
         NavigateTo(ShellPage.Home, fromTabControl: false);
+        BringToForeground();
+        Dispatcher.UIThread.Post(() =>
+        {
+            using var _ = StartupTrace.Measure("Deferred workspace open");
+            JobViewControl.SetLayoutReady(true);
+        }, DispatcherPriority.Background);
         if (AppHostContext.StartupArgs.Length > 0)
             StartupFileHandler.TryLoadFromArgs(AppHostContext.StartupArgs);
 
@@ -112,7 +129,17 @@ public partial class MainWindow : Window
         return true;
     }
 
-    void OnMainWindowClosing(object? sender, WindowClosingEventArgs e) => DisconnectMachine();
+    void OnMainWindowClosing(object? sender, WindowClosingEventArgs e)
+    {
+        SaveWindowPlacement();
+        DisconnectMachine();
+    }
+
+    protected override void OnResized(WindowResizedEventArgs e)
+    {
+        base.OnResized(e);
+        SaveWindowPlacement();
+    }
 
     void DisconnectMachine()
     {
@@ -141,6 +168,85 @@ public partial class MainWindow : Window
     }
 
     public void HandleIpcMessage(string message) => StartupFileHandler.TryLoadFromIpcMessage(message);
+
+    void RestoreWindowPlacement()
+    {
+        var config = AppHostContext.AppConfig.Base;
+        if (!config.KeepWindowSize)
+            return;
+
+        _restoringPlacement = true;
+        try
+        {
+            if (config.WindowWidth == -1 || config.WindowMaximized)
+            {
+                WindowState = WindowState.Maximized;
+                return;
+            }
+
+            var screen = config.WindowLeft >= 0 && config.WindowTop >= 0
+                ? Screens.ScreenFromPoint(new PixelPoint(
+                    (int)Math.Round(config.WindowLeft),
+                    (int)Math.Round(config.WindowTop)))
+                : Screens.Primary;
+            var workArea = screen?.WorkingArea;
+            var maxWidth = workArea?.Width ?? 3840;
+            var maxHeight = workArea?.Height ?? 2160;
+
+            Width = Math.Max(Math.Min(config.WindowWidth, maxWidth), MinWidth);
+            Height = Math.Max(Math.Min(config.WindowHeight, maxHeight), MinHeight);
+
+            if (workArea is { } area && config.WindowLeft >= 0 && config.WindowTop >= 0)
+            {
+                var left = Clamp((int)Math.Round(config.WindowLeft), area.X, Math.Max(area.X, area.Right - (int)Math.Round(Width)));
+                var top = Clamp((int)Math.Round(config.WindowTop), area.Y, Math.Max(area.Y, area.Bottom - (int)Math.Round(Height)));
+                Position = new PixelPoint(left, top);
+                WindowStartupLocation = WindowStartupLocation.Manual;
+            }
+        }
+        finally
+        {
+            _restoringPlacement = false;
+        }
+    }
+
+    void SaveWindowPlacement()
+    {
+        if (_restoringPlacement)
+            return;
+
+        var config = AppHostContext.AppConfig.Base;
+        if (!config.KeepWindowSize)
+            return;
+
+        config.WindowMaximized = WindowState == WindowState.Maximized;
+
+        if (WindowState != WindowState.Maximized && WindowState != WindowState.Minimized)
+        {
+            config.WindowWidth = Bounds.Width > 0 ? Bounds.Width : Width;
+            config.WindowHeight = Bounds.Height > 0 ? Bounds.Height : Height;
+            config.WindowLeft = Position.X;
+            config.WindowTop = Position.Y;
+        }
+    }
+
+    void BringToForeground()
+    {
+        if (WindowState == WindowState.Minimized)
+            WindowState = WindowState.Normal;
+
+        Activate();
+        Topmost = true;
+        Dispatcher.UIThread.Post(() =>
+        {
+            Topmost = false;
+            Activate();
+            Focus();
+        }, DispatcherPriority.Loaded);
+    }
+
+    static int Clamp(int value, int min, int max) =>
+        Math.Min(Math.Max(value, min), max);
 
     private void ApplyLocalization()
     {
@@ -212,15 +318,16 @@ public partial class MainWindow : Window
         if (!_shellReady && page != ShellPage.Home)
             return;
 
+        using var _ = StartupTrace.Measure($"Navigate {page}");
         DeactivatePage(_activePage);
 
         _activePage = page;
 
         JobViewControl.IsVisible = page == ShellPage.Home;
-        ProbingViewControl.IsVisible = page == ShellPage.Probing;
-        OffsetsViewControl.IsVisible = page == ShellPage.Offsets;
-        GrblConfigViewControl.IsVisible = page == ShellPage.GrblSettings;
-        AppConfigViewControl.IsVisible = page == ShellPage.AppSettings;
+        ProbingPageHost.IsVisible = page == ShellPage.Probing;
+        OffsetsPageHost.IsVisible = page == ShellPage.Offsets;
+        GrblConfigPageHost.IsVisible = page == ShellPage.GrblSettings;
+        AppConfigPageHost.IsVisible = page == ShellPage.AppSettings;
 
         if (page is ShellPage.Home or ShellPage.Probing or ShellPage.Offsets)
         {
@@ -256,13 +363,16 @@ public partial class MainWindow : Window
         switch (page)
         {
             case ShellPage.Probing:
-                ProbingViewControl.Activate(true);
+                EnsureProbingView().Activate(true);
                 break;
             case ShellPage.Offsets:
-                OffsetsViewControl.Activate(true);
+                EnsureOffsetsView().Activate(true);
                 break;
             case ShellPage.GrblSettings:
-                GrblConfigViewControl.Activate(true);
+                EnsureGrblConfigView().Activate(true);
+                break;
+            case ShellPage.AppSettings:
+                EnsureAppConfigView();
                 break;
         }
     }
@@ -272,15 +382,79 @@ public partial class MainWindow : Window
         switch (page)
         {
             case ShellPage.Probing:
-                ProbingViewControl.Activate(false);
+                _probingView?.Activate(false);
                 break;
             case ShellPage.Offsets:
-                OffsetsViewControl.Activate(false);
+                _offsetsView?.Activate(false);
                 break;
             case ShellPage.GrblSettings:
-                GrblConfigViewControl.Activate(false);
+                _grblConfigView?.Activate(false);
                 break;
         }
+    }
+
+    ProbingView EnsureProbingView()
+    {
+        if (_probingView is not null)
+            return _probingView;
+
+        using var _ = StartupTrace.Measure("Create ProbingView");
+        _probingView = new ProbingView
+        {
+            DataContext = _viewModel.Grbl,
+            HorizontalAlignment = Avalonia.Layout.HorizontalAlignment.Stretch,
+            VerticalAlignment = Avalonia.Layout.VerticalAlignment.Stretch,
+        };
+        ProbingPageHost.Content = _probingView;
+        return _probingView;
+    }
+
+    OffsetView EnsureOffsetsView()
+    {
+        if (_offsetsView is not null)
+            return _offsetsView;
+
+        using var _ = StartupTrace.Measure("Create OffsetView");
+        _offsetsView = new OffsetView
+        {
+            DataContext = _viewModel.Grbl,
+            HorizontalAlignment = Avalonia.Layout.HorizontalAlignment.Stretch,
+            VerticalAlignment = Avalonia.Layout.VerticalAlignment.Stretch,
+        };
+        OffsetsPageHost.Content = _offsetsView;
+        return _offsetsView;
+    }
+
+    GrblConfigView EnsureGrblConfigView()
+    {
+        if (_grblConfigView is not null)
+            return _grblConfigView;
+
+        using var _ = StartupTrace.Measure("Create GrblConfigView");
+        _grblConfigView = new GrblConfigView
+        {
+            DataContext = _viewModel.Grbl,
+            HorizontalAlignment = Avalonia.Layout.HorizontalAlignment.Stretch,
+            VerticalAlignment = Avalonia.Layout.VerticalAlignment.Stretch,
+        };
+        GrblConfigPageHost.Content = _grblConfigView;
+        return _grblConfigView;
+    }
+
+    AppConfigView EnsureAppConfigView()
+    {
+        if (_appConfigView is not null)
+            return _appConfigView;
+
+        using var _ = StartupTrace.Measure("Create AppConfigView");
+        _appConfigView = new AppConfigView
+        {
+            DataContext = AppHostContext.AppConfig.Base,
+            HorizontalAlignment = Avalonia.Layout.HorizontalAlignment.Stretch,
+            VerticalAlignment = Avalonia.Layout.VerticalAlignment.Stretch,
+        };
+        AppConfigPageHost.Content = _appConfigView;
+        return _appConfigView;
     }
 
     void UpdateLayoutMenuEnabled()

@@ -9,6 +9,7 @@ using Avalonia.Layout;
 using Avalonia.VisualTree;
 using CNC.Controls.Avalonia.Config;
 using CNC.Controls.Avalonia.Controls;
+using CNC.Controls.Avalonia.Services;
 using CNC.Controls.Avalonia.Utilities;
 using CNC.Controls.Avalonia.ViewModels;
 using CNC.Core;
@@ -20,6 +21,12 @@ namespace CNC.Controls.Avalonia.Views;
 
 public partial class JogBaseControl : UserControl
 {
+    public static readonly StyledProperty<string> QueueStatusTextProperty =
+        AvaloniaProperty.Register<JogBaseControl, string>(nameof(QueueStatusText), string.Empty);
+
+    public static readonly StyledProperty<bool> IsQueueStatusVisibleProperty =
+        AvaloniaProperty.Register<JogBaseControl, bool>(nameof(IsQueueStatusVisible));
+
     const Key Xplus = Key.J, Xminus = Key.H, Yplus = Key.K, Yminus = Key.L, Zplus = Key.I, Zminus = Key.M, Aplus = Key.U, Aminus = Key.N;
     const double FeedColumnWidth = 72;
     const double PadGap = 4;
@@ -28,11 +35,14 @@ public partial class JogBaseControl : UserControl
     string _mode = "G21";
     bool _softLimits;
     KeypressHandler? _keyboard;
+    GrblViewModel? _subscribedModel;
+    readonly UiJogCommandQueue _jogQueue = new();
     static bool _keyboardMappingsOk;
     static bool _jogDataHandlersHooked;
-    static int _jogAxis = -1;
-    static readonly Queue<string> _pendingJogQueue = new();
     static readonly JogViewModel SharedJogData = new();
+
+    public event System.Action? QueueStatusChanged;
+
     static JogBaseControl()
     {
         SharedJogData.SetMetric(true);
@@ -49,6 +59,9 @@ public partial class JogBaseControl : UserControl
             if (DataContext is GrblViewModel model)
                 ApplyJogUnits(model);
         };
+        Unloaded += (_, _) => DetachModelHandlers();
+        _jogQueue.Changed += UpdateQueueStatus;
+        UpdateQueueStatus();
     }
 
     void WireControls()
@@ -72,6 +85,26 @@ public partial class JogBaseControl : UserControl
     }
 
     public JogViewModel JogData { get; }
+
+    public string QueueStatusText
+    {
+        get => GetValue(QueueStatusTextProperty);
+        set => SetValue(QueueStatusTextProperty, value);
+    }
+
+    public bool IsQueueStatusVisible
+    {
+        get => GetValue(IsQueueStatusVisibleProperty);
+        set => SetValue(IsQueueStatusVisibleProperty, value);
+    }
+
+    void UpdateQueueStatus()
+    {
+        var count = _jogQueue.PendingCount;
+        QueueStatusText = count > 0 ? $"Queue: {count}" : string.Empty;
+        IsQueueStatusVisible = count > 0;
+        QueueStatusChanged?.Invoke();
+    }
 
     void JogData_PropertyChanged(object? sender, PropertyChangedEventArgs e)
     {
@@ -118,25 +151,9 @@ public partial class JogBaseControl : UserControl
         if (sender is not GrblViewModel model)
             return;
 
-        if (e.PropertyName is nameof(GrblViewModel.MachinePosition) or nameof(GrblViewModel.GrblState) &&
-            model.GrblState.State != GrblStates.Jog)
-            _jogAxis = -1;
-
-        if (e.PropertyName == nameof(GrblViewModel.GrblState) &&
-            model.GrblState.State == GrblStates.Idle)
-            FlushPendingJog();
+        if (e.PropertyName == nameof(GrblViewModel.GrblState))
+            _jogQueue.OnGrblStateChanged(model.GrblState);
     }
-
-    static void EnqueueJog(string cmd) => _pendingJogQueue.Enqueue(cmd);
-
-    void FlushPendingJog()
-    {
-        if (_pendingJogQueue.Count == 0)
-            return;
-        JogCommand(_pendingJogQueue.Dequeue());
-    }
-
-    static bool IsMotionBusy(GrblStates state) => state == GrblStates.Jog;
 
     void JogControl_Loaded(object? sender, RoutedEventArgs e)
     {
@@ -148,10 +165,7 @@ public partial class JogBaseControl : UserControl
             return;
 
         ApplyJogUnits(model);
-        model.PropertyChanged -= Model_IsMetricChanged;
-        model.PropertyChanged += Model_IsMetricChanged;
-        model.PropertyChanged -= Model_PropertyChanged;
-        model.PropertyChanged += Model_PropertyChanged;
+        AttachModelHandlers(model);
 
         _softLimits = !(GrblInfo.IsGrblHAL && GrblSettings.GetInteger(grblHALSetting.SoftLimitJogging) == 1) &&
                       GrblSettings.GetInteger(GrblSetting.SoftLimitsEnable) == 1;
@@ -228,6 +242,28 @@ public partial class JogBaseControl : UserControl
             _keyboard.AddHandler(Key.NumPad6, ModifierKeys.None, StepInc);
             _keyboard.AddHandler(Key.NumPad8, ModifierKeys.None, FeedInc);
         }
+    }
+
+    void AttachModelHandlers(GrblViewModel model)
+    {
+        if (ReferenceEquals(_subscribedModel, model))
+            return;
+
+        DetachModelHandlers();
+        _subscribedModel = model;
+        model.PropertyChanged += Model_IsMetricChanged;
+        model.PropertyChanged += Model_PropertyChanged;
+    }
+
+    void DetachModelHandlers()
+    {
+        if (_subscribedModel == null)
+            return;
+
+        _subscribedModel.PropertyChanged -= Model_IsMetricChanged;
+        _subscribedModel.PropertyChanged -= Model_PropertyChanged;
+        _subscribedModel = null;
+        _jogQueue.Clear();
     }
 
     double _limitSwitchesClearance = .5d, _position;
@@ -417,10 +453,7 @@ public partial class JogBaseControl : UserControl
 
         if (cmd == "stop")
         {
-            _pendingJogQueue.Clear();
-            _jogAxis = -1;
-            cmd = ((char)GrblConstants.CMD_JOG_CANCEL).ToString();
-            model.ExecuteCommand(cmd);
+            _jogQueue.Stop();
             return true;
         }
 
@@ -433,12 +466,6 @@ public partial class JogBaseControl : UserControl
 
         if (!CanJog(model.GrblState.State))
             return false;
-
-        if (IsMotionBusy(model.GrblState.State))
-        {
-            EnqueueJog(cmd);
-            return false;
-        }
 
         var distance = (JogData.Distance == -1 ? GrblInfo.MaxTravel.Values[axis] : JogData.Distance) * (cmd[1] == '-' ? -1d : 1d);
 
@@ -471,7 +498,6 @@ public partial class JogBaseControl : UserControl
             if (_position == 0d)
                 return false;
 
-            _jogAxis = axis;
             var mode = model.IsMetric ? "G21" : "G20";
             cmd = string.Format("$J=G53{0}{1}{2}F{3}", mode, cmd[..1], _position.ToInvariantString(), Math.Ceiling(JogData.FeedRate).ToInvariantString());
         }
@@ -479,11 +505,11 @@ public partial class JogBaseControl : UserControl
         {
             var mode = model.IsMetric ? "G21" : "G20";
             cmd = string.Format("$J=G91{0}{1}{2}F{3}", mode, cmd[..1], distance.ToInvariantString(), Math.Ceiling(JogData.FeedRate).ToInvariantString());
-            _jogAxis = axis;
         }
 
-        model.ExecuteCommand(cmd);
-        return true;
+        return JogData.Distance == -1
+            ? _jogQueue.TryStartContinuous(cmd, model.GrblState)
+            : _jogQueue.TryEnqueueStep(cmd, model.GrblState);
     }
 
     void JogButton_JogStart(object? sender, EventArgs e)

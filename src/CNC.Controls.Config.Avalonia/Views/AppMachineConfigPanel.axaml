@@ -19,7 +19,7 @@
       <CheckBox Content="Keep MDI focus" IsChecked="{Binding KeepMdiFocus, Mode=TwoWay}"/>
       <CheckBox Content='Filter "ok" response' IsChecked="{Binding FilterOkResponse, Mode=TwoWay}"/>
       <CheckBox Content="Auto-compress gcode on transforms" IsChecked="{Binding AutoCompress, Mode=TwoWay}"/>
-      <CheckBox Content="Restore last window size on startup" IsChecked="{Binding KeepWindowSize, Mode=TwoWay}"/>
+      <CheckBox Content="Restore last window size and position on startup" IsChecked="{Binding KeepWindowSize, Mode=TwoWay}"/>
       <CheckBox Content="Send comments" IsChecked="{Binding SendComments, Mode=TwoWay}"/>
       <CheckBox Content="Add line numbers" IsChecked="{Binding AddLineNumbers, Mode=TwoWay}"/>
       <TextBlock Text="Layout" Margin="0,6,0,0"/>

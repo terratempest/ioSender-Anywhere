@@ -17,11 +17,13 @@ public partial class App : Application
 {
     public override void Initialize()
     {
+        using var _ = StartupTrace.Measure("App.Initialize");
         AvaloniaXamlLoader.Load(this);
     }
 
     public override void OnFrameworkInitializationCompleted()
     {
+        StartupTrace.Mark("Framework initialization completed");
         EarlyStartupBanner.ReportProgress("Preparing application...", 20);
 
         if (ApplicationLifetime is IClassicDesktopStyleApplicationLifetime desktop)
@@ -58,25 +60,34 @@ public partial class App : Application
         StartupBannerWindow? startupBanner)
     {
         EarlyStartupBanner.ReportProgress("Loading platform services...", 30);
-        var platform = PlatformBootstrap.Create();
+        PlatformServices platform;
+        using (StartupTrace.Measure("Platform services"))
+            platform = PlatformBootstrap.Create();
 
         EarlyStartupBanner.ReportProgress("Loading configuration...", 40);
         var appConfig = new AppConfigService(platform.PathService);
-        appConfig.InitializePaths(AppContext.BaseDirectory);
-        appConfig.EnsureLoaded();
+        using (StartupTrace.Measure("Configuration load"))
+        {
+            appConfig.InitializePaths(AppContext.BaseDirectory);
+            appConfig.EnsureLoaded();
+        }
 
         var startupArgs = desktop.Args ?? [];
 
         AppHostContext.Initialize(platform, appConfig, startupArgs);
 
         EarlyStartupBanner.ReportProgress("Applying theme...", 52);
-        AppTheme.Apply(appConfig.Base.Theme);
+        using (StartupTrace.Measure("Theme apply"))
+            AppTheme.Apply(appConfig.Base.Theme);
 
         EarlyStartupBanner.ReportProgress("Loading localization...", 60);
-        LocalizationBootstrap.Initialize(
-            startupArgs,
-            appConfig.Base.Locale,
-            AppContext.BaseDirectory);
+        using (StartupTrace.Measure("Localization load"))
+        {
+            LocalizationBootstrap.Initialize(
+                startupArgs,
+                appConfig.Base.Locale,
+                AppContext.BaseDirectory);
+        }
 
         EarlyStartupBanner.ReportProgress("Configuring controls...", 68);
         Comms.UiDispatcher = platform.UiDispatcher;
@@ -95,7 +106,8 @@ public partial class App : Application
             CloseStartupBanner(startupBanner);
 
             var forwarded = string.Join('\n', Environment.GetCommandLineArgs().Skip(1));
-            platform.SingleInstanceHost.SendMessage(forwarded + '\n');
+            if (!string.IsNullOrWhiteSpace(forwarded))
+                platform.SingleInstanceHost.SendMessage(forwarded + '\n');
 
             Environment.Exit(0);
             return;
@@ -112,15 +124,19 @@ public partial class App : Application
         try
         {
             EarlyStartupBanner.ReportProgress("Building main window...", 84);
-            var mainWindow = new MainWindow();
+            MainWindow mainWindow;
+            using (StartupTrace.Measure("MainWindow construction"))
+                mainWindow = new MainWindow();
             mainWindow.Opened += (_, _) =>
             {
+                StartupTrace.Mark("MainWindow opened");
                 EarlyStartupBanner.ReportProgress("Opening workspace...", 99);
                 CloseStartupBanner(startupBanner);
             };
 
             desktop.MainWindow = mainWindow;
             EarlyStartupBanner.ReportProgress("Showing main window...", 94);
+            StartupTrace.Mark("Showing main window");
             mainWindow.Show();
         }
         catch

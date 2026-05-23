@@ -142,25 +142,22 @@
                        DataContext="{Binding Grbl}"
                        HorizontalAlignment="Stretch"
                        VerticalAlignment="Stretch"/>
-        <probing:ProbingView x:Name="ProbingViewControl"
-                             IsVisible="False"
-                             DataContext="{Binding Grbl}"
-                             HorizontalAlignment="Stretch"
-                             VerticalAlignment="Stretch"/>
-        <cnc:OffsetView x:Name="OffsetsViewControl"
+        <ContentControl x:Name="ProbingPageHost"
                         IsVisible="False"
-                        DataContext="{Binding Grbl}"
                         HorizontalAlignment="Stretch"
                         VerticalAlignment="Stretch"/>
-        <config:GrblConfigView x:Name="GrblConfigViewControl"
-                               IsVisible="False"
-                               DataContext="{Binding Grbl}"
-                               HorizontalAlignment="Stretch"
-                               VerticalAlignment="Stretch"/>
-        <config:AppConfigView x:Name="AppConfigViewControl"
-                              IsVisible="False"
-                              HorizontalAlignment="Stretch"
-                              VerticalAlignment="Stretch"/>
+        <ContentControl x:Name="OffsetsPageHost"
+                        IsVisible="False"
+                        HorizontalAlignment="Stretch"
+                        VerticalAlignment="Stretch"/>
+        <ContentControl x:Name="GrblConfigPageHost"
+                        IsVisible="False"
+                        HorizontalAlignment="Stretch"
+                        VerticalAlignment="Stretch"/>
+        <ContentControl x:Name="AppConfigPageHost"
+                        IsVisible="False"
+                        HorizontalAlignment="Stretch"
+                        VerticalAlignment="Stretch"/>
       </Grid>
     </Grid>
   </DockPanel>

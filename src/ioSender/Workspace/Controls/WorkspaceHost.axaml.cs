@@ -6,6 +6,7 @@ using CNC.Controls.Avalonia.Services;
 using CNC.Core;
 using CNC.GCodeViewer.Avalonia;
 using CNC.GCodeViewer.Avalonia.Views;
+using ioSender.Services;
 using ioSender.Workspace.Editors;
 
 namespace ioSender.Workspace.Controls;
@@ -102,6 +103,7 @@ public partial class WorkspaceHost : UserControl
         if (_factory is null)
             return;
 
+        using var _ = StartupTrace.Measure("Workspace rebuild");
         _factory.PruneToTree(_root);
         foreach (var chrome in _regionChromes)
             chrome.ClearEditorHost();
@@ -209,8 +211,8 @@ public partial class WorkspaceHost : UserControl
         chrome.EditorId = leaf.Editor;
         var content = _factory!.GetOrCreate(leaf);
         chrome.SetEditorContent(content);
-        if (content is RenderControl viewer)
-            viewer.TryLoadProgram();
+        if (content is RenderControl viewerControl)
+            viewerControl.TryLoadProgram();
         chrome.RefreshTitle();
     }
 
