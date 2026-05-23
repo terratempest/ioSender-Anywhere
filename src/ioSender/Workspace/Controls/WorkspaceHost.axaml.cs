@@ -46,6 +46,8 @@ public partial class WorkspaceHost : UserControl
 
     public WorkspaceEditorFactory Factory => _factory ?? throw new InvalidOperationException("Workspace not initialized.");
 
+    public WorkspaceNode CurrentRoot => _root.Clone();
+
     protected override void OnDataContextChanged(EventArgs e)
     {
         base.OnDataContextChanged(e);
@@ -82,7 +84,12 @@ public partial class WorkspaceHost : UserControl
 
     public void ApplyPreset(string presetName)
     {
-        WorkspaceLayoutService.ApplyPreset(presetName);
+        ApplyLayout(presetName);
+    }
+
+    public void ApplyLayout(string layoutName)
+    {
+        WorkspaceLayoutService.TryApplyLayout(layoutName);
         _root = WorkspaceLayoutService.EnsureRoot();
         Rebuild();
         WorkspaceLayoutService.Persist();
@@ -144,6 +151,7 @@ public partial class WorkspaceHost : UserControl
 
         _root = newRoot;
         WorkspaceLayoutService.SaveRoot(_root);
+        WorkspaceLayoutService.Persist();
         WorkspaceDragBroker.Clear();
         Rebuild();
     }
@@ -159,6 +167,7 @@ public partial class WorkspaceHost : UserControl
         _factory.Remove(leaf);
         _root = newRoot;
         WorkspaceLayoutService.SaveRoot(_root);
+        WorkspaceLayoutService.Persist();
         WorkspaceDragBroker.Clear();
         Rebuild();
     }
@@ -172,6 +181,7 @@ public partial class WorkspaceHost : UserControl
         ApplyLeafToChrome(leaf, chrome);
 
         WorkspaceLayoutService.SaveRoot(_root);
+        WorkspaceLayoutService.Persist();
         SyncActiveEditors();
     }
 
@@ -187,6 +197,7 @@ public partial class WorkspaceHost : UserControl
             ApplyLeafToChrome(sourceLeaf, source);
             ApplyLeafToChrome(targetLeaf, target);
             WorkspaceLayoutService.SaveRoot(_root);
+            WorkspaceLayoutService.Persist();
             SyncActiveEditors();
         }
 
@@ -245,5 +256,6 @@ public partial class WorkspaceHost : UserControl
 
         foreach (var chrome in _regionChromes)
             chrome.IsEditMode = IsEditMode;
+        _builder?.SetEditMode(IsEditMode);
     }
 }

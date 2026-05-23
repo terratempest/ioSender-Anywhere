@@ -44,7 +44,7 @@ public sealed class SplitLayoutBuilder
             grid.ColumnDefinitions.Add(new ColumnDefinition(new GridLength(1 - ratio, GridUnitType.Star)));
 
             var first = BuildNode(split.First, editMode, wireRegion);
-            var splitter = CreateSplitter(split, GridResizeDirection.Columns);
+            var splitter = CreateSplitter(split, GridResizeDirection.Columns, editMode);
             var second = BuildNode(split.Second, editMode, wireRegion);
 
             Grid.SetColumn(first, 0);
@@ -61,7 +61,7 @@ public sealed class SplitLayoutBuilder
             grid.RowDefinitions.Add(new RowDefinition(new GridLength(1 - ratio, GridUnitType.Star)));
 
             var first = BuildNode(split.First, editMode, wireRegion);
-            var splitter = CreateSplitter(split, GridResizeDirection.Rows);
+            var splitter = CreateSplitter(split, GridResizeDirection.Rows, editMode);
             var second = BuildNode(split.Second, editMode, wireRegion);
 
             Grid.SetRow(first, 0);
@@ -75,13 +75,18 @@ public sealed class SplitLayoutBuilder
         return grid;
     }
 
-    GridSplitter CreateSplitter(WorkspaceSplit split, GridResizeDirection direction)
+    GridSplitter CreateSplitter(WorkspaceSplit split, GridResizeDirection direction, bool editMode)
     {
         var splitter = new GridSplitter
         {
             Width = direction == GridResizeDirection.Columns ? 1 : double.NaN,
             Height = direction == GridResizeDirection.Rows ? 1 : double.NaN,
+            MinWidth = direction == GridResizeDirection.Columns ? 1 : 0,
+            MinHeight = direction == GridResizeDirection.Rows ? 1 : 0,
+            MaxWidth = direction == GridResizeDirection.Columns ? 1 : double.PositiveInfinity,
+            MaxHeight = direction == GridResizeDirection.Rows ? 1 : double.PositiveInfinity,
             ResizeDirection = direction,
+            IsEnabled = editMode,
         };
         splitter.Classes.Add("workspace-splitter");
 
@@ -89,6 +94,12 @@ public sealed class SplitLayoutBuilder
         splitter.DragDelta += (_, _) => UpdateRatioFromGrid(split, splitter);
         splitter.DragCompleted += (_, _) => _onSplitterResizeCompleted?.Invoke();
         return splitter;
+    }
+
+    public void SetEditMode(bool editMode)
+    {
+        foreach (var splitter in _splitters.Values)
+            splitter.IsEnabled = editMode;
     }
 
     void UpdateRatioFromGrid(WorkspaceSplit split, GridSplitter splitter)

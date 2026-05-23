@@ -34,18 +34,22 @@
       </MenuItem>
       <MenuItem x:Name="MnuView" Header="_View"
                 loc:Localize.Key="ioSender.mainwindow.mnu_view" loc:Localize.Fallback="_View">
-        <MenuItem x:Name="MnuCustomizeLayout" Header="_Customize layout" ToggleType="CheckBox"
-                  Click="OnCustomizeLayoutClick"
-                  loc:Localize.Key="ioSender.mainwindow.mnu_customizeLayout" loc:Localize.Fallback="_Customize layout"/>
+        <MenuItem x:Name="MnuLockLayout" Header="_Lock layout" ToggleType="CheckBox" IsChecked="True"
+                  Click="OnLockLayoutClick"
+                  loc:Localize.Key="ioSender.mainwindow.mnu_lockLayout" loc:Localize.Fallback="_Lock layout"/>
         <MenuItem x:Name="MnuResetLayout" Header="_Reset layout" Click="OnResetLayoutClick"
                   loc:Localize.Key="ioSender.mainwindow.mnu_resetLayout" loc:Localize.Fallback="_Reset layout"/>
-        <MenuItem x:Name="MnuLayoutPreset" Header="Layout _preset"
-                  loc:Localize.Key="ioSender.mainwindow.mnu_layoutPreset" loc:Localize.Fallback="Layout _preset">
+        <MenuItem x:Name="MnuLayouts" Header="_Layouts"
+                  loc:Localize.Key="ioSender.mainwindow.mnu_layouts" loc:Localize.Fallback="_Layouts">
           <MenuItem x:Name="MnuPresetCompact" Header="_Compact" Click="OnPresetCompactClick"
                     loc:Localize.Key="ioSender.mainwindow.mnu_presetCompact" loc:Localize.Fallback="_Compact"/>
           <MenuItem x:Name="MnuPresetExpanded" Header="_Expanded" Click="OnPresetExpandedClick"
                     loc:Localize.Key="ioSender.mainwindow.mnu_presetExpanded" loc:Localize.Fallback="_Expanded"/>
         </MenuItem>
+        <MenuItem x:Name="MnuSaveLayout" Header="_Save layout..." Click="OnSaveLayoutClick"
+                  loc:Localize.Key="ioSender.mainwindow.mnu_saveLayout" loc:Localize.Fallback="_Save layout..."/>
+        <MenuItem x:Name="MnuDeleteLayout" Header="_Delete layout..." Click="OnDeleteLayoutClick"
+                  loc:Localize.Key="ioSender.mainwindow.mnu_deleteLayout" loc:Localize.Fallback="_Delete layout..."/>
         <Separator/>
         <MenuItem x:Name="MnuViewCamera" Header="_Camera..." Click="OnCameraClick"
                   loc:Localize.Key="ioSender.mainwindow.mnu_camera"/>

@@ -134,6 +134,10 @@ public static class WorkspaceLayoutDefaults
         _ => null,
     };
 
+    public static bool IsBuiltIn(string? name) =>
+        string.Equals(name, PresetCompact, StringComparison.OrdinalIgnoreCase)
+        || string.Equals(name, PresetExpanded, StringComparison.OrdinalIgnoreCase);
+
     public static bool IsValid(WorkspaceNode? root) =>
         root is not null && root.EnumerateEditors().Any();
 }

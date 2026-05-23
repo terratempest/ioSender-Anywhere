@@ -28,6 +28,7 @@ public partial class WorkspaceRegionChrome : Border
     public event EventHandler<WorkspaceEditorId>? ChangeEditorRequested;
 
     bool _isDropTarget;
+    ContextMenu? _editContextMenu;
 
     public WorkspaceRegionChrome()
     {
@@ -147,6 +148,7 @@ public partial class WorkspaceRegionChrome : Border
     {
         EditHint.IsVisible = IsEditMode;
         Classes.Set("workspace-region-edit", IsEditMode);
+        TitleBar.ContextMenu = IsEditMode ? _editContextMenu : null;
     }
 
     void OnSizeChanged(object? sender, SizeChangedEventArgs e) => UpdateTitleBarVisibility();
@@ -222,8 +224,9 @@ public partial class WorkspaceRegionChrome : Border
                 () => ChangeEditorRequested?.Invoke(this, id)));
         }
         menu.Items.Add(change);
+        _editContextMenu = menu;
         ContextMenu = null;
-        TitleBar.ContextMenu = menu;
+        TitleBar.ContextMenu = IsEditMode ? _editContextMenu : null;
     }
 
     void RequestSplit(EventHandler? handler)

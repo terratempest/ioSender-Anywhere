@@ -50,6 +50,8 @@ public partial class MainWindow : Window
         UpdateProgramFileButtons();
         UpdateLayoutMenuEnabled();
         WireShellTabHeaders();
+        MnuView.SubmenuOpened += (_, _) => UpdateLayoutMenuEnabled();
+        MnuLayouts.SubmenuOpened += (_, _) => RebuildLayoutsMenu();
         Opened += OnMainWindowOpened;
         Closing += OnMainWindowClosing;
     }
@@ -74,7 +76,8 @@ public partial class MainWindow : Window
         Opened -= OnMainWindowOpened;
         _shellReady = true;
         JobViewControl.SetLayoutReady(true);
-        JobViewControl.WorkspaceHost.IsEditMode = MnuCustomizeLayout.IsChecked == true;
+        JobViewControl.WorkspaceHost.IsEditMode = MnuLockLayout.IsChecked != true;
+        JobViewControl.WorkspaceHost.LayoutChanged += (_, _) => UpdateLayoutMenuEnabled();
         RegisterGCodeExtensions();
         NavigateTo(ShellPage.Home, fromTabControl: false);
         if (AppHostContext.StartupArgs.Length > 0)
@@ -148,11 +151,13 @@ public partial class MainWindow : Window
         Localize.Apply(MnuDragKnife);
         Localize.Apply(MnuFileConnect);
         Localize.Apply(MnuView);
-        Localize.Apply(MnuCustomizeLayout);
+        Localize.Apply(MnuLockLayout);
         Localize.Apply(MnuResetLayout);
-        Localize.Apply(MnuLayoutPreset);
+        Localize.Apply(MnuLayouts);
         Localize.Apply(MnuPresetCompact);
         Localize.Apply(MnuPresetExpanded);
+        Localize.Apply(MnuSaveLayout);
+        Localize.Apply(MnuDeleteLayout);
         Localize.Apply(MnuViewCamera);
         Localize.Apply(MnuRefreshPorts);
         Localize.Apply(MnuSettings);
@@ -281,9 +286,11 @@ public partial class MainWindow : Window
     void UpdateLayoutMenuEnabled()
     {
         var homeActive = _activePage == ShellPage.Home;
-        MnuCustomizeLayout.IsEnabled = homeActive;
+        MnuLockLayout.IsEnabled = homeActive;
         MnuResetLayout.IsEnabled = homeActive;
-        MnuLayoutPreset.IsEnabled = homeActive;
+        MnuLayouts.IsEnabled = homeActive;
+        MnuSaveLayout.IsEnabled = homeActive;
+        MnuDeleteLayout.IsEnabled = homeActive && CanDeleteActiveLayout();
     }
 
     private async void OnOpenGCodeClick(object? sender, RoutedEventArgs e)
@@ -407,15 +414,14 @@ public partial class MainWindow : Window
         return false;
     }
 
-    private void OnCustomizeLayoutClick(object? sender, RoutedEventArgs e)
+    private void OnLockLayoutClick(object? sender, RoutedEventArgs e)
     {
         if (!_shellReady || _activePage != ShellPage.Home)
             return;
 
-        var edit = MnuCustomizeLayout.IsChecked != true;
-        MnuCustomizeLayout.IsChecked = edit;
-        JobViewControl.WorkspaceHost.IsEditMode = edit;
-        if (!edit)
+        var locked = MnuLockLayout.IsChecked == true;
+        JobViewControl.WorkspaceHost.IsEditMode = !locked;
+        if (locked)
             WorkspaceLayoutService.Persist();
     }
 
@@ -425,6 +431,7 @@ public partial class MainWindow : Window
             return;
 
         JobViewControl.WorkspaceHost.ResetToDefault();
+        UpdateLayoutMenuEnabled();
     }
 
     private void OnPresetCompactClick(object? sender, RoutedEventArgs e)
@@ -432,7 +439,7 @@ public partial class MainWindow : Window
         if (!_shellReady || _activePage != ShellPage.Home)
             return;
 
-        JobViewControl.WorkspaceHost.ApplyPreset(WorkspaceLayoutDefaults.PresetCompact);
+        ApplyLayout(WorkspaceLayoutDefaults.PresetCompact);
     }
 
     private void OnPresetExpandedClick(object? sender, RoutedEventArgs e)
@@ -440,7 +447,81 @@ public partial class MainWindow : Window
         if (!_shellReady || _activePage != ShellPage.Home)
             return;
 
-        JobViewControl.WorkspaceHost.ApplyPreset(WorkspaceLayoutDefaults.PresetExpanded);
+        ApplyLayout(WorkspaceLayoutDefaults.PresetExpanded);
+    }
+
+    void ApplyLayout(string layoutName)
+    {
+        JobViewControl.WorkspaceHost.ApplyLayout(layoutName);
+        UpdateLayoutMenuEnabled();
+    }
+
+    void RebuildLayoutsMenu()
+    {
+        MnuLayouts.Items.Clear();
+        MnuLayouts.Items.Add(MnuPresetCompact);
+        MnuLayouts.Items.Add(MnuPresetExpanded);
+
+        var layouts = WorkspaceLayoutFileService.LoadLayouts();
+        if (layouts.Count > 0)
+            MnuLayouts.Items.Add(new Separator());
+
+        foreach (var layout in layouts)
+        {
+            var layoutName = layout.Name;
+            var item = new MenuItem { Header = layoutName };
+            item.Click += (_, _) =>
+            {
+                if (_shellReady && _activePage == ShellPage.Home)
+                    ApplyLayout(layoutName);
+            };
+            MnuLayouts.Items.Add(item);
+        }
+    }
+
+    async void OnSaveLayoutClick(object? sender, RoutedEventArgs e)
+    {
+        if (!_shellReady || _activePage != ShellPage.Home)
+            return;
+
+        var dialog = new LayoutNameDialog();
+        var name = await dialog.ShowDialog<string?>(this);
+        if (string.IsNullOrWhiteSpace(name))
+            return;
+
+        var root = JobViewControl.WorkspaceHost.CurrentRoot;
+        WorkspaceLayoutFileService.Save(name, root);
+        WorkspaceLayoutService.SaveRoot(root, name);
+        WorkspaceLayoutService.Persist();
+        RebuildLayoutsMenu();
+        UpdateLayoutMenuEnabled();
+    }
+
+    async void OnDeleteLayoutClick(object? sender, RoutedEventArgs e)
+    {
+        if (!_shellReady || _activePage != ShellPage.Home || !CanDeleteActiveLayout())
+            return;
+
+        var name = WorkspaceLayoutService.ActiveLayoutName;
+        var dialog = new LayoutDeleteDialog(name);
+        var confirmed = await dialog.ShowDialog<bool?>(this);
+        if (confirmed != true)
+            return;
+
+        if (WorkspaceLayoutFileService.Delete(name))
+            ApplyLayout(WorkspaceLayoutDefaults.PresetCompact);
+
+        RebuildLayoutsMenu();
+        UpdateLayoutMenuEnabled();
+    }
+
+    static bool CanDeleteActiveLayout()
+    {
+        var active = WorkspaceLayoutService.ActiveLayoutName;
+        return !string.IsNullOrWhiteSpace(active)
+            && !WorkspaceLayoutDefaults.IsBuiltIn(active)
+            && WorkspaceLayoutFileService.LoadLayouts()
+                .Any(l => l.Name.Equals(active, StringComparison.OrdinalIgnoreCase));
     }
 
     private void OnRefreshPortsClick(object? sender, RoutedEventArgs e) => _viewModel.RefreshPorts();

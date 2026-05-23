@@ -38,12 +38,40 @@ public static class WorkspaceLayoutService
         AppHostContext.AppConfig.Base.WorkspacePreset = string.Empty;
     }
 
+    public static void SaveRoot(WorkspaceNode root, string layoutName)
+    {
+        AppHostContext.AppConfig.Base.WorkspaceRoot = root;
+        AppHostContext.AppConfig.Base.WorkspacePreset = layoutName;
+    }
+
     public static void ApplyPreset(string presetName)
     {
         var root = WorkspaceLayoutDefaults.GetPreset(presetName) ?? WorkspaceLayoutDefaults.Default.Clone();
         AppHostContext.AppConfig.Base.WorkspacePreset = presetName;
         AppHostContext.AppConfig.Base.WorkspaceRoot = root.Clone();
     }
+
+    public static bool TryApplyLayout(string layoutName)
+    {
+        if (WorkspaceLayoutDefaults.GetPreset(layoutName) is { } preset)
+        {
+            AppHostContext.AppConfig.Base.WorkspacePreset = layoutName;
+            AppHostContext.AppConfig.Base.WorkspaceRoot = preset.Clone();
+            return true;
+        }
+
+        if (WorkspaceLayoutFileService.TryLoadByName(layoutName, out var saved)
+            && WorkspaceLayoutDefaults.IsValid(saved.Root))
+        {
+            AppHostContext.AppConfig.Base.WorkspacePreset = saved.Name;
+            AppHostContext.AppConfig.Base.WorkspaceRoot = saved.Root.Clone();
+            return true;
+        }
+
+        return false;
+    }
+
+    public static string ActiveLayoutName => AppHostContext.AppConfig.Base.WorkspacePreset;
 
     public static void Persist() => AppHostContext.AppConfig.Save();
 }
