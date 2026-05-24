@@ -499,7 +499,7 @@ public class BaseConfig : ViewModelBase
         set { _maxBufferSize = value; OnPropertyChanged(); }
     }
 
-    public string Editor { get; set; } = "notepad.exe";
+    public string Editor { get; set; } = "";
 
     public bool KeepMdiFocus
     {

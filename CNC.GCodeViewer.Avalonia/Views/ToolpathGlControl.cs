@@ -13,6 +13,11 @@ namespace CNC.GCodeViewer.Avalonia.Views;
 /// <summary>Cross-platform OpenGL toolpath viewport (Windows + Linux).</summary>
 public class ToolpathGlControl : OpenGlControlBase
 {
+    const int GlBlend = 0x0BE2;
+    const int GlStencilTest = 0x0B90;
+    const int GlSampleAlphaToCoverage = 0x809E;
+    const int GlSampleCoverage = 0x80A0;
+
     readonly OpenGlLineRenderer _renderer = new();
     readonly ViewerCamera _camera = new();
     ViewerScene? _scene;
@@ -20,6 +25,7 @@ public class ToolpathGlControl : OpenGlControlBase
     bool _blackBackground = true;
     bool _initFailed;
     string? _initFailureMessage;
+    string? _renderFailureMessage;
 
     bool _isMiddlePanning;
     bool _isRightRotating;
@@ -29,10 +35,13 @@ public class ToolpathGlControl : OpenGlControlBase
     DispatcherTimer? _animationTimer;
 
     public event EventHandler? InitializationFailed;
+    public event EventHandler? RenderingFailed;
     public event EventHandler? SceneApplied;
     public event EventHandler? CameraChanged;
 
     public ViewerCamera Camera => _camera;
+    public string? InitializationFailureMessage => _initFailureMessage;
+    public string? RenderFailureMessage => _renderFailureMessage;
 
     public ToolpathGlControl()
     {
@@ -136,9 +145,13 @@ public class ToolpathGlControl : OpenGlControlBase
         {
             _initFailed = false;
             _initFailureMessage = null;
-            _renderer.Initialize(gl);
+            _renderFailureMessage = null;
+            _renderer.Initialize(gl, GlVersion);
+            _sceneGpuDirty = true;
             gl.ClearColor(0.06f, 0.06f, 0.06f, 1f);
             gl.Disable(GlConsts.GL_DEPTH_TEST);
+            gl.Disable(GlConsts.GL_CULL_FACE);
+            gl.Disable(GlConsts.GL_SCISSOR_TEST);
         }
         catch (Exception ex)
         {
@@ -152,6 +165,13 @@ public class ToolpathGlControl : OpenGlControlBase
     {
         _renderer.Deinitialize(gl);
         _renderer.Dispose();
+        _sceneGpuDirty = true;
+    }
+
+    protected override void OnOpenGlLost()
+    {
+        _sceneGpuDirty = true;
+        base.OnOpenGlLost();
     }
 
     protected override void OnOpenGlRender(GlInterface gl, int fb)
@@ -164,6 +184,7 @@ public class ToolpathGlControl : OpenGlControlBase
         var h = Math.Max(1, (int)size.Height);
         gl.Viewport(0, 0, w, h);
 
+        ResetFrameState(gl);
         gl.ClearColor(_blackBackground ? 0.06f : 1f, _blackBackground ? 0.06f : 1f, _blackBackground ? 0.06f : 1f, 1f);
         gl.Clear(GlConsts.GL_COLOR_BUFFER_BIT);
 
@@ -176,12 +197,45 @@ public class ToolpathGlControl : OpenGlControlBase
 
         if (_sceneGpuDirty)
         {
-            _renderer.SetScene(gl, layers);
-            _sceneGpuDirty = false;
+            if (_renderer.SetScene(gl, layers))
+            {
+                _sceneGpuDirty = false;
+            }
+            else
+            {
+                MarkRenderFailure(_renderer.LastError ?? "OpenGL scene upload failed");
+                return;
+            }
         }
 
         var mvp = _camera.GetMvpMatrix(w, h);
-        _renderer.Draw(gl, mvp);
+        if (!_renderer.Draw(gl, mvp))
+        {
+            MarkRenderFailure(_renderer.LastError ?? "OpenGL draw failed");
+            return;
+        }
+
+        _renderFailureMessage = null;
+    }
+
+    static void ResetFrameState(GlInterface gl)
+    {
+        gl.Disable(GlConsts.GL_DEPTH_TEST);
+        gl.Disable(GlConsts.GL_CULL_FACE);
+        gl.Disable(GlConsts.GL_SCISSOR_TEST);
+        gl.Disable(GlBlend);
+        gl.Disable(GlStencilTest);
+        gl.Disable(GlSampleAlphaToCoverage);
+        gl.Disable(GlSampleCoverage);
+    }
+
+    void MarkRenderFailure(string message)
+    {
+        if (string.Equals(_renderFailureMessage, message, StringComparison.Ordinal))
+            return;
+
+        _renderFailureMessage = message;
+        Dispatcher.UIThread.Post(() => RenderingFailed?.Invoke(this, EventArgs.Empty));
     }
 
     void OnAttachedToVisualTreeHandler(object? sender, VisualTreeAttachmentEventArgs e) =>
@@ -209,7 +263,10 @@ public class ToolpathGlControl : OpenGlControlBase
 
     void OnAnimationTick(object? sender, EventArgs e)
     {
-        if (_scene != null && !_initFailed)
+        if (_initFailed)
+            return;
+
+        if (_scene != null)
             RequestNextFrameRendering();
     }
 

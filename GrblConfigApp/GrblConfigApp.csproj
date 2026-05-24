@@ -3,7 +3,6 @@
     <OutputType>WinExe</OutputType>
     <TargetFramework>net8.0</TargetFramework>
     <Nullable>enable</Nullable>
-    <ApplicationManifest>app.manifest</ApplicationManifest>
     <AvaloniaUseCompiledBindingsByDefault>true</AvaloniaUseCompiledBindingsByDefault>
     <RootNamespace>GrblConfigApp</RootNamespace>
     <AssemblyName>GrblConfigApp</AssemblyName>
@@ -22,6 +21,9 @@
   </PropertyGroup>
   <PropertyGroup Condition="'$(IoSenderTargetPlatform)' == 'Linux'">
     <DefineConstants>$(DefineConstants);IOSENDER_LINUX</DefineConstants>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(IoSenderTargetPlatform)' == 'Windows'">
+    <ApplicationManifest>app.manifest</ApplicationManifest>
   </PropertyGroup>
 
   <ItemGroup>

@@ -39,16 +39,30 @@ public sealed class GCodeFileService
         set => _program.HeightMapApplied = value;
     }
 
+    /// <summary>Fired before program data is mutated; detach UI bound to <see cref="Data"/>.</summary>
+    public event System.Action? ProgramLoading;
+
     public event System.Action? ProgramChanged;
 
     public void Load(string filename)
     {
-        RunWithLoadDialect(() => _program.LoadFile(filename, GrblInfo.UseLinenumbers));
+        BeginProgramMutation();
+        try
+        {
+            RunWithLoadDialect(() => _program.LoadFile(filename, GrblInfo.UseLinenumbers));
+        }
+        catch (Exception ex)
+        {
+            GrblUi.ShowError(ex.Message, "ioSender");
+            return;
+        }
+
         if (Model != null)
         {
             Model.FileName = filename;
             Model.Blocks = Blocks;
         }
+
         ProgramChanged?.Invoke();
     }
 
@@ -57,6 +71,7 @@ public sealed class GCodeFileService
     {
         ArgumentNullException.ThrowIfNull(lines);
 
+        BeginProgramMutation();
         RunWithLoadDialect(() =>
         {
             _program.AddBlock(displayName, Core.Action.New);
@@ -81,6 +96,7 @@ public sealed class GCodeFileService
 
     public void Close()
     {
+        BeginProgramMutation();
         _program.CloseFile();
         if (Model != null)
         {
@@ -115,6 +131,7 @@ public sealed class GCodeFileService
 
     public void ReplaceFromTokens(IReadOnlyList<GCodeToken> tokens, string headerComment, bool compress)
     {
+        BeginProgramMutation();
         var gc = GCodeParser.TokensToGCode(tokens.ToList(), compress);
         var fileName = Model?.FileName ?? string.Empty;
         AddBlock($"{headerComment}: {fileName}", CNC.Core.Action.New);
@@ -128,9 +145,20 @@ public sealed class GCodeFileService
         if (Model == null)
             return;
 
-        Model.FileName = filename;
-        Model.Blocks = Blocks;
+        if (filename == "")
+        {
+            Model.ProgramLimits.Clear();
+            return;
+        }
+
+        foreach (int i in AxisFlags.All.ToIndices())
+        {
+            Model.ProgramLimits.MinValues[i] = Model.ConvertMM2Current(_program.BoundingBox.Min[i]);
+            Model.ProgramLimits.MaxValues[i] = Model.ConvertMM2Current(_program.BoundingBox.Max[i]);
+        }
     }
+
+    void BeginProgramMutation() => ProgramLoading?.Invoke();
 
     private bool RunWithLoadDialect(Func<bool> load)
     {

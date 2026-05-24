@@ -352,8 +352,12 @@ namespace CNC.Core
                             } else
                                 axisFlags = AxisFlags.All;
 
-                            foreach (int i in axisFlags.ToIndices())
-                                machinePos[i] = g28.Values[i]; // - offsets[i] - origin[i];
+                            if (g28 != null)
+                            {
+                                foreach (int i in axisFlags.ToIndices())
+                                    machinePos[i] = g28.Values[i]; // - offsets[i] - origin[i];
+                            }
+
                             action.End = machinePos.Point3D;
                 //            action.Token = new GCLinearMotion(Commands.G0, token.LineNumber, machinePos.Array, AxisFlags.All);
                             action.Token = new GCAbsLinearMotion(token.Command, Commands.G0, token.LineNumber, machinePos.Array, axisFlags, token.BlockDelete);
@@ -365,6 +369,7 @@ namespace CNC.Core
 
                     // G28.1: Set Predefined Position
                     case Commands.G28_1:
+                        if (g28 != null)
                         {
                             for (int i = 0; i < g28.Values.Length; i++)
                                 g28.Values[i] = offsets[i];
@@ -388,8 +393,12 @@ namespace CNC.Core
                             else
                                 axisFlags = AxisFlags.All;
 
-                            foreach (int i in axisFlags.ToIndices())
-                                machinePos[i] = g30.Values[i]; // - offsets[i] - origin[i];
+                            if (g30 != null)
+                            {
+                                foreach (int i in axisFlags.ToIndices())
+                                    machinePos[i] = g30.Values[i]; // - offsets[i] - origin[i];
+                            }
+
                             action.End = machinePos.Point3D;
 //                            action.Token = new GCLinearMotion(Commands.G0, token.LineNumber, machinePos.Array, AxisFlags.All);
                             action.Token = new GCAbsLinearMotion(token.Command, Commands.G0, token.LineNumber, machinePos.Array, axisFlags, token.BlockDelete);
@@ -400,6 +409,7 @@ namespace CNC.Core
 
                     // G30.1: Set Predefined Position
                     case Commands.G30_1:
+                        if (g30 != null)
                         {
                             for (int i = 0; i < g30.Values.Length; i++)
                                 g30.Values[i] = offsets[i];
@@ -509,8 +519,11 @@ namespace CNC.Core
                         {
                             string cs = token.Command.ToString().Replace('_', '.');
                             coordinateSystem = coordinateSystems.Where(x => x.Code == cs).FirstOrDefault();
-                            foreach (int i in AxisFlags.All.ToIndices()) // GrblInfo.AxisFlags?
-                                offsets[i] = coordinateSystem.Values[i];
+                            if (coordinateSystem != null)
+                            {
+                                foreach (int i in AxisFlags.All.ToIndices()) // GrblInfo.AxisFlags?
+                                    offsets[i] = coordinateSystem.Values[i];
+                            }
                             //    CoordinateSystem = GrblWorkParameters.CoordinateSystems();
                             //GCCoordinateSystem cs = (GCCoordinateSystem)token;
                             // TODO: handle offsets... Need to read current from grbl

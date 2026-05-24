@@ -36,25 +36,53 @@ jobs:
         run: |
           if [ "${{ runner.os }}" = "Windows" ]; then
             RID=win-x64
+            SC=false
           else
             RID=linux-x64
+            SC=true
           fi
-          dotnet publish ioSender/ioSender.csproj -c Release -r "$RID" --self-contained false -o "artifacts/publish/$RID"
+          dotnet publish ioSender/ioSender.csproj -c Release -r "$RID" \
+            --self-contained "$SC" \
+            -p:PublishSingleFile=false \
+            -o "artifacts/publish/$RID"
 
       - name: Publish GrblConfigApp
         shell: bash
         run: |
           if [ "${{ runner.os }}" = "Windows" ]; then
             RID=win-x64
+            SC=false
           else
             RID=linux-x64
+            SC=true
           fi
-          dotnet publish GrblConfigApp/GrblConfigApp.csproj -c Release -r "$RID" --self-contained false -o "artifacts/publish/grbl-config-$RID"
+          dotnet publish GrblConfigApp/GrblConfigApp.csproj -c Release -r "$RID" \
+            --self-contained "$SC" \
+            -p:PublishSingleFile=false \
+            -o "artifacts/publish/grbl-config-$RID"
+
+      - name: Check Linux dependencies
+        if: runner.os == 'Linux'
+        run: |
+          PUBLISH_DIR="$GITHUB_WORKSPACE/artifacts/publish/linux-x64" \
+            bash scripts/check-linux-deps.sh
+
+      - name: Build Debian package
+        if: runner.os == 'Linux'
+        run: |
+          PUBLISH_DIR="$GITHUB_WORKSPACE/artifacts/publish/linux-x64" \
+            bash scripts/package-deb.sh
 
       - uses: actions/upload-artifact@v4
         with:
           name: ioSender-${{ matrix.os }}
           path: artifacts/publish
+
+      - uses: actions/upload-artifact@v4
+        if: runner.os == 'Linux'
+        with:
+          name: ioSender-deb
+          path: artifacts/*.deb
 
       - uses: actions/upload-artifact@v4
         with:

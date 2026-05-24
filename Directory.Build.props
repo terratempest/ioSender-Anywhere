@@ -5,5 +5,7 @@
     <ImplicitUsings>enable</ImplicitUsings>
     <AvaloniaVersion>11.2.0</AvaloniaVersion>
     <AvaloniaDataGridVersion>11.2.0</AvaloniaDataGridVersion>
+    <Version>2.0.47</Version>
+    <InformationalVersion>$(Version)</InformationalVersion>
   </PropertyGroup>
 </Project>

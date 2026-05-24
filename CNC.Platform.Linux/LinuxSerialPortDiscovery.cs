@@ -11,7 +11,10 @@ public sealed class LinuxSerialPortDiscovery : ISerialPortDiscovery
 
         foreach (var name in SerialPort.GetPortNames())
         {
-            ports.Add(name);
+            if (!LinuxSerialPortFilter.IsRelevantDevice(name))
+                continue;
+
+            ports.Add(LinuxSerialPortFilter.NormalizeDevicePath(name));
         }
 
         if (Directory.Exists("/dev"))
@@ -19,10 +22,8 @@ public sealed class LinuxSerialPortDiscovery : ISerialPortDiscovery
             foreach (var devicePath in Directory.EnumerateFiles("/dev", "tty*"))
             {
                 var name = Path.GetFileName(devicePath);
-                if (name.StartsWith("tty", StringComparison.Ordinal))
-                {
+                if (LinuxSerialPortFilter.IsRelevantDevice(name))
                     ports.Add(devicePath);
-                }
             }
         }
 

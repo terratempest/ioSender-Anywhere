@@ -155,12 +155,14 @@ namespace CNC.Core
             uint ln;
 
             FileInfo file = new FileInfo(filename);
+            using StreamReader sr = file.OpenText();
 
-            StreamReader sr = file.OpenText();
+            string? block = sr.ReadLine();
+            var staged = new List<GCodeBlock>();
 
-            string block = sr.ReadLine();
-
-            AddBlock(filename, Action.New);
+            Reset();
+            commands.Clear();
+            this.filename = filename;
 
             while (block != null)
             {
@@ -178,19 +180,21 @@ namespace CNC.Core
                         {
                             LineNumber += 10;
                             block = "N" + LineNumber.ToString() + block;
-                        } else
+                        }
+                        else
                             LineNumber++;
 
-                        blocks.Add(new GCodeBlock(LineNumber, block, block.Length + 1, isComment, Parser.ProgramEnd, blocks.Count + 1));
+                        staged.Add(new GCodeBlock(LineNumber, block, block.Length + 1, isComment, Parser.ProgramEnd, staged.Count + 1));
                         while (commands.Count > 0)
                         {
                             block = commands.Dequeue();
                             LineNumber++;
                             if (addLineNumber)
                                 block = "N" + (LineNumber).ToString() + block;
-                            blocks.Add(new GCodeBlock(LineNumber, block, block.Length + 1, false, false, blocks.Count + 1));
+                            staged.Add(new GCodeBlock(LineNumber, block, block.Length + 1, false, false, staged.Count + 1));
                         }
                     }
+
                     block = sr.ReadLine();
                 }
                 catch (Exception e)
@@ -202,14 +206,69 @@ namespace CNC.Core
                 }
             }
 
-            sr.Close();
-
             if (ok)
-                AddBlock("", Action.End);
+            {
+                ReplaceBlocks(staged);
+                FinalizeLoadedProgram(filename);
+            }
             else
+            {
                 CloseFile();
+            }
 
             return ok;
+        }
+
+        void ReplaceBlocks(IReadOnlyList<GCodeBlock> staged)
+        {
+            blocks.Clear();
+            foreach (var item in staged)
+                blocks.Add(item);
+        }
+
+        void FinalizeLoadedProgram(string filename)
+        {
+#if DEBUG
+            System.Diagnostics.Stopwatch stopWatch = new System.Diagnostics.Stopwatch();
+            stopWatch.Start();
+#endif
+
+            try
+            {
+                BoundingBox.Reset();
+
+                var syncWithController = Comms.com is { IsOpen: true };
+                GCodeEmulator emu = new GCodeEmulator(true, syncMachineState: syncWithController);
+
+                foreach (var cmd in emu.Execute(Tokens))
+                {
+                    if (cmd.Token is GCArc)
+                        BoundingBox.AddBoundingBox((cmd.Token as GCArc).GetBoundingBox(emu.Plane, new double[] { cmd.Start.X, cmd.Start.Y, cmd.Start.Z }, emu.DistanceMode == DistanceMode.Incremental));
+                    else if (cmd.Token is GCCubicSpline)
+                        BoundingBox.AddBoundingBox((cmd.Token as GCCubicSpline).GetBoundingBox(emu.Plane, new double[] { cmd.Start.X, cmd.Start.Y, cmd.Start.Z }, emu.DistanceMode == DistanceMode.Incremental));
+                    else if (cmd.Token is GCQuadraticSpline)
+                        BoundingBox.AddBoundingBox((cmd.Token as GCQuadraticSpline).GetBoundingBox(emu.Plane, new double[] { cmd.Start.X, cmd.Start.Y, cmd.Start.Z }, emu.DistanceMode == DistanceMode.Incremental));
+                    else if (cmd.Token is GCAxisCommand9)
+                    {
+                        if (GrblInfo.LatheUVWModeEnabled)
+                            BoundingBox.AddBoundingBox((cmd.Token as GCAxisCommand9).GetBoundingBox(emu.Plane, new double[] { cmd.Start.X, cmd.Start.Y, cmd.Start.Z }, emu.DistanceMode == DistanceMode.Incremental));
+                        else
+                            BoundingBox.AddPoint(cmd.End, (cmd.Token as GCAxisCommand9).AxisFlags);
+                    }
+                }
+
+                BoundingBox.Conclude();
+            }
+            catch (Exception ex)
+            {
+                GrblUi.ShowError($"Could not compute program bounds: {ex.Message}", "ioSender");
+            }
+
+#if DEBUG
+            stopWatch.Stop();
+#endif
+
+            FileChanged?.Invoke(filename);
         }
 
         public void AddBlock(string block, Action action)
@@ -257,46 +316,7 @@ namespace CNC.Core
             }
 
             if (action == Action.End)
-            {
-#if DEBUG
-                System.Diagnostics.Stopwatch stopWatch = new System.Diagnostics.Stopwatch();
-                stopWatch.Start();
-#endif
-
-                // Calculate program limits (bounding box)
-
-                BoundingBox.Reset();
-
-                GCodeEmulator emu = new GCodeEmulator(true, syncMachineState: false);
-
-                foreach (var cmd in emu.Execute(Tokens))
-                {
-                    if (cmd.Token is GCArc)
-                        BoundingBox.AddBoundingBox((cmd.Token as GCArc).GetBoundingBox(emu.Plane, new double[] { cmd.Start.X, cmd.Start.Y, cmd.Start.Z }, emu.DistanceMode == DistanceMode.Incremental));
-                    else if (cmd.Token is GCCubicSpline)
-                        BoundingBox.AddBoundingBox((cmd.Token as GCCubicSpline).GetBoundingBox(emu.Plane, new double[] { cmd.Start.X, cmd.Start.Y, cmd.Start.Z }, emu.DistanceMode == DistanceMode.Incremental));
-                    else if (cmd.Token is GCQuadraticSpline)
-                        BoundingBox.AddBoundingBox((cmd.Token as GCQuadraticSpline).GetBoundingBox(emu.Plane, new double[] { cmd.Start.X, cmd.Start.Y, cmd.Start.Z }, emu.DistanceMode == DistanceMode.Incremental));
-                    else if (cmd.Token is GCAxisCommand9)
-                    {
-                        if (GrblInfo.LatheUVWModeEnabled)
-                            BoundingBox.AddBoundingBox((cmd.Token as GCAxisCommand9).GetBoundingBox(emu.Plane, new double[] { cmd.Start.X, cmd.Start.Y, cmd.Start.Z }, emu.DistanceMode == DistanceMode.Incremental));
-                        else
-                            BoundingBox.AddPoint(cmd.End, (cmd.Token as GCAxisCommand9).AxisFlags);
-                    }
-                }
-
-                BoundingBox.Conclude();
-
-#if DEBUG
-                stopWatch.Stop();
-#endif
-
-                //GCodeParser.Save(@"d:\tokens.xml", Parser.Tokens);
-                //GCodeParser.Save(@"d:\file.nc", GCodeParser.TokensToGCode(Parser.Tokens));
-
-                FileChanged?.Invoke(filename);
-            }
+                FinalizeLoadedProgram(filename);
         }
 
         public void AddBlock(string block)

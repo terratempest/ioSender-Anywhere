@@ -47,10 +47,18 @@ public partial class RenderControl : UserControl
         GlViewport.InitializationFailed += (_, _) =>
         {
             _glInitFailed = true;
-            SetStatus("3D view unavailable — OpenGL");
+            SetStatus($"3D view unavailable - {GlViewport.InitializationFailureMessage ?? "OpenGL"}");
+        };
+        GlViewport.RenderingFailed += (_, _) =>
+        {
+            var reason = GlViewport.RenderFailureMessage;
+            if (!string.IsNullOrWhiteSpace(reason))
+                SetStatus($"3D view OpenGL error - {reason}");
         };
         GlViewport.SceneApplied += (_, _) =>
         {
+            if (_pathBuildInProgress)
+                return;
             if (_renderPending && GlViewport.Bounds.Width >= 4 && GlViewport.Bounds.Height >= 4)
                 TryFlushRender();
         };
@@ -71,7 +79,7 @@ public partial class RenderControl : UserControl
 
     public void Open(IReadOnlyList<GCodeToken> tokens, Point3D? start = null)
     {
-        _tokens = tokens as GCodeToken[] ?? tokens.ToArray();
+        _tokens = tokens;
         _programStart = start;
         RequestRender(start);
     }
@@ -122,7 +130,7 @@ public partial class RenderControl : UserControl
         if (_glInitFailed)
             return;
         TryFlushRender();
-        if (_renderPending)
+        if (_renderPending && !_pathBuildInProgress)
             StartRenderWaitTimer();
     }
 
@@ -132,7 +140,7 @@ public partial class RenderControl : UserControl
             return;
 
         if (_pathBuildInProgress)
-            CancelPathBuild();
+            return;
 
         var viewportSize = GlViewport.Bounds;
         if (viewportSize.Width < 4 || viewportSize.Height < 4)
@@ -162,20 +170,20 @@ public partial class RenderControl : UserControl
                 var cfg = GCodeViewerContext.Settings;
                 var built = GCodePathBuilder.Build(tokens, start, cfg.ArcResolution, cfg.MinDistance, ct);
                 var bounds = PathBounds.FromSegments(built.Segments);
+                var scene = ToolpathSceneBuilder.Build(built.Segments, bounds, cfg, ct);
                 Dispatcher.UIThread.Post(() =>
                 {
-                    if (!IsCurrentBuild(buildVersion, tokens))
+                    if (ReferenceEquals(_buildCts, cts))
+                    {
+                        _pathBuildInProgress = false;
+                        _buildCts = null;
+                    }
+
+                    if (!IsCurrentBuild(buildVersion))
                         return;
 
                     try
                     {
-                        var scene = ToolpathSceneBuilder.Build(built.Segments, bounds, cfg);
-                        if (!IsCurrentBuild(buildVersion, tokens))
-                            return;
-
-                        _pathBuildInProgress = false;
-                        if (ReferenceEquals(_buildCts, cts))
-                            _buildCts = null;
                         if (!_renderPending)
                             return;
 
@@ -184,18 +192,11 @@ public partial class RenderControl : UserControl
                     }
                     catch (OperationCanceledException)
                     {
-                        if (IsCurrentBuild(buildVersion, tokens))
-                            _pathBuildInProgress = false;
                     }
-                    catch (Exception ex)
+                    catch (Exception)
                     {
-                        if (!IsCurrentBuild(buildVersion, tokens))
-                            return;
-                        _pathBuildInProgress = false;
                         _renderPending = false;
-                        if (ReferenceEquals(_buildCts, cts))
-                            _buildCts = null;
-                        SetStatus($"3D view — build failed: {ex.GetType().Name}");
+                        SetStatus("3D view — build failed");
                     }
                 }, DispatcherPriority.Background);
             }
@@ -203,20 +204,27 @@ public partial class RenderControl : UserControl
             {
                 Dispatcher.UIThread.Post(() =>
                 {
-                    if (IsCurrentBuild(buildVersion, tokens))
+                    if (ReferenceEquals(_buildCts, cts))
+                    {
                         _pathBuildInProgress = false;
+                        _buildCts = null;
+                    }
                 });
             }
             catch (Exception ex)
             {
                 Dispatcher.UIThread.Post(() =>
                 {
-                    if (!IsCurrentBuild(buildVersion, tokens))
-                        return;
-                    _pathBuildInProgress = false;
-                    _renderPending = false;
                     if (ReferenceEquals(_buildCts, cts))
+                    {
+                        _pathBuildInProgress = false;
                         _buildCts = null;
+                    }
+
+                    if (!IsCurrentBuild(buildVersion))
+                        return;
+
+                    _renderPending = false;
                     SetStatus($"3D view — build failed: {ex.GetType().Name}");
                 });
             }
@@ -226,16 +234,19 @@ public partial class RenderControl : UserControl
 
     void CancelPathBuild()
     {
+        if (_buildCts == null)
+        {
+            _pathBuildInProgress = false;
+            return;
+        }
+
         _buildVersion++;
         _pathBuildInProgress = false;
-        if (_buildCts == null)
-            return;
         _buildCts.Cancel();
         _buildCts = null;
     }
 
-    bool IsCurrentBuild(int buildVersion, IReadOnlyList<GCodeToken> tokens) =>
-        buildVersion == _buildVersion && ReferenceEquals(_tokens, tokens);
+    bool IsCurrentBuild(int buildVersion) => buildVersion == _buildVersion;
 
     void ApplyScene(GCodePathSegments segments, PathBounds bounds, int motionCount, ViewerScene scene)
     {
@@ -393,6 +404,9 @@ public partial class RenderControl : UserControl
 
     void OnRenderWaitTick(object? sender, EventArgs e)
     {
+        if (_pathBuildInProgress)
+            return;
+
         if (!_renderPending)
         {
             StopRenderWaitTimer();

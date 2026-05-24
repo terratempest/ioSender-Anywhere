@@ -1,0 +1,14 @@
+# Debian/Ubuntu packages required at runtime (self-contained .NET + OpenCV still need GUI/OpenGL).
+# One package name per line. Lines starting with # are ignored.
+libc6
+libx11-6
+libice6
+libsm6
+libxext6
+libfontconfig1
+libgl1
+libglx0
+libegl1
+libopengl0
+libgtk-3-0
+libstdc++6

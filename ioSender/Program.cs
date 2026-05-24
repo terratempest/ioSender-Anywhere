@@ -1,4 +1,5 @@
 using Avalonia;
+using Avalonia.X11;
 using ioSender.Services;
 using System;
 
@@ -18,6 +19,12 @@ class Program
                 Console.Error.WriteLine(ex);
         };
 
+        TaskScheduler.UnobservedTaskException += (_, e) =>
+        {
+            Console.Error.WriteLine(e.Exception);
+            e.SetObserved();
+        };
+
         try
         {
             EarlyStartupBanner.Show();
@@ -34,8 +41,26 @@ class Program
 
     // Avalonia configuration, don't remove; also used by visual designer.
     public static AppBuilder BuildAvaloniaApp()
-        => AppBuilder.Configure<App>()
-            .UsePlatformDetect()
+        => ConfigureLinuxX11Rendering(AppBuilder.Configure<App>()
+            .UsePlatformDetect())
             .WithInterFont()
             .LogToTrace();
+
+    static AppBuilder ConfigureLinuxX11Rendering(AppBuilder builder)
+    {
+        if (!OperatingSystem.IsLinux())
+            return builder;
+
+        return builder.With(new X11PlatformOptions
+        {
+            RenderingMode =
+            [
+                X11RenderingMode.Glx,
+                X11RenderingMode.Egl,
+                X11RenderingMode.Software,
+            ],
+            UseDBusMenu = false,
+        });
+    }
+
 }

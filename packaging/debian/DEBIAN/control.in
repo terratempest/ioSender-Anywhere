@@ -1,0 +1,10 @@
+Package: iosender
+Version: @VERSION@
+Section: utils
+Priority: optional
+Architecture: amd64
+Depends: @DEPENDS@
+Maintainer: ioSender <https://github.com/terjeio/ioSender>
+Description: G-code sender for grblHAL and Grbl controllers
+ ioSender is a desktop application for sending G-code to Grbl and grblHAL
+ CNC controllers over serial or network connections.

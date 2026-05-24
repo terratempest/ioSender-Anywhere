@@ -1,0 +1,9 @@
+[Desktop Entry]
+Name=ioSender
+Comment=G-code sender for grblHAL and Grbl
+Exec=iosender %F
+Icon=iosender
+Terminal=false
+Type=Application
+Categories=Engineering;Development;
+StartupWMClass=ioSender

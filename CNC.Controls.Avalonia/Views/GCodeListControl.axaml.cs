@@ -29,6 +29,7 @@ public partial class GCodeListControl : UserControl
         DragDrop.SetAllowDrop(GCodeGrid, true);
         GCodeGrid.AddHandler(DragDrop.DragOverEvent, OnDragOver);
         GCodeGrid.AddHandler(DragDrop.DropEvent, OnDrop);
+        GCodeFileService.Instance.ProgramLoading += OnProgramLoading;
         GCodeFileService.Instance.ProgramChanged += OnProgramChanged;
         Loaded += (_, _) =>
         {
@@ -77,10 +78,24 @@ public partial class GCodeListControl : UserControl
         _model = null;
     }
 
+    void OnProgramLoading()
+    {
+        GCodeGrid.ItemsSource = null;
+        DetachBlockHandlers();
+    }
+
     void OnProgramChanged() => BindProgram();
+
+    void DetachBlockHandlers()
+    {
+        foreach (var (block, handler) in _blockHandlers.ToList())
+            block.PropertyChanged -= handler;
+        _blockHandlers.Clear();
+    }
 
     void BindProgram()
     {
+        DetachBlockHandlers();
         GCodeGrid.ItemsSource = GCodeFileService.Instance.Data;
         if (_model != null && _model.ScrollPosition >= 0)
             ScrollToBlock(_model.ScrollPosition);

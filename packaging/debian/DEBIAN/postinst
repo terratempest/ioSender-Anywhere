@@ -1,0 +1,10 @@
+#!/bin/sh
+set -e
+if [ "$1" = "configure" ]; then
+  echo ""
+  echo "ioSender: for USB serial access, add your user to the dialout group:"
+  echo "  sudo usermod -aG dialout \$USER"
+  echo "  (log out and back in for the change to take effect)"
+  echo ""
+fi
+exit 0

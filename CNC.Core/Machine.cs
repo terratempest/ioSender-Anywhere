@@ -62,6 +62,21 @@ namespace CNC.Core
         protected List<Tool> toolTable = new List<Tool>();
         protected Point6D machinePos = new Point6D();
 
+        static readonly string[] DefaultCoordinateSystemCodes =
+        [
+            "G54", "G55", "G56", "G57", "G58", "G59",
+            "G59.1", "G59.2", "G59.3", "G28", "G30", "G92"
+        ];
+
+        static void EnsureDefaultCoordinateSystems(List<CoordinateSystem> systems)
+        {
+            if (systems.Count > 0)
+                return;
+
+            foreach (var code in DefaultCoordinateSystemCodes)
+                systems.Add(new CoordinateSystem(code, ""));
+        }
+
         public void Reset(bool syncWithController = true)
         {
             // Sync with controller when connected (skip during offline UI startup)
@@ -79,6 +94,7 @@ namespace CNC.Core
             coordinateSystems.Clear();
             foreach (CoordinateSystem c in GrblWorkParameters.CoordinateSystems)
                 coordinateSystems.Add(c);
+            EnsureDefaultCoordinateSystems(coordinateSystems);
 
             toolTable.Clear();
             if (GrblInfo.NumTools > 0)
@@ -145,6 +161,10 @@ namespace CNC.Core
 
                 case GCode.Plane.YZ:
                     Plane = new GCPlane(Commands.G19, 0, false);
+                    break;
+
+                default:
+                    Plane = new GCPlane(Commands.G17, 0, false);
                     break;
             }
         }

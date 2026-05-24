@@ -23,6 +23,12 @@ public partial class App : Application
 
     public override void OnFrameworkInitializationCompleted()
     {
+        Dispatcher.UIThread.UnhandledException += (_, e) =>
+        {
+            Console.Error.WriteLine(e.Exception);
+            e.Handled = true;
+        };
+
         StartupTrace.Mark("Framework initialization completed");
         EarlyStartupBanner.ReportProgress("Preparing application...", 20);
 

@@ -20,11 +20,14 @@ dotnet run --project ioSender/ioSender.csproj
 dotnet run --project GrblConfigApp/GrblConfigApp.csproj
 
 # Publish
-./scripts/publish-linux.sh          # linux-x64 → artifacts/publish/linux-x64
+./scripts/publish-linux.sh          # self-contained linux-x64 → artifacts/publish/linux-x64
+./scripts/package-deb.sh            # build artifacts/iosender_*_amd64.deb (Linux)
 pwsh ./scripts/publish-windows.ps1  # win-x64   → artifacts/publish/win-x64
 ```
 
 On Windows, `ioSender` and `GrblConfigApp` use `CNC.Platform.Windows`; on Linux, `CNC.Platform.Linux`.
+
+**Linux install and packaging:** see [docs/LINUX.md](docs/LINUX.md) (`.deb`, serial `dialout`, dependencies).
 
 **Large layout** (formerly ioSender XL): View → Toggle large layout.
 

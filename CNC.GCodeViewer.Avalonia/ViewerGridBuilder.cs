@@ -6,7 +6,6 @@ internal static class ViewerGridBuilder
 {
     const double MinorStep = 10d;
     const double MajorStep = 100d;
-    const double MajorThickness = 0.75d;
 
     public sealed record GridLines(List<NumericVector3> Minor, List<NumericVector3> Major);
 
@@ -35,9 +34,6 @@ internal static class ViewerGridBuilder
         return new GridLines(minor, major);
     }
 
-    public static List<NumericVector3> BuildMajorQuads(IReadOnlyList<NumericVector3> majorLines) =>
-        BuildQuads(majorLines, MajorThickness);
-
     static void AddGridLines(
         List<NumericVector3> minor,
         List<NumericVector3> major,
@@ -64,38 +60,6 @@ internal static class ViewerGridBuilder
     {
         target.Add(new NumericVector3(x1, y1, z1));
         target.Add(new NumericVector3(x2, y2, z2));
-    }
-
-    static List<NumericVector3> BuildQuads(IReadOnlyList<NumericVector3> lineSegments, double thickness)
-    {
-        var quads = new List<NumericVector3>(lineSegments.Count * 3);
-        var half = (float)(thickness / 2d);
-        for (var i = 0; i + 1 < lineSegments.Count; i += 2)
-        {
-            var a = lineSegments[i];
-            var b = lineSegments[i + 1];
-            var dx = b.X - a.X;
-            var dy = b.Y - a.Y;
-            var length = MathF.Sqrt(dx * dx + dy * dy);
-            if (length <= 1e-6f)
-                continue;
-
-            var px = -dy / length * half;
-            var py = dx / length * half;
-            var a0 = new NumericVector3(a.X + px, a.Y + py, a.Z);
-            var a1 = new NumericVector3(a.X - px, a.Y - py, a.Z);
-            var b0 = new NumericVector3(b.X + px, b.Y + py, b.Z);
-            var b1 = new NumericVector3(b.X - px, b.Y - py, b.Z);
-
-            quads.Add(a0);
-            quads.Add(b0);
-            quads.Add(b1);
-            quads.Add(a0);
-            quads.Add(b1);
-            quads.Add(a1);
-        }
-
-        return quads;
     }
 
     static double Floor(double value, double step) => Math.Floor(value / step) * step;

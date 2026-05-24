@@ -44,7 +44,7 @@ internal static class ToolpathSceneBuilder
                 if (gridLines.Minor.Count > 1)
                     grid = ViewerLineLayerBuilder.FromPoints(gridLines.Minor, HalfBrightness(color), 0.5f);
                 if (gridLines.Major.Count > 1)
-                    gridMajor = ViewerLineLayerBuilder.FromTriangles(ViewerGridBuilder.BuildMajorQuads(gridLines.Major), color);
+                    gridMajor = ViewerLineLayerBuilder.FromPoints(gridLines.Major, color, 1.25f);
             }
 
             if (cfg.ShowBoundingBox)

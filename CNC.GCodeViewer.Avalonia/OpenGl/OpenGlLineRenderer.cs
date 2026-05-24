@@ -32,18 +32,23 @@ internal sealed class OpenGlLineRenderer : IDisposable
     sealed class LayerGpu
     {
         public required int Vbo { get; init; }
+        public required int Vao { get; init; }
         public required int VertexCount { get; init; }
         public required Color Color { get; init; }
         public required ViewerPrimitiveKind PrimitiveKind { get; init; }
         public required float LineWidth { get; init; }
     }
 
-    public void Initialize(GlInterface gl)
+    public string? LastError { get; private set; }
+
+    public void Initialize(GlInterface gl, GlVersion version)
     {
         if (_initialized)
             return;
 
-        _program = CreateProgram(gl);
+        LastError = null;
+        var useOpenGlEs = version.Type == GlProfileType.OpenGLES;
+        _program = CreateProgram(gl, useOpenGlEs);
         _uMvp = gl.GetUniformLocationString(_program, "uMvp");
         _uColorR = gl.GetUniformLocationString(_program, "uColorR");
         _uColorG = gl.GetUniformLocationString(_program, "uColorG");
@@ -75,49 +80,87 @@ internal sealed class OpenGlLineRenderer : IDisposable
 
         gl.DeleteProgram(_program);
         foreach (var layer in _layers)
+        {
+            if (layer.Vao != 0)
+                gl.DeleteVertexArray(layer.Vao);
             gl.DeleteBuffer(layer.Vbo);
+        }
         _layers.Clear();
         _initialized = false;
         _program = 0;
         _lineWidth = null;
     }
 
-    public void SetScene(GlInterface gl, IEnumerable<ViewerLineLayer> layers)
+    public bool SetScene(GlInterface gl, IEnumerable<ViewerLineLayer> layers)
     {
         if (!_initialized)
-            return;
+            return false;
 
+        LastError = null;
         foreach (var layer in _layers)
+        {
+            if (layer.Vao != 0)
+                gl.DeleteVertexArray(layer.Vao);
             gl.DeleteBuffer(layer.Vbo);
+        }
         _layers.Clear();
 
         foreach (var layer in layers)
         {
             var vertices = LayerVertices(layer.Points);
-            if (!IsDrawable(layer, vertices.Length))
+            var primitiveKind = layer.PrimitiveKind;
+
+            if (!IsDrawable(primitiveKind, vertices.Length))
                 continue;
 
             var vbo = gl.GenBuffer();
+            if (vbo == 0)
+            {
+                LastError = "OpenGL VBO unavailable";
+                return false;
+            }
+
+            var vao = gl.GenVertexArray();
+            if (vao == 0)
+            {
+                gl.DeleteBuffer(vbo);
+                LastError = "OpenGL VAO unavailable";
+                return false;
+            }
+
+            gl.BindVertexArray(vao);
             gl.BindBuffer(GlConsts.GL_ARRAY_BUFFER, vbo);
             UploadVertices(gl, vertices);
+            gl.VertexAttribPointer(PositionAttrib, 3, GlConsts.GL_FLOAT, 0, 0, IntPtr.Zero);
+            gl.EnableVertexAttribArray(PositionAttrib);
+
             _layers.Add(new LayerGpu
             {
                 Vbo = vbo,
+                Vao = vao,
                 VertexCount = vertices.Length / FloatsPerVertex,
                 Color = layer.Color,
-                PrimitiveKind = layer.PrimitiveKind,
+                PrimitiveKind = primitiveKind,
                 LineWidth = Math.Max(1f, layer.LineWidth),
             });
         }
+
+        gl.BindBuffer(GlConsts.GL_ARRAY_BUFFER, 0);
+        gl.BindVertexArray(0);
+        if (_layers.Count == 0 && LastError != null)
+            return false;
+
+        return true;
     }
 
-    public void Draw(GlInterface gl, Matrix4x4 mvp)
+    public bool Draw(GlInterface gl, Matrix4x4 mvp)
     {
         if (!_initialized || _layers.Count == 0)
-            return;
+            return true;
 
+        LastError = null;
         gl.UseProgram(_program);
-        UploadMvp(gl, mvp);
+        UploadMvpForRowVectorCamera(gl, mvp);
 
         foreach (var layer in _layers)
         {
@@ -125,19 +168,19 @@ internal sealed class OpenGlLineRenderer : IDisposable
             SetColor(gl, rgba.R / 255f, rgba.G / 255f, rgba.B / 255f, rgba.A / 255f);
             _lineWidth?.Invoke(layer.LineWidth);
 
-            gl.BindBuffer(GlConsts.GL_ARRAY_BUFFER, layer.Vbo);
-            gl.EnableVertexAttribArray(PositionAttrib);
-            gl.VertexAttribPointer(PositionAttrib, 3, GlConsts.GL_FLOAT, 0, 0, IntPtr.Zero);
-            gl.DrawArrays(ToGlPrimitive(layer.PrimitiveKind), 0, (IntPtr)layer.VertexCount);
+            gl.BindVertexArray(layer.Vao);
+            gl.DrawArrays(ToGlPrimitive(layer.PrimitiveKind), 0, new IntPtr(layer.VertexCount));
         }
 
         _lineWidth?.Invoke(1f);
+        gl.BindVertexArray(0);
         gl.BindBuffer(GlConsts.GL_ARRAY_BUFFER, 0);
         gl.UseProgram(0);
+        return LastError == null;
     }
 
-    static bool IsDrawable(ViewerLineLayer layer, int vertexFloatCount) =>
-        layer.PrimitiveKind switch
+    static bool IsDrawable(ViewerPrimitiveKind primitiveKind, int vertexFloatCount) =>
+        primitiveKind switch
         {
             ViewerPrimitiveKind.Triangles => vertexFloatCount >= FloatsPerVertex * 3,
             _ => vertexFloatCount >= FloatsPerVertex * 2,
@@ -158,12 +201,13 @@ internal sealed class OpenGlLineRenderer : IDisposable
         }
     }
 
-    void UploadMvp(GlInterface gl, Matrix4x4 matrix)
+    void UploadMvpForRowVectorCamera(GlInterface gl, Matrix4x4 matrix)
     {
         if (_uMvp < 0)
             return;
 
-        // Match Avalonia OpenGlContent: System.Numerics row-major, transpose=false.
+        // ViewerCamera builds a System.Numerics row-vector MVP (view * projection).
+        // Avalonia's GL samples upload that layout with transpose=false, so keep it explicit here.
         unsafe
         {
             gl.UniformMatrix4fv(_uMvp, 1, false, &matrix);
@@ -191,41 +235,43 @@ internal sealed class OpenGlLineRenderer : IDisposable
         return verts;
     }
 
-    static int CreateProgram(GlInterface gl)
+    static int CreateProgram(GlInterface gl, bool useOpenGlEs)
     {
-        const string vertexShader = """
-            #version 300 es
-            precision mediump float;
-            uniform mat4 uMvp;
-            in vec3 aPosition;
-            void main() {
-                gl_Position = uMvp * vec4(aPosition, 1.0);
-            }
-            """;
+        var primaryErr = TryCreateProgram(gl, useOpenGlEs, out var program);
+        if (program != 0)
+            return program;
 
-        const string fragmentShader = """
-            #version 300 es
-            precision mediump float;
-            uniform float uColorR;
-            uniform float uColorG;
-            uniform float uColorB;
-            uniform float uColorA;
-            out vec4 fragColor;
-            void main() {
-                fragColor = vec4(uColorR, uColorG, uColorB, uColorA);
-            }
-            """;
+        var fallbackErr = TryCreateProgram(gl, !useOpenGlEs, out program);
+        if (program != 0)
+            return program;
+
+        throw new InvalidOperationException(primaryErr ?? fallbackErr ?? "Shader link failed");
+    }
+
+    static string? TryCreateProgram(GlInterface gl, bool useOpenGlEs, out int program)
+    {
+        program = 0;
+        var (vertexShader, fragmentShader) = useOpenGlEs ? OpenGlEsShaders() : DesktopGlShaders();
 
         var vs = gl.CreateShader(GlConsts.GL_VERTEX_SHADER);
         var fs = gl.CreateShader(GlConsts.GL_FRAGMENT_SHADER);
         var vsErr = gl.CompileShaderAndGetError(vs, vertexShader);
         if (vsErr != null)
-            throw new InvalidOperationException("Vertex shader: " + vsErr);
+        {
+            gl.DeleteShader(vs);
+            gl.DeleteShader(fs);
+            return "Vertex shader: " + vsErr;
+        }
+
         var fsErr = gl.CompileShaderAndGetError(fs, fragmentShader);
         if (fsErr != null)
-            throw new InvalidOperationException("Fragment shader: " + fsErr);
+        {
+            gl.DeleteShader(vs);
+            gl.DeleteShader(fs);
+            return "Fragment shader: " + fsErr;
+        }
 
-        var program = gl.CreateProgram();
+        program = gl.CreateProgram();
         gl.AttachShader(program, vs);
         gl.AttachShader(program, fs);
         gl.BindAttribLocationString(program, PositionAttrib, "aPosition");
@@ -233,7 +279,55 @@ internal sealed class OpenGlLineRenderer : IDisposable
         gl.DeleteShader(vs);
         gl.DeleteShader(fs);
         if (linkErr != null)
-            throw new InvalidOperationException("Link: " + linkErr);
-        return program;
+        {
+            gl.DeleteProgram(program);
+            program = 0;
+            return "Link: " + linkErr;
+        }
+
+        return null;
     }
+
+    static (string Vertex, string Fragment) OpenGlEsShaders() => (
+        """
+        #version 300 es
+        uniform mat4 uMvp;
+        in vec3 aPosition;
+        void main() {
+            gl_Position = uMvp * vec4(aPosition, 1.0);
+        }
+        """,
+        """
+        #version 300 es
+        precision mediump float;
+        uniform float uColorR;
+        uniform float uColorG;
+        uniform float uColorB;
+        uniform float uColorA;
+        out vec4 fragColor;
+        void main() {
+            fragColor = vec4(uColorR, uColorG, uColorB, uColorA);
+        }
+        """);
+
+    static (string Vertex, string Fragment) DesktopGlShaders() => (
+        """
+        #version 330 core
+        uniform mat4 uMvp;
+        layout(location = 0) in vec3 aPosition;
+        void main() {
+            gl_Position = uMvp * vec4(aPosition, 1.0);
+        }
+        """,
+        """
+        #version 330 core
+        uniform float uColorR;
+        uniform float uColorG;
+        uniform float uColorB;
+        uniform float uColorA;
+        out vec4 fragColor;
+        void main() {
+            fragColor = vec4(uColorR, uColorG, uColorB, uColorA);
+        }
+        """);
 }
