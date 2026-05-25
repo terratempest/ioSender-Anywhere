@@ -39,7 +39,7 @@ public partial class PortDialog : Window
 
     private void ApplyLocalization()
     {
-        Localize.Set(PortDialogRoot, "CNC.Controls.WPF.portdialog.dlg_title", "Sender connection");
+        Localize.Set(PortDialogRoot, "CNC.Controls.Avalonia.portdialog.dlg_title", "Sender connection");
         Localize.Apply(PortDialogRoot);
         Localize.Apply(TabSerial);
         Localize.Apply(TabTelnet);
@@ -48,7 +48,7 @@ public partial class PortDialog : Window
         Localize.Apply(LblSerialBaud);
         Localize.Apply(LblTelnetHost);
         Localize.Apply(LblTelnetPort);
-        Localize.Set(BtnConnect, "CNC.Controls.WPF.portdialog.btn_ok", "Connect");
+        Localize.Set(BtnConnect, "CNC.Controls.Avalonia.portdialog.btn_ok", "Connect");
         Localize.Apply(BtnConnect);
         Localize.Apply(BtnCancel);
     }

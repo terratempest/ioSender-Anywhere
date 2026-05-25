@@ -1,10 +1,12 @@
 using Avalonia.Controls;
 using CNC.App.Workspace;
+using CNC.Controls.Avalonia.Services;
 using CNC.Controls.Avalonia.Views;
 using CNC.Controls.Config;
 using CNC.Controls.Lathe;
 using CNC.Controls.Probing;
 using CNC.Core;
+using CNC.GCodeViewer.Avalonia;
 using CNC.GCodeViewer.Avalonia.Views;
 using ioSender.Services;
 using ioSender.ViewModels;
@@ -18,11 +20,23 @@ public sealed class WorkspaceEditorFactory
     readonly Dictionary<Guid, WorkspaceEditorId> _editorByLeaf = new();
     readonly object _grblContext;
     readonly object? _appConfigContext;
+    readonly AppSession _session;
+    readonly GCodeViewerSession _viewerSession;
 
-    public WorkspaceEditorFactory(object grblContext, object? appConfigContext = null)
+    public WorkspaceEditorFactory(
+        object grblContext,
+        object? appConfigContext = null,
+        AppSession? session = null,
+        ProgramService? programService = null)
     {
+        _session = session ?? AppHostContext.Session;
         _grblContext = ResolveGrblContext(grblContext);
-        _appConfigContext = appConfigContext ?? AppHostContext.AppConfig.Base;
+        _appConfigContext = appConfigContext ?? _session.AppConfig.Base;
+        var program = programService ?? _session.Program;
+        _viewerSession = new GCodeViewerSession(
+            _session.AppConfig,
+            (GrblViewModel)_grblContext,
+            () => program.Tokens);
     }
 
     public Control GetOrCreate(WorkspaceLeaf leaf)
@@ -87,13 +101,14 @@ public sealed class WorkspaceEditorFactory
 
     Control Create(WorkspaceEditorId id) => id switch
     {
-        WorkspaceEditorId.Program => new GCodeListControl
+        WorkspaceEditorId.Program => new GCodeListControl(_session.Program, _session.MachineCommands)
         {
             HorizontalAlignment = Avalonia.Layout.HorizontalAlignment.Stretch,
             VerticalAlignment = Avalonia.Layout.VerticalAlignment.Stretch,
         },
         WorkspaceEditorId.Viewer3D => new RenderControl
         {
+            Session = _viewerSession,
             HorizontalAlignment = Avalonia.Layout.HorizontalAlignment.Stretch,
             VerticalAlignment = Avalonia.Layout.VerticalAlignment.Stretch,
         },
@@ -115,14 +130,14 @@ public sealed class WorkspaceEditorFactory
             HorizontalAlignment = Avalonia.Layout.HorizontalAlignment.Stretch,
         },
         WorkspaceEditorId.Jog => new JogControl { HorizontalAlignment = Avalonia.Layout.HorizontalAlignment.Stretch },
-        WorkspaceEditorId.Outline => new OutlineControl(),
+        WorkspaceEditorId.Outline => new OutlineControl(_session.AppConfig),
         WorkspaceEditorId.Goto => new GotoControl(),
         WorkspaceEditorId.WorkParams => new WorkParametersControl
         {
             HorizontalAlignment = Avalonia.Layout.HorizontalAlignment.Stretch,
             VerticalAlignment = Avalonia.Layout.VerticalAlignment.Stretch,
         },
-        WorkspaceEditorId.Spindle => new SpindleControl
+        WorkspaceEditorId.Spindle => new SpindleControl(_session.MachineCommands)
         {
             HorizontalAlignment = Avalonia.Layout.HorizontalAlignment.Stretch,
             VerticalAlignment = Avalonia.Layout.VerticalAlignment.Stretch,
@@ -132,25 +147,25 @@ public sealed class WorkspaceEditorFactory
             HorizontalAlignment = Avalonia.Layout.HorizontalAlignment.Stretch,
             VerticalAlignment = Avalonia.Layout.VerticalAlignment.Stretch,
         },
-        WorkspaceEditorId.Feed => new FeedControl
+        WorkspaceEditorId.Feed => new FeedControl(_session.MachineCommands)
         {
             HorizontalAlignment = Avalonia.Layout.HorizontalAlignment.Stretch,
             VerticalAlignment = Avalonia.Layout.VerticalAlignment.Stretch,
         },
-        WorkspaceEditorId.JobBar => new JobBarEditorControl(),
-        WorkspaceEditorId.Probing => new ProbingView(),
+        WorkspaceEditorId.JobBar => new JobBarEditorControl(_session.AppConfig.Base, _session.MachineCommands),
+        WorkspaceEditorId.Probing => new ProbingView(_session.AppConfig.Base),
         WorkspaceEditorId.SdCard => new SDCardView(),
         WorkspaceEditorId.Lathe => new LatheWizardsView(),
         WorkspaceEditorId.Offsets => new OffsetView(),
         WorkspaceEditorId.Tools => new ToolView(),
-        WorkspaceEditorId.GrblConfig => new GrblConfigView(),
+        WorkspaceEditorId.GrblConfig => new GrblConfigView(_session.AppConfig.Base),
         WorkspaceEditorId.AppConfig => CreateAppConfig(),
         _ => new TextBlock { Text = id.ToString() },
     };
 
     Control CreateAppConfig()
     {
-        var view = new AppConfigView { DataContext = _appConfigContext };
+        var view = new AppConfigView(_session.AppConfig) { DataContext = _appConfigContext };
         return view;
     }
 

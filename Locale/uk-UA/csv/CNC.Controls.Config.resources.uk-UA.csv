@@ -1,0 +1,112 @@
+CNC.Controls.Config.g.uk-UA.resources:appconfigview.baml,btn_saveKeyMap:System.Windows.Controls.ContentControl.Content,Button,True,True,,Зберегти
+CNC.Controls.Config.g.uk-UA.resources:appconfigview.baml,btn_saveSettings:System.Windows.Controls.ContentControl.Content,Button,True,True,,Зберегти налаштув.
+CNC.Controls.Config.g.uk-UA.resources:appconfigview.baml,msg_restart:System.String.$Content,None,True,True,,Зміни налаштувань почнуть діяти після перезапуска програми!
+CNC.Controls.Config.g.uk-UA.resources:basicconfigcontrol.baml,fld_maxBuffer:CNC.Controls.NumericField.Label,None,False,True,,Max. буфер:
+CNC.Controls.Config.g.uk-UA.resources:basicconfigcontrol.baml,fld_maxBuffer:CNC.Controls.NumericField.Unit,None,False,True,,байт
+CNC.Controls.Config.g.uk-UA.resources:basicconfigcontrol.baml,fld_maxBuffer:System.Windows.FrameworkElement.ToolTip,ToolTip,True,True,,Maксимальна загрузка послідовного буфера (Обмежтесь 90% глубини буфера).
+CNC.Controls.Config.g.uk-UA.resources:basicconfigcontrol.baml,fld_pollInterval:CNC.Controls.NumericField.Label,None,False,True,,Інтервал опитування:
+CNC.Controls.Config.g.uk-UA.resources:basicconfigcontrol.baml,fld_pollInterval:CNC.Controls.NumericField.Unit,None,False,True,,мс
+CNC.Controls.Config.g.uk-UA.resources:basicconfigcontrol.baml,fld_pollInterval:System.Windows.FrameworkElement.ToolTip,ToolTip,True,True,,"Інтервал опитування стану контролера, ms."
+CNC.Controls.Config.g.uk-UA.resources:basicconfigcontrol.baml,fld_resetDelay:CNC.Controls.NumericField.Label,None,False,True,,Затримка Сброса:
+CNC.Controls.Config.g.uk-UA.resources:basicconfigcontrol.baml,fld_resetDelay:CNC.Controls.NumericField.Unit,None,False,True,,мс
+CNC.Controls.Config.g.uk-UA.resources:basicconfigcontrol.baml,fld_resetDelay:System.Windows.FrameworkElement.ToolTip,ToolTip,True,True,,Затримка для запуска контролера перед началом зв'язку.
+CNC.Controls.Config.g.uk-UA.resources:basicconfigcontrol.baml,grb_mainConfig:System.Windows.Controls.HeaderedContentControl.Header,Label,True,True,,Основний
+CNC.Controls.Config.g.uk-UA.resources:basicconfigcontrol.baml,lbl_addLineNumbers:System.Windows.Controls.ContentControl.Content,CheckBox,True,True,,Add line numbers
+CNC.Controls.Config.g.uk-UA.resources:basicconfigcontrol.baml,lbl_addLineNumbers:System.Windows.FrameworkElement.ToolTip,ToolTip,True,True,,Add linenumbers if the controller is configured to report them.
+CNC.Controls.Config.g.uk-UA.resources:basicconfigcontrol.baml,lbl_agressiveBuffering:System.Windows.Controls.ContentControl.Content,CheckBox,True,True,,Агресивна буферизація
+CNC.Controls.Config.g.uk-UA.resources:basicconfigcontrol.baml,lbl_agressiveBuffering:System.Windows.FrameworkElement.ToolTip,ToolTip,True,True,,Буферизувати більше одного блока G-Code в контролері для плавного виконання. Лише для grblHAL!
+CNC.Controls.Config.g.uk-UA.resources:basicconfigcontrol.baml,lbl_autoCompressGcode:System.Windows.Controls.ContentControl.Content,CheckBox,True,True,,Стискати G-Code при претворенні
+CNC.Controls.Config.g.uk-UA.resources:basicconfigcontrol.baml,lbl_autoCompressGcode:System.Windows.FrameworkElement.ToolTip,ToolTip,True,True,,Видаляти зайві елементи G-Code
+CNC.Controls.Config.g.uk-UA.resources:basicconfigcontrol.baml,lbl_FilterOk:System.Windows.Controls.ContentControl.Content,CheckBox,True,True,,Видалити &quot;ok&quot;
+CNC.Controls.Config.g.uk-UA.resources:basicconfigcontrol.baml,lbl_FilterOk:System.Windows.FrameworkElement.ToolTip,ToolTip,True,True,,"Увімкніть, коли відровіді Ok заважають у консолі (зазвичай при великій кількоспі коротких переміщень)."
+CNC.Controls.Config.g.uk-UA.resources:basicconfigcontrol.baml,lbl_keepMdiFocus:System.Windows.Controls.ContentControl.Content,CheckBox,True,True,,Утримувати фокус консолі
+CNC.Controls.Config.g.uk-UA.resources:basicconfigcontrol.baml,lbl_keepMdiFocus:System.Windows.FrameworkElement.ToolTip,ToolTip,True,True,,Буферизувати більше одного блока G-Code в контролері для плавного виконання. Лише для grblHAL!
+CNC.Controls.Config.g.uk-UA.resources:basicconfigcontrol.baml,lbl_restoreWindowSize:System.Windows.Controls.ContentControl.Content,CheckBox,True,True,,Відновити попредьній розмір вікна при старті
+CNC.Controls.Config.g.uk-UA.resources:basicconfigcontrol.baml,lbl_restoreWindowSize:System.Windows.FrameworkElement.ToolTip,ToolTip,True,True,,Відновити размір вікна при наступному запуску.
+CNC.Controls.Config.g.uk-UA.resources:basicconfigcontrol.baml,lbl_sendComments:System.Windows.Controls.ContentControl.Content,CheckBox,True,True,,Send comments
+CNC.Controls.Config.g.uk-UA.resources:basicconfigcontrol.baml,lbl_sendComments:System.Windows.FrameworkElement.ToolTip,ToolTip,True,True,,Send complete comments.
+CNC.Controls.Config.g.uk-UA.resources:basicconfigcontrol.baml,lbl_theme:System.Windows.Controls.ContentControl.Content,Label,True,True,,Theme:
+CNC.Controls.Config.g.uk-UA.resources:grblconfigcontrol.baml,btn_backup:System.Windows.Controls.ContentControl.Content,Button,True,True,,Архів
+CNC.Controls.Config.g.uk-UA.resources:grblconfigcontrol.baml,btn_reload:System.Windows.Controls.ContentControl.Content,Button,True,True,,Перечитати
+CNC.Controls.Config.g.uk-UA.resources:grblconfigcontrol.baml,btn_reload:System.Windows.FrameworkElement.ToolTip,ToolTip,True,True,,Перечитати налаштування з контролера.
+CNC.Controls.Config.g.uk-UA.resources:grblconfigcontrol.baml,btn_restore:System.Windows.Controls.ContentControl.Content,Button,True,True,,Відновити
+CNC.Controls.Config.g.uk-UA.resources:grblconfigcontrol.baml,btn_save:System.Windows.Controls.ContentControl.Content,Button,True,True,,Зберегти
+CNC.Controls.Config.g.uk-UA.resources:grblconfigcontrol.baml,btn_save:System.Windows.FrameworkElement.ToolTip,ToolTip,True,True,,Зберегти зміни в контролері.
+CNC.Controls.Config.g.uk-UA.resources:grblconfigcontrol.baml,fld_findSetting:CNC.Controls.NumericField.KeyDown,None,True,True,,searchField_KeyDown
+CNC.Controls.Config.g.uk-UA.resources:grblconfigcontrol.baml,fld_findSetting:CNC.Controls.NumericField.Label,None,True,True,,Setting:
+CNC.Controls.Config.g.uk-UA.resources:grblconfigcontrol.baml,fld_findSetting:CNC.Controls.NumericField.Unit,None,True,True,,
+CNC.Controls.Config.g.uk-UA.resources:grblconfigcontrol.baml,fld_findSetting:System.Windows.FrameworkElement.ToolTip,ToolTip,True,True,,Search for setting
+CNC.Controls.Config.g.uk-UA.resources:grblconfigcontrol.baml,hdr_settingId:System.Windows.Controls.DataGridColumn.Header,None,True,True,,Id
+CNC.Controls.Config.g.uk-UA.resources:grblconfigcontrol.baml,hdr_settingName:System.Windows.Controls.DataGridColumn.Header,None,True,True,,Им'я
+CNC.Controls.Config.g.uk-UA.resources:grblconfigcontrol.baml,hdr_settingUnit:System.Windows.Controls.DataGridColumn.Header,None,True,True,,Одиниці
+CNC.Controls.Config.g.uk-UA.resources:grblconfigcontrol.baml,hdr_settingValue:System.Windows.Controls.DataGridColumn.Header,None,True,True,,Значення
+CNC.Controls.Config.g.uk-UA.resources:grblconfigcontrol.baml,str_saveSettings:System.String.$Content,None,True,True,,Налаштування змінено. Зберегти зараз?
+CNC.Controls.Config.g.uk-UA.resources:grblconfigcontrol.baml,str_settingsError:System.String.$Content,None,True,True,,"Установка {0} повернула {1}, продовжити?"
+CNC.Controls.Config.g.uk-UA.resources:grblconfigcontrol.baml,str_settingsFail:System.String.$Content,None,True,True,,Помилка...\\nПродовжити завантаження?
+CNC.Controls.Config.g.uk-UA.resources:grblconfigcontrol.baml,str_settingsInvalid:System.String.$Content,None,True,True,,Файл не містить бідьяких налаштувань.
+CNC.Controls.Config.g.uk-UA.resources:grblconfigcontrol.baml,str_settingsReloadMismatch:System.String.$Content,None,True,True,,"{0} settings were ignored, not supported by the controller."
+CNC.Controls.Config.g.uk-UA.resources:grblconfigcontrol.baml,str_settingsRestore:System.String.$Content,None,True,True,,Відновити налаштування з файла
+CNC.Controls.Config.g.uk-UA.resources:grblconfigcontrol.baml,str_settingsTimeout:System.String.$Content,None,True,True,,"Перевищєно час при встановленні {0}, продовжити?"
+CNC.Controls.Config.g.uk-UA.resources:grblconfigcontrol.baml,str_settingsWritten:System.String.$Content,None,True,True,,Усі налаштування збережено у {0} в папцы програми.
+CNC.Controls.Config.g.uk-UA.resources:grblconfigview.baml,fld_findSetting:CNC.Controls.NumericField.Unit,None,True,True,,
+CNC.Controls.Config.g.uk-UA.resources:grblconfigview.baml,tab_basicConfig:System.Windows.Controls.HeaderedContentControl.Header,Label,True,True,,Basic settings
+CNC.Controls.Config.g.uk-UA.resources:grblconfigview.baml,tab_pidTuner:System.Windows.Controls.HeaderedContentControl.Header,Label,True,True,,Налаштування PID
+CNC.Controls.Config.g.uk-UA.resources:grblconfigview.baml,tab_stepperCalibration:System.Windows.Controls.HeaderedContentControl.Header,Label,True,True,,Stepper calibration
+CNC.Controls.Config.g.uk-UA.resources:grblconfigview.baml,tab_trinamic:System.Windows.Controls.HeaderedContentControl.Header,Label,True,True,,Налаштування Trinamic
+CNC.Controls.Config.g.uk-UA.resources:jogconfigcontrol.baml,fld_fastDistance:CNC.Controls.NumericField.Label,None,False,True,,Відстань Швидко:
+CNC.Controls.Config.g.uk-UA.resources:jogconfigcontrol.baml,fld_fastFeedrate:CNC.Controls.NumericField.Label,None,False,True,,Подача Швидко:
+CNC.Controls.Config.g.uk-UA.resources:jogconfigcontrol.baml,fld_fastFeedrate:CNC.Controls.NumericField.Unit,None,False,True,,мм/хв
+CNC.Controls.Config.g.uk-UA.resources:jogconfigcontrol.baml,fld_slowDistance:CNC.Controls.NumericField.Label,None,False,True,,дистанція повілно:
+CNC.Controls.Config.g.uk-UA.resources:jogconfigcontrol.baml,fld_slowFeedrate:CNC.Controls.NumericField.Label,None,False,True,,Подача повілно:
+CNC.Controls.Config.g.uk-UA.resources:jogconfigcontrol.baml,fld_slowFeedrate:CNC.Controls.NumericField.Unit,None,False,True,,мм/хв
+CNC.Controls.Config.g.uk-UA.resources:jogconfigcontrol.baml,fld_stepDistance:CNC.Controls.NumericField.Label,None,False,True,,дистанція кроку:
+CNC.Controls.Config.g.uk-UA.resources:jogconfigcontrol.baml,fld_stepFeedrate:CNC.Controls.NumericField.Label,None,False,True,,Подача кроку:
+CNC.Controls.Config.g.uk-UA.resources:jogconfigcontrol.baml,fld_stepFeedrate:CNC.Controls.NumericField.Unit,None,False,True,,мм/хв
+CNC.Controls.Config.g.uk-UA.resources:jogconfigcontrol.baml,grp_kbdJogging:System.Windows.Controls.HeaderedContentControl.Header,Label,True,True,,Переміщення клавіатурою
+CNC.Controls.Config.g.uk-UA.resources:jogconfigcontrol.baml,lbl_enable:System.Windows.Controls.ContentControl.Content,CheckBox,True,True,,Дозволити
+CNC.Controls.Config.g.uk-UA.resources:jogconfigcontrol.baml,lbl_linkStepToUi:System.Windows.Controls.ContentControl.Content,CheckBox,True,True,,Использовать шаг UI
+CNC.Controls.Config.g.uk-UA.resources:jogconfigcontrol.baml,pnl_kbdJogging:System.Windows.FrameworkElement.ToolTip,ToolTip,True,True,,Увага! - Grbl має помилки при перериванні переміщення (при відпусканні клавиш).
+CNC.Controls.Config.g.uk-UA.resources:joguiconfigcontrol.baml,grp_uiJogging:System.Windows.Controls.HeaderedContentControl.Header,Label,True,True,,Екранний пульт
+CNC.Controls.Config.g.uk-UA.resources:joguiconfigcontrol.baml,lbl_distance0:CNC.Controls.NumericField.Label,None,False,True,,Крок 0:
+CNC.Controls.Config.g.uk-UA.resources:joguiconfigcontrol.baml,lbl_distance0:CNC.Controls.NumericField.Unit,None,False,True,,мм
+CNC.Controls.Config.g.uk-UA.resources:joguiconfigcontrol.baml,lbl_distance1:CNC.Controls.NumericField.Label,None,False,True,,Крок 1:
+CNC.Controls.Config.g.uk-UA.resources:joguiconfigcontrol.baml,lbl_distance1:CNC.Controls.NumericField.Unit,None,False,True,,мм
+CNC.Controls.Config.g.uk-UA.resources:joguiconfigcontrol.baml,lbl_distance2:CNC.Controls.NumericField.Label,None,False,True,,Крок 2:
+CNC.Controls.Config.g.uk-UA.resources:joguiconfigcontrol.baml,lbl_distance2:CNC.Controls.NumericField.Unit,None,False,True,,мм
+CNC.Controls.Config.g.uk-UA.resources:joguiconfigcontrol.baml,lbl_distance3:CNC.Controls.NumericField.Label,None,False,True,,Крок 3:
+CNC.Controls.Config.g.uk-UA.resources:joguiconfigcontrol.baml,lbl_distance3:CNC.Controls.NumericField.Unit,None,False,True,,мм
+CNC.Controls.Config.g.uk-UA.resources:joguiconfigcontrol.baml,lbl_feedrate0:CNC.Controls.NumericField.Label,None,False,True,,Подача 0:
+CNC.Controls.Config.g.uk-UA.resources:joguiconfigcontrol.baml,lbl_feedrate0:CNC.Controls.NumericField.Unit,None,False,True,,мм/хв
+CNC.Controls.Config.g.uk-UA.resources:joguiconfigcontrol.baml,lbl_feedrate1:CNC.Controls.NumericField.Label,None,False,True,,Подача 1:
+CNC.Controls.Config.g.uk-UA.resources:joguiconfigcontrol.baml,lbl_feedrate1:CNC.Controls.NumericField.Unit,None,False,True,,мм/хв
+CNC.Controls.Config.g.uk-UA.resources:joguiconfigcontrol.baml,lbl_feedrate2:CNC.Controls.NumericField.Label,None,False,True,,Подача 2:
+CNC.Controls.Config.g.uk-UA.resources:joguiconfigcontrol.baml,lbl_feedrate2:CNC.Controls.NumericField.Unit,None,False,True,,мм/хв
+CNC.Controls.Config.g.uk-UA.resources:joguiconfigcontrol.baml,lbl_feedrate3:CNC.Controls.NumericField.Label,None,False,True,,Подача 3:
+CNC.Controls.Config.g.uk-UA.resources:joguiconfigcontrol.baml,lbl_feedrate3:CNC.Controls.NumericField.Unit,None,False,True,,мм/хв
+CNC.Controls.Config.g.uk-UA.resources:steppercalibrationwizard.baml,btn_goneg:System.Windows.Controls.ContentControl.Content,Button,True,True,,Go-
+CNC.Controls.Config.g.uk-UA.resources:steppercalibrationwizard.baml,btn_goneg:System.Windows.FrameworkElement.ToolTip,ToolTip,True,True,,Press to move in the negative direction.
+CNC.Controls.Config.g.uk-UA.resources:steppercalibrationwizard.baml,btn_gopos:System.Windows.Controls.ContentControl.Content,Button,True,True,,Go+
+CNC.Controls.Config.g.uk-UA.resources:steppercalibrationwizard.baml,btn_gopos:System.Windows.FrameworkElement.ToolTip,ToolTip,True,True,,Press to move in the positive direction.
+CNC.Controls.Config.g.uk-UA.resources:steppercalibrationwizard.baml,btn_stop:System.Windows.Controls.ContentControl.Content,Button,True,True,,Stop
+CNC.Controls.Config.g.uk-UA.resources:steppercalibrationwizard.baml,btn_update:System.Windows.Controls.ContentControl.Content,Button,True,True,,Save
+CNC.Controls.Config.g.uk-UA.resources:steppercalibrationwizard.baml,fld_distance:CNC.Controls.NumericField.Label,None,True,True,,Distance:
+CNC.Controls.Config.g.uk-UA.resources:steppercalibrationwizard.baml,fld_measured:CNC.Controls.NumericField.Label,None,True,True,,Measured:
+CNC.Controls.Config.g.uk-UA.resources:steppercalibrationwizard.baml,fld_measured:CNC.Controls.NumericField.Tooltip2,None,True,True,,Actual distance.
+CNC.Controls.Config.g.uk-UA.resources:steppercalibrationwizard.baml,fld_resolution:CNC.Controls.NumericField.IsReadOnly,None,True,True,,True
+CNC.Controls.Config.g.uk-UA.resources:steppercalibrationwizard.baml,fld_resolution:CNC.Controls.NumericField.Label,None,True,True,,Resolution:
+CNC.Controls.Config.g.uk-UA.resources:steppercalibrationwizard.baml,lbl_axis:System.Windows.Controls.ContentControl.Content,Label,True,True,,Axis:
+CNC.Controls.Config.g.uk-UA.resources:steppercalibrationwizard.baml,str_CalibrationInstructions1:System.String.$Content,None,True,True,,"1. Select the axis to calibrate, Resolution is set from the underlying setting."
+CNC.Controls.Config.g.uk-UA.resources:steppercalibrationwizard.baml,str_CalibrationInstructions2:System.String.$Content,None,True,True,,2. Jog to the starting positition in the same direction as the first &quot;Go&quot; move and mark it.
+CNC.Controls.Config.g.uk-UA.resources:steppercalibrationwizard.baml,str_CalibrationInstructions3:System.String.$Content,None,True,True,,"3. Enter the Distance to measure, Measured distance is linked to Distance so will be equal."
+CNC.Controls.Config.g.uk-UA.resources:steppercalibrationwizard.baml,str_CalibrationInstructions4:System.String.$Content,None,True,True,,"4. Press the appropriate &quot;Go&quot; button to move the entered distance, measure and enter the value in the Measured field."
+CNC.Controls.Config.g.uk-UA.resources:steppercalibrationwizard.baml,str_CalibrationInstructions5:System.String.$Content,None,True,True,,5. Press the opposite &quot;Go&quot; button to move back to the origin.\\nThis step can be skipped but avoids repositioning manually to the marked start position if multiple measurements are to be performed.
+CNC.Controls.Config.g.uk-UA.resources:steppercalibrationwizard.baml,str_CalibrationInstructions6:System.String.$Content,None,True,True,,6. Press the &quot;Save&quot; button to update the setting.
+CNC.Controls.Config.g.uk-UA.resources:steppercalibrationwizard.baml,str_CalibrationInstructions7:System.String.$Content,None,True,True,,7. Repeat from step 4 (or 3). until the measured distance matches the commanded distance with the required accuracy.
+CNC.Controls.Config.g.uk-UA.resources:steppercalibrationwizard.baml,str_CalibrationWarnings:System.String.$Content,None,True,True,,Make sure there is room for the axis to move and avoid collision. Return move will add 0.5mm overshoot to remove any backlash from subsequent measurements.
+CNC.Controls.Config.g.uk-UA.resources:stripgcodeconfigcontrol.baml,grp_gcodeStrip:System.Windows.Controls.HeaderedContentControl.Header,Label,True,True,,Обрізка команд G-Code
+CNC.Controls.Config.g.uk-UA.resources:trinamicview.baml,btn_getStatus:System.Windows.Controls.ContentControl.Content,Button,True,True,,Зчитати статус
+CNC.Controls.Config.g.uk-UA.resources:trinamicview.baml,btn_getStatusAll:System.Windows.Controls.ContentControl.Content,Button,True,True,,Зчитати статус усіх
+CNC.Controls.Config.g.uk-UA.resources:trinamicview.baml,grp_stallGuard:System.Windows.Controls.HeaderedContentControl.Header,Label,True,True,,Захист зупинки
+CNC.Controls.Config.g.uk-UA.resources:trinamicview.baml,lbl_configure:System.Windows.Controls.ContentControl.Content,Button,True,True,,Налаштувати
+CNC.Controls.Config.g.uk-UA.resources:trinamicview.baml,lbl_sgLoad:System.Windows.Controls.ContentControl.Content,Label,True,True,,Загрузить (SG_RESULT)
+CNC.Controls.Config.g.uk-UA.resources:trinamicview.baml,lbl_stallGuardEnable:System.Windows.Controls.ContentControl.Content,CheckBox,True,True,,Увімкнути фільтр (SFILT)

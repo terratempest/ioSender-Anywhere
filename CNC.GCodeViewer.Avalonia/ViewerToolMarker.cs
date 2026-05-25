@@ -56,9 +56,8 @@ internal static class ViewerToolMarker
         };
     }
 
-    public static Point3D GetToolPosition()
+    public static Point3D GetToolPosition(GrblViewModel? grbl)
     {
-        var grbl = GCodeViewerContext.Grbl;
         if (grbl == null)
             return new Point3D();
 

@@ -38,11 +38,23 @@ internal static class CsvLocaleLoader
                 continue;
 
             var baseKey = $"{assembly}.{page}.{control}";
-            catalog[baseKey] = value;
-            catalog[$"{page}.{control}"] = value;
 
             if (!string.IsNullOrEmpty(propertySuffix))
                 catalog[$"{baseKey}:{propertySuffix}"] = value;
+
+            // Base key is the visible label (Content/Header/Text), not shortcut ToolTips.
+            if (IsPrimaryDisplayProperty(propertySuffix))
+            {
+                catalog[baseKey] = value;
+                catalog[$"{page}.{control}"] = value;
+            }
+
+            // WPF-era keys still resolve while controls migrate to Avalonia/Config assemblies.
+            if (assembly.Equals("CNC.Controls.Avalonia", StringComparison.OrdinalIgnoreCase)
+                || assembly.Equals("CNC.Controls.Config", StringComparison.OrdinalIgnoreCase))
+            {
+                RegisterWpfAlias(catalog, page, control, propertySuffix, value);
+            }
         }
     }
 
@@ -77,6 +89,35 @@ internal static class CsvLocaleLoader
         propertySuffix = string.IsNullOrEmpty(property) ? string.Empty : SimplifyProperty(property);
         return !string.IsNullOrEmpty(control);
     }
+
+    private static void RegisterWpfAlias(
+        Dictionary<string, string> catalog,
+        string page,
+        string control,
+        string propertySuffix,
+        string value)
+    {
+        const string wpfAssembly = "CNC.Controls.WPF";
+        var wpfKey = $"{wpfAssembly}.{page}.{control}";
+
+        if (!string.IsNullOrEmpty(propertySuffix))
+            catalog[$"{wpfKey}:{propertySuffix}"] = value;
+
+        if (IsPrimaryDisplayProperty(propertySuffix))
+        {
+            catalog[wpfKey] = value;
+            catalog[$"{page}.{control}"] = value;
+        }
+    }
+
+    private static bool IsPrimaryDisplayProperty(string propertySuffix) =>
+        string.IsNullOrEmpty(propertySuffix)
+        || propertySuffix.Equals("Content", StringComparison.OrdinalIgnoreCase)
+        || propertySuffix.Equals("Header", StringComparison.OrdinalIgnoreCase)
+        || propertySuffix.Equals("Text", StringComparison.OrdinalIgnoreCase)
+        || propertySuffix.Equals("Title", StringComparison.OrdinalIgnoreCase)
+        || propertySuffix.Equals("Label", StringComparison.OrdinalIgnoreCase)
+        || propertySuffix.Equals("$Content", StringComparison.OrdinalIgnoreCase);
 
     private static string SimplifyProperty(string property)
     {

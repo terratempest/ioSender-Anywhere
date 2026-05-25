@@ -62,6 +62,8 @@ public partial class StepperCalibrationControl : UserControl, IGrblConfigTab
 
     public GrblConfigType GrblConfigType => GrblConfigType.StepperCalibration;
 
+    public int PollInterval { get; set; } = 200;
+
     public int Axis
     {
         get => GetValue(AxisProperty);
@@ -142,8 +144,7 @@ public partial class StepperCalibrationControl : UserControl, IGrblConfigTab
             model.ExecuteCommand(_distanceMode == DistanceMode.Absolute ? "G90" : "G91");
         }
 
-        var poll = ControlsPlatformContext.AppConfig?.Base.PollInterval ?? 200;
-        model.Poller.SetState(activate ? poll : 0);
+        model.Poller.SetState(activate ? PollInterval : 0);
     }
 
     void OnLoaded(object? sender, RoutedEventArgs e)

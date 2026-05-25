@@ -1,5 +1,6 @@
 using Avalonia.Media;
 using CNC.App;
+using CNC.Core;
 using CNC.GCodeViewer.Avalonia.OpenGl;
 
 namespace CNC.GCodeViewer.Avalonia;
@@ -11,6 +12,7 @@ internal static class ToolpathSceneBuilder
         GCodePathSegments segments,
         PathBounds bounds,
         GCodeViewerConfig cfg,
+        GrblViewModel? grbl = null,
         CancellationToken cancellationToken = default)
     {
         cancellationToken.ThrowIfCancellationRequested();
@@ -56,7 +58,7 @@ internal static class ToolpathSceneBuilder
 
             if (cfg.ShowWorkEnvelope)
             {
-                var work = ViewerEnvelopeBuilder.WorkAreaBox();
+                var work = ViewerEnvelopeBuilder.WorkAreaBox(grbl);
                 if (work.Count > 1)
                     workBox = ViewerLineLayerBuilder.FromPoints(work, Colors.DarkBlue, 1f);
             }

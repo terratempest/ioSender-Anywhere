@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Globalization;
 using System.Text;
+using Avalonia.Data;
 using Avalonia.Data.Converters;
 using CNC.Core;
 using CNC.GCode;
@@ -64,7 +65,7 @@ public sealed class StringCollectionToTextConverter : IMultiValueConverter
     }
 
     public object? ConvertBack(IList<object?> values, Type targetType, object? parameter, CultureInfo culture)
-        => throw new NotImplementedException();
+        => BindingOperations.DoNothing;
 }
 
 public sealed class CncMeasureConverter : IMultiValueConverter
@@ -81,7 +82,7 @@ public sealed class CncMeasureConverter : IMultiValueConverter
     }
 
     public object? ConvertBack(IList<object?> values, Type targetType, object? parameter, CultureInfo culture)
-        => throw new NotImplementedException();
+        => BindingOperations.DoNothing;
 }
 
 public sealed class SideToInsideBoolConverter : IValueConverter
@@ -108,7 +109,7 @@ public sealed class SideToIsEnabledConverter : IValueConverter
         => value is Thread.Side side && side == Thread.Side.Both;
 
     public object? ConvertBack(object? value, Type targetType, object? parameter, CultureInfo culture)
-        => throw new NotImplementedException();
+        => BindingOperations.DoNothing;
 }
 
 public sealed class SideToStringConverter : IValueConverter
@@ -119,7 +120,7 @@ public sealed class SideToStringConverter : IValueConverter
             : string.Empty;
 
     public object? ConvertBack(object? value, Type targetType, object? parameter, CultureInfo culture)
-        => throw new NotImplementedException();
+        => BindingOperations.DoNothing;
 }
 
 public sealed class ToolToRoundedBoolConverter : IValueConverter
@@ -148,7 +149,7 @@ public sealed class ToolToLabelStringConverter : IValueConverter
             : string.Empty;
 
     public object? ConvertBack(object? value, Type targetType, object? parameter, CultureInfo culture)
-        => throw new NotImplementedException();
+        => BindingOperations.DoNothing;
 }
 
 public sealed class TaperTypeToBoolConverter : IValueConverter
@@ -157,5 +158,5 @@ public sealed class TaperTypeToBoolConverter : IValueConverter
         => value is ThreadTaper taper && taper != ThreadTaper.None;
 
     public object? ConvertBack(object? value, Type targetType, object? parameter, CultureInfo culture)
-        => throw new NotImplementedException();
+        => BindingOperations.DoNothing;
 }

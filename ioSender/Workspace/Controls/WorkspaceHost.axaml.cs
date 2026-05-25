@@ -24,6 +24,7 @@ public partial class WorkspaceHost : UserControl
     SplitLayoutBuilder? _builder;
     readonly List<WorkspaceRegionChrome> _regionChromes = new();
     HashSet<WorkspaceEditorId> _activeEditors = new();
+    ProgramService? _programService;
 
     public event EventHandler? LayoutChanged;
     public event EventHandler<IReadOnlyCollection<WorkspaceEditorId>>? ActiveEditorsChanged;
@@ -70,14 +71,15 @@ public partial class WorkspaceHost : UserControl
             return;
 
         _root = WorkspaceLayoutService.EnsureRoot();
-        _factory = new WorkspaceEditorFactory(DataContext);
-        GCodeViewerContext.GetProgramTokens = () => GCodeFileService.Instance.Tokens;
-        GCodeFileService.Instance.ProgramChanged += OnProgramChanged;
+        _programService = AppHostContext.Session.Program;
+        _factory = new WorkspaceEditorFactory(DataContext, session: AppHostContext.Session, programService: _programService);
+        _programService.ProgramChanged += OnProgramChanged;
     }
 
     protected override void OnDetachedFromVisualTree(VisualTreeAttachmentEventArgs e)
     {
-        GCodeFileService.Instance.ProgramChanged -= OnProgramChanged;
+        if (_programService != null)
+            _programService.ProgramChanged -= OnProgramChanged;
         base.OnDetachedFromVisualTree(e);
     }
 

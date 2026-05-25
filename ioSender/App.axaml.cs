@@ -6,7 +6,6 @@ using CNC.App;
 using CNC.Controls.Avalonia.Services;
 using CNC.Controls.Config;
 using CNC.Core;
-using CNC.GCodeViewer.Avalonia;
 using CNC.Localization;
 using ioSender.Services;
 using ioSender.Views;
@@ -102,10 +101,6 @@ public partial class App : Application
 
         AvaloniaGrblUi.Configure();
 
-        ControlsPlatformContext.ExternalEditor = platform.ExternalEditor;
-        ControlsPlatformContext.AppConfig = appConfig;
-        GCodeViewerContext.AppConfig = appConfig;
-
         EarlyStartupBanner.ReportProgress("Checking running instances...", 75);
         if (!platform.SingleInstanceHost.TryAcquire())
         {
@@ -130,6 +125,8 @@ public partial class App : Application
         try
         {
             EarlyStartupBanner.ReportProgress("Building main window...", 84);
+            using (StartupTrace.Measure("App session"))
+                AppHostContext.EnsureSession();
             MainWindow mainWindow;
             using (StartupTrace.Measure("MainWindow construction"))
                 mainWindow = new MainWindow();

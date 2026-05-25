@@ -34,6 +34,11 @@ public partial class RenderControl : UserControl
     Point3D? _renderStartOverride;
     Point3D? _programStart;
 
+    public GCodeViewerSession? Session { get; set; }
+
+    GCodeViewerSession ViewerSession =>
+        Session ?? throw new InvalidOperationException("G-code viewer session was not assigned.");
+
     public RenderControl()
     {
         InitializeComponent();
@@ -86,14 +91,14 @@ public partial class RenderControl : UserControl
 
     public void TryLoadProgram()
     {
-        if (!GCodeViewerContext.Settings.IsEnabled)
+        if (!ViewerSession.Settings.IsEnabled)
         {
             Close();
             SetStatus("3D view disabled in App Settings → G-code viewer");
             return;
         }
 
-        var tokens = GCodeViewerContext.GetProgramTokens?.Invoke();
+        var tokens = ViewerSession.GetProgramTokens();
         if (tokens is { Count: > 0 })
             Open(tokens);
         else
@@ -105,6 +110,7 @@ public partial class RenderControl : UserControl
         base.OnAttachedToVisualTree(e);
         SubscribeConfig();
         SubscribeGrbl();
+        GlViewport.ViewerConfig = ViewerSession.Settings;
         GlViewport.SetAnimationActive(true);
         SetStatus(_glInitFailed ? "3D view unavailable — OpenGL" : "3D view — ready");
         TryLoadProgram();
@@ -152,7 +158,7 @@ public partial class RenderControl : UserControl
         StopRenderWaitTimer();
         var tokens = _tokens;
         var tokenCount = tokens.Count;
-        var start = _renderStartOverride ?? ViewerToolMarker.GetToolPosition();
+        var start = _renderStartOverride ?? ViewerToolMarker.GetToolPosition(ViewerSession.Grbl);
         _renderStartOverride = null;
         _programStart ??= start;
         CancelPathBuild();
@@ -167,10 +173,10 @@ public partial class RenderControl : UserControl
         {
             try
             {
-                var cfg = GCodeViewerContext.Settings;
+                var cfg = ViewerSession.Settings;
                 var built = GCodePathBuilder.Build(tokens, start, cfg.ArcResolution, cfg.MinDistance, ct);
                 var bounds = PathBounds.FromSegments(built.Segments);
-                var scene = ToolpathSceneBuilder.Build(built.Segments, bounds, cfg, ct);
+                var scene = ToolpathSceneBuilder.Build(built.Segments, bounds, cfg, ViewerSession.Grbl, ct);
                 Dispatcher.UIThread.Post(() =>
                 {
                     if (ReferenceEquals(_buildCts, cts))
@@ -267,7 +273,7 @@ public partial class RenderControl : UserControl
 
     void EnrichScene(ViewerScene scene)
     {
-        var cfg = GCodeViewerContext.Settings;
+        var cfg = ViewerSession.Settings;
         scene.OriginAxes = ViewerAdornmentsBuilder.BuildOriginAxes(cfg, _bounds);
         scene.ViewCube = null;
         scene.Executed = BuildExecutedLayer(cfg);
@@ -287,7 +293,7 @@ public partial class RenderControl : UserControl
     {
         if (_segments == null)
             return;
-        var cfg = GCodeViewerContext.Settings;
+        var cfg = ViewerSession.Settings;
         GlViewport.UpdateDynamicLayers(BuildToolMarker(cfg), BuildExecutedLayer(cfg));
     }
 
@@ -301,12 +307,12 @@ public partial class RenderControl : UserControl
         if (highlight.R == cut.R && highlight.G == cut.G && highlight.B == cut.B)
             return null;
 
-        var grbl = GCodeViewerContext.Grbl;
+        var grbl = Session?.Grbl;
         var block = grbl?.BlockExecuting ?? 0;
         if (block <= 0)
             return null;
 
-        var start = _programStart ?? ViewerToolMarker.GetToolPosition();
+        var start = _programStart ?? ViewerToolMarker.GetToolPosition(ViewerSession.Grbl);
         var points = GCodePathBuilder.BuildExecutedCut(
             _tokens,
             start,
@@ -341,10 +347,10 @@ public partial class RenderControl : UserControl
 
     Point3D ResolveToolMarkerPosition()
     {
-        if (GCodeViewerContext.Grbl != null)
-            return ViewerToolMarker.GetToolPosition();
+        if (Session?.Grbl != null)
+            return ViewerToolMarker.GetToolPosition(ViewerSession.Grbl);
 
-        return _programStart ?? ViewerToolMarker.GetToolPosition();
+        return _programStart ?? ViewerToolMarker.GetToolPosition(ViewerSession.Grbl);
     }
 
     PathBounds BoundsIncluding(Point3D point)
@@ -378,8 +384,8 @@ public partial class RenderControl : UserControl
         if (_segments == null || _glInitFailed)
             return;
 
-        var cfg = GCodeViewerContext.Settings;
-        var scene = ToolpathSceneBuilder.Build(_segments, _bounds, cfg);
+        var cfg = ViewerSession.Settings;
+        var scene = ToolpathSceneBuilder.Build(_segments, _bounds, cfg, ViewerSession.Grbl);
         EnrichScene(scene);
         PushSceneToViewport(scene, _bounds, resetView: false);
     }
@@ -436,7 +442,7 @@ public partial class RenderControl : UserControl
 
     void SubscribeConfig()
     {
-        var cfg = GCodeViewerContext.AppConfig?.Base.GCodeViewer;
+        var cfg = Session?.Settings;
         if (cfg == null || ReferenceEquals(cfg, _subscribedConfig))
             return;
 
@@ -455,7 +461,7 @@ public partial class RenderControl : UserControl
 
     void SubscribeGrbl()
     {
-        var grbl = GCodeViewerContext.Grbl;
+        var grbl = Session?.Grbl;
         if (grbl == null)
             return;
         grbl.PropertyChanged -= OnGrblPropertyChanged;
@@ -464,14 +470,15 @@ public partial class RenderControl : UserControl
 
     void UnsubscribeGrbl()
     {
-        if (GCodeViewerContext.Grbl == null)
+        var grbl = Session?.Grbl;
+        if (grbl == null)
             return;
-        GCodeViewerContext.Grbl.PropertyChanged -= OnGrblPropertyChanged;
+        grbl.PropertyChanged -= OnGrblPropertyChanged;
     }
 
     void OnViewerConfigChanged(object? sender, PropertyChangedEventArgs e)
     {
-        var cfg = GCodeViewerContext.Settings;
+        var cfg = ViewerSession.Settings;
         GlViewport.SetBackground(cfg.BlackBackground);
         OverlayPanel.IsVisible = cfg.ShowTextOverlay;
         ViewCube.IsVisible = cfg.ShowViewCube;
@@ -559,3 +566,4 @@ public partial class RenderControl : UserControl
     void OnViewportPointerWheelChanged(object? sender, PointerWheelEventArgs e) =>
         GlViewport.HandlePointerWheelChanged(e, ViewportInput);
 }
+

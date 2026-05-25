@@ -4,7 +4,7 @@ using CNC.GCode;
 
 namespace CNC.Controls.Avalonia.Services;
 
-/// <summary>Platform-neutral G-code file holder (replaces legacy WPF GCode.File).</summary>
+/// <summary>Platform-neutral active G-code program holder.</summary>
 public sealed class GCodeFileService
 {
     public const string FileTypes = "cnc,nc,ncc,ngc,gcode,tap";

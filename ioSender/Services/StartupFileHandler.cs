@@ -22,11 +22,12 @@ public static class StartupFileHandler
         if (ext.Length == 0 || (!Extensions.Contains(ext) && !ext.Equals("txt", StringComparison.OrdinalIgnoreCase)))
             return false;
 
-        var model = GCodeFileService.Instance.Model;
+        var program = AppHostContext.Session.Program;
+        var model = program.Model;
         if (!allowWhileJobRunning && model?.IsJobRunning == true)
             return false;
 
-        GCodeFileService.Instance.Load(path);
+        program.Load(path);
         return true;
     }
 

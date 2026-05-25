@@ -19,7 +19,7 @@
 
         x:Name="PortDialogRoot"
         Title="Sender connection"
-        loc:Localize.Key="CNC.Controls.WPF.portdialog.dlg_title"
+        loc:Localize.Key="CNC.Controls.Avalonia.portdialog.dlg_title"
 
         Width="400"
 
@@ -33,12 +33,12 @@
 
     <TabControl SelectedIndex="{Binding SelectedTabIndex}">
 
-      <TabItem x:Name="TabSerial" Header="Serial" loc:Localize.Key="CNC.Controls.WPF.portdialog.tab_serial">
+      <TabItem x:Name="TabSerial" Header="Serial" loc:Localize.Key="CNC.Controls.Avalonia.portdialog.tab_serial">
 
         <Grid ColumnDefinitions="90,*" RowDefinitions="Auto,Auto,Auto" Margin="0,8,0,0">
 
           <TextBlock x:Name="LblSerialPort" Grid.Row="0" Grid.Column="0" Text="Port:" VerticalAlignment="Center"
-                     loc:Localize.Key="CNC.Controls.WPF.portdialog.lbl_serialPort"/>
+                     loc:Localize.Key="CNC.Controls.Avalonia.portdialog.lbl_serialPort"/>
 
           <ComboBox x:Name="PortCombo" Grid.Row="0" Grid.Column="1"
 
@@ -61,7 +61,7 @@
 
 
           <TextBlock x:Name="LblSerialBaud" Grid.Row="1" Grid.Column="0" Text="Baud rate:" VerticalAlignment="Center" Margin="0,8,0,0"
-                     loc:Localize.Key="CNC.Controls.WPF.portdialog.lbl_serialBaud"/>
+                     loc:Localize.Key="CNC.Controls.Avalonia.portdialog.lbl_serialBaud"/>
 
           <ComboBox Grid.Row="1" Grid.Column="1" Margin="0,8,0,0"
 
@@ -75,19 +75,19 @@
 
 
 
-      <TabItem x:Name="TabTelnet" Header="Telnet" loc:Localize.Key="CNC.Controls.WPF.portdialog.tab_network">
+      <TabItem x:Name="TabTelnet" Header="Telnet" loc:Localize.Key="CNC.Controls.Avalonia.portdialog.tab_network">
 
         <Grid ColumnDefinitions="90,*" RowDefinitions="Auto,Auto" Margin="0,8,0,0">
 
           <TextBlock x:Name="LblTelnetHost" Grid.Row="0" Grid.Column="0" Text="Host:" VerticalAlignment="Center"
-                     loc:Localize.Key="CNC.Controls.WPF.portdialog.lbl_ipAddress"/>
+                     loc:Localize.Key="CNC.Controls.Avalonia.portdialog.lbl_ipAddress"/>
 
           <TextBox Grid.Row="0" Grid.Column="1" Text="{Binding TelnetHost}"/>
 
 
 
           <TextBlock x:Name="LblTelnetPort" Grid.Row="1" Grid.Column="0" Text="Port:" VerticalAlignment="Center" Margin="0,8,0,0"
-                     loc:Localize.Key="CNC.Controls.WPF.portdialog.lbl_netPort"/>
+                     loc:Localize.Key="CNC.Controls.Avalonia.portdialog.lbl_netPort"/>
 
           <TextBox Grid.Row="1" Grid.Column="1" Margin="0,8,0,0" Text="{Binding TelnetPort}"/>
 
@@ -97,7 +97,7 @@
 
 
 
-      <TabItem x:Name="TabWebsocket" Header="WebSocket" loc:Localize.Key="CNC.Controls.WPF.portdialog.lbl_websocket">
+      <TabItem x:Name="TabWebsocket" Header="WebSocket" loc:Localize.Key="CNC.Controls.Avalonia.portdialog.lbl_websocket">
 
         <Grid ColumnDefinitions="90,*" RowDefinitions="Auto,Auto" Margin="0,8,0,0">
 
@@ -135,7 +135,7 @@
               loc:Localize.Fallback="Connect"/>
 
       <Button x:Name="BtnCancel" Content="Cancel" Width="80" Click="OnCancelClick"
-              loc:Localize.Key="CNC.Controls.WPF.portdialog.btn_cancel"/>
+              loc:Localize.Key="CNC.Controls.Avalonia.portdialog.btn_cancel"/>
 
     </StackPanel>
 

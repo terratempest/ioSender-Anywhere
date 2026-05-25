@@ -3,7 +3,7 @@ using Avalonia.Controls;
 using Avalonia.Interactivity;
 using Avalonia.VisualTree;
 using Avalonia.Controls.ApplicationLifetimes;
-using CNC.Controls.Avalonia.Services;
+using CNC.App;
 using CNC.Core;
 using CNC.Core.Input;
 
@@ -14,13 +14,18 @@ public partial class ProbingView : UserControl, IKeyHandlerContext
     string IKeyHandlerContext.Name => "Probing";
 
     object? IKeyHandlerContext.DataContext => DataContext;
-    readonly ProbingViewModel _vm = new();
+    readonly ProbingViewModel _vm;
     bool _active;
     bool _keyboardMapped;
     bool _cycleStartSignal;
 
-    public ProbingView()
+    public ProbingView() : this(null)
     {
+    }
+
+    public ProbingView(BaseConfig? config)
+    {
+        _vm = new ProbingViewModel(config);
         InitializeComponent();
         SidebarHost.DataContext = _vm;
         WizardTabs.DataContext = _vm;

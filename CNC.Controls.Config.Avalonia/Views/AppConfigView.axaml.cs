@@ -7,10 +7,18 @@ namespace CNC.Controls.Config;
 
 public partial class AppConfigView : UserControl
 {
-    public AppConfigView()
+    readonly AppConfigService? _appConfig;
+
+    public AppConfigView() : this(null)
     {
+    }
+
+    public AppConfigView(AppConfigService? appConfig)
+    {
+        _appConfig = appConfig;
         InitializeComponent();
-        DataContext = ControlsPlatformContext.AppConfig?.Base;
+        if (appConfig != null)
+            DataContext = appConfig.Base;
         Loaded += OnLoaded;
     }
 
@@ -26,6 +34,6 @@ public partial class AppConfigView : UserControl
 
     void OnSaveClick(object? sender, RoutedEventArgs e)
     {
-        ControlsPlatformContext.AppConfig?.Save();
+        _appConfig?.Save();
     }
 }

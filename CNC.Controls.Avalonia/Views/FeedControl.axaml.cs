@@ -1,22 +1,28 @@
 using System.ComponentModel;
-using System.Globalization;
-
 using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Controls.Primitives;
 using Avalonia.Interactivity;
 
 using CNC.Core;
+using CNC.Controls.Avalonia.Services;
+using CNC.Controls.Avalonia.ViewModels;
 using CNC.Localization.Avalonia;
 
 namespace CNC.Controls.Avalonia.Views;
 
 public partial class FeedControl : UserControl
 {
+    readonly FeedPanelViewModel _viewModel;
     GrblViewModel? _subscribedModel;
 
-    public FeedControl()
+    public FeedControl() : this(null)
     {
+    }
+
+    public FeedControl(MachineCommandService? commands)
+    {
+        _viewModel = new FeedPanelViewModel(commands);
         InitializeComponent();
         DataContextChanged += FeedControl_DataContextChanged;
         Loaded += (_, _) =>
@@ -55,6 +61,7 @@ public partial class FeedControl : UserControl
             oldPc.PropertyChanged -= OnDataContextPropertyChanged;
 
         _subscribedModel = DataContext as GrblViewModel;
+        _viewModel.Model = _subscribedModel;
 
         if (_subscribedModel is INotifyPropertyChanged newPc)
             newPc.PropertyChanged += OnDataContextPropertyChanged;
@@ -73,25 +80,32 @@ public partial class FeedControl : UserControl
 
     void UpdateFeedText()
     {
-        if (DataContext is not GrblViewModel model)
+        if (_viewModel.Model == null)
             return;
 
-        cvFeedRate.Text = model.FeedRate.ToString("####0", CultureInfo.InvariantCulture);
-        LblFeedOverrideSummary.Text = $"{model.FeedrateUnit} % {model.FeedOverride:0}";
-        LblFeedOverride.Text = $"Feed % {model.FeedOverride:0}";
-        LblRapidsOverride.Text = $"%{model.RapidsOverride:0}";
+        _viewModel.UpdateFromModel();
+        cvFeedRate.Text = _viewModel.FeedRateText;
+        LblFeedOverrideSummary.Text = _viewModel.FeedOverrideSummary;
+        LblFeedOverride.Text = _viewModel.FeedOverrideText;
+        LblRapidsOverride.Text = _viewModel.RapidsOverrideText;
     }
 
     bool UseCoarseFeedStep => RbFeedStepCoarse.IsChecked == true;
 
-    void BtnFeedOvrPlus_Click(object? sender, RoutedEventArgs e) =>
-        SendOverride(UseCoarseFeedStep ? GrblConstants.CMD_FEED_OVR_COARSE_PLUS : GrblConstants.CMD_FEED_OVR_FINE_PLUS);
+    void BtnFeedOvrPlus_Click(object? sender, RoutedEventArgs e)
+    {
+        _viewModel.UseCoarseFeedStep = UseCoarseFeedStep;
+        _viewModel.FeedOverridePlus();
+    }
 
-    void BtnFeedOvrMinus_Click(object? sender, RoutedEventArgs e) =>
-        SendOverride(UseCoarseFeedStep ? GrblConstants.CMD_FEED_OVR_COARSE_MINUS : GrblConstants.CMD_FEED_OVR_FINE_MINUS);
+    void BtnFeedOvrMinus_Click(object? sender, RoutedEventArgs e)
+    {
+        _viewModel.UseCoarseFeedStep = UseCoarseFeedStep;
+        _viewModel.FeedOverrideMinus();
+    }
 
     void BtnFeedOvrReset_Click(object? sender, RoutedEventArgs e) =>
-        SendOverride(GrblConstants.CMD_FEED_OVR_RESET);
+        _viewModel.FeedOverrideReset();
 
     void FeedOvrStep_Click(object? sender, RoutedEventArgs e)
     {
@@ -104,26 +118,14 @@ public partial class FeedControl : UserControl
 
     void BtnRapidOvrPlus_Click(object? sender, RoutedEventArgs e)
     {
-        if (DataContext is not GrblViewModel model)
-            return;
-        if (model.RapidsOverride <= 25)
-            SendOverride(GrblConstants.CMD_RAPID_OVR_MEDIUM);
-        else if (model.RapidsOverride <= 50)
-            SendOverride(GrblConstants.CMD_RAPID_OVR_RESET);
+        _viewModel.RapidsOverridePlus();
     }
 
     void BtnRapidOvrMinus_Click(object? sender, RoutedEventArgs e)
     {
-        if (DataContext is not GrblViewModel model)
-            return;
-        if (model.RapidsOverride > 50)
-            SendOverride(GrblConstants.CMD_RAPID_OVR_MEDIUM);
-        else if (model.RapidsOverride > 25)
-            SendOverride(GrblConstants.CMD_RAPID_OVR_LOW);
+        _viewModel.RapidsOverrideMinus();
     }
 
     void BtnRapidOvrReset_Click(object? sender, RoutedEventArgs e) =>
-        SendOverride(GrblConstants.CMD_RAPID_OVR_RESET);
-
-    static void SendOverride(byte command) => Comms.com?.WriteByte(command);
+        _viewModel.RapidsOverrideReset();
 }

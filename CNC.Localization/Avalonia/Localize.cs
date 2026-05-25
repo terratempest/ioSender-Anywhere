@@ -1,6 +1,7 @@
 using System.Runtime.CompilerServices;
 using Avalonia;
 using Avalonia.Controls;
+using Avalonia.Controls.Primitives;
 
 namespace CNC.Localization.Avalonia;
 
@@ -55,7 +56,7 @@ public static class Localize
             return;
 
         var fallback = GetFallback(control) ?? ReadCurrentText(control);
-        var text = LocalizedStrings.Get(key, fallback);
+        var text = ResolveDisplayText(key, fallback);
 
         switch (control)
         {
@@ -76,6 +77,7 @@ public static class Localize
                 break;
             case Button button:
                 button.Content = text;
+                ApplyToolTip(button, key);
                 break;
             case TextBlock textBlock:
                 textBlock.Text = text;
@@ -100,4 +102,20 @@ public static class Localize
     };
 
     public static string T(string key, string fallback) => LocalizedStrings.Get(key, fallback);
+
+    private static string ResolveDisplayText(string key, string? fallback)
+    {
+        if (LocalizedStrings.TryGet($"{key}:Content", out var content))
+            return content;
+
+        return LocalizedStrings.Get(key, fallback);
+    }
+
+    private static void ApplyToolTip(Control control, string key)
+    {
+        if (!LocalizedStrings.TryGet($"{key}:ToolTip", out var tip))
+            return;
+
+        ToolTip.SetTip(control, tip);
+    }
 }

@@ -23,11 +23,12 @@ namespace ioSender;
 
 public partial class MainWindow : Window
 {
+    private readonly AppSession _session;
     private readonly MainWindowViewModel _viewModel;
     private readonly ConnectionService _connectionService;
     private readonly MachineConnectionCoordinator _connectionCoordinator;
-    private readonly MachineConnectionInitializer _connectionInitializer = new();
-    private readonly GrblCommandRouter _commandRouter = new();
+    private readonly MachineConnectionInitializer _connectionInitializer;
+    private readonly ProgramService _programService;
     private CameraWindow? _cameraWindow;
     private bool _shellReady;
     private bool _suppressShellEvents;
@@ -45,16 +46,15 @@ public partial class MainWindow : Window
         RestoreWindowPlacement();
         using (StartupTrace.Measure("MainWindow localization"))
             ApplyLocalization();
-        var platform = AppHostContext.Platform;
-        _connectionService = new ConnectionService(platform.SerialPortDiscovery, platform.UiDispatcher);
-        _connectionCoordinator = new MachineConnectionCoordinator(_connectionService);
-        _viewModel = new MainWindowViewModel(platform, _connectionService);
+        _session = AppHostContext.Session;
+        _connectionService = _session.Connection;
+        _connectionCoordinator = _session.ConnectionCoordinator;
+        _connectionInitializer = _session.ConnectionInitializer;
+        _programService = _session.Program;
+        _viewModel = _session.MainWindow;
         _viewModel.ConnectionChanged += OnConnectionChanged;
         _viewModel.Grbl.PropertyChanged += OnGrblPropertyChanged;
         DataContext = _viewModel;
-
-        _commandRouter.Attach(_viewModel.Grbl);
-        ControlsPlatformContext.CommandRouter = _commandRouter;
 
         UpdateConnectionUi();
         UpdateProgramFileButtons();
@@ -143,8 +143,7 @@ public partial class MainWindow : Window
 
     void DisconnectMachine()
     {
-        _connectionInitializer.Unregister();
-        _connectionCoordinator.Detach(_viewModel.Grbl);
+        _session.Disconnect();
     }
 
     static bool ShouldAutoConnectOnStartup()
@@ -399,7 +398,7 @@ public partial class MainWindow : Window
             return _probingView;
 
         using var _ = StartupTrace.Measure("Create ProbingView");
-        _probingView = new ProbingView
+        _probingView = new ProbingView(_session.AppConfig.Base)
         {
             DataContext = _viewModel.Grbl,
             HorizontalAlignment = Avalonia.Layout.HorizontalAlignment.Stretch,
@@ -431,7 +430,7 @@ public partial class MainWindow : Window
             return _grblConfigView;
 
         using var _ = StartupTrace.Measure("Create GrblConfigView");
-        _grblConfigView = new GrblConfigView
+        _grblConfigView = new GrblConfigView(_session.AppConfig.Base)
         {
             DataContext = _viewModel.Grbl,
             HorizontalAlignment = Avalonia.Layout.HorizontalAlignment.Stretch,
@@ -447,7 +446,7 @@ public partial class MainWindow : Window
             return _appConfigView;
 
         using var _ = StartupTrace.Measure("Create AppConfigView");
-        _appConfigView = new AppConfigView
+        _appConfigView = new AppConfigView(_session.AppConfig)
         {
             DataContext = AppHostContext.AppConfig.Base,
             HorizontalAlignment = Avalonia.Layout.HorizontalAlignment.Stretch,
@@ -477,7 +476,7 @@ public partial class MainWindow : Window
             return;
 
         if (!GCodeConverterRegistry.TryLoad(path, GCodeFileTarget.Current, this))
-            GCodeFileService.Instance.Load(path);
+            _programService.Load(path);
     }
 
     static async Task<string?> PickGCodeOrConvertedPathAsync(IStorageProvider storage)
@@ -508,10 +507,10 @@ public partial class MainWindow : Window
     {
         var filename = _viewModel.Grbl.FileName;
         if (!string.IsNullOrWhiteSpace(filename) && _viewModel.Grbl.IsPhysicalFileLoaded)
-            GCodeFileService.Instance.Load(filename);
+            _programService.Load(filename);
     }
 
-    void OnCloseProgramClick(object? sender, RoutedEventArgs e) => GCodeFileService.Instance.Close();
+    void OnCloseProgramClick(object? sender, RoutedEventArgs e) => _programService.Close();
 
     private void OnCameraClick(object? sender, RoutedEventArgs e)
     {

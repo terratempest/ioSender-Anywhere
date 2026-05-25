@@ -122,7 +122,9 @@ namespace CNC.Core
             Feedrate = val == null ? 0d : double.Parse(val, CultureInfo.InvariantCulture);
             val = GrblParserState.IsActive("S");
             _rpm = val == null ? 0d : double.Parse(val, CultureInfo.InvariantCulture);
-            _tool = GrblParserState.Tool == GrblConstants.NO_TOOL ? 0 : int.Parse(GrblParserState.Tool);
+            _tool = string.IsNullOrEmpty(GrblParserState.Tool) || GrblParserState.Tool == GrblConstants.NO_TOOL
+                ? 0
+                : int.Parse(GrblParserState.Tool);
             SelectedTool = null;
             RetractOldZ = GrblParserState.IsActive("G99") == null;
             SpindleRpmMode = GrblParserState.IsActive("G96") == null;

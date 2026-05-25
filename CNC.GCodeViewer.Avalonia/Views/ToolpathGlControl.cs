@@ -39,6 +39,8 @@ public class ToolpathGlControl : OpenGlControlBase
     public event EventHandler? SceneApplied;
     public event EventHandler? CameraChanged;
 
+    public GCodeViewerConfig? ViewerConfig { get; set; }
+
     public ViewerCamera Camera => _camera;
     public string? InitializationFailureMessage => _initFailureMessage;
     public string? RenderFailureMessage => _renderFailureMessage;
@@ -131,7 +133,7 @@ public class ToolpathGlControl : OpenGlControlBase
 
     public void SaveCameraToConfig()
     {
-        var cfg = GCodeViewerContext.AppConfig?.Base.GCodeViewer;
+        var cfg = ViewerConfig;
         if (cfg == null)
             return;
         _camera.SaveToConfig(cfg);

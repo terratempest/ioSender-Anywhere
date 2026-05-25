@@ -1,0 +1,112 @@
+CNC.Controls.Config.g.zh-CN.resources:appconfigview.baml,btn_saveKeyMap:System.Windows.Controls.ContentControl.Content,Button,True,True,,保存键盘映射
+CNC.Controls.Config.g.zh-CN.resources:appconfigview.baml,btn_saveSettings:System.Windows.Controls.ContentControl.Content,Button,True,True,,保存设置
+CNC.Controls.Config.g.zh-CN.resources:appconfigview.baml,msg_restart:System.String.$Content,None,True,True,,更改设置后需要重新启动！
+CNC.Controls.Config.g.zh-CN.resources:basicconfigcontrol.baml,fld_maxBuffer:CNC.Controls.NumericField.Label,None,False,True,,最大缓冲区:
+CNC.Controls.Config.g.zh-CN.resources:basicconfigcontrol.baml,fld_maxBuffer:CNC.Controls.NumericField.Unit,None,False,True,,字节
+CNC.Controls.Config.g.zh-CN.resources:basicconfigcontrol.baml,fld_maxBuffer:System.Windows.FrameworkElement.ToolTip,ToolTip,True,True,,使用的最大串行缓冲区大小（限制为报告值的 90%）。
+CNC.Controls.Config.g.zh-CN.resources:basicconfigcontrol.baml,fld_pollInterval:CNC.Controls.NumericField.Label,None,False,True,,轮询间隔:
+CNC.Controls.Config.g.zh-CN.resources:basicconfigcontrol.baml,fld_pollInterval:CNC.Controls.NumericField.Unit,None,False,True,,ms
+CNC.Controls.Config.g.zh-CN.resources:basicconfigcontrol.baml,fld_pollInterval:System.Windows.FrameworkElement.ToolTip,ToolTip,True,True,,状态请求发送到控制器的间隔时间。
+CNC.Controls.Config.g.zh-CN.resources:basicconfigcontrol.baml,fld_resetDelay:CNC.Controls.NumericField.Label,None,False,True,,复位延迟:
+CNC.Controls.Config.g.zh-CN.resources:basicconfigcontrol.baml,fld_resetDelay:CNC.Controls.NumericField.Unit,None,False,True,,ms
+CNC.Controls.Config.g.zh-CN.resources:basicconfigcontrol.baml,fld_resetDelay:System.Windows.FrameworkElement.ToolTip,ToolTip,True,True,,"延迟,允许控制器在通信开始前完成启动。 "
+CNC.Controls.Config.g.zh-CN.resources:basicconfigcontrol.baml,grb_mainConfig:System.Windows.Controls.HeaderedContentControl.Header,Label,True,True,,Main
+CNC.Controls.Config.g.zh-CN.resources:basicconfigcontrol.baml,lbl_addLineNumbers:System.Windows.Controls.ContentControl.Content,CheckBox,True,True,,Add line numbers
+CNC.Controls.Config.g.zh-CN.resources:basicconfigcontrol.baml,lbl_addLineNumbers:System.Windows.FrameworkElement.ToolTip,ToolTip,True,True,,Add linenumbers if the controller is configured to report them.
+CNC.Controls.Config.g.zh-CN.resources:basicconfigcontrol.baml,lbl_agressiveBuffering:System.Windows.Controls.ContentControl.Content,CheckBox,True,True,,多个缓冲区块
+CNC.Controls.Config.g.zh-CN.resources:basicconfigcontrol.baml,lbl_agressiveBuffering:System.Windows.FrameworkElement.ToolTip,ToolTip,True,True,,在控制器中缓冲多行G代码以使执行更流畅。只限grblHAL!
+CNC.Controls.Config.g.zh-CN.resources:basicconfigcontrol.baml,lbl_autoCompressGcode:System.Windows.Controls.ContentControl.Content,CheckBox,True,True,,在转换时自动压缩G代码
+CNC.Controls.Config.g.zh-CN.resources:basicconfigcontrol.baml,lbl_autoCompressGcode:System.Windows.FrameworkElement.ToolTip,ToolTip,True,True,,删除多余的 gcode 命令。
+CNC.Controls.Config.g.zh-CN.resources:basicconfigcontrol.baml,lbl_FilterOk:System.Windows.Controls.ContentControl.Content,CheckBox,True,True,,过滤“ok” 回复信息
+CNC.Controls.Config.g.zh-CN.resources:basicconfigcontrol.baml,lbl_FilterOk:System.Windows.FrameworkElement.ToolTip,ToolTip,True,True,,"如果 ok 响应覆盖了控制台日志记录,则启用,通常在发送大量短命令时发生。"
+CNC.Controls.Config.g.zh-CN.resources:basicconfigcontrol.baml,lbl_keepMdiFocus:System.Windows.Controls.ContentControl.Content,CheckBox,True,True,,保持MDI焦点
+CNC.Controls.Config.g.zh-CN.resources:basicconfigcontrol.baml,lbl_keepMdiFocus:System.Windows.FrameworkElement.ToolTip,ToolTip,True,True,,在控制器中缓冲多行G代码以使执行更流畅。只限grblHAL!
+CNC.Controls.Config.g.zh-CN.resources:basicconfigcontrol.baml,lbl_restoreWindowSize:System.Windows.Controls.ContentControl.Content,CheckBox,True,True,,在启动时恢复上次窗口大小
+CNC.Controls.Config.g.zh-CN.resources:basicconfigcontrol.baml,lbl_restoreWindowSize:System.Windows.FrameworkElement.ToolTip,ToolTip,True,True,,下次启动时恢复窗口大小。
+CNC.Controls.Config.g.zh-CN.resources:basicconfigcontrol.baml,lbl_sendComments:System.Windows.Controls.ContentControl.Content,CheckBox,True,True,,Send comments
+CNC.Controls.Config.g.zh-CN.resources:basicconfigcontrol.baml,lbl_sendComments:System.Windows.FrameworkElement.ToolTip,ToolTip,True,True,,Send complete comments.
+CNC.Controls.Config.g.zh-CN.resources:basicconfigcontrol.baml,lbl_theme:System.Windows.Controls.ContentControl.Content,Label,True,True,,主题:
+CNC.Controls.Config.g.zh-CN.resources:grblconfigcontrol.baml,btn_backup:System.Windows.Controls.ContentControl.Content,Button,True,True,,备份
+CNC.Controls.Config.g.zh-CN.resources:grblconfigcontrol.baml,btn_reload:System.Windows.Controls.ContentControl.Content,Button,True,True,,重新加载
+CNC.Controls.Config.g.zh-CN.resources:grblconfigcontrol.baml,btn_reload:System.Windows.FrameworkElement.ToolTip,ToolTip,True,True,,从控制器重新加载设置。
+CNC.Controls.Config.g.zh-CN.resources:grblconfigcontrol.baml,btn_restore:System.Windows.Controls.ContentControl.Content,Button,True,True,,恢复
+CNC.Controls.Config.g.zh-CN.resources:grblconfigcontrol.baml,btn_save:System.Windows.Controls.ContentControl.Content,Button,True,True,,保存
+CNC.Controls.Config.g.zh-CN.resources:grblconfigcontrol.baml,btn_save:System.Windows.FrameworkElement.ToolTip,ToolTip,True,True,,将更改的设置保存到控制器。
+CNC.Controls.Config.g.zh-CN.resources:grblconfigcontrol.baml,fld_findSetting:CNC.Controls.NumericField.KeyDown,None,True,True,,searchField_KeyDown
+CNC.Controls.Config.g.zh-CN.resources:grblconfigcontrol.baml,fld_findSetting:CNC.Controls.NumericField.Label,None,True,True,,Setting:
+CNC.Controls.Config.g.zh-CN.resources:grblconfigcontrol.baml,fld_findSetting:CNC.Controls.NumericField.Unit,None,True,True,,
+CNC.Controls.Config.g.zh-CN.resources:grblconfigcontrol.baml,fld_findSetting:System.Windows.FrameworkElement.ToolTip,ToolTip,True,True,,Search for setting
+CNC.Controls.Config.g.zh-CN.resources:grblconfigcontrol.baml,hdr_settingId:System.Windows.Controls.DataGridColumn.Header,None,True,True,,Id
+CNC.Controls.Config.g.zh-CN.resources:grblconfigcontrol.baml,hdr_settingName:System.Windows.Controls.DataGridColumn.Header,None,True,True,,名字
+CNC.Controls.Config.g.zh-CN.resources:grblconfigcontrol.baml,hdr_settingUnit:System.Windows.Controls.DataGridColumn.Header,None,True,True,,单元
+CNC.Controls.Config.g.zh-CN.resources:grblconfigcontrol.baml,hdr_settingValue:System.Windows.Controls.DataGridColumn.Header,None,True,True,,值
+CNC.Controls.Config.g.zh-CN.resources:grblconfigcontrol.baml,str_saveSettings:System.String.$Content,None,True,True,,设置已更改，现在保存吗？
+CNC.Controls.Config.g.zh-CN.resources:grblconfigcontrol.baml,str_settingsError:System.String.$Content,None,True,True,,设置 {0} 返回 {1}，是否继续？
+CNC.Controls.Config.g.zh-CN.resources:grblconfigcontrol.baml,str_settingsFail:System.String.$Content,None,True,True,,糟糕...\\n继续加载吗？
+CNC.Controls.Config.g.zh-CN.resources:grblconfigcontrol.baml,str_settingsInvalid:System.String.$Content,None,True,True,,该文件不包含任何设置。
+CNC.Controls.Config.g.zh-CN.resources:grblconfigcontrol.baml,str_settingsReloadMismatch:System.String.$Content,None,True,True,,{0} 设置被忽略，控制器不支持。
+CNC.Controls.Config.g.zh-CN.resources:grblconfigcontrol.baml,str_settingsRestore:System.String.$Content,None,True,True,,从文件恢复设置
+CNC.Controls.Config.g.zh-CN.resources:grblconfigcontrol.baml,str_settingsTimeout:System.String.$Content,None,True,True,,设置 {0} 时超时，是否继续？
+CNC.Controls.Config.g.zh-CN.resources:grblconfigcontrol.baml,str_settingsWritten:System.String.$Content,None,True,True,,所有设置均写入上位机文件夹中的 {0}。
+CNC.Controls.Config.g.zh-CN.resources:grblconfigview.baml,fld_findSetting:CNC.Controls.NumericField.Unit,None,True,True,,
+CNC.Controls.Config.g.zh-CN.resources:grblconfigview.baml,tab_basicConfig:System.Windows.Controls.HeaderedContentControl.Header,Label,True,True,,Basic settings
+CNC.Controls.Config.g.zh-CN.resources:grblconfigview.baml,tab_pidTuner:System.Windows.Controls.HeaderedContentControl.Header,Label,True,True,,PID调节器
+CNC.Controls.Config.g.zh-CN.resources:grblconfigview.baml,tab_stepperCalibration:System.Windows.Controls.HeaderedContentControl.Header,Label,True,True,,Stepper calibration
+CNC.Controls.Config.g.zh-CN.resources:grblconfigview.baml,tab_trinamic:System.Windows.Controls.HeaderedContentControl.Header,Label,True,True,,Trinamic tuner
+CNC.Controls.Config.g.zh-CN.resources:jogconfigcontrol.baml,fld_fastDistance:CNC.Controls.NumericField.Label,None,False,True,,快速距离：
+CNC.Controls.Config.g.zh-CN.resources:jogconfigcontrol.baml,fld_fastFeedrate:CNC.Controls.NumericField.Label,None,False,True,,快速进给速度：
+CNC.Controls.Config.g.zh-CN.resources:jogconfigcontrol.baml,fld_fastFeedrate:CNC.Controls.NumericField.Unit,None,False,True,,mm/min
+CNC.Controls.Config.g.zh-CN.resources:jogconfigcontrol.baml,fld_slowDistance:CNC.Controls.NumericField.Label,None,False,True,,慢速距离：
+CNC.Controls.Config.g.zh-CN.resources:jogconfigcontrol.baml,fld_slowFeedrate:CNC.Controls.NumericField.Label,None,False,True,,慢速进给：
+CNC.Controls.Config.g.zh-CN.resources:jogconfigcontrol.baml,fld_slowFeedrate:CNC.Controls.NumericField.Unit,None,False,True,,mm/min
+CNC.Controls.Config.g.zh-CN.resources:jogconfigcontrol.baml,fld_stepDistance:CNC.Controls.NumericField.Label,None,False,True,,步距：
+CNC.Controls.Config.g.zh-CN.resources:jogconfigcontrol.baml,fld_stepFeedrate:CNC.Controls.NumericField.Label,None,False,True,,步进进给速度：
+CNC.Controls.Config.g.zh-CN.resources:jogconfigcontrol.baml,fld_stepFeedrate:CNC.Controls.NumericField.Unit,None,False,True,,mm/min
+CNC.Controls.Config.g.zh-CN.resources:jogconfigcontrol.baml,grp_kbdJogging:System.Windows.Controls.HeaderedContentControl.Header,Label,True,True,,键盘JOG
+CNC.Controls.Config.g.zh-CN.resources:jogconfigcontrol.baml,lbl_enable:System.Windows.Controls.ContentControl.Content,CheckBox,True,True,,使能
+CNC.Controls.Config.g.zh-CN.resources:jogconfigcontrol.baml,lbl_linkStepToUi:System.Windows.Controls.ContentControl.Content,CheckBox,True,True,,将步距显示到JOG页面
+CNC.Controls.Config.g.zh-CN.resources:jogconfigcontrol.baml,pnl_kbdJogging:System.Windows.FrameworkElement.ToolTip,ToolTip,True,True,,警告！ - Grbl 在点动取消（按键上）方面存在冲突的错误。
+CNC.Controls.Config.g.zh-CN.resources:joguiconfigcontrol.baml,grp_uiJogging:System.Windows.Controls.HeaderedContentControl.Header,Label,True,True,,用户JOG界面
+CNC.Controls.Config.g.zh-CN.resources:joguiconfigcontrol.baml,lbl_distance0:CNC.Controls.NumericField.Label,None,False,True,,距离 0:
+CNC.Controls.Config.g.zh-CN.resources:joguiconfigcontrol.baml,lbl_distance0:CNC.Controls.NumericField.Unit,None,False,True,,mm
+CNC.Controls.Config.g.zh-CN.resources:joguiconfigcontrol.baml,lbl_distance1:CNC.Controls.NumericField.Label,None,False,True,,距离 1:
+CNC.Controls.Config.g.zh-CN.resources:joguiconfigcontrol.baml,lbl_distance1:CNC.Controls.NumericField.Unit,None,False,True,,mm
+CNC.Controls.Config.g.zh-CN.resources:joguiconfigcontrol.baml,lbl_distance2:CNC.Controls.NumericField.Label,None,False,True,,距离 2：
+CNC.Controls.Config.g.zh-CN.resources:joguiconfigcontrol.baml,lbl_distance2:CNC.Controls.NumericField.Unit,None,False,True,,mm
+CNC.Controls.Config.g.zh-CN.resources:joguiconfigcontrol.baml,lbl_distance3:CNC.Controls.NumericField.Label,None,False,True,,距离 3：
+CNC.Controls.Config.g.zh-CN.resources:joguiconfigcontrol.baml,lbl_distance3:CNC.Controls.NumericField.Unit,None,False,True,,mm
+CNC.Controls.Config.g.zh-CN.resources:joguiconfigcontrol.baml,lbl_feedrate0:CNC.Controls.NumericField.Label,None,False,True,,进给倍率 0:
+CNC.Controls.Config.g.zh-CN.resources:joguiconfigcontrol.baml,lbl_feedrate0:CNC.Controls.NumericField.Unit,None,False,True,,mm/min
+CNC.Controls.Config.g.zh-CN.resources:joguiconfigcontrol.baml,lbl_feedrate1:CNC.Controls.NumericField.Label,None,False,True,,进给倍率 1:
+CNC.Controls.Config.g.zh-CN.resources:joguiconfigcontrol.baml,lbl_feedrate1:CNC.Controls.NumericField.Unit,None,False,True,,mm/min
+CNC.Controls.Config.g.zh-CN.resources:joguiconfigcontrol.baml,lbl_feedrate2:CNC.Controls.NumericField.Label,None,False,True,,进给倍率 2:
+CNC.Controls.Config.g.zh-CN.resources:joguiconfigcontrol.baml,lbl_feedrate2:CNC.Controls.NumericField.Unit,None,False,True,,mm/min
+CNC.Controls.Config.g.zh-CN.resources:joguiconfigcontrol.baml,lbl_feedrate3:CNC.Controls.NumericField.Label,None,False,True,,进给倍率 3:
+CNC.Controls.Config.g.zh-CN.resources:joguiconfigcontrol.baml,lbl_feedrate3:CNC.Controls.NumericField.Unit,None,False,True,,mm/min
+CNC.Controls.Config.g.zh-CN.resources:steppercalibrationwizard.baml,btn_goneg:System.Windows.Controls.ContentControl.Content,Button,True,True,,Go-
+CNC.Controls.Config.g.zh-CN.resources:steppercalibrationwizard.baml,btn_goneg:System.Windows.FrameworkElement.ToolTip,ToolTip,True,True,,Press to move in the negative direction.
+CNC.Controls.Config.g.zh-CN.resources:steppercalibrationwizard.baml,btn_gopos:System.Windows.Controls.ContentControl.Content,Button,True,True,,Go+
+CNC.Controls.Config.g.zh-CN.resources:steppercalibrationwizard.baml,btn_gopos:System.Windows.FrameworkElement.ToolTip,ToolTip,True,True,,Press to move in the positive direction.
+CNC.Controls.Config.g.zh-CN.resources:steppercalibrationwizard.baml,btn_stop:System.Windows.Controls.ContentControl.Content,Button,True,True,,Stop
+CNC.Controls.Config.g.zh-CN.resources:steppercalibrationwizard.baml,btn_update:System.Windows.Controls.ContentControl.Content,Button,True,True,,Save
+CNC.Controls.Config.g.zh-CN.resources:steppercalibrationwizard.baml,fld_distance:CNC.Controls.NumericField.Label,None,True,True,,Distance:
+CNC.Controls.Config.g.zh-CN.resources:steppercalibrationwizard.baml,fld_measured:CNC.Controls.NumericField.Label,None,True,True,,Measured:
+CNC.Controls.Config.g.zh-CN.resources:steppercalibrationwizard.baml,fld_measured:CNC.Controls.NumericField.Tooltip2,None,True,True,,Actual distance.
+CNC.Controls.Config.g.zh-CN.resources:steppercalibrationwizard.baml,fld_resolution:CNC.Controls.NumericField.IsReadOnly,None,True,True,,True
+CNC.Controls.Config.g.zh-CN.resources:steppercalibrationwizard.baml,fld_resolution:CNC.Controls.NumericField.Label,None,True,True,,Resolution:
+CNC.Controls.Config.g.zh-CN.resources:steppercalibrationwizard.baml,lbl_axis:System.Windows.Controls.ContentControl.Content,Label,True,True,,Axis:
+CNC.Controls.Config.g.zh-CN.resources:steppercalibrationwizard.baml,str_CalibrationInstructions1:System.String.$Content,None,True,True,,"1. Select the axis to calibrate, Resolution is set from the underlying setting."
+CNC.Controls.Config.g.zh-CN.resources:steppercalibrationwizard.baml,str_CalibrationInstructions2:System.String.$Content,None,True,True,,2. Jog to the starting positition in the same direction as the first &quot;Go&quot; move and mark it.
+CNC.Controls.Config.g.zh-CN.resources:steppercalibrationwizard.baml,str_CalibrationInstructions3:System.String.$Content,None,True,True,,"3. Enter the Distance to measure, Measured distance is linked to Distance so will be equal."
+CNC.Controls.Config.g.zh-CN.resources:steppercalibrationwizard.baml,str_CalibrationInstructions4:System.String.$Content,None,True,True,,"4. Press the appropriate &quot;Go&quot; button to move the entered distance, measure and enter the value in the Measured field."
+CNC.Controls.Config.g.zh-CN.resources:steppercalibrationwizard.baml,str_CalibrationInstructions5:System.String.$Content,None,True,True,,5. Press the opposite &quot;Go&quot; button to move back to the origin.\\nThis step can be skipped but avoids repositioning manually to the marked start position if multiple measurements are to be performed.
+CNC.Controls.Config.g.zh-CN.resources:steppercalibrationwizard.baml,str_CalibrationInstructions6:System.String.$Content,None,True,True,,6. Press the &quot;Save&quot; button to update the setting.
+CNC.Controls.Config.g.zh-CN.resources:steppercalibrationwizard.baml,str_CalibrationInstructions7:System.String.$Content,None,True,True,,7. Repeat from step 4 (or 3). until the measured distance matches the commanded distance with the required accuracy.
+CNC.Controls.Config.g.zh-CN.resources:steppercalibrationwizard.baml,str_CalibrationWarnings:System.String.$Content,None,True,True,,Make sure there is room for the axis to move and avoid collision. Return move will add 0.5mm overshoot to remove any backlash from subsequent measurements.
+CNC.Controls.Config.g.zh-CN.resources:stripgcodeconfigcontrol.baml,grp_gcodeStrip:System.Windows.Controls.HeaderedContentControl.Header,Label,True,True,,G代码命令剥离
+CNC.Controls.Config.g.zh-CN.resources:trinamicview.baml,btn_getStatus:System.Windows.Controls.ContentControl.Content,Button,True,True,,获取状态
+CNC.Controls.Config.g.zh-CN.resources:trinamicview.baml,btn_getStatusAll:System.Windows.Controls.ContentControl.Content,Button,True,True,,获取所有驱动程序的状态
+CNC.Controls.Config.g.zh-CN.resources:trinamicview.baml,grp_stallGuard:System.Windows.Controls.HeaderedContentControl.Header,Label,True,True,,档位保护
+CNC.Controls.Config.g.zh-CN.resources:trinamicview.baml,lbl_configure:System.Windows.Controls.ContentControl.Content,Button,True,True,,配置
+CNC.Controls.Config.g.zh-CN.resources:trinamicview.baml,lbl_sgLoad:System.Windows.Controls.ContentControl.Content,Label,True,True,,加载（SG_RESULT）
+CNC.Controls.Config.g.zh-CN.resources:trinamicview.baml,lbl_stallGuardEnable:System.Windows.Controls.ContentControl.Content,CheckBox,True,True,,启用过滤器 (SFILT)

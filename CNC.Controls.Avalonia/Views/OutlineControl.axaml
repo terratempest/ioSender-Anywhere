@@ -6,7 +6,7 @@
   <Border Classes="panel-chrome" BorderThickness="1" Padding="4" Width="250" Height="125">
     <StackPanel>
       <TextBlock Text="Outline" FontWeight="Bold" Margin="0,0,0,4"/>
-      <views:OutlineBaseControl/>
+      <views:OutlineBaseControl x:Name="OutlineBase"/>
     </StackPanel>
   </Border>
 </UserControl>

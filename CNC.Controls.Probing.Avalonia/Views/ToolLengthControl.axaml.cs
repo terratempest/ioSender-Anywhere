@@ -1,6 +1,5 @@
 using Avalonia.Controls;
 using Avalonia.Interactivity;
-using CNC.Controls.Avalonia.Services;
 using CNC.Core;
 using CNC.GCode;
 
@@ -61,7 +60,7 @@ public partial class ToolLengthControl : UserControl, IProbeTab
         if (!probing.VerifyProbe())
             return;
 
-        var checkProbe = ControlsPlatformContext.AppConfig?.Base.Probing.CheckProbeStatus != false || !probing.ProbeFixture;
+        var checkProbe = probing.Config?.Probing.CheckProbeStatus != false || !probing.ProbeFixture;
         if (!probing.Program.Init(checkProbe))
             return;
 

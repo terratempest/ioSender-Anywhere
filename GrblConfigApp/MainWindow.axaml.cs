@@ -29,9 +29,9 @@ public partial class MainWindow : Window
         InitializeComponent();
         DataContext = _grbl;
         Grbl.GrblViewModel = _grbl;
+        configView.Configure(_appConfig.Base);
         configView.DataContext = _grbl;
         _commandRouter.Attach(_grbl);
-        ControlsPlatformContext.CommandRouter = _commandRouter;
         Opened += OnOpened;
         Closing += OnClosing;
     }

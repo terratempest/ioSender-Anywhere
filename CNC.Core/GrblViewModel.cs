@@ -165,13 +165,12 @@ namespace CNC.Core
 
         private void SpindleState_PropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)
         {
-            _rpmDisplay = _spindleStatePrev == GCode.SpindleState.Off ? _rpmInput : _rpm;
             if (!(SpindleState.Value.HasFlag(GCode.SpindleState.Off | GCode.SpindleState.CW) || SpindleState.Value.HasFlag(GCode.SpindleState.Off | GCode.SpindleState.CCW)))
             {
                 OnPropertyChanged(nameof(SpindleState));
                 if (e.PropertyName == "Item[]")
                     OnPropertyChanged("SpindleState.Item[]");
-                OnPropertyChanged(nameof(RPM));
+                SyncRpmDisplay();
                 _spindleStatePrev = SpindleState.Value;
             }
         }
@@ -675,19 +674,20 @@ namespace CNC.Core
                     OnPropertyChanged();
 
                     if (_rpm != 0d)
-                        _rpmInput = _rpm / (RPMOverride / 100d);
+                    {
+                        // FS reports effective RPM; only back-solve setpoint when unknown or at 100% override.
+                        if (ShouldSyncSpindleSetpointFromFs())
+                            _rpmInput = _rpm / (RPMOverride / 100d);
+                    }
                     else if (!IsGrblHAL && (_a == "S" || _a == "C")) // Hack for legacy Grbl no informing about spindle going off
                     {
                         _a = "";
                         SpindleState.Value = GCode.SpindleState.Off;
                     }
 
-                    OnPropertyChanged(nameof(SpindleSetpointRPM));
-                    if (double.IsNaN(ActualRPM))
-                    {
-                        _rpmDisplay = _rpm == 0d ? _rpmInput : _rpm;
-                        OnPropertyChanged(nameof(RPM));
-                    }
+                    if (ShouldSyncSpindleSetpointFromFs())
+                        OnPropertyChanged(nameof(SpindleSetpointRPM));
+                    SyncRpmDisplay();
                 }
             }
         }
@@ -700,11 +700,7 @@ namespace CNC.Core
                 {
                     _rpmActual = value;
                     OnPropertyChanged();
-                    if (!double.IsNaN(ActualRPM))
-                    {
-                        _rpmDisplay = _rpmActual == 0d ? _rpmInput : _rpmActual;
-                        OnPropertyChanged(nameof(RPM));
-                    }
+                    SyncRpmDisplay();
                 }
             }
         }
@@ -723,8 +719,42 @@ namespace CNC.Core
                 {
                     _rpmInput = value;
                     OnPropertyChanged();
+                    SyncRpmDisplay();
                 }
             }
+        }
+
+        bool ShouldSyncSpindleSetpointFromFs() =>
+            _rpmInput == 0d || Math.Abs(RPMOverride - 100d) < 0.01;
+
+        bool IsSpindleRunning() =>
+            SpindleState.Value.HasFlag(GCode.SpindleState.CW)
+            || SpindleState.Value.HasFlag(GCode.SpindleState.CCW);
+
+        void SyncRpmDisplay()
+        {
+            if (!double.IsNaN(ActualRPM))
+            {
+                _rpmDisplay = _rpmActual == 0d ? _rpmInput : _rpmActual;
+            }
+            else if (_rpmInput > 0d && IsSpindleRunning())
+            {
+                var expected = _rpmInput * (RPMOverride / 100d);
+                if (_rpm != 0d && Math.Abs(_rpm - expected) <= Math.Max(1d, expected * 0.02))
+                    _rpmDisplay = _rpm;
+                else
+                    _rpmDisplay = expected;
+            }
+            else if (_rpm != 0d)
+            {
+                _rpmDisplay = _rpm;
+            }
+            else
+            {
+                _rpmDisplay = _rpmInput;
+            }
+
+            OnPropertyChanged(nameof(RPM));
         }
 
         public int PWM { get { return _pwm; } private set { _pwm = value; OnPropertyChanged(); } }
@@ -735,7 +765,17 @@ namespace CNC.Core
         public double FeedOverride { get { return _feedOverride; } private set { _feedOverride = value; OnPropertyChanged(); } }
         public bool FeedOverrideDisabled { get { return _feedOverrideDisabled; } private set { _feedOverrideDisabled = value; OnPropertyChanged(); } }
         public double RapidsOverride { get { return _rapidsOverride; } private set { _rapidsOverride = value; OnPropertyChanged(); } }
-        public double RPMOverride { get { return _rpmOverride; } private set { _rpmOverride = value; OnPropertyChanged(); } }
+        public double RPMOverride { get { return _rpmOverride; } private set => ApplyRpmOverride(value); }
+
+        void ApplyRpmOverride(double value)
+        {
+            if (_rpmOverride == value)
+                return;
+
+            _rpmOverride = value;
+            OnPropertyChanged();
+            SyncRpmDisplay();
+        }
         public bool RPMOverrideDisabled { get { return _rpmOverrideDisabled; } private set { _rpmOverrideDisabled = value; OnPropertyChanged(); } }
         public bool FeedHoldDisabled { get { return _feedHoldDisabled; } private set { _feedHoldDisabled = value; OnPropertyChanged(); } }
 
@@ -1170,7 +1210,7 @@ namespace CNC.Core
                             if (_rapidsOverride != values[1])
                                 RapidsOverride = values[1];
                             if (_rpmOverride != values[2])
-                                RPMOverride = values[2];
+                                ApplyRpmOverride(values[2]);
                         }
                         catch { }
                     }

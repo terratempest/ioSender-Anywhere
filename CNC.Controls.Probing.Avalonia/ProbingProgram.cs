@@ -1,5 +1,4 @@
 using System.Collections.Concurrent;
-using CNC.Controls.Avalonia.Services;
 using CNC.Core;
 using CNC.GCode;
 
@@ -24,8 +23,7 @@ public partial class ProbingProgram
     bool _probeOnCycleStart;
     int _step;
 
-    static int PollInterval =>
-        ControlsPlatformContext.AppConfig?.Base.PollInterval ?? 250;
+    int PollInterval => _probing.Config?.PollInterval ?? 250;
 
     public bool Silent { get; set; }
     public Action<bool>? OnCompleted { get; set; }

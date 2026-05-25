@@ -1,4 +1,5 @@
 using System.Globalization;
+using Avalonia.Data;
 using Avalonia.Data.Converters;
 using CNC.Core;
 using CNC.Core.Geometry;
@@ -20,7 +21,7 @@ public class GrblStateToBooleanConverter : IMultiValueConverter
         => values.Count == 2 && values[0] is GrblState state && values[1] is GrblStates expected && state.State == expected;
 
     public object? ConvertBack(IList<object?> values, Type targetType, object? parameter, CultureInfo culture)
-        => throw new NotImplementedException();
+        => BindingOperations.DoNothing;
 }
 
 public class PositionToStringConverter : IMultiValueConverter
@@ -68,5 +69,5 @@ public class PositionToStringConverter : IMultiValueConverter
     }
 
     public object? ConvertBack(IList<object?> values, Type targetType, object? parameter, CultureInfo culture)
-        => throw new NotImplementedException();
+        => BindingOperations.DoNothing;
 }

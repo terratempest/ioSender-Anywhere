@@ -11,7 +11,7 @@
   </UserControl.Resources>
   <StackPanel Orientation="Horizontal" Height="30" Width="240" VerticalAlignment="Center">
     <TextBlock x:Name="lblOverride" Text="Override" VerticalAlignment="Center" Width="75" TextAlignment="Right"
-               loc:Localize.Key="CNC.Controls.WPF.overridecontrol.lbl_override" loc:Localize.Fallback="Override"/>
+               loc:Localize.Key="CNC.Controls.Avalonia.overridecontrol.lbl_override" loc:Localize.Fallback="Override"/>
     <Slider x:Name="slider" Width="100" TickPlacement="TopLeft" IsSnapToTickEnabled="True"
             SmallChange="1" LargeChange="10"
             Value="{Binding SliderValue, RelativeSource={RelativeSource AncestorType=UserControl}}"

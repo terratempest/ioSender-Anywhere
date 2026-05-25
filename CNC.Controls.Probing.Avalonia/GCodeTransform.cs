@@ -1,7 +1,7 @@
 // Portions from OpenCNCPilot (Martin Pittermann, 2018) — height-map segment splitting.
 
-using CNC.Controls.Avalonia.Services;
 using CNC.Core;
+using CNC.Controls.Avalonia.Services;
 using CNC.Core.Geometry;
 using CNC.GCode;
 
@@ -9,6 +9,13 @@ namespace CNC.Controls.Probing;
 
 sealed class GCodeTransform
 {
+    readonly bool _compress;
+
+    public GCodeTransform(bool compress = false)
+    {
+        _compress = compress;
+    }
+
     static Vector3 ToAbsolute(Vector3 orig, double[] values, bool isRelative = false) =>
         isRelative ? orig + new Vector3(values[0], values[1], values[2]) : new Vector3(values[0], values[1], values[2]);
 
@@ -134,7 +141,6 @@ sealed class GCodeTransform
             }
         }
 
-        var compress = ControlsPlatformContext.AppConfig?.Base.AutoCompress ?? false;
-        file.ReplaceFromTokens(newToolPath, $"Heightmap applied", compress);
+        file.ReplaceFromTokens(newToolPath, $"Heightmap applied", _compress);
     }
 }

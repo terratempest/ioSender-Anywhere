@@ -49,7 +49,7 @@ public class HomedStateToBooleanConverter : IValueConverter
         => value is HomedState homed && homed == HomedState.Homed;
 
     public object? ConvertBack(object? value, Type targetType, object? parameter, CultureInfo culture)
-        => throw new NotImplementedException();
+        => BindingOperations.DoNothing;
 }
 
 public class LatheModeToStringConverter : IValueConverter
@@ -62,7 +62,7 @@ public class LatheModeToStringConverter : IValueConverter
     }
 
     public object? ConvertBack(object? value, Type targetType, object? parameter, CultureInfo culture)
-        => throw new NotImplementedException();
+        => BindingOperations.DoNothing;
 }
 
 public class AxisLetterToJogPlusConverter : IValueConverter
@@ -71,7 +71,7 @@ public class AxisLetterToJogPlusConverter : IValueConverter
         => value is string s ? s + "+" : string.Empty;
 
     public object? ConvertBack(object? value, Type targetType, object? parameter, CultureInfo culture)
-        => throw new NotImplementedException();
+        => BindingOperations.DoNothing;
 }
 
 public class AxisLetterToJogMinusConverter : IValueConverter
@@ -80,7 +80,7 @@ public class AxisLetterToJogMinusConverter : IValueConverter
         => value is string s ? s + "-" : string.Empty;
 
     public object? ConvertBack(object? value, Type targetType, object? parameter, CultureInfo culture)
-        => throw new NotImplementedException();
+        => BindingOperations.DoNothing;
 }
 
 public class GrblStateToColorConverter : IValueConverter
@@ -91,7 +91,7 @@ public class GrblStateToColorConverter : IValueConverter
             : ControlConverters.ThemeBrush("ThemeControlMidBrush", Brushes.Transparent);
 
     public object? ConvertBack(object? value, Type targetType, object? parameter, CultureInfo culture)
-        => throw new NotImplementedException();
+        => BindingOperations.DoNothing;
 }
 
 public class IsHomingEnabledConverter : IMultiValueConverter
@@ -131,7 +131,7 @@ public class HomedStateToColorConverter : IValueConverter
     }
 
     public object? ConvertBack(object? value, Type targetType, object? parameter, CultureInfo culture)
-        => throw new NotImplementedException();
+        => BindingOperations.DoNothing;
 }
 
 public class EncoderModeToColorConverter : IMultiValueConverter
@@ -175,7 +175,7 @@ public class GrblStateToStringConverter : IValueConverter
     }
 
     public object? ConvertBack(object? value, Type targetType, object? parameter, CultureInfo culture)
-        => throw new NotImplementedException();
+        => BindingOperations.DoNothing;
 }
 
 public class GrblStateToIsJoggingConverter : IValueConverter
@@ -184,7 +184,7 @@ public class GrblStateToIsJoggingConverter : IValueConverter
         => value is GrblState state && state.State == GrblStates.Jog;
 
     public object? ConvertBack(object? value, Type targetType, object? parameter, CultureInfo culture)
-        => throw new NotImplementedException();
+        => BindingOperations.DoNothing;
 }
 
 public class LogicalNotConverter : IValueConverter
@@ -253,7 +253,7 @@ public class BoolToBrushConverter : IMultiValueConverter
 }
 
 /// <summary>
-/// Multi-binding: EnumFlags holder + flag value → bool (replaces WPF-style indexer bindings).
+/// Multi-binding: EnumFlags holder + flag value to bool.
 /// </summary>
 public class EnumFlagsHasFlagConverter : IMultiValueConverter
 {
@@ -333,7 +333,7 @@ public class ActualRpmDisplayConverter : IValueConverter
     }
 
     public object? ConvertBack(object? value, Type targetType, object? parameter, CultureInfo culture)
-        => throw new NotImplementedException();
+        => BindingOperations.DoNothing;
 }
 
 public class EnumValueToBooleanConverter : IValueConverter

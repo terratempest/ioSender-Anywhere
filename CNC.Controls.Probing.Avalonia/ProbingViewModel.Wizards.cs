@@ -353,7 +353,7 @@ public sealed partial class ProbingViewModel
 
         try
         {
-            var compress = ControlsPlatformContext.AppConfig?.Base.AutoCompress ?? false;
+            var compress = Config?.AutoCompress ?? false;
             new GCodeRotate().ApplyRotation(_cycle.ProbedAngle, GetRotationOriginOffset(), compress);
         }
         catch (Exception ex)
@@ -806,7 +806,7 @@ public sealed partial class ProbingViewModel
 
         try
         {
-            new GCodeTransform().ApplyHeightMap(this);
+            new GCodeTransform(Config?.AutoCompress ?? false).ApplyHeightMap(this);
             HeightMapApplied = true;
         }
         catch (Exception ex)

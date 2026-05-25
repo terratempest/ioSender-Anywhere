@@ -26,7 +26,7 @@
           HorizontalAlignment="Stretch" VerticalAlignment="Stretch">
     <Grid RowDefinitions="Auto,Auto,*,Auto">
       <Button x:Name="btnHomeAll" Grid.Row="0" Content="Home All"
-              loc:Localize.Key="CNC.Controls.WPF.drocontrol.btn_homeAll"
+              loc:Localize.Key="CNC.Controls.Avalonia.drocontrol.btn_homeAll"
               loc:Localize.Fallback="Home All"
               ToolTip.Tip="Ctrl+H"
               Focusable="False" Margin="0,0,0,4" Height="32"
@@ -185,7 +185,7 @@
         </views:DROBaseControl>
       </Grid>
       <Button x:Name="btnZeroAll" Grid.Row="3" Content="Zero all"
-              loc:Localize.Key="CNC.Controls.WPF.drocontrol.btn_zeroAll" loc:Localize.Fallback="Zero all"
+              loc:Localize.Key="CNC.Controls.Avalonia.drocontrol.btn_zeroAll" loc:Localize.Fallback="Zero all"
               IsEnabled="{Binding IsJobRunning, Converter={StaticResource BooleanConverter}}"
               Focusable="False" Height="32" Margin="0,4,0,0"
               HorizontalAlignment="Stretch" VerticalAlignment="Top"/>

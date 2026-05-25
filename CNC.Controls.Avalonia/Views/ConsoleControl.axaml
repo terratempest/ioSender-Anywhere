@@ -10,13 +10,13 @@
   <DockPanel>
     <StackPanel DockPanel.Dock="Top" Orientation="Horizontal" Spacing="10" Margin="0,0,0,5">
       <CheckBox x:Name="ChkVerbose" Content="Verbose" IsChecked="{Binding ResponseLogVerbose}"
-                loc:Localize.Key="CNC.Controls.WPF.consolecontrol.lbl_verbose" loc:Localize.Fallback="Verbose"/>
+                loc:Localize.Key="CNC.Controls.Avalonia.consolecontrol.lbl_verbose" loc:Localize.Fallback="Verbose"/>
       <CheckBox x:Name="ChkFilterRt" Content="Filter out realtime responses" IsChecked="{Binding ResponseLogFilterRT}" IsEnabled="{Binding ResponseLogVerbose}"
-                loc:Localize.Key="CNC.Controls.WPF.consolecontrol.lbl_filterRT" loc:Localize.Fallback="Filter out realtime responses"/>
+                loc:Localize.Key="CNC.Controls.Avalonia.consolecontrol.lbl_filterRT" loc:Localize.Fallback="Filter out realtime responses"/>
       <CheckBox x:Name="ChkShowAllRt" Content="Show all realtime responses" IsChecked="{Binding ResponseLogShowRTAll}" IsEnabled="{Binding ResponseLogVerbose}"
-                loc:Localize.Key="CNC.Controls.WPF.consolecontrol.lbl_showAll" loc:Localize.Fallback="Show all realtime responses"/>
+                loc:Localize.Key="CNC.Controls.Avalonia.consolecontrol.lbl_showAll" loc:Localize.Fallback="Show all realtime responses"/>
       <Button x:Name="BtnClear" Content="Clear" Click="OnClearClick"
-              loc:Localize.Key="CNC.Controls.WPF.consolecontrol.btn_clear" loc:Localize.Fallback="Clear"/>
+              loc:Localize.Key="CNC.Controls.Avalonia.consolecontrol.btn_clear" loc:Localize.Fallback="Clear"/>
     </StackPanel>
     <ListBox ItemsSource="{Binding ResponseLog}" FontFamily="Consolas,Courier New,monospace" FontSize="10"/>
   </DockPanel>

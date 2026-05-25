@@ -1,4 +1,19 @@
-﻿ioSender.g.en-US.resources:mainwindow.baml,lbl_jogStep:System.Windows.FrameworkElement.ToolTip,ToolTip,True,True,,Distancia do passo do teclado (com &lt;CTRL&gt; modificador).
+ioSender.g.en-US.resources:jobview.baml,str_msgDoorExit:System.String.$Content,None,True,True,,"Porta continua aberta, sair?"
+ioSender.g.en-US.resources:jobview.baml,str_msgDoorOpen:System.String.$Content,None,True,True,,"Porta está aberta, fechar porta e continuar?"
+ioSender.g.en-US.resources:jobview.baml,str_msgDoorPersist:System.String.$Content,None,True,True,,Estado da porta não pode ser limpo com &lt;Reset&gt;
+ioSender.g.en-US.resources:jobview.baml,str_msgEStop:System.String.$Content,None,True,True,,E-Stop ativo! - limpar antes de prosseguir...
+ioSender.g.en-US.resources:jobview.baml,str_msgEStopExit:System.String.$Content,None,True,True,,"E-Stop continua ativo, sair?"
+ioSender.g.en-US.resources:jobview.baml,str_msgHome:System.String.$Content,None,True,True,,"Ciclo de homing necesário, &lt;;Ínicio&gt; para continuar"
+ioSender.g.en-US.resources:jobview.baml,str_msgNoComm:System.String.$Content,None,True,True,,"Controlador está no estado {0} e não pode responder, tentar reiniciar(soft reset)?"
+ioSender.g.en-US.resources:jobview.baml,str_msgNoCommAlarm:System.String.$Content,None,True,True,,"Não é possível se comunicar com o controlador devido ao alarme {0}, tentando reiniciar(soft reset)."
+ioSender.g.en-US.resources:jobview.baml,str_msgNoResponse:System.String.$Content,None,True,True,,Controlador não está respondendo!
+ioSender.g.en-US.resources:jobview.baml,str_msgResetExit:System.String.$Content,None,True,True,,"Reinicio falhou, fechando o programa."
+ioSender.g.en-US.resources:jobview.baml,str_msgResetFailed:System.String.$Content,None,True,True,,"Reinicio falhou, fechando o programa."
+ioSender.g.en-US.resources:jobview.baml,str_msgWait:System.String.$Content,None,True,True,,Aguardando controlador ({0})...
+ioSender.g.en-US.resources:jobview.baml,tab_3DView:System.Windows.Controls.HeaderedContentControl.Header,Label,True,True,,Visão 3D
+ioSender.g.en-US.resources:jobview.baml,tab_console:System.Windows.Controls.HeaderedContentControl.Header,Label,True,True,,Console
+ioSender.g.en-US.resources:jobview.baml,tab_program:System.Windows.Controls.HeaderedContentControl.Header,Label,True,True,,Programa
+ioSender.g.en-US.resources:mainwindow.baml,lbl_jogStep:System.Windows.FrameworkElement.ToolTip,ToolTip,True,True,,Distancia do passo do teclado (com &lt;CTRL&gt; modificador).
 ioSender.g.en-US.resources:mainwindow.baml,mnu_about:System.Windows.Controls.HeaderedItemsControl.Header,Menu,True,True,,_Sobre
 ioSender.g.en-US.resources:mainwindow.baml,mnu_briefTour:System.Windows.Controls.HeaderedItemsControl.Header,Menu,True,True,,Um _pequeno tour
 ioSender.g.en-US.resources:mainwindow.baml,mnu_camera:System.Windows.Controls.HeaderedItemsControl.Header,Menu,True,True,,_Camera
@@ -20,23 +35,9 @@ ioSender.g.en-US.resources:mainwindow.baml,str_mnuArcsToLines:System.String.$Con
 ioSender.g.en-US.resources:mainwindow.baml,str_mnuCompress:System.String.$Content,None,True,True,,Comprimir (experimental)
 ioSender.g.en-US.resources:mainwindow.baml,str_mnuDragKnife:System.String.$Content,None,True,True,,Adicionar os movimentos da faca de arrasto
 ioSender.g.en-US.resources:mainwindow.baml,str_mnuRotate:System.String.$Content,None,True,True,,Rotacionar
-ioSender.g.en-US.resources:jobview.baml,str_msgDoorExit:System.String.$Content,None,True,True,,"Porta continua aberta, sair?"
-ioSender.g.en-US.resources:jobview.baml,str_msgDoorOpen:System.String.$Content,None,True,True,,"Porta está aberta, fechar porta e continuar?"
-ioSender.g.en-US.resources:jobview.baml,str_msgDoorPersist:System.String.$Content,None,True,True,,Estado da porta não pode ser limpo com &lt;Reset&gt;
-ioSender.g.en-US.resources:jobview.baml,str_msgEStop:System.String.$Content,None,True,True,,E-Stop ativo! - limpar antes de prosseguir...
-ioSender.g.en-US.resources:jobview.baml,str_msgEStopExit:System.String.$Content,None,True,True,,"E-Stop continua ativo, sair?"
-ioSender.g.en-US.resources:jobview.baml,str_msgHome:System.String.$Content,None,True,True,,"Ciclo de homing necesário, &lt;;Ínicio&gt; para continuar"
-ioSender.g.en-US.resources:jobview.baml,str_msgNoComm:System.String.$Content,None,True,True,,"Controlador está no estado {0} e não pode responder, tentar reiniciar(soft reset)?"
-ioSender.g.en-US.resources:jobview.baml,str_msgNoCommAlarm:System.String.$Content,None,True,True,,"Não é possível se comunicar com o controlador devido ao alarme {0}, tentando reiniciar(soft reset)."
-ioSender.g.en-US.resources:jobview.baml,str_msgNoResponse:System.String.$Content,None,True,True,,Controlador não está respondendo!
-ioSender.g.en-US.resources:jobview.baml,str_msgResetExit:System.String.$Content,None,True,True,,"Reinicio falhou, fechando o programa."
-ioSender.g.en-US.resources:jobview.baml,str_msgResetFailed:System.String.$Content,None,True,True,,"Reinicio falhou, fechando o programa."
-ioSender.g.en-US.resources:jobview.baml,str_msgWait:System.String.$Content,None,True,True,,Aguardando controlador ({0})...
 ioSender.g.en-US.resources:mainwindow.baml,str_runTime:System.String.$Content,None,True,True,,Tempo de execução: {0}
-ioSender.g.en-US.resources:jobview.baml,tab_3DView:System.Windows.Controls.HeaderedContentControl.Header,Label,True,True,,Visão 3D
 ioSender.g.en-US.resources:mainwindow.baml,tab_3DView:System.Windows.Controls.HeaderedContentControl.Header,Label,True,True,,Visão 3D
 ioSender.g.en-US.resources:mainwindow.baml,tab_appConfig:System.Windows.Controls.HeaderedContentControl.Header,Label,True,True,,Configurações: Programa
-ioSender.g.en-US.resources:jobview.baml,tab_console:System.Windows.Controls.HeaderedContentControl.Header,Label,True,True,,Console
 ioSender.g.en-US.resources:mainwindow.baml,tab_facing:System.Windows.Controls.HeaderedContentControl.Header,Label,True,True,,Facing
 ioSender.g.en-US.resources:mainwindow.baml,tab_grbl:System.Windows.Controls.HeaderedContentControl.Header,Label,True,True,,Grbl
 ioSender.g.en-US.resources:mainwindow.baml,tab_grblConfig:System.Windows.Controls.HeaderedContentControl.Header,Label,True,True,,Configurações: Grbl
@@ -45,8 +46,21 @@ ioSender.g.en-US.resources:mainwindow.baml,tab_latheWizards:System.Windows.Contr
 ioSender.g.en-US.resources:mainwindow.baml,tab_offsets:System.Windows.Controls.HeaderedContentControl.Header,Label,True,True,,Offsets
 ioSender.g.en-US.resources:mainwindow.baml,tab_parting:System.Windows.Controls.HeaderedContentControl.Header,Label,True,True,,Separação
 ioSender.g.en-US.resources:mainwindow.baml,tab_probing:System.Windows.Controls.HeaderedContentControl.Header,Label,True,True,,Sondagem
-ioSender.g.en-US.resources:jobview.baml,tab_program:System.Windows.Controls.HeaderedContentControl.Header,Label,True,True,,Programa
 ioSender.g.en-US.resources:mainwindow.baml,tab_sdCard:System.Windows.Controls.HeaderedContentControl.Header,Label,True,True,,Cartão SD
 ioSender.g.en-US.resources:mainwindow.baml,tab_threading:System.Windows.Controls.HeaderedContentControl.Header,Label,True,True,,Threading
 ioSender.g.en-US.resources:mainwindow.baml,tab_tools:System.Windows.Controls.HeaderedContentControl.Header,Label,True,True,,Ferramentas
 ioSender.g.en-US.resources:mainwindow.baml,tab_turning:System.Windows.Controls.HeaderedContentControl.Header,Label,True,True,,Virando
+ioSender.g.pt-BR.resources:workspace.baml,editor_console:System.String.$Content,None,True,True,,Console
+ioSender.g.pt-BR.resources:workspace.baml,editor_coolant:System.String.$Content,None,True,True,,Coolant
+ioSender.g.pt-BR.resources:workspace.baml,editor_feed:System.String.$Content,None,True,True,,Feed
+ioSender.g.pt-BR.resources:workspace.baml,editor_goto:System.String.$Content,None,True,True,,Goto
+ioSender.g.pt-BR.resources:workspace.baml,editor_jobbar:System.String.$Content,None,True,True,,Job
+ioSender.g.pt-BR.resources:workspace.baml,editor_jog:System.String.$Content,None,True,True,,Jog
+ioSender.g.pt-BR.resources:workspace.baml,editor_mdiTouch:System.String.$Content,None,True,True,,MDI (Touch)
+ioSender.g.pt-BR.resources:workspace.baml,editor_outline:System.String.$Content,None,True,True,,Outline
+ioSender.g.pt-BR.resources:workspace.baml,editor_program:System.String.$Content,None,True,True,,Program
+ioSender.g.pt-BR.resources:workspace.baml,editor_signals:System.String.$Content,None,True,True,,Signals
+ioSender.g.pt-BR.resources:workspace.baml,editor_spindle:System.String.$Content,None,True,True,,Spindle
+ioSender.g.pt-BR.resources:workspace.baml,editor_status:System.String.$Content,None,True,True,,Status
+ioSender.g.pt-BR.resources:workspace.baml,editor_viewer3d:System.String.$Content,None,True,True,,3D View
+ioSender.g.pt-BR.resources:workspace.baml,editor_workparams:System.String.$Content,None,True,True,,Work Parameters

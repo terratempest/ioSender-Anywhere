@@ -35,21 +35,15 @@
       <ColumnDefinition Width="*"/>
     </Grid.ColumnDefinitions>
 
-    <primitives:ToggleButton x:Name="BtnFlood" Grid.Column="0" Classes="jog-option" Tag="Flood" Content="Flood"
-                             IsChecked="{Binding Flood, Mode=OneWay}"
-                             HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Margin="0,0,2,0"
-                             Padding="2,2" Click="Coolant_Click"
-                             loc:Localize.Key="CNC.Controls.WPF.coolantcontrol.lbl_flood" loc:Localize.Fallback="Flood"/>
-    <primitives:ToggleButton x:Name="BtnMist" Grid.Column="1" Classes="jog-option" Tag="Mist" Content="Mist"
-                             IsChecked="{Binding Mist, Mode=OneWay}"
-                             HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Margin="2,0,2,0"
-                             Padding="2,2" Click="Coolant_Click"
-                             loc:Localize.Key="CNC.Controls.WPF.coolantcontrol.lbl_mist" loc:Localize.Fallback="Mist"/>
-    <primitives:ToggleButton x:Name="BtnFan" Grid.Column="2" Classes="jog-option" Tag="Fan" Content="Fan"
+    <primitives:ToggleButton x:Name="BtnFlood" Grid.Column="0" Classes="panel-toggle compact" Tag="Flood" Content="Flood"
+                             IsChecked="{Binding Flood, Mode=OneWay}" Margin="0,0,2,0" Click="Coolant_Click"
+                             loc:Localize.Key="CNC.Controls.Avalonia.coolantcontrol.lbl_flood" loc:Localize.Fallback="Flood"/>
+    <primitives:ToggleButton x:Name="BtnMist" Grid.Column="1" Classes="panel-toggle compact" Tag="Mist" Content="Mist"
+                             IsChecked="{Binding Mist, Mode=OneWay}" Margin="2,0,2,0" Click="Coolant_Click"
+                             loc:Localize.Key="CNC.Controls.Avalonia.coolantcontrol.lbl_mist" loc:Localize.Fallback="Mist"/>
+    <primitives:ToggleButton x:Name="BtnFan" Grid.Column="2" Classes="panel-toggle compact" Tag="Fan" Content="Fan"
                              IsChecked="{Binding Fan0, Mode=OneWay}"
-                             IsVisible="{Binding HasFans, Converter={StaticResource IsVisibleConverter}}"
-                             HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Margin="2,0,0,0"
-                             Padding="2,2" Click="Coolant_Click"
-                             loc:Localize.Key="CNC.Controls.WPF.coolantcontrol.lbl_fan" loc:Localize.Fallback="Fan"/>
+                             IsVisible="{Binding HasFans, Converter={StaticResource IsVisibleConverter}}" Margin="2,0,0,0" Click="Coolant_Click"
+                             loc:Localize.Key="CNC.Controls.Avalonia.coolantcontrol.lbl_fan" loc:Localize.Fallback="Fan"/>
   </Grid>
 </UserControl>

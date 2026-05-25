@@ -19,7 +19,9 @@ public partial class JobControl : UserControl, IKeyHandlerContext
 {
     static bool _keyboardMappingsOk;
 
-    readonly JobStreamingService _streaming = new();
+    readonly MachineCommandService _commands;
+    readonly JobStreamingService _streaming;
+    readonly BaseConfig? _appBase;
     GrblViewModel? _model;
     KeypressHandler? _keyboard;
 
@@ -27,8 +29,15 @@ public partial class JobControl : UserControl, IKeyHandlerContext
 
     object? IKeyHandlerContext.DataContext => DataContext;
 
-    public JobControl()
+    public JobControl() : this(null, null)
     {
+    }
+
+    public JobControl(BaseConfig? appBase, MachineCommandService? commands = null)
+    {
+        _appBase = appBase;
+        _commands = commands ?? new MachineCommandService();
+        _streaming = new JobStreamingService(appBase);
         InitializeComponent();
         ApplyLocalization();
         Focusable = true;
@@ -67,7 +76,6 @@ public partial class JobControl : UserControl, IKeyHandlerContext
         Localize.Apply(BtnHold);
         Localize.Apply(BtnStop);
         Localize.Apply(BtnRewind);
-        BtnStart.Content = "Cycle Start";
     }
 
     void OnDataContextChanged(object? sender, EventArgs e)
@@ -195,43 +203,45 @@ public partial class JobControl : UserControl, IKeyHandlerContext
 
     bool Home(CoreKey key)
     {
-        _model?.ExecuteCommand(GrblConstants.CMD_HOMING);
+        if (_model != null)
+            _commands.ExecuteCommand(_model, GrblConstants.CMD_HOMING);
         return true;
     }
 
     bool Unlock(CoreKey key)
     {
-        _model?.ExecuteCommand(GrblConstants.CMD_UNLOCK);
+        if (_model != null)
+            _commands.ExecuteCommand(_model, GrblConstants.CMD_UNLOCK);
         return true;
     }
 
     bool Reset(CoreKey key)
     {
-        Comms.com?.WriteByte(GrblConstants.CMD_RESET);
+        _commands.Reset();
         return true;
     }
 
     bool FeedRateUp(CoreKey key)
     {
-        Comms.com?.WriteByte(GrblConstants.CMD_FEED_OVR_COARSE_PLUS);
+        _commands.SendRealtime(GrblConstants.CMD_FEED_OVR_COARSE_PLUS);
         return true;
     }
 
     bool FeedRateDown(CoreKey key)
     {
-        Comms.com?.WriteByte(GrblConstants.CMD_FEED_OVR_COARSE_MINUS);
+        _commands.SendRealtime(GrblConstants.CMD_FEED_OVR_COARSE_MINUS);
         return true;
     }
 
     bool FeedRateUpFine(CoreKey key)
     {
-        Comms.com?.WriteByte(GrblConstants.CMD_FEED_OVR_FINE_PLUS);
+        _commands.SendRealtime(GrblConstants.CMD_FEED_OVR_FINE_PLUS);
         return true;
     }
 
     bool FeedRateDownFine(CoreKey key)
     {
-        Comms.com?.WriteByte(GrblConstants.CMD_FEED_OVR_FINE_MINUS);
+        _commands.SendRealtime(GrblConstants.CMD_FEED_OVR_FINE_MINUS);
         return true;
     }
 
@@ -241,7 +251,7 @@ public partial class JobControl : UserControl, IKeyHandlerContext
             return false;
 
         var id = (int)key - 89;
-        var macros = ControlsPlatformContext.AppConfig?.Base.Macros;
+        var macros = _appBase?.Macros;
         var macro = macros?.FirstOrDefault(o => o.Id == id);
         if (macro == null)
             return false;
@@ -251,7 +261,7 @@ public partial class JobControl : UserControl, IKeyHandlerContext
             return false;
 
         if (!Grbl.SendRealtimeCommand(macro.Code))
-            _model.ExecuteCommand(macro.Code);
+            _commands.ExecuteCommand(_model, macro.Code);
         return true;
     }
 }

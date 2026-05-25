@@ -50,6 +50,6 @@
             HorizontalAlignment="Right" VerticalAlignment="Stretch"
             HorizontalContentAlignment="Center" VerticalContentAlignment="Center"
             Click="OnSendClick"
-            loc:Localize.Key="CNC.Controls.WPF.mdicontrol.btn_send" loc:Localize.Fallback="Send"/>
+            loc:Localize.Key="CNC.Controls.Avalonia.mdicontrol.btn_send" loc:Localize.Fallback="Send"/>
   </Grid>
 </UserControl>

@@ -28,24 +28,24 @@
             UnloadingRow="OnUnloadingRow">
     <DataGrid.Columns>
       <DataGridTextColumn Header="Block" Binding="{Binding Row}" Width="48"
-                          loc:Localize.Key="CNC.Controls.WPF.gcodelistcontrol.hdr_block" loc:Localize.Fallback="Block"/>
+                          loc:Localize.Key="CNC.Controls.Avalonia.gcodelistcontrol.hdr_block" loc:Localize.Fallback="Block"/>
       <DataGridTextColumn Header="Sts" Binding="{Binding Sent}" Width="48"/>
       <DataGridTextColumn Header="Data" Binding="{Binding DisplayData}" Width="*"
-                          loc:Localize.Key="CNC.Controls.WPF.gcodelistcontrol.hdr_data" loc:Localize.Fallback="Data"/>
+                          loc:Localize.Key="CNC.Controls.Avalonia.gcodelistcontrol.hdr_data" loc:Localize.Fallback="Data"/>
     </DataGrid.Columns>
     <DataGrid.ContextMenu>
       <ContextMenu>
         <MenuItem x:Name="MnuSendToController" Header="Send to controller" IsEnabled="{Binding MultipleSelected}"
-                  loc:Localize.Key="CNC.Controls.WPF.gcodelistcontrol.mnu_sendToController" loc:Localize.Fallback="Send to controller"
+                  loc:Localize.Key="CNC.Controls.Avalonia.gcodelistcontrol.mnu_sendToController" loc:Localize.Fallback="Send to controller"
                   Click="OnSendControllerClick"/>
         <MenuItem x:Name="MnuStartFromHere" Header="Start from here" IsEnabled="{Binding SingleSelected}"
-                  loc:Localize.Key="CNC.Controls.WPF.gcodelistcontrol.mnu_startFromHere" loc:Localize.Fallback="Start from here"
+                  loc:Localize.Key="CNC.Controls.Avalonia.gcodelistcontrol.mnu_startFromHere" loc:Localize.Fallback="Start from here"
                   Click="OnStartHereClick"/>
         <MenuItem x:Name="MnuCopyToMdi" Header="Copy to MDI" IsEnabled="{Binding SingleSelected}"
-                  loc:Localize.Key="CNC.Controls.WPF.gcodelistcontrol.mnu_copyToMDI" loc:Localize.Fallback="Copy to MDI"
+                  loc:Localize.Key="CNC.Controls.Avalonia.gcodelistcontrol.mnu_copyToMDI" loc:Localize.Fallback="Copy to MDI"
                   Click="OnCopyMdiClick"/>
         <MenuItem x:Name="MnuToggleBreak" Header="Toggle Break" IsEnabled="{Binding SingleSelected}"
-                  loc:Localize.Key="CNC.Controls.WPF.gcodelistcontrol.mnu_ToggleBreak" loc:Localize.Fallback="Toggle Break"
+                  loc:Localize.Key="CNC.Controls.Avalonia.gcodelistcontrol.mnu_ToggleBreak" loc:Localize.Fallback="Toggle Break"
                   Click="OnToggleBreakClick"/>
       </ContextMenu>
     </DataGrid.ContextMenu>

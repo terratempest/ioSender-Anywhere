@@ -11,7 +11,7 @@ public enum Key
     PageDown = 20,
     Home = 36,
     End = 35,
-    // Letter / numpad keys (WPF virtual-key codes for handler compatibility)
+    // Letter / numpad keys use the legacy values expected by the handler.
     D0 = 34,
     A = 44,
     B = 45,

@@ -2,7 +2,6 @@ using System.Collections.ObjectModel;
 using System.Diagnostics;
 using CNC.Controls.Avalonia.Services;
 using CNC.Core;
-using CNC.GCodeViewer.Avalonia;
 using CNC.Platform.Abstractions;
 using ioSender.Services;
 
@@ -18,14 +17,17 @@ public sealed class MainWindowViewModel
 
     public static GrblViewModel Singleton => Current.Grbl;
 
+    public MainWindowViewModel(AppSession session)
+        : this(session.Platform, session.Connection)
+    {
+    }
+
     public MainWindowViewModel(PlatformServices platform, ConnectionService? connectionService = null)
     {
         Platform = platform;
         _connectionService = connectionService;
         Grbl = new GrblViewModel { PathService = platform.PathService };
         CNC.Core.Grbl.GrblViewModel = Grbl;
-        GCodeFileService.Instance.Model = Grbl;
-        GCodeViewerContext.Grbl = Grbl;
         _current = this;
     }
 

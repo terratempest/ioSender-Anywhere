@@ -25,8 +25,6 @@ public partial class App : Application
         Comms.UiDispatcher = platform.UiDispatcher;
         UiThread.Capture();
         AvaloniaGrblUi.Configure();
-        ControlsPlatformContext.AppConfig = appConfig;
-
         if (ApplicationLifetime is IClassicDesktopStyleApplicationLifetime desktop)
             desktop.MainWindow = new MainWindow(platform, appConfig);
 

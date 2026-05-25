@@ -7,7 +7,7 @@ using CNC.GCode;
 
 namespace CNC.Controls.Avalonia.Services;
 
-/// <summary>File streaming state machine (ported from legacy WPF JobControl).</summary>
+/// <summary>File streaming state machine for the Avalonia job controls.</summary>
 public sealed class JobStreamingService
 {
     private enum StreamingHandler
@@ -43,6 +43,7 @@ public sealed class JobStreamingService
     private volatile StreamingState _streamingState = StreamingState.NoFile;
     private GrblState _grblState;
     private GrblViewModel? _model;
+    private readonly BaseConfig? _appBase;
     private JobData _job;
     private int _missed;
 
@@ -51,8 +52,9 @@ public sealed class JobStreamingService
 
     public event Action<JobButtonState>? ButtonStateChanged;
 
-    public JobStreamingService()
+    public JobStreamingService(BaseConfig? appBase = null)
     {
+        _appBase = appBase;
         _grblState.State = GrblStates.Unknown;
         _grblState.Substate = 0;
         _grblState.MPG = false;
@@ -80,7 +82,7 @@ public sealed class JobStreamingService
 
     private static GCodeFileService GCode => GCodeFileService.Instance;
 
-    private BaseConfig? AppBase => ControlsPlatformContext.AppConfig?.Base;
+    private BaseConfig? AppBase => _appBase;
 
     public void Attach(GrblViewModel model)
     {

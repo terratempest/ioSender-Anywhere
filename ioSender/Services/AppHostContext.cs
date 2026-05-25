@@ -8,6 +8,8 @@ public static class AppHostContext
 
     public static AppConfigService AppConfig { get; private set; } = null!;
 
+    public static AppSession Session { get; private set; } = null!;
+
     public static string[] StartupArgs { get; private set; } = [];
 
     public static void Initialize(PlatformServices platform, AppConfigService appConfig, string[]? startupArgs = null)
@@ -15,5 +17,11 @@ public static class AppHostContext
         Platform = platform;
         AppConfig = appConfig;
         StartupArgs = startupArgs ?? [];
+    }
+
+    public static AppSession EnsureSession()
+    {
+        Session ??= new AppSession(Platform, AppConfig);
+        return Session;
     }
 }

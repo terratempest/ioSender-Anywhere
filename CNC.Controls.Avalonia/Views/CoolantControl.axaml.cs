@@ -2,6 +2,7 @@ using System.ComponentModel;
 using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Interactivity;
+using CNC.Controls.Avalonia.ViewModels;
 using CNC.Core;
 using CNC.Localization.Avalonia;
 
@@ -9,6 +10,7 @@ namespace CNC.Controls.Avalonia.Views;
 
 public partial class CoolantControl : UserControl
 {
+    readonly CoolantPanelViewModel _viewModel = new();
     GrblViewModel? _model;
     readonly Thickness _mistMarginWithFan = new(2, 0, 2, 0);
     readonly Thickness _mistMarginWithoutFan = new(2, 0, 0, 0);
@@ -27,6 +29,7 @@ public partial class CoolantControl : UserControl
         base.OnDataContextChanged(e);
 
         _model = DataContext as GrblViewModel;
+        _viewModel.Model = _model;
         if (_model != null)
             _model.PropertyChanged += OnModelPropertyChanged;
 
@@ -48,7 +51,7 @@ public partial class CoolantControl : UserControl
 
     void UpdateFanLayout()
     {
-        var hasFans = _model?.HasFans == true;
+        var hasFans = _viewModel.HasFans;
         LayoutRoot.ColumnDefinitions[2].Width = hasFans
             ? new GridLength(1, GridUnitType.Star)
             : new GridLength(0);
@@ -57,20 +60,9 @@ public partial class CoolantControl : UserControl
 
     void Coolant_Click(object? sender, RoutedEventArgs e)
     {
-        if (DataContext is not GrblViewModel model || sender is not Control { Tag: string tag })
+        if (sender is not Control { Tag: string tag })
             return;
 
-        switch (tag)
-        {
-            case "Flood":
-                model.ExecuteCommand(GrblCommand.Flood);
-                break;
-            case "Mist":
-                model.ExecuteCommand(GrblCommand.Mist);
-                break;
-            case "Fan":
-                model.ExecuteCommand(GrblCommand.Fan);
-                break;
-        }
+        _viewModel.Toggle(tag);
     }
 }

@@ -6,45 +6,14 @@
              mc:Ignorable="d" d:DesignWidth="230" d:DesignHeight="210"
              x:Class="CNC.Controls.Avalonia.Views.JobControl">
 
-  <UserControl.Styles>
-    <Style Selector="Button.job-transport">
-      <Setter Property="Background" Value="#9C9C9C"/>
-      <Setter Property="Foreground" Value="#111111"/>
-      <Setter Property="BorderBrush" Value="#9C9C9C"/>
-      <Setter Property="BorderThickness" Value="1"/>
-      <Setter Property="CornerRadius" Value="2"/>
-      <Setter Property="FontWeight" Value="SemiBold"/>
-      <Setter Property="HorizontalAlignment" Value="Stretch"/>
-      <Setter Property="VerticalAlignment" Value="Stretch"/>
-      <Setter Property="HorizontalContentAlignment" Value="Center"/>
-      <Setter Property="VerticalContentAlignment" Value="Center"/>
-      <Setter Property="Focusable" Value="False"/>
-      <Setter Property="Cursor" Value="Hand"/>
-    </Style>
-    <Style Selector="Button.job-transport:pointerover">
-      <Setter Property="Background" Value="#AAAAAA"/>
-      <Setter Property="BorderBrush" Value="#AAAAAA"/>
-    </Style>
-    <Style Selector="Button.job-transport:pressed">
-      <Setter Property="Background" Value="#868686"/>
-      <Setter Property="BorderBrush" Value="#868686"/>
-    </Style>
-    <Style Selector="Button.job-transport:disabled">
-      <Setter Property="Background" Value="#5B5B5B"/>
-      <Setter Property="Foreground" Value="#1A1A1A"/>
-      <Setter Property="BorderBrush" Value="#5B5B5B"/>
-      <Setter Property="Opacity" Value="1"/>
-    </Style>
-  </UserControl.Styles>
-
   <Grid RowDefinitions="*,6,*,6,*,6,*" Margin="4,4">
     <Button x:Name="BtnStart" Grid.Row="0" Classes="job-transport" Content="Cycle Start" Click="OnCycleStartClick"
-            loc:Localize.Key="CNC.Controls.WPF.jobcontrol.btn_cycleStart"/>
+            loc:Localize.Key="CNC.Controls.Avalonia.jobcontrol.btn_cycleStart"/>
     <Button x:Name="BtnHold" Grid.Row="2" Classes="job-transport" Content="Feed Hold" Click="OnFeedHoldClick"
-            loc:Localize.Key="CNC.Controls.WPF.jobcontrol.btn_feedHold"/>
+            loc:Localize.Key="CNC.Controls.Avalonia.jobcontrol.btn_feedHold"/>
     <Button x:Name="BtnStop" Grid.Row="4" Classes="job-transport" Content="Stop" Click="OnStopClick"
-            loc:Localize.Key="CNC.Controls.WPF.jobcontrol.btn_stop"/>
+            loc:Localize.Key="CNC.Controls.Avalonia.jobcontrol.btn_stop"/>
     <Button x:Name="BtnRewind" Grid.Row="6" Classes="job-transport" Content="Rewind" Click="OnRewindClick"
-            loc:Localize.Key="CNC.Controls.WPF.jobcontrol.btn_rewind"/>
+            loc:Localize.Key="CNC.Controls.Avalonia.jobcontrol.btn_rewind"/>
   </Grid>
 </UserControl>

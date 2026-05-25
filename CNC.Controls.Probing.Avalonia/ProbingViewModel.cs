@@ -1,6 +1,6 @@
 using System.Collections.ObjectModel;
 using System.Diagnostics;
-using CNC.Controls.Avalonia.Services;
+using CNC.App;
 using CNC.Core;
 using CNC.GCode;
 
@@ -15,11 +15,9 @@ public sealed partial class ProbingViewModel : ProbingPanelViewModel
         Measure
     }
 
-    static int PollInterval =>
-        ControlsPlatformContext.AppConfig?.Base.PollInterval ?? 250;
+    int PollInterval => Config?.PollInterval ?? 250;
 
-    static bool ValidateProbeConnected =>
-        ControlsPlatformContext.AppConfig?.Base.Probing.ValidateProbeConnected ?? false;
+    bool ValidateProbeConnected => Config?.Probing.ValidateProbeConnected ?? false;
 
     readonly CancellationToken _cancellationToken = new();
     readonly List<Position> _positions = [];
@@ -51,8 +49,9 @@ public sealed partial class ProbingViewModel : ProbingPanelViewModel
     bool _allowMeasure;
     double _workpieceXYEdgeOffset;
 
-    public ProbingViewModel()
+    public ProbingViewModel(BaseConfig? config = null)
     {
+        Config = config;
         Program = new ProbingProgram(this);
         HeightMap.PropertyChanged += (_, e) =>
         {
@@ -62,6 +61,8 @@ public sealed partial class ProbingViewModel : ProbingPanelViewModel
     }
 
     public ProbingProgram Program { get; }
+
+    public BaseConfig? Config { get; }
 
     public ProbeMacroViewModel Macro { get; } = new();
 

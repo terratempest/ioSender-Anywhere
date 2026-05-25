@@ -1,0 +1,266 @@
+CNC.Controls.Avalonia.g.en-US.resources:consolecontrol.baml,btn_clear:System.Windows.Controls.ContentControl.Content,Button,True,True,,Tiszt�t
+CNC.Controls.Avalonia.g.en-US.resources:consolecontrol.baml,lbl_filterRT:System.Windows.Controls.ContentControl.Content,CheckBox,True,True,,Szurje ki a val�s ideju v�laszokat
+CNC.Controls.Avalonia.g.en-US.resources:consolecontrol.baml,lbl_showAll:System.Windows.Controls.ContentControl.Content,CheckBox,True,True,,Az �sszes val�s ideju v�lasz megjelen�t�se
+CNC.Controls.Avalonia.g.en-US.resources:consolecontrol.baml,lbl_verbose:System.Windows.Controls.ContentControl.Content,CheckBox,True,True,,Bobesz�du
+CNC.Controls.Avalonia.g.en-US.resources:coolantcontrol.baml,lbl_fan:CNC.Controls.ToggleControl.Label,None,False,True,,Ventil�tor
+CNC.Controls.Avalonia.g.en-US.resources:coolantcontrol.baml,lbl_flood:CNC.Controls.ToggleControl.Label,None,False,True,,�rv�z
+CNC.Controls.Avalonia.g.en-US.resources:coolantcontrol.baml,lbl_mist:CNC.Controls.ToggleControl.Label,None,False,True,,K�d
+CNC.Controls.Avalonia.g.en-US.resources:drocontrol.baml,btn_zeroAll:System.Windows.Controls.ContentControl.Content,Button,True,True,,Mind null�ra
+CNC.Controls.Avalonia.g.en-US.resources:drocontrol.baml,grp_dro:System.Windows.Controls.HeaderedContentControl.Header,Label,True,True,,DRO
+CNC.Controls.Avalonia.g.en-US.resources:feedcontrol.baml,lbl_rapids:System.Windows.Controls.ContentControl.Content,Label,True,True,,Gyors mozg�s:
+CNC.Controls.Avalonia.g.en-US.resources:gcodelistcontrol.baml,hdr_block:System.Windows.Controls.DataGridColumn.Header,None,True,True,,Blokk
+CNC.Controls.Avalonia.g.en-US.resources:gcodelistcontrol.baml,hdr_data:System.Windows.Controls.DataGridColumn.Header,None,True,True,,Adat
+CNC.Controls.Avalonia.g.en-US.resources:gcodelistcontrol.baml,mnu_copyToMDI:System.Windows.Controls.HeaderedItemsControl.Header,Menu,True,True,,Copy to MDI
+CNC.Controls.Avalonia.g.en-US.resources:gcodelistcontrol.baml,mnu_sendToController:System.Windows.Controls.HeaderedItemsControl.Header,Menu,True,True,,Send to controller
+CNC.Controls.Avalonia.g.en-US.resources:gcodelistcontrol.baml,mnu_startFromHere:System.Windows.Controls.HeaderedItemsControl.Header,Menu,True,True,,Start from here
+CNC.Controls.Avalonia.g.en-US.resources:gcodelistcontrol.baml,mnu_ToggleBreak:System.Windows.Controls.HeaderedItemsControl.Header,Menu,True,True,,Toggle Break
+CNC.Controls.Avalonia.g.en-US.resources:jobcontrol.baml,btn_cycleStart:System.Windows.Controls.ContentControl.Content,Button,True,True,,Ciklusind�t�s
+CNC.Controls.Avalonia.g.en-US.resources:jobcontrol.baml,btn_cycleStart:System.Windows.FrameworkElement.ToolTip,ToolTip,True,True,,Alt+R
+CNC.Controls.Avalonia.g.en-US.resources:jobcontrol.baml,btn_feedHold:System.Windows.Controls.ContentControl.Content,Button,True,True,,Elotol�s tart�s
+CNC.Controls.Avalonia.g.en-US.resources:jobcontrol.baml,btn_feedHold:System.Windows.FrameworkElement.ToolTip,ToolTip,True,True,,Ur
+CNC.Controls.Avalonia.g.en-US.resources:jobcontrol.baml,btn_rewind:System.Windows.Controls.ContentControl.Content,Button,True,True,,Visszateker�s
+CNC.Controls.Avalonia.g.en-US.resources:jobcontrol.baml,btn_stop:System.Windows.Controls.ContentControl.Content,Button,True,True,,Stop
+CNC.Controls.Avalonia.g.en-US.resources:jobcontrol.baml,btn_stop:System.Windows.FrameworkElement.ToolTip,ToolTip,True,True,,Alt+S
+CNC.Controls.Avalonia.g.en-US.resources:jogbasecontrol.baml,grp_jogDistance:System.Windows.Controls.HeaderedContentControl.Header,Label,True,True,,T�vols�g
+CNC.Controls.Avalonia.g.en-US.resources:jogbasecontrol.baml,grp_jogFeedrate:System.Windows.Controls.HeaderedContentControl.Header,Label,True,True,,Elotol�s m�rt�k
+CNC.Controls.Avalonia.g.en-US.resources:jogbasecontrol.baml,lbl_jogContinuous:System.Windows.Controls.ContentControl.Content,RadioButton,True,True,,Continuous
+CNC.Controls.Avalonia.g.en-US.resources:mdicontrol.baml,btn_send:System.Windows.Controls.ContentControl.Content,Button,True,True,,K�ld
+CNC.Controls.Avalonia.g.en-US.resources:mdicontrol.baml,grp_mdi:System.Windows.Controls.HeaderedContentControl.Header,Label,True,True,,MDI
+CNC.Controls.Avalonia.g.en-US.resources:overridecontrol.baml,lbl_override:System.Windows.Controls.ContentControl.Content,Label,True,True,,Fel�lb�r�l�s
+CNC.Controls.Avalonia.g.en-US.resources:portdialog.baml,btn_cancel:System.Windows.Controls.ContentControl.Content,Button,True,True,,M�gsem
+CNC.Controls.Avalonia.g.en-US.resources:portdialog.baml,btn_ok:System.Windows.Controls.ContentControl.Content,Button,True,True,,Ok
+CNC.Controls.Avalonia.g.en-US.resources:portdialog.baml,dlg_title:System.Windows.Window.Title,Title,True,True,,Felad� kapcsolat
+CNC.Controls.Avalonia.g.en-US.resources:portdialog.baml,lbl_ipAddress:System.Windows.Controls.ContentControl.Content,Label,True,True,,IP-c�m:
+CNC.Controls.Avalonia.g.en-US.resources:portdialog.baml,lbl_netPort:System.Windows.Controls.ContentControl.Content,Label,True,True,,Port:
+CNC.Controls.Avalonia.g.en-US.resources:portdialog.baml,lbl_serialBaud:System.Windows.Controls.ContentControl.Content,Label,True,True,,�tviteli sebess�g:
+CNC.Controls.Avalonia.g.en-US.resources:portdialog.baml,lbl_serialPort:System.Windows.Controls.ContentControl.Content,Label,True,True,,Port:
+CNC.Controls.Avalonia.g.en-US.resources:portdialog.baml,lbl_websocket:System.Windows.Controls.ContentControl.Content,CheckBox,True,True,,WebSocket
+CNC.Controls.Avalonia.g.en-US.resources:portdialog.baml,tab_network:System.Windows.Controls.HeaderedContentControl.Header,Label,True,True,,H�l�zat
+CNC.Controls.Avalonia.g.en-US.resources:portdialog.baml,tab_serial:System.Windows.Controls.HeaderedContentControl.Header,Label,True,True,,Sorozat
+CNC.Controls.Avalonia.g.en-US.resources:spindlecontrol.baml,lbl_ccw:System.Windows.Controls.ContentControl.Content,RadioButton,True,True,,CCW
+CNC.Controls.Avalonia.g.en-US.resources:spindlecontrol.baml,lbl_cw:System.Windows.Controls.ContentControl.Content,RadioButton,True,True,,CW
+CNC.Controls.Avalonia.g.en-US.resources:spindlecontrol.baml,lbl_off:System.Windows.Controls.ContentControl.Content,RadioButton,True,True,,Ki
+CNC.Controls.Avalonia.g.en-US.resources:spindlecontrol.baml,lbl_rpm:System.Windows.Controls.ContentControl.Content,Label,True,True,,RPM
+CNC.Controls.Avalonia.g.en-US.resources:statuscontrol.baml,btn_reset:System.Windows.Controls.ContentControl.Content,Button,True,True,,Vissza�ll�t�s
+CNC.Controls.Avalonia.g.en-US.resources:statuscontrol.baml,btn_reset:System.Windows.FrameworkElement.ToolTip,ToolTip,True,True,,Ctrl+Shift+R
+CNC.Controls.Avalonia.g.en-US.resources:statuscontrol.baml,lbl_state:System.Windows.Controls.ContentControl.Content,Label,True,True,,State:
+CNC.Controls.Avalonia.g.en-US.resources:workparameterscontrol.baml,lbl_offset:System.Windows.Controls.ContentControl.Content,Label,True,True,,Eltol�s:
+CNC.Controls.Avalonia.g.en-US.resources:workparameterscontrol.baml,lbl_tool:System.Windows.Controls.ContentControl.Content,Label,True,True,,Eszk�z:
+CNC.Controls.Avalonia.g.hu-HU.resources:about.baml,btn_ok:System.Windows.Controls.ContentControl.Content,Button,True,True,,Ok
+CNC.Controls.Avalonia.g.hu-HU.resources:about.baml,btn_toClipboard:System.Windows.Controls.ContentControl.Content,Button,True,True,,A vágólapra
+CNC.Controls.Avalonia.g.hu-HU.resources:about.baml,btn_toClipboard:System.Windows.FrameworkElement.ToolTip,ToolTip,True,True,,A grbl verzióinformációit és beállításait másolja a vágólapra
+CNC.Controls.Avalonia.g.hu-HU.resources:about.baml,dlg_about:System.Windows.Window.Title,Title,True,True,,Az IOSender
+CNC.Controls.Avalonia.g.hu-HU.resources:consolecontrol.baml,btn_clear:System.Windows.Controls.ContentControl.Content,Button,True,True,,Tisztít
+CNC.Controls.Avalonia.g.hu-HU.resources:consolecontrol.baml,label_filterRT:System.Windows.Controls.ContentControl.Content,CheckBox,True,True,,Szűrje ki a valós idejű válaszokat
+CNC.Controls.Avalonia.g.hu-HU.resources:consolecontrol.baml,label_showAll:System.Windows.Controls.ContentControl.Content,CheckBox,True,True,,Az összes valós idejű válasz megjelenítése
+CNC.Controls.Avalonia.g.hu-HU.resources:consolecontrol.baml,lbl_filterRT:System.Windows.Controls.ContentControl.Content,CheckBox,True,True,,Szűrje ki a valós idejű válaszokat
+CNC.Controls.Avalonia.g.hu-HU.resources:consolecontrol.baml,lbl_showAll:System.Windows.Controls.ContentControl.Content,CheckBox,True,True,,Az összes valós idejű válasz megjelenítése
+CNC.Controls.Avalonia.g.hu-HU.resources:consolecontrol.baml,lbl_verbose:System.Windows.Controls.ContentControl.Content,CheckBox,True,True,,Bőbeszédű
+CNC.Controls.Avalonia.g.hu-HU.resources:consolewindow.baml,dlg_senderConsole:System.Windows.Window.Title,Title,True,True,,Feladó konzol
+CNC.Controls.Avalonia.g.hu-HU.resources:coolantcontrol.baml,grp_coolant:System.Windows.Controls.HeaderedContentControl.Header,Label,True,True,,Hűtőfolyadék
+CNC.Controls.Avalonia.g.hu-HU.resources:coolantcontrol.baml,lbl_fan:CNC.Controls.ToggleControl.Label,None,False,True,,Ventilátor
+CNC.Controls.Avalonia.g.hu-HU.resources:coolantcontrol.baml,lbl_flood:CNC.Controls.ToggleControl.Label,None,False,True,,Árvíz
+CNC.Controls.Avalonia.g.hu-HU.resources:coolantcontrol.baml,lbl_mist:CNC.Controls.ToggleControl.Label,None,False,True,,Köd
+CNC.Controls.Avalonia.g.hu-HU.resources:coordvaluesetcontrol.baml,btn_set:System.Windows.Controls.ContentControl.Content,Button,True,True,,Készlet
+CNC.Controls.Avalonia.g.hu-HU.resources:drocontrol.baml,btn_zeroAll:System.Windows.Controls.ContentControl.Content,Button,True,True,,Mind nullára
+CNC.Controls.Avalonia.g.hu-HU.resources:drocontrol.baml,grp_dro:System.Windows.Controls.HeaderedContentControl.Header,Label,True,True,,DRO
+CNC.Controls.Avalonia.g.hu-HU.resources:errorsandalarms.baml,tab_alarms:System.Windows.Controls.HeaderedContentControl.Header,Label,True,True,,Riasztási kódok
+CNC.Controls.Avalonia.g.hu-HU.resources:errorsandalarms.baml,tab_errors:System.Windows.Controls.HeaderedContentControl.Header,Label,True,True,,Hibakódok
+CNC.Controls.Avalonia.g.hu-HU.resources:errorsandalarms.baml,wnd_errorsAndAlarms:System.Windows.Window.Title,Title,True,True,,Vezérlő hiba és riasztási kódok
+CNC.Controls.Avalonia.g.hu-HU.resources:feedcontrol.baml,grp_feedrate:System.Windows.Controls.HeaderedContentControl.Header,Label,True,True,,Előtolás mérték
+CNC.Controls.Avalonia.g.hu-HU.resources:feedcontrol.baml,lbl_rapids:System.Windows.Controls.ContentControl.Content,Label,True,True,,Gyors mozgás:
+CNC.Controls.Avalonia.g.hu-HU.resources:gcodelistcontrol.baml,hdr_block:System.Windows.Controls.DataGridColumn.Header,None,True,True,,Blokk
+CNC.Controls.Avalonia.g.hu-HU.resources:gcodelistcontrol.baml,hdr_data:System.Windows.Controls.DataGridColumn.Header,None,True,True,,Adat
+CNC.Controls.Avalonia.g.hu-HU.resources:gcodelistcontrol.baml,mnu_copyToMDI:System.Windows.Controls.HeaderedItemsControl.Header,Menu,True,True,,Copy to MDI
+CNC.Controls.Avalonia.g.hu-HU.resources:gcodelistcontrol.baml,mnu_sendToController:System.Windows.Controls.HeaderedItemsControl.Header,Menu,True,True,,Send to controller
+CNC.Controls.Avalonia.g.hu-HU.resources:gcodelistcontrol.baml,mnu_startFromHere:System.Windows.Controls.HeaderedItemsControl.Header,Menu,True,True,,Start from here
+CNC.Controls.Avalonia.g.hu-HU.resources:gcodelistcontrol.baml,mnu_ToggleBreak:System.Windows.Controls.HeaderedItemsControl.Header,Menu,True,True,,Toggle Break
+CNC.Controls.Avalonia.g.hu-HU.resources:gcoderotatedialog.baml,btn_cancel:System.Windows.Controls.ContentControl.Content,Button,True,True,,Mégsem
+CNC.Controls.Avalonia.g.hu-HU.resources:gcoderotatedialog.baml,btn_ok:System.Windows.Controls.ContentControl.Content,Button,True,True,,Ok
+CNC.Controls.Avalonia.g.hu-HU.resources:gcoderotatedialog.baml,fld_angle:CNC.Controls.NumericField.Label,None,True,True,,Szög:
+CNC.Controls.Avalonia.g.hu-HU.resources:gcoderotatedialog.baml,fld_angle:CNC.Controls.NumericField.Unit,None,True,True,,fokon
+CNC.Controls.Avalonia.g.hu-HU.resources:gcoderotatedialog.baml,grp_rotationCenter:System.Windows.Controls.HeaderedContentControl.Header,Label,True,True,,Forgatási központ 
+CNC.Controls.Avalonia.g.hu-HU.resources:gcoderotatedialog.baml,grp_rotationCenter:System.Windows.FrameworkElement.ToolTip,ToolTip,True,True,,"Kattintson ide a munkához viszonyított forgatási középpont kiválasztásához, ha nincs kiválasztva X0,Y0 használatban."
+CNC.Controls.Avalonia.g.hu-HU.resources:gcodewrapdialog.baml,btn_cancel:System.Windows.Controls.ContentControl.Content,Button,True,True,,Mégsem
+CNC.Controls.Avalonia.g.hu-HU.resources:gcodewrapdialog.baml,btn_ok:System.Windows.Controls.ContentControl.Content,Button,True,True,,Ok
+CNC.Controls.Avalonia.g.hu-HU.resources:gcodewrapdialog.baml,fld_diameter:CNC.Controls.NumericField.Label,None,True,True,,Átmérő:
+CNC.Controls.Avalonia.g.hu-HU.resources:gcodewrapdialog.baml,lbl_wrapSource:System.Windows.Controls.ContentControl.Content,Label,True,True,,Betakar:
+CNC.Controls.Avalonia.g.hu-HU.resources:gcodewrapdialog.baml,lbl_wrapTarget:System.Windows.Controls.ContentControl.Content,Label,True,True,,nak:
+CNC.Controls.Avalonia.g.hu-HU.resources:gotobasecontrol.baml,btn_goto:System.Windows.Controls.ContentControl.Content,Button,True,True,,Go
+CNC.Controls.Avalonia.g.hu-HU.resources:gotobasecontrol.baml,btn_gotoG28:System.Windows.Controls.ContentControl.Content,Button,True,True,,Menj pozícióba 1 (G28)
+CNC.Controls.Avalonia.g.hu-HU.resources:gotobasecontrol.baml,btn_gotoG30:System.Windows.Controls.ContentControl.Content,Button,True,True,,Menj pozícióba 2 (G30)
+CNC.Controls.Avalonia.g.hu-HU.resources:gotocontrol.baml,grp_goto:System.Windows.Controls.HeaderedContentControl.Header,Label,True,True,,Menj
+CNC.Controls.Avalonia.g.hu-HU.resources:gotoflyoutcontrol.baml,str_gotoFlyout:System.String.$Content,None,True,True,,_Menj
+CNC.Controls.Avalonia.g.hu-HU.resources:grblalarmlist.baml,hdr_alarmCode:System.Windows.Controls.DataGridColumn.Header,None,True,True,,Kód
+CNC.Controls.Avalonia.g.hu-HU.resources:grblalarmlist.baml,hdr_alarmMessage:System.Windows.Controls.DataGridColumn.Header,None,True,True,,Üzenet
+CNC.Controls.Avalonia.g.hu-HU.resources:grblerrorlist.baml,hdr_errorCode:System.Windows.Controls.DataGridColumn.Header,None,True,True,,Kód
+CNC.Controls.Avalonia.g.hu-HU.resources:grblerrorlist.baml,hdr_errorMessage:System.Windows.Controls.DataGridColumn.Header,None,True,True,,Üzenet
+CNC.Controls.Avalonia.g.hu-HU.resources:jobcontrol.baml,btn_cycleStart:System.Windows.Controls.ContentControl.Content,Button,True,True,,Ciklusindítás
+CNC.Controls.Avalonia.g.hu-HU.resources:jobcontrol.baml,btn_cycleStart:System.Windows.FrameworkElement.ToolTip,ToolTip,True,True,,Alt+R
+CNC.Controls.Avalonia.g.hu-HU.resources:jobcontrol.baml,btn_feedHold:System.Windows.Controls.ContentControl.Content,Button,True,True,,Előtolás tartás
+CNC.Controls.Avalonia.g.hu-HU.resources:jobcontrol.baml,btn_feedHold:System.Windows.FrameworkElement.ToolTip,ToolTip,True,True,,Űr
+CNC.Controls.Avalonia.g.hu-HU.resources:jobcontrol.baml,btn_rewind:System.Windows.Controls.ContentControl.Content,Button,True,True,,Visszatekerés
+CNC.Controls.Avalonia.g.hu-HU.resources:jobcontrol.baml,btn_stop:System.Windows.Controls.ContentControl.Content,Button,True,True,,Stop
+CNC.Controls.Avalonia.g.hu-HU.resources:jobcontrol.baml,btn_stop:System.Windows.FrameworkElement.ToolTip,ToolTip,True,True,,Alt+S
+CNC.Controls.Avalonia.g.hu-HU.resources:jobcontrol.baml,str_checking:System.String.$Content,None,True,True,,Ellenőrzés...
+CNC.Controls.Avalonia.g.hu-HU.resources:jobcontrol.baml,str_g28g30:System.String.$Content,None,True,True,,"A munka G28/G30 mozgásokat végez, és a gép nincs otthon."
+CNC.Controls.Avalonia.g.hu-HU.resources:jobcontrol.baml,str_pause:System.String.$Content,None,True,True,,Szünet
+CNC.Controls.Avalonia.g.hu-HU.resources:jobcontrol.baml,str_stop:System.String.$Content,None,True,True,,Stop
+CNC.Controls.Avalonia.g.hu-HU.resources:jobcontrol.baml,str_toolchanges:System.String.$Content,None,True,True,,"A munkának {0} szerszámcseréje van az M6 használatával, csak néhány Grbl port támogatja ezt."
+CNC.Controls.Avalonia.g.hu-HU.resources:jobcontrol.baml,str_toolchangeTLO:System.String.$Content,None,True,True,,"A munkának {0} szerszámcseréje van, a szerszámhossz-referenciát az indítás előtt meg kell határozni."
+CNC.Controls.Avalonia.g.hu-HU.resources:jobcontrol.baml,str_transferComplete:System.String.$Content,None,True,True,,Az átvitel kész
+CNC.Controls.Avalonia.g.hu-HU.resources:jogbasecontrol.baml,grp_jogDistance:System.Windows.Controls.HeaderedContentControl.Header,Label,True,True,,Távolság
+CNC.Controls.Avalonia.g.hu-HU.resources:jogbasecontrol.baml,grp_jogFeedrate:System.Windows.Controls.HeaderedContentControl.Header,Label,True,True,,Előtolás mérték
+CNC.Controls.Avalonia.g.hu-HU.resources:jogbasecontrol.baml,lbl_jogContinuous:System.Windows.Controls.ContentControl.Content,RadioButton,True,True,,Continuous
+CNC.Controls.Avalonia.g.hu-HU.resources:jogcontrol.baml,grp_uijog:System.Windows.Controls.HeaderedContentControl.Header,Label,True,True,,Kocogás
+CNC.Controls.Avalonia.g.hu-HU.resources:jogflyoutcontrol.baml,str_jogFlyout:System.String.$Content,None,True,True,,_Kocogó
+CNC.Controls.Avalonia.g.hu-HU.resources:libstrings.baml,str_appconfCreate:System.String.$Content,None,True,True,,"A konfigurációs fájl nem található vagy érvénytelen, hozzon létre újat?"
+CNC.Controls.Avalonia.g.hu-HU.resources:libstrings.baml,str_appconfCreateFail:System.String.$Content,None,True,True,,Nem sikerült menteni a konfigurációs fájlt.
+CNC.Controls.Avalonia.g.hu-HU.resources:libstrings.baml,str_appconfNoConnect:System.String.$Content,None,True,True,,Nem lehet megnyitni a kapcsolatot ({0})
+CNC.Controls.Avalonia.g.hu-HU.resources:libstrings.baml,str_convBlockOfBlocks:System.String.$Content,None,True,True,,Blokk: {0}/{1}
+CNC.Controls.Avalonia.g.hu-HU.resources:libstrings.baml,str_convNumBlocks:System.String.$Content,None,True,True,,Blokkok: {1}
+CNC.Controls.Avalonia.g.hu-HU.resources:libstrings.baml,str_grblStateAlarm:System.String.$Content,None,True,True,,RIASZTÁS
+CNC.Controls.Avalonia.g.hu-HU.resources:libstrings.baml,str_grblStateCheck:System.String.$Content,None,True,True,,ELLENŐRZÉS
+CNC.Controls.Avalonia.g.hu-HU.resources:libstrings.baml,str_grblStateDoor:System.String.$Content,None,True,True,,AJTÓ
+CNC.Controls.Avalonia.g.hu-HU.resources:libstrings.baml,str_grblStateHold:System.String.$Content,None,True,True,,TART
+CNC.Controls.Avalonia.g.hu-HU.resources:libstrings.baml,str_grblStateHome:System.String.$Content,None,True,True,,HAZA
+CNC.Controls.Avalonia.g.hu-HU.resources:libstrings.baml,str_grblStateIdle:System.String.$Content,None,True,True,,TÉTLEN
+CNC.Controls.Avalonia.g.hu-HU.resources:libstrings.baml,str_grblStateJog:System.String.$Content,None,True,True,,KOCOGÓ
+CNC.Controls.Avalonia.g.hu-HU.resources:libstrings.baml,str_grblStateRun:System.String.$Content,None,True,True,,FUT
+CNC.Controls.Avalonia.g.hu-HU.resources:libstrings.baml,str_grblStateSleep:System.String.$Content,None,True,True,,ALVÁS
+CNC.Controls.Avalonia.g.hu-HU.resources:libstrings.baml,str_grblStateTool:System.String.$Content,None,True,True,,ESZKÖZ
+CNC.Controls.Avalonia.g.hu-HU.resources:libstrings.baml,str_grblStateUnknown:System.String.$Content,None,True,True,,ISMERETLEN
+CNC.Controls.Avalonia.g.hu-HU.resources:libstrings.baml,str_keymappingsSaved:System.String.$Content,None,True,True,,A billentyűleképezések elmentve ide {0}
+CNC.Controls.Avalonia.g.hu-HU.resources:libstrings.baml,str_msgBadResponseExit:System.String.$Content,None,True,True,,"Váratlan válasz érkezett a vezérlőtől: {0}, kilépés."
+CNC.Controls.Avalonia.g.hu-HU.resources:libstrings.baml,str_msgDoorExit:System.String.$Content,None,True,True,,"Az ajtó még nyitva van, kilépjen?"
+CNC.Controls.Avalonia.g.hu-HU.resources:libstrings.baml,str_msgDoorOpen:System.String.$Content,None,True,True,,"Az ajtó nyitva van, zárja be az ajtót és folytassa?"
+CNC.Controls.Avalonia.g.hu-HU.resources:libstrings.baml,str_msgDoorPersist:System.String.$Content,None,True,True,,Az ajtó állapotát nem lehet törölni &lt;Reset&gt;
+CNC.Controls.Avalonia.g.hu-HU.resources:libstrings.baml,str_msgEStop:System.String.$Content,None,True,True,,E-Stop aktív! - tisztítsa meg a folytatás előtt...
+CNC.Controls.Avalonia.g.hu-HU.resources:libstrings.baml,str_msgEStopExit:System.String.$Content,None,True,True,,"E-Stop még aktív, lépjen ki?"
+CNC.Controls.Avalonia.g.hu-HU.resources:libstrings.baml,str_msgHome:System.String.$Content,None,True,True,,"Helyreállítási ciklus szükséges, &lt;Haza&gt; folytatáshoz"
+CNC.Controls.Avalonia.g.hu-HU.resources:libstrings.baml,str_msgNoComm:System.String.$Content,None,True,True,,"A vezérlő {0} állapotban van, és nem tud válaszolni, próbálja meg a lágy reset-et?"
+CNC.Controls.Avalonia.g.hu-HU.resources:libstrings.baml,str_msgNoCommAlarm:System.String.$Content,None,True,True,,"A vezérlő nem tud kommunikálni a(z) {0} riasztás miatt, lágy visszaállítást kísérel meg."
+CNC.Controls.Avalonia.g.hu-HU.resources:libstrings.baml,str_msgNoResponse:System.String.$Content,None,True,True,,A vezérlő nem válaszol!
+CNC.Controls.Avalonia.g.hu-HU.resources:libstrings.baml,str_msgNoResponseExit:System.String.$Content,None,True,True,,"Nem érkezett válasz a vezérlőtől, kilépés."
+CNC.Controls.Avalonia.g.hu-HU.resources:libstrings.baml,str_msgResetExit:System.String.$Content,None,True,True,,"A vezérlő lágy reset nem sikerült, kilépés."
+CNC.Controls.Avalonia.g.hu-HU.resources:libstrings.baml,str_msgResetFailed:System.String.$Content,None,True,True,,"A vezérlő lágy reset nem sikerült, kilépés."
+CNC.Controls.Avalonia.g.hu-HU.resources:libstrings.baml,str_msgWait:System.String.$Content,None,True,True,,Várakozás a vezérlőre ({0})...
+CNC.Controls.Avalonia.g.hu-HU.resources:libstrings.baml,str_rotateG17G18Arcs:System.String.$Content,None,True,True,,"A GCode XZ vagy YZ síkban íveket tartalmaz (G18/19), transzformáció nem alkalmazható. Használat &apos;Arcs to Lines&apos; ha tényleg szüksége van erre."
+CNC.Controls.Avalonia.g.hu-HU.resources:libstrings.baml,str_rotateRadiusArcs:System.String.$Content,None,True,True,,"A GCode sugármódú íveket tartalmaz, nem alkalmazható transzformáció. Használat &apos;Arcs to Lines&apos; ha tényleg szüksége van erre."
+CNC.Controls.Avalonia.g.hu-HU.resources:libstrings.baml,str_settingsReloadMismatch:System.String.$Content,None,True,True,,"Some settings were ignored, not supported by the controller."
+CNC.Controls.Avalonia.g.hu-HU.resources:libstrings.baml,str_settingsSaved:System.String.$Content,None,True,True,,Beállítások elmentve.
+CNC.Controls.Avalonia.g.hu-HU.resources:libstrings.baml,str_themeBlack:System.String.$Content,None,True,True,,Black
+CNC.Controls.Avalonia.g.hu-HU.resources:libstrings.baml,str_themeDark:System.String.$Content,None,True,True,,Dark
+CNC.Controls.Avalonia.g.hu-HU.resources:libstrings.baml,str_themeDefault:System.String.$Content,None,True,True,,Default
+CNC.Controls.Avalonia.g.hu-HU.resources:libstrings.baml,str_themeLight:System.String.$Content,None,True,True,,Light
+CNC.Controls.Avalonia.g.hu-HU.resources:libstrings.baml,str_themeWhite:System.String.$Content,None,True,True,,White
+CNC.Controls.Avalonia.g.hu-HU.resources:libstrings.baml,str_validateMax:System.String.$Content,None,True,True,,Érvénytelen bevitel: a megengedett maximális érték {0}.
+CNC.Controls.Avalonia.g.hu-HU.resources:libstrings.baml,str_validateMin:System.String.$Content,None,True,True,,Érvénytelen bevitel: a minimális megengedett érték {0}.
+CNC.Controls.Avalonia.g.hu-HU.resources:libstrings.baml,str_validateNotIP4:System.String.$Content,None,True,True,,Érvénytelen bevitel: nem IP4-cím..
+CNC.Controls.Avalonia.g.hu-HU.resources:libstrings.baml,str_validateRange:System.String.$Content,None,True,True,,Érvénytelen bevitel: a megengedett tartomány {0} - {1}.
+CNC.Controls.Avalonia.g.hu-HU.resources:libstrings.baml,str_verifySendController:System.String.$Content,None,True,True,,Are you sure you want to send the selected blocks to the controller?
+CNC.Controls.Avalonia.g.hu-HU.resources:libstrings.baml,str_verifyStartFrom:System.String.$Content,None,True,True,,Are you sure the controller is in the correct state to start from block {0}?
+CNC.Controls.Avalonia.g.hu-HU.resources:limitscontrol.baml,grp_programLimits:System.Windows.Controls.HeaderedContentControl.Header,Label,True,True,,Programkorlátok
+CNC.Controls.Avalonia.g.hu-HU.resources:machinepositionflyout.baml,lbl_machinePosition:System.Windows.Controls.TextBlock.Text,Text,True,True,,Gép helyzete
+CNC.Controls.Avalonia.g.hu-HU.resources:machinepositionflyout.baml,str_mposFlyout:System.String.$Content,None,True,True,,M_Pos
+CNC.Controls.Avalonia.g.hu-HU.resources:macroeditor.baml,btn_add:System.Windows.Controls.ContentControl.Content,Button,True,True,,Hozzáadás
+CNC.Controls.Avalonia.g.hu-HU.resources:macroeditor.baml,btn_cancel:System.Windows.Controls.ContentControl.Content,Button,True,True,,Mégsem
+CNC.Controls.Avalonia.g.hu-HU.resources:macroeditor.baml,btn_ok:System.Windows.Controls.ContentControl.Content,Button,True,True,,Ok
+CNC.Controls.Avalonia.g.hu-HU.resources:macroeditor.baml,chk_confirm:System.Windows.Controls.ContentControl.Content,CheckBox,True,True,,Végrehajtás előtt erősítse meg
+CNC.Controls.Avalonia.g.hu-HU.resources:macroeditor.baml,dlg_macroEditor:System.Windows.Window.Title,Title,True,True,,Makrószerkesztő
+CNC.Controls.Avalonia.g.hu-HU.resources:macroexecutecontrol.baml,btn_edit:System.Windows.Controls.ContentControl.Content,Button,True,True,,Szerkesztés
+CNC.Controls.Avalonia.g.hu-HU.resources:macroexecutecontrol.baml,lbl_noMacrosDefined:System.Windows.Controls.ContentControl.Content,Label,True,True,,"Nincsenek makrók meghatározva, a Szerkesztés gombbal adhatja hozzá."
+CNC.Controls.Avalonia.g.hu-HU.resources:macroexecutecontrol.baml,lbl_noMacrosDefined:System.Windows.Controls.TextBlock.Text,Text,True,True,,"Nincsenek makrók meghatározva, a Szerkesztés gombbal adhatja hozzá."
+CNC.Controls.Avalonia.g.hu-HU.resources:macroexecutecontrol.baml,str_macrosFlyout:System.String.$Content,None,True,True,,_Makrók
+CNC.Controls.Avalonia.g.hu-HU.resources:macroexecutecontrol.baml,str_runMacro:System.String.$Content,None,True,True,,Fut {0} makró?
+CNC.Controls.Avalonia.g.hu-HU.resources:macrotoolbarcontrol.baml,str_runMacro:System.String.$Content,None,True,True,,Fut {0} makró?
+CNC.Controls.Avalonia.g.hu-HU.resources:mdicontrol.baml,btn_send:System.Windows.Controls.ContentControl.Content,Button,True,True,,Küld
+CNC.Controls.Avalonia.g.hu-HU.resources:mdicontrol.baml,grp_mdi:System.Windows.Controls.HeaderedContentControl.Header,Label,True,True,,MDI
+CNC.Controls.Avalonia.g.hu-HU.resources:mpgpending.baml,lbl_mpgModeActive:System.Windows.Controls.ContentControl.Content,Label,True,True,,"MPG mód aktív, várja a letiltásra..."
+CNC.Controls.Avalonia.g.hu-HU.resources:offsetview.baml,btn_clear:System.Windows.Controls.ContentControl.Content,Button,True,True,,Mindent tisztít
+CNC.Controls.Avalonia.g.hu-HU.resources:offsetview.baml,btn_currPos:System.Windows.Controls.ContentControl.Content,Button,True,True,,Szerezze meg az aktuális pozíciót
+CNC.Controls.Avalonia.g.hu-HU.resources:offsetview.baml,btn_setAll:System.Windows.Controls.ContentControl.Content,Button,True,True,,Állítsa be az összeset
+CNC.Controls.Avalonia.g.hu-HU.resources:offsetview.baml,hdr_offset:System.Windows.Controls.DataGridColumn.Header,None,True,True,,Eltolás
+CNC.Controls.Avalonia.g.hu-HU.resources:offsetview.baml,lbl_axis:System.String.$Content,None,True,True,,{0} tengely:
+CNC.Controls.Avalonia.g.hu-HU.resources:offsetview.baml,lbl_offset:System.Windows.Controls.ContentControl.Content,Label,True,True,,Eltolás:
+CNC.Controls.Avalonia.g.hu-HU.resources:outlinebasecontrol.baml,btn_go:System.Windows.Controls.ContentControl.Content,Button,True,True,,Indulás
+CNC.Controls.Avalonia.g.hu-HU.resources:outlinebasecontrol.baml,lbl_feedrate:CNC.Controls.NumericField.Label,None,True,True,,Előtolás mérték:
+CNC.Controls.Avalonia.g.hu-HU.resources:outlinebasecontrol.baml,txt_line1:System.Windows.Documents.Run.Text,Text,True,True,,Hajtsa végre a mozgásokat az X és Y program határainak felvázolásához.
+CNC.Controls.Avalonia.g.hu-HU.resources:outlinebasecontrol.baml,txt_line2:System.Windows.Documents.Run.Text,Text,True,True,,"Ügyeljen arra, hogy a szerszám hegye ne legyen akadályozva!"
+CNC.Controls.Avalonia.g.hu-HU.resources:outlinecontrol.baml,grp_outline:System.Windows.Controls.HeaderedContentControl.Header,Label,True,True,,Vázlat
+CNC.Controls.Avalonia.g.hu-HU.resources:outlineflyout.baml,btn_go:System.Windows.Controls.ContentControl.Content,Button,True,True,,Indulás
+CNC.Controls.Avalonia.g.hu-HU.resources:outlineflyout.baml,lbl_feedrate:CNC.Controls.NumericField.Label,None,True,True,,Előtolás mérték:
+CNC.Controls.Avalonia.g.hu-HU.resources:outlineflyout.baml,str_outlineFlyout:System.String.$Content,None,True,True,,_Vázlat
+CNC.Controls.Avalonia.g.hu-HU.resources:overridecontrol.baml,lbl_override:System.Windows.Controls.ContentControl.Content,Label,True,True,,Felülbírálás
+CNC.Controls.Avalonia.g.hu-HU.resources:portdialog.baml,btn_cancel:System.Windows.Controls.ContentControl.Content,Button,True,True,,Mégsem
+CNC.Controls.Avalonia.g.hu-HU.resources:portdialog.baml,btn_ok:System.Windows.Controls.ContentControl.Content,Button,True,True,,Ok
+CNC.Controls.Avalonia.g.hu-HU.resources:portdialog.baml,dlg_connection:System.Windows.Window.Title,Title,True,True,,Feladó kapcsolat
+CNC.Controls.Avalonia.g.hu-HU.resources:portdialog.baml,dlg_title:System.Windows.Window.Title,Title,True,True,,Feladó kapcsolat
+CNC.Controls.Avalonia.g.hu-HU.resources:portdialog.baml,lbl_ipAddress:System.Windows.Controls.ContentControl.Content,Label,True,True,,IP-cím:
+CNC.Controls.Avalonia.g.hu-HU.resources:portdialog.baml,lbl_netPort:System.Windows.Controls.ContentControl.Content,Label,True,True,,Port:
+CNC.Controls.Avalonia.g.hu-HU.resources:portdialog.baml,lbl_onConnect:System.Windows.Controls.ContentControl.Content,Label,True,True,,Csatlakozáskor:
+CNC.Controls.Avalonia.g.hu-HU.resources:portdialog.baml,lbl_serialBaud:System.Windows.Controls.ContentControl.Content,Label,True,True,,Átviteli sebesség:
+CNC.Controls.Avalonia.g.hu-HU.resources:portdialog.baml,lbl_serialPort:System.Windows.Controls.ContentControl.Content,Label,True,True,,Port:
+CNC.Controls.Avalonia.g.hu-HU.resources:portdialog.baml,lbl_websocket:System.Windows.Controls.ContentControl.Content,CheckBox,True,True,,WebSocket
+CNC.Controls.Avalonia.g.hu-HU.resources:portdialog.baml,tab_network:System.Windows.Controls.HeaderedContentControl.Header,Label,True,True,,Hálózat
+CNC.Controls.Avalonia.g.hu-HU.resources:portdialog.baml,tab_serial:System.Windows.Controls.HeaderedContentControl.Header,Label,True,True,,Sorozat
+CNC.Controls.Avalonia.g.hu-HU.resources:sdcardview.baml,btn_upload:System.Windows.Controls.ContentControl.Content,Button,True,True,,Feltöltés
+CNC.Controls.Avalonia.g.hu-HU.resources:sdcardview.baml,chk_viewAll:System.Windows.Controls.ContentControl.Content,CheckBox,True,True,,List CNC files only
+CNC.Controls.Avalonia.g.hu-HU.resources:sdcardview.baml,dgr_sdcard:System.Windows.FrameworkElement.ToolTip,ToolTip,True,True,,"Kattintson a jobb gombbal a menühöz, kattintson duplán a fájl futtatásához."
+CNC.Controls.Avalonia.g.hu-HU.resources:sdcardview.baml,hdr_name:System.Windows.Controls.DataGridColumn.Header,None,True,True,,Név
+CNC.Controls.Avalonia.g.hu-HU.resources:sdcardview.baml,hdr_size:System.Windows.Controls.DataGridColumn.Header,None,True,True,,Méret
+CNC.Controls.Avalonia.g.hu-HU.resources:sdcardview.baml,mnu_delete:System.Windows.Controls.HeaderedItemsControl.Header,Menu,True,True,,Törlés
+CNC.Controls.Avalonia.g.hu-HU.resources:sdcardview.baml,mnu_downloadRun:System.Windows.Controls.HeaderedItemsControl.Header,Menu,True,True,,letöltés_ és futtatás
+CNC.Controls.Avalonia.g.hu-HU.resources:sdcardview.baml,mnu_enableRewind:System.Windows.Controls.HeaderedItemsControl.Header,Menu,True,True,,Visszatekerés engedélyezése
+CNC.Controls.Avalonia.g.hu-HU.resources:sdcardview.baml,mnu_run:System.Windows.Controls.HeaderedItemsControl.Header,Menu,True,True,,Fut
+CNC.Controls.Avalonia.g.hu-HU.resources:sdcardview.baml,mnu_viewAll:System.Windows.Controls.HeaderedItemsControl.Header,Menu,True,True,,List CNC files only
+CNC.Controls.Avalonia.g.hu-HU.resources:sdcardview.baml,str_deleteFile:System.String.$Content,None,True,True,,Törlés {0}?
+CNC.Controls.Avalonia.g.hu-HU.resources:sdcardview.baml,str_downloadAndRun:System.String.$Content,None,True,True,,Töltse le és futtassa {0}?
+CNC.Controls.Avalonia.g.hu-HU.resources:sdcardview.baml,str_downloading:System.String.$Content,None,True,True,,Letöltés {0}...
+CNC.Controls.Avalonia.g.hu-HU.resources:sdcardview.baml,str_illegalName:System.String.$Content,None,True,True,,"Fájl: {0}\\n!,?,~ és SZÓKÖZ nem támogatott a fájlnevekben, kérjük, nevezze át."
+CNC.Controls.Avalonia.g.hu-HU.resources:sdcardview.baml,str_noCard:System.String.$Content,None,True,True,,No card mounted.
+CNC.Controls.Avalonia.g.hu-HU.resources:sdcardview.baml,str_notConnection:System.String.$Content,None,True,True,,Nincs kapcsolat.
+CNC.Controls.Avalonia.g.hu-HU.resources:sdcardview.baml,str_runMacro:System.String.$Content,None,True,True,,Run macro {0} with no parameters?
+CNC.Controls.Avalonia.g.hu-HU.resources:sdcardview.baml,str_transferAborted:System.String.$Content,None,True,True,,Az átvitel megszakítva.
+CNC.Controls.Avalonia.g.hu-HU.resources:sdcardview.baml,str_transferDone:System.String.$Content,None,True,True,,Az átvitel megtörtént.
+CNC.Controls.Avalonia.g.hu-HU.resources:sdcardview.baml,str_transferring:System.String.$Content,None,True,True,,Áthelyezve {0} a {1} bájtból...
+CNC.Controls.Avalonia.g.hu-HU.resources:sdcardview.baml,str_uploading:System.String.$Content,None,True,True,,Feltöltés...
+CNC.Controls.Avalonia.g.hu-HU.resources:signalscontrol.baml,grp_signals:System.Windows.Controls.HeaderedContentControl.Header,Label,True,True,,Jelek
+CNC.Controls.Avalonia.g.hu-HU.resources:signalscontrol.baml,lbl_signalBlockDelete:System.Windows.FrameworkElement.ToolTip,ToolTip,True,True,,Törlés letiltása
+CNC.Controls.Avalonia.g.hu-HU.resources:signalscontrol.baml,lbl_signalCycleStart:System.Windows.FrameworkElement.ToolTip,ToolTip,True,True,,Ciklusindítás
+CNC.Controls.Avalonia.g.hu-HU.resources:signalscontrol.baml,lbl_signalEStop:System.Windows.FrameworkElement.ToolTip,ToolTip,True,True,,E-Stop
+CNC.Controls.Avalonia.g.hu-HU.resources:signalscontrol.baml,lbl_signalFeedHold:System.Windows.FrameworkElement.ToolTip,ToolTip,True,True,,Előtolás tartás
+CNC.Controls.Avalonia.g.hu-HU.resources:signalscontrol.baml,lbl_signalMotorFault:System.Windows.FrameworkElement.ToolTip,ToolTip,True,True,,Motor fault
+CNC.Controls.Avalonia.g.hu-HU.resources:signalscontrol.baml,lbl_signalMotorWarning:System.Windows.FrameworkElement.ToolTip,ToolTip,True,True,,Motor figyelmeztetés
+CNC.Controls.Avalonia.g.hu-HU.resources:signalscontrol.baml,lbl_signalOptionalStop:System.Windows.FrameworkElement.ToolTip,ToolTip,True,True,,Opcionális megállás
+CNC.Controls.Avalonia.g.hu-HU.resources:signalscontrol.baml,lbl_signalProbe:System.Windows.FrameworkElement.ToolTip,ToolTip,True,True,,Szonda
+CNC.Controls.Avalonia.g.hu-HU.resources:signalscontrol.baml,lbl_signalReset:System.Windows.FrameworkElement.ToolTip,ToolTip,True,True,,Visszaállítás
+CNC.Controls.Avalonia.g.hu-HU.resources:signalscontrol.baml,lbl_signalSafetyDoor:System.Windows.FrameworkElement.ToolTip,ToolTip,True,True,,Biztonsági ajtó
+CNC.Controls.Avalonia.g.hu-HU.resources:spindlecontrol.baml,grp_spindle:System.Windows.Controls.HeaderedContentControl.Header,Label,True,True,,Orsó
+CNC.Controls.Avalonia.g.hu-HU.resources:spindlecontrol.baml,lbl_ccw:System.Windows.Controls.ContentControl.Content,RadioButton,True,True,,CCW
+CNC.Controls.Avalonia.g.hu-HU.resources:spindlecontrol.baml,lbl_cw:System.Windows.Controls.ContentControl.Content,RadioButton,True,True,,CW
+CNC.Controls.Avalonia.g.hu-HU.resources:spindlecontrol.baml,lbl_off:System.Windows.Controls.ContentControl.Content,RadioButton,True,True,,Ki
+CNC.Controls.Avalonia.g.hu-HU.resources:spindlecontrol.baml,lbl_rpm:System.Windows.Controls.ContentControl.Content,Label,True,True,,RPM
+CNC.Controls.Avalonia.g.hu-HU.resources:statuscontrol.baml,btn_home:System.Windows.Controls.ContentControl.Content,Button,True,True,,Haza
+CNC.Controls.Avalonia.g.hu-HU.resources:statuscontrol.baml,btn_home:System.Windows.FrameworkElement.ToolTip,ToolTip,True,True,,Ctrl+H
+CNC.Controls.Avalonia.g.hu-HU.resources:statuscontrol.baml,btn_reset:System.Windows.Controls.ContentControl.Content,Button,True,True,,Visszaállítás
+CNC.Controls.Avalonia.g.hu-HU.resources:statuscontrol.baml,btn_reset:System.Windows.FrameworkElement.ToolTip,ToolTip,True,True,,Ctrl+Shift+R
+CNC.Controls.Avalonia.g.hu-HU.resources:statuscontrol.baml,btn_unlock:System.Windows.Controls.ContentControl.Content,Button,True,True,,Kinyit
+CNC.Controls.Avalonia.g.hu-HU.resources:statuscontrol.baml,btn_unlock:System.Windows.FrameworkElement.ToolTip,ToolTip,True,True,,Ctrl+U
+CNC.Controls.Avalonia.g.hu-HU.resources:statuscontrol.baml,lbl_check:System.Windows.Controls.ContentControl.Content,Label,True,True,,Ellenőrzés
+CNC.Controls.Avalonia.g.hu-HU.resources:statuscontrol.baml,lbl_state:System.Windows.Controls.ContentControl.Content,Label,True,True,,State:
+CNC.Controls.Avalonia.g.hu-HU.resources:statuscontrol.baml,str_clearEStop:System.String.$Content,None,True,True,,E-Stop törlése előtt &lt;Visszaállítás&gt;&gt;
+CNC.Controls.Avalonia.g.hu-HU.resources:thcmonitorcontrol.baml,str_ThcFlyout:System.String.$Content,None,True,True,,_THC monitor
+CNC.Controls.Avalonia.g.hu-HU.resources:toolview.baml,btn_clear:System.Windows.Controls.ContentControl.Content,Button,True,True,,Mindent tisztít
+CNC.Controls.Avalonia.g.hu-HU.resources:toolview.baml,btn_currPos:System.Windows.Controls.ContentControl.Content,Button,True,True,,Szerezze meg az aktuális pozíciót
+CNC.Controls.Avalonia.g.hu-HU.resources:toolview.baml,btn_setAll:System.Windows.Controls.ContentControl.Content,Button,True,True,,Állítsa be az összeset
+CNC.Controls.Avalonia.g.hu-HU.resources:toolview.baml,hdr_tool:System.Windows.Controls.DataGridColumn.Header,None,True,True,,Eszköz
+CNC.Controls.Avalonia.g.hu-HU.resources:toolview.baml,lbl_tipRadius:CNC.Controls.CoordValueSetControl.Label,None,True,True,,A hegy sugara:
+CNC.Controls.Avalonia.g.hu-HU.resources:toolview.baml,lbl_tool:System.Windows.Controls.ContentControl.Content,Label,True,True,,Eszköz:
+CNC.Controls.Avalonia.g.hu-HU.resources:toolview.baml,lbl_xAxis:CNC.Controls.CoordValueSetControl.Label,None,True,True,,X tengely:
+CNC.Controls.Avalonia.g.hu-HU.resources:toolview.baml,lbl_yAxis:CNC.Controls.CoordValueSetControl.Label,None,True,True,,Y tengely:
+CNC.Controls.Avalonia.g.hu-HU.resources:toolview.baml,lbl_zAxis:CNC.Controls.CoordValueSetControl.Label,None,True,True,,Z tengely:
+CNC.Controls.Avalonia.g.hu-HU.resources:workparameterscontrol.baml,grp_workparams:System.Windows.Controls.HeaderedContentControl.Header,Label,True,True,,Munkaparaméterek
+CNC.Controls.Avalonia.g.hu-HU.resources:workparameterscontrol.baml,lbl_offset:System.Windows.Controls.ContentControl.Content,Label,True,True,,Eltolás:
+CNC.Controls.Avalonia.g.hu-HU.resources:workparameterscontrol.baml,lbl_probe:System.Windows.Controls.ContentControl.Content,Label,True,True,,Probe:
+CNC.Controls.Avalonia.g.hu-HU.resources:workparameterscontrol.baml,lbl_tool:System.Windows.Controls.ContentControl.Content,Label,True,True,,Eszköz:

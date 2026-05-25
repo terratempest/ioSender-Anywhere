@@ -214,4 +214,35 @@ public sealed class GrblViewModelReadoutTests
         Assert.True(vm.AxisScaled.Value.HasFlag(AxisFlags.X));
         Assert.False(vm.AxisScaled.Value.HasFlag(AxisFlags.Y));
     }
+
+    [Fact]
+    public void Spindle_override_does_not_shrink_setpoint_while_fs_lags()
+    {
+        var vm = new GrblViewModel();
+        const string running = "<Idle|MPos:0,0,0|A:S|FS:0,10000|Ov:100,100,{0}|Bf:15,128>";
+
+        vm.DataReceived(string.Format(running, 100));
+        Assert.Equal(10000, vm.SpindleSetpointRPM);
+        Assert.Equal(10000, vm.RPM);
+
+        vm.DataReceived(string.Format(running, 110));
+        Assert.Equal(10000, vm.SpindleSetpointRPM);
+        Assert.Equal(11000, vm.RPM);
+
+        vm.DataReceived(string.Format(running, 120));
+        Assert.Equal(10000, vm.SpindleSetpointRPM);
+        Assert.Equal(12000, vm.RPM);
+    }
+
+    [Fact]
+    public void Spindle_fs_effective_rpm_tracks_setpoint_when_override_matches()
+    {
+        var vm = new GrblViewModel();
+        vm.DataReceived("<Idle|MPos:0,0,0|A:S|FS:0,10000|Ov:100,100,100|Bf:15,128>");
+        Assert.Equal(10000, vm.SpindleSetpointRPM);
+
+        vm.DataReceived("<Idle|MPos:0,0,0|A:S|FS:0,11000|Ov:100,100,110|Bf:15,128>");
+        Assert.Equal(10000, vm.SpindleSetpointRPM);
+        Assert.Equal(11000, vm.RPM);
+    }
 }

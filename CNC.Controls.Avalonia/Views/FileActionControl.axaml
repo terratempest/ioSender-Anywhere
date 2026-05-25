@@ -20,19 +20,19 @@
 
     <Button x:Name="BtnOpen" Content="Open" ToolTip.Tip="Open file" Padding="10,4" Click="OnOpenClick"
 
-            loc:Localize.Key="CNC.Controls.WPF.fileactioncontrol.btn_open" loc:Localize.Fallback="Open"/>
+            loc:Localize.Key="CNC.Controls.Avalonia.fileactioncontrol.btn_open" loc:Localize.Fallback="Open"/>
 
     <Button x:Name="BtnReload" Content="Reload" ToolTip.Tip="Reload file" Padding="10,4" IsEnabled="{Binding IsPhysicalFileLoaded}" Click="OnReloadClick"
 
-            loc:Localize.Key="CNC.Controls.WPF.fileactioncontrol.btn_reload" loc:Localize.Fallback="Reload"/>
+            loc:Localize.Key="CNC.Controls.Avalonia.fileactioncontrol.btn_reload" loc:Localize.Fallback="Reload"/>
 
     <Button x:Name="BtnEdit" Content="Edit" ToolTip.Tip="Edit file" Padding="10,4" IsEnabled="{Binding IsPhysicalFileLoaded}" Click="OnEditClick"
 
-            loc:Localize.Key="CNC.Controls.WPF.fileactioncontrol.btn_edit" loc:Localize.Fallback="Edit"/>
+            loc:Localize.Key="CNC.Controls.Avalonia.fileactioncontrol.btn_edit" loc:Localize.Fallback="Edit"/>
 
     <Button x:Name="BtnClose" Content="Close" ToolTip.Tip="Close file" Padding="10,4" IsEnabled="{Binding IsFileLoaded}" Click="OnCloseClick"
 
-            loc:Localize.Key="CNC.Controls.WPF.fileactioncontrol.btn_close" loc:Localize.Fallback="Close"/>
+            loc:Localize.Key="CNC.Controls.Avalonia.fileactioncontrol.btn_close" loc:Localize.Fallback="Close"/>
 
   </StackPanel>
 

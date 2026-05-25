@@ -1,4 +1,33 @@
-﻿ioSender.g.en-US.resources:mainwindow.baml,lbl_jogStep:System.Windows.FrameworkElement.ToolTip,ToolTip,True,True,,Distanz für Tastatur Schrittweite (mit &lt;Strg&gt; Taste).
+ioSender.g.de-DE.resources:workspace.baml,editor_console:System.String.$Content,None,True,True,,Console
+ioSender.g.de-DE.resources:workspace.baml,editor_coolant:System.String.$Content,None,True,True,,Coolant
+ioSender.g.de-DE.resources:workspace.baml,editor_feed:System.String.$Content,None,True,True,,Feed
+ioSender.g.de-DE.resources:workspace.baml,editor_goto:System.String.$Content,None,True,True,,Goto
+ioSender.g.de-DE.resources:workspace.baml,editor_jobbar:System.String.$Content,None,True,True,,Job
+ioSender.g.de-DE.resources:workspace.baml,editor_jog:System.String.$Content,None,True,True,,Jog
+ioSender.g.de-DE.resources:workspace.baml,editor_mdiTouch:System.String.$Content,None,True,True,,MDI (Touch)
+ioSender.g.de-DE.resources:workspace.baml,editor_outline:System.String.$Content,None,True,True,,Outline
+ioSender.g.de-DE.resources:workspace.baml,editor_program:System.String.$Content,None,True,True,,Program
+ioSender.g.de-DE.resources:workspace.baml,editor_signals:System.String.$Content,None,True,True,,Signals
+ioSender.g.de-DE.resources:workspace.baml,editor_spindle:System.String.$Content,None,True,True,,Spindle
+ioSender.g.de-DE.resources:workspace.baml,editor_status:System.String.$Content,None,True,True,,Status
+ioSender.g.de-DE.resources:workspace.baml,editor_viewer3d:System.String.$Content,None,True,True,,3D View
+ioSender.g.de-DE.resources:workspace.baml,editor_workparams:System.String.$Content,None,True,True,,Work Parameters
+ioSender.g.en-US.resources:jobview.baml,str_msgDoorExit:System.String.$Content,None,True,True,,"Door is still open, exit?"
+ioSender.g.en-US.resources:jobview.baml,str_msgDoorOpen:System.String.$Content,None,True,True,,"Door is open, close door and continue?"
+ioSender.g.en-US.resources:jobview.baml,str_msgDoorPersist:System.String.$Content,None,True,True,,Door state cannot be cleared with &lt;Reset&gt;
+ioSender.g.en-US.resources:jobview.baml,str_msgEStop:System.String.$Content,None,True,True,,E-Stop active! - clear before continuing...
+ioSender.g.en-US.resources:jobview.baml,str_msgEStopExit:System.String.$Content,None,True,True,,"E-Stop still active, exit?"
+ioSender.g.en-US.resources:jobview.baml,str_msgHome:System.String.$Content,None,True,True,,"Homing cycle required, &lt;Home&gt; to continue"
+ioSender.g.en-US.resources:jobview.baml,str_msgNoComm:System.String.$Content,None,True,True,,"Controller is in {0} state and cannot respond, try a soft reset?"
+ioSender.g.en-US.resources:jobview.baml,str_msgNoCommAlarm:System.String.$Content,None,True,True,,"Controller is not able to communicate due to alarm {0}, attempting a soft reset."
+ioSender.g.en-US.resources:jobview.baml,str_msgNoResponse:System.String.$Content,None,True,True,,Controller is not responding!
+ioSender.g.en-US.resources:jobview.baml,str_msgResetExit:System.String.$Content,None,True,True,,"Controller soft reset failed, exiting."
+ioSender.g.en-US.resources:jobview.baml,str_msgResetFailed:System.String.$Content,None,True,True,,"Controller soft reset failed, exiting."
+ioSender.g.en-US.resources:jobview.baml,str_msgWait:System.String.$Content,None,True,True,,Waiting for controller ({0})...
+ioSender.g.en-US.resources:jobview.baml,tab_3DView:System.Windows.Controls.HeaderedContentControl.Header,Label,True,True,,3D Ansicht
+ioSender.g.en-US.resources:jobview.baml,tab_console:System.Windows.Controls.HeaderedContentControl.Header,Label,True,True,,Konsole
+ioSender.g.en-US.resources:jobview.baml,tab_program:System.Windows.Controls.HeaderedContentControl.Header,Label,True,True,,Programm
+ioSender.g.en-US.resources:mainwindow.baml,lbl_jogStep:System.Windows.FrameworkElement.ToolTip,ToolTip,True,True,,Distanz für Tastatur Schrittweite (mit &lt;Strg&gt; Taste).
 ioSender.g.en-US.resources:mainwindow.baml,mnu_about:System.Windows.Controls.HeaderedItemsControl.Header,Menu,True,True,,_Über
 ioSender.g.en-US.resources:mainwindow.baml,mnu_briefTour:System.Windows.Controls.HeaderedItemsControl.Header,Menu,True,True,,A _brief tour
 ioSender.g.en-US.resources:mainwindow.baml,mnu_camera:System.Windows.Controls.HeaderedItemsControl.Header,Menu,True,True,,_Kamera
@@ -20,23 +49,9 @@ ioSender.g.en-US.resources:mainwindow.baml,str_mnuArcsToLines:System.String.$Con
 ioSender.g.en-US.resources:mainwindow.baml,str_mnuCompress:System.String.$Content,None,True,True,,Komprimieren (experimentell)
 ioSender.g.en-US.resources:mainwindow.baml,str_mnuDragKnife:System.String.$Content,None,True,True,,Schleppmesserbewegungen hinzufügen
 ioSender.g.en-US.resources:mainwindow.baml,str_mnuRotate:System.String.$Content,None,True,True,,Drehen
-ioSender.g.en-US.resources:jobview.baml,str_msgDoorExit:System.String.$Content,None,True,True,,"Door is still open, exit?"
-ioSender.g.en-US.resources:jobview.baml,str_msgDoorOpen:System.String.$Content,None,True,True,,"Door is open, close door and continue?"
-ioSender.g.en-US.resources:jobview.baml,str_msgDoorPersist:System.String.$Content,None,True,True,,Door state cannot be cleared with &lt;Reset&gt;
-ioSender.g.en-US.resources:jobview.baml,str_msgEStop:System.String.$Content,None,True,True,,E-Stop active! - clear before continuing...
-ioSender.g.en-US.resources:jobview.baml,str_msgEStopExit:System.String.$Content,None,True,True,,"E-Stop still active, exit?"
-ioSender.g.en-US.resources:jobview.baml,str_msgHome:System.String.$Content,None,True,True,,"Homing cycle required, &lt;Home&gt; to continue"
-ioSender.g.en-US.resources:jobview.baml,str_msgNoComm:System.String.$Content,None,True,True,,"Controller is in {0} state and cannot respond, try a soft reset?"
-ioSender.g.en-US.resources:jobview.baml,str_msgNoCommAlarm:System.String.$Content,None,True,True,,"Controller is not able to communicate due to alarm {0}, attempting a soft reset."
-ioSender.g.en-US.resources:jobview.baml,str_msgNoResponse:System.String.$Content,None,True,True,,Controller is not responding!
-ioSender.g.en-US.resources:jobview.baml,str_msgResetExit:System.String.$Content,None,True,True,,"Controller soft reset failed, exiting."
-ioSender.g.en-US.resources:jobview.baml,str_msgResetFailed:System.String.$Content,None,True,True,,"Controller soft reset failed, exiting."
-ioSender.g.en-US.resources:jobview.baml,str_msgWait:System.String.$Content,None,True,True,,Waiting for controller ({0})...
 ioSender.g.en-US.resources:mainwindow.baml,str_runTime:System.String.$Content,None,True,True,,Laufzeit: {0}
-ioSender.g.en-US.resources:jobview.baml,tab_3DView:System.Windows.Controls.HeaderedContentControl.Header,Label,True,True,,3D Ansicht
 ioSender.g.en-US.resources:mainwindow.baml,tab_3DView:System.Windows.Controls.HeaderedContentControl.Header,Label,True,True,,3D Ansicht
 ioSender.g.en-US.resources:mainwindow.baml,tab_appConfig:System.Windows.Controls.HeaderedContentControl.Header,Label,True,True,,Einstellungen: Programm
-ioSender.g.en-US.resources:jobview.baml,tab_console:System.Windows.Controls.HeaderedContentControl.Header,Label,True,True,,Konsole
 ioSender.g.en-US.resources:mainwindow.baml,tab_facing:System.Windows.Controls.HeaderedContentControl.Header,Label,True,True,,Facing
 ioSender.g.en-US.resources:mainwindow.baml,tab_grbl:System.Windows.Controls.HeaderedContentControl.Header,Label,True,True,,Grbl
 ioSender.g.en-US.resources:mainwindow.baml,tab_grblConfig:System.Windows.Controls.HeaderedContentControl.Header,Label,True,True,,Einstellungen: Grbl
@@ -45,7 +60,6 @@ ioSender.g.en-US.resources:mainwindow.baml,tab_latheWizards:System.Windows.Contr
 ioSender.g.en-US.resources:mainwindow.baml,tab_offsets:System.Windows.Controls.HeaderedContentControl.Header,Label,True,True,,Offsets
 ioSender.g.en-US.resources:mainwindow.baml,tab_parting:System.Windows.Controls.HeaderedContentControl.Header,Label,True,True,,Trennen
 ioSender.g.en-US.resources:mainwindow.baml,tab_probing:System.Windows.Controls.HeaderedContentControl.Header,Label,True,True,,Antasten
-ioSender.g.en-US.resources:jobview.baml,tab_program:System.Windows.Controls.HeaderedContentControl.Header,Label,True,True,,Programm
 ioSender.g.en-US.resources:mainwindow.baml,tab_sdCard:System.Windows.Controls.HeaderedContentControl.Header,Label,True,True,,SD Karte
 ioSender.g.en-US.resources:mainwindow.baml,tab_threading:System.Windows.Controls.HeaderedContentControl.Header,Label,True,True,,Gewindeschneiden
 ioSender.g.en-US.resources:mainwindow.baml,tab_tools:System.Windows.Controls.HeaderedContentControl.Header,Label,True,True,,Werkzeuge

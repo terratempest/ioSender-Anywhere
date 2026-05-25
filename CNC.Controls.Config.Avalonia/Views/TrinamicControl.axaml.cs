@@ -59,6 +59,8 @@ public partial class TrinamicControl : UserControl, IGrblConfigTab
 
     public GrblConfigType GrblConfigType => GrblConfigType.Trinamic;
 
+    public int PollInterval { get; set; } = 200;
+
     public EnumFlags<AxisFlags> AxisEnabled => _axisEnabled;
 
     public bool SFiltEnabled
@@ -112,8 +114,7 @@ public partial class TrinamicControl : UserControl, IGrblConfigTab
             model.PropertyChanged -= OnModelPropertyChanged;
         }
 
-        var poll = ControlsPlatformContext.AppConfig?.Base.PollInterval ?? 200;
-        model.Poller.SetState(activate ? poll : 0);
+        model.Poller.SetState(activate ? PollInterval : 0);
     }
 
     void OnLoaded(object? sender, RoutedEventArgs e) => CaptureModel();
@@ -200,7 +201,6 @@ public partial class TrinamicControl : UserControl, IGrblConfigTab
         DriverStatus = string.Empty;
         comms.PurgeQueue();
 
-        var poll = ControlsPlatformContext.AppConfig?.Base.PollInterval ?? 200;
         model.Poller.SetState(0);
         model.SuspendProcessing = true;
 
@@ -219,7 +219,7 @@ public partial class TrinamicControl : UserControl, IGrblConfigTab
             EventUtils.DoEvents();
 
         model.SuspendProcessing = false;
-        model.Poller.SetState(poll);
+        model.Poller.SetState(PollInterval);
     }
 
     void OnModelPropertyChanged(object? sender, PropertyChangedEventArgs e)

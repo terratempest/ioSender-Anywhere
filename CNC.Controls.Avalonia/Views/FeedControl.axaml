@@ -42,7 +42,7 @@
         <TextBlock x:Name="LblFeedRate"
                    Text="Feed Rate:"
                    Foreground="{DynamicResource ThemeForegroundBrush}"
-                   loc:Localize.Key="CNC.Controls.WPF.feedcontrol.lbl_feedrate"
+                   loc:Localize.Key="CNC.Controls.Avalonia.feedcontrol.lbl_feedrate"
                    loc:Localize.Fallback="Feed Rate:"/>
       </Viewbox>
 
@@ -75,21 +75,16 @@
 
     <Grid Grid.Row="1" ColumnDefinitions="*,*,*" VerticalAlignment="Stretch" Margin="0,4,0,0"
           IsEnabled="{Binding FeedOverrideDisabled, Converter={StaticResource LogicalNotConverter}}">
-      <Button x:Name="BtnFeedOvrPlus" Grid.Column="0" Classes="spindle-action" Content="+"
-              HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Margin="0,0,2,0" Click="BtnFeedOvrPlus_Click" MinWidth="24" Padding="0"/>
-      <Button x:Name="BtnFeedOvrMinus" Grid.Column="1" Classes="spindle-action" Content="−"
-              HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Margin="2,0,2,0" Click="BtnFeedOvrMinus_Click" MinWidth="24" Padding="0"/>
-      <Button x:Name="BtnFeedOvrReset" Grid.Column="2" Classes="spindle-action" Content="↺"
-              HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Margin="2,0,0,0" Click="BtnFeedOvrReset_Click" MinWidth="24" Padding="0"/>
+      <Button x:Name="BtnFeedOvrPlus" Grid.Column="0" Classes="panel-action" Content="+" Margin="0,0,2,0" Click="BtnFeedOvrPlus_Click"/>
+      <Button x:Name="BtnFeedOvrMinus" Grid.Column="1" Classes="panel-action" Content="−" Margin="2,0,2,0" Click="BtnFeedOvrMinus_Click"/>
+      <Button x:Name="BtnFeedOvrReset" Grid.Column="2" Classes="panel-action" Content="↺" Margin="2,0,0,0" Click="BtnFeedOvrReset_Click"/>
     </Grid>
 
     <Grid Grid.Row="2" ColumnDefinitions="*,*,*" VerticalAlignment="Center" Margin="0,4,0,0"
           IsEnabled="{Binding FeedOverrideDisabled, Converter={StaticResource LogicalNotConverter}}">
-      <primitives:ToggleButton x:Name="RbFeedStepFine" Grid.Column="0" Classes="jog-option" Content="X1" Padding="2,2"
-                   HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Margin="0,0,2,0" IsChecked="True"
+      <primitives:ToggleButton x:Name="RbFeedStepFine" Grid.Column="0" Classes="panel-toggle compact" Content="X1" Margin="0,0,2,0" IsChecked="True"
                    Click="FeedOvrStep_Click"/>
-      <primitives:ToggleButton x:Name="RbFeedStepCoarse" Grid.Column="1" Classes="jog-option" Content="X10" Padding="2,2"
-                   HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Margin="2,0,2,0"
+      <primitives:ToggleButton x:Name="RbFeedStepCoarse" Grid.Column="1" Classes="panel-toggle compact" Content="X10" Margin="2,0,2,0"
                    Click="FeedOvrStep_Click"/>
       <TextBlock Grid.Column="2" VerticalAlignment="Center" HorizontalAlignment="Right" Margin="2,0,0,0"
                  x:Name="LblFeedOverride"
@@ -102,7 +97,7 @@
     <StackPanel Grid.Row="3" Orientation="Horizontal" HorizontalAlignment="Center" Spacing="4" Margin="0,4,0,0">
       <TextBlock x:Name="LblRapids" VerticalAlignment="Center"
                  Foreground="{DynamicResource ThemeForegroundBrush}"
-                 loc:Localize.Key="CNC.Controls.WPF.feedcontrol.lbl_rapids" loc:Localize.Fallback="Rapids:"
+                 loc:Localize.Key="CNC.Controls.Avalonia.feedcontrol.lbl_rapids" loc:Localize.Fallback="Rapids:"
                  Text="Rapids:"/>
       <TextBlock VerticalAlignment="Center"
                  x:Name="LblRapidsOverride"
@@ -111,12 +106,9 @@
     </StackPanel>
 
     <Grid Grid.Row="4" ColumnDefinitions="*,*,*" VerticalAlignment="Stretch" Margin="0,4,0,0">
-      <Button x:Name="BtnRapidOvrPlus" Grid.Column="0" Classes="spindle-action" Content="+"
-              HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Margin="0,0,2,0" Click="BtnRapidOvrPlus_Click" MinWidth="24" Padding="0"/>
-      <Button x:Name="BtnRapidOvrMinus" Grid.Column="1" Classes="spindle-action" Content="−"
-              HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Margin="2,0,2,0" Click="BtnRapidOvrMinus_Click" MinWidth="24" Padding="0"/>
-      <Button x:Name="BtnRapidOvrReset" Grid.Column="2" Classes="spindle-action" Content="↺"
-              HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Margin="2,0,0,0" Click="BtnRapidOvrReset_Click" MinWidth="24" Padding="0"/>
+      <Button x:Name="BtnRapidOvrPlus" Grid.Column="0" Classes="panel-action" Content="+" Margin="0,0,2,0" Click="BtnRapidOvrPlus_Click"/>
+      <Button x:Name="BtnRapidOvrMinus" Grid.Column="1" Classes="panel-action" Content="−" Margin="2,0,2,0" Click="BtnRapidOvrMinus_Click"/>
+      <Button x:Name="BtnRapidOvrReset" Grid.Column="2" Classes="panel-action" Content="↺" Margin="2,0,0,0" Click="BtnRapidOvrReset_Click"/>
     </Grid>
   </Grid>
 </UserControl>

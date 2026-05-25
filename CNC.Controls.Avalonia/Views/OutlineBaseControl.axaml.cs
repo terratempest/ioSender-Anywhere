@@ -1,7 +1,7 @@
 using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Interactivity;
-using CNC.Controls.Avalonia.Services;
+using CNC.App;
 using CNC.Core;
 
 namespace CNC.Controls.Avalonia.Views;
@@ -15,8 +15,10 @@ public partial class OutlineBaseControl : UserControl
     {
         InitializeComponent();
         AttachedToVisualTree += (_, _) =>
-            FeedRate = ControlsPlatformContext.AppConfig?.Base.OutlineFeedRate ?? 500;
+            FeedRate = AppConfig?.Base.OutlineFeedRate ?? 500;
     }
+
+    public AppConfigService? AppConfig { get; set; }
 
     public int FeedRate { get => GetValue(FeedRateProperty); set => SetValue(FeedRateProperty, value); }
 
@@ -25,7 +27,7 @@ public partial class OutlineBaseControl : UserControl
         if (DataContext is not GrblViewModel model || !model.IsFileLoaded)
             return;
 
-        var config = ControlsPlatformContext.AppConfig;
+        var config = AppConfig;
         if (config != null && config.Base.OutlineFeedRate != FeedRate)
         {
             config.Base.OutlineFeedRate = FeedRate;

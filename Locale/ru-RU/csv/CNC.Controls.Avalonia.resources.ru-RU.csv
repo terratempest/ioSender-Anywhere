@@ -1,0 +1,693 @@
+CNC.Controls.Avalonia.g.en-US.resources:consolecontrol.baml,btn_clear:System.Windows.Controls.ContentControl.Content,Button,True,True,,????????
+CNC.Controls.Avalonia.g.en-US.resources:consolecontrol.baml,lbl_filterRT:System.Windows.Controls.ContentControl.Content,CheckBox,True,True,,????????????? ??????
+CNC.Controls.Avalonia.g.en-US.resources:consolecontrol.baml,lbl_showAll:System.Windows.Controls.ContentControl.Content,CheckBox,True,True,,?????????? ??? ??????
+CNC.Controls.Avalonia.g.en-US.resources:consolecontrol.baml,lbl_verbose:System.Windows.Controls.ContentControl.Content,CheckBox,True,True,,?????????
+CNC.Controls.Avalonia.g.en-US.resources:coolantcontrol.baml,lbl_fan:CNC.Controls.ToggleControl.Label,None,False,True,,?????
+CNC.Controls.Avalonia.g.en-US.resources:coolantcontrol.baml,lbl_flood:CNC.Controls.ToggleControl.Label,None,False,True,,?????
+CNC.Controls.Avalonia.g.en-US.resources:coolantcontrol.baml,lbl_mist:CNC.Controls.ToggleControl.Label,None,False,True,,?????
+CNC.Controls.Avalonia.g.en-US.resources:drocontrol.baml,btn_zeroAll:System.Windows.Controls.ContentControl.Content,Button,True,True,,?????. ???
+CNC.Controls.Avalonia.g.en-US.resources:drocontrol.baml,grp_dro:System.Windows.Controls.HeaderedContentControl.Header,Label,True,True,,??????? ??????????
+CNC.Controls.Avalonia.g.en-US.resources:feedcontrol.baml,lbl_rapids:System.Windows.Controls.ContentControl.Content,Label,True,True,,??????? ???????????:
+CNC.Controls.Avalonia.g.en-US.resources:gcodelistcontrol.baml,hdr_block:System.Windows.Controls.DataGridColumn.Header,None,True,True,,????
+CNC.Controls.Avalonia.g.en-US.resources:gcodelistcontrol.baml,hdr_data:System.Windows.Controls.DataGridColumn.Header,None,True,True,,??????
+CNC.Controls.Avalonia.g.en-US.resources:gcodelistcontrol.baml,mnu_copyToMDI:System.Windows.Controls.HeaderedItemsControl.Header,Menu,True,True,,Copy to MDI
+CNC.Controls.Avalonia.g.en-US.resources:gcodelistcontrol.baml,mnu_sendToController:System.Windows.Controls.HeaderedItemsControl.Header,Menu,True,True,,Send to controller
+CNC.Controls.Avalonia.g.en-US.resources:gcodelistcontrol.baml,mnu_startFromHere:System.Windows.Controls.HeaderedItemsControl.Header,Menu,True,True,,Start from here
+CNC.Controls.Avalonia.g.en-US.resources:gcodelistcontrol.baml,mnu_ToggleBreak:System.Windows.Controls.HeaderedItemsControl.Header,Menu,True,True,,Toggle Break
+CNC.Controls.Avalonia.g.en-US.resources:jobcontrol.baml,btn_cycleStart:System.Windows.Controls.ContentControl.Content,Button,True,True,,????
+CNC.Controls.Avalonia.g.en-US.resources:jobcontrol.baml,btn_cycleStart:System.Windows.FrameworkElement.ToolTip,ToolTip,True,True,,Alt+R
+CNC.Controls.Avalonia.g.en-US.resources:jobcontrol.baml,btn_feedHold:System.Windows.Controls.ContentControl.Content,Button,True,True,,?????? ????
+CNC.Controls.Avalonia.g.en-US.resources:jobcontrol.baml,btn_feedHold:System.Windows.FrameworkElement.ToolTip,ToolTip,True,True,,??????
+CNC.Controls.Avalonia.g.en-US.resources:jobcontrol.baml,btn_rewind:System.Windows.Controls.ContentControl.Content,Button,True,True,,? ??????
+CNC.Controls.Avalonia.g.en-US.resources:jobcontrol.baml,btn_stop:System.Windows.Controls.ContentControl.Content,Button,True,True,,????
+CNC.Controls.Avalonia.g.en-US.resources:jobcontrol.baml,btn_stop:System.Windows.FrameworkElement.ToolTip,ToolTip,True,True,,Alt+S
+CNC.Controls.Avalonia.g.en-US.resources:jogbasecontrol.baml,grp_jogDistance:System.Windows.Controls.HeaderedContentControl.Header,Label,True,True,,?????????? ???????????
+CNC.Controls.Avalonia.g.en-US.resources:jogbasecontrol.baml,grp_jogFeedrate:System.Windows.Controls.HeaderedContentControl.Header,Label,True,True,,??????
+CNC.Controls.Avalonia.g.en-US.resources:jogbasecontrol.baml,lbl_jogContinuous:System.Windows.Controls.ContentControl.Content,RadioButton,True,True,,Continuous
+CNC.Controls.Avalonia.g.en-US.resources:mdicontrol.baml,btn_send:System.Windows.Controls.ContentControl.Content,Button,True,True,,?????????
+CNC.Controls.Avalonia.g.en-US.resources:mdicontrol.baml,grp_mdi:System.Windows.Controls.HeaderedContentControl.Header,Label,True,True,,???????
+CNC.Controls.Avalonia.g.en-US.resources:overridecontrol.baml,lbl_override:System.Windows.Controls.ContentControl.Content,Label,True,True,,?????????
+CNC.Controls.Avalonia.g.en-US.resources:portdialog.baml,btn_cancel:System.Windows.Controls.ContentControl.Content,Button,True,True,,??????
+CNC.Controls.Avalonia.g.en-US.resources:portdialog.baml,btn_ok:System.Windows.Controls.ContentControl.Content,Button,True,True,,Ok
+CNC.Controls.Avalonia.g.en-US.resources:portdialog.baml,dlg_title:System.Windows.Window.Title,Title,True,True,,??????????? ???????????
+CNC.Controls.Avalonia.g.en-US.resources:portdialog.baml,lbl_ipAddress:System.Windows.Controls.ContentControl.Content,Label,True,True,,IP ?????:
+CNC.Controls.Avalonia.g.en-US.resources:portdialog.baml,lbl_netPort:System.Windows.Controls.ContentControl.Content,Label,True,True,,????:
+CNC.Controls.Avalonia.g.en-US.resources:portdialog.baml,lbl_serialBaud:System.Windows.Controls.ContentControl.Content,Label,True,True,,Baud rate:
+CNC.Controls.Avalonia.g.en-US.resources:portdialog.baml,lbl_serialPort:System.Windows.Controls.ContentControl.Content,Label,True,True,,????:
+CNC.Controls.Avalonia.g.en-US.resources:portdialog.baml,lbl_websocket:System.Windows.Controls.ContentControl.Content,CheckBox,True,True,,Web ????
+CNC.Controls.Avalonia.g.en-US.resources:portdialog.baml,tab_network:System.Windows.Controls.HeaderedContentControl.Header,Label,True,True,,????
+CNC.Controls.Avalonia.g.en-US.resources:portdialog.baml,tab_serial:System.Windows.Controls.HeaderedContentControl.Header,Label,True,True,,???????????????? ????
+CNC.Controls.Avalonia.g.en-US.resources:spindlecontrol.baml,lbl_ccw:System.Windows.Controls.ContentControl.Content,RadioButton,True,True,,?????? ???????
+CNC.Controls.Avalonia.g.en-US.resources:spindlecontrol.baml,lbl_cw:System.Windows.Controls.ContentControl.Content,RadioButton,True,True,,?? ???????
+CNC.Controls.Avalonia.g.en-US.resources:spindlecontrol.baml,lbl_off:System.Windows.Controls.ContentControl.Content,RadioButton,True,True,,????.
+CNC.Controls.Avalonia.g.en-US.resources:spindlecontrol.baml,lbl_rpm:System.Windows.Controls.ContentControl.Content,Label,True,True,,??/???
+CNC.Controls.Avalonia.g.en-US.resources:statuscontrol.baml,btn_reset:System.Windows.Controls.ContentControl.Content,Button,True,True,,?????
+CNC.Controls.Avalonia.g.en-US.resources:statuscontrol.baml,btn_reset:System.Windows.FrameworkElement.ToolTip,ToolTip,True,True,,Ctrl+Shift+R
+CNC.Controls.Avalonia.g.en-US.resources:statuscontrol.baml,lbl_state:System.Windows.Controls.ContentControl.Content,Label,True,True,,??????:
+CNC.Controls.Avalonia.g.en-US.resources:workparameterscontrol.baml,lbl_offset:System.Windows.Controls.ContentControl.Content,Label,True,True,,????????:
+CNC.Controls.Avalonia.g.en-US.resources:workparameterscontrol.baml,lbl_tool:System.Windows.Controls.ContentControl.Content,Label,True,True,,??????????:
+CNC.Controls.Avalonia.g.ru-RU.resources:about.baml,btn_ok:System.Windows.Controls.Button.$Content,Button,True,True,,
+CNC.Controls.Avalonia.g.ru-RU.resources:about.baml,btn_ok:System.Windows.Controls.ContentControl.Content,Button,True,True,,Ok
+CNC.Controls.Avalonia.g.ru-RU.resources:about.baml,btn_ok:System.Windows.FrameworkElement.HorizontalAlignment,None,False,True,,Center
+CNC.Controls.Avalonia.g.ru-RU.resources:about.baml,btn_ok:System.Windows.FrameworkElement.VerticalAlignment,None,False,True,,Top
+CNC.Controls.Avalonia.g.ru-RU.resources:about.baml,btn_ok:System.Windows.FrameworkElement.Width,None,False,True,,85
+CNC.Controls.Avalonia.g.ru-RU.resources:about.baml,btn_toClipboard:System.Windows.Controls.Button.$Content,Button,True,True,,
+CNC.Controls.Avalonia.g.ru-RU.resources:about.baml,btn_toClipboard:System.Windows.Controls.ContentControl.Content,Button,True,True,,To Clipboard
+CNC.Controls.Avalonia.g.ru-RU.resources:about.baml,btn_toClipboard:System.Windows.FrameworkElement.HorizontalAlignment,None,False,True,,Center
+CNC.Controls.Avalonia.g.ru-RU.resources:about.baml,btn_toClipboard:System.Windows.FrameworkElement.Margin,None,False,True,,"5,0,0,0"
+CNC.Controls.Avalonia.g.ru-RU.resources:about.baml,btn_toClipboard:System.Windows.FrameworkElement.ToolTip,ToolTip,True,True,,Copy grbl version information and settings to clipboard
+CNC.Controls.Avalonia.g.ru-RU.resources:about.baml,btn_toClipboard:System.Windows.FrameworkElement.VerticalAlignment,None,False,True,,Top
+CNC.Controls.Avalonia.g.ru-RU.resources:about.baml,btn_toClipboard:System.Windows.FrameworkElement.Width,None,False,True,,85
+CNC.Controls.Avalonia.g.ru-RU.resources:about.baml,dlg_about:System.Windows.FrameworkElement.Height,None,False,True,,285
+CNC.Controls.Avalonia.g.ru-RU.resources:about.baml,dlg_about:System.Windows.FrameworkElement.Width,None,False,True,,315
+CNC.Controls.Avalonia.g.ru-RU.resources:about.baml,dlg_about:System.Windows.Window.Icon,None,False,True,,App.ico
+CNC.Controls.Avalonia.g.ru-RU.resources:about.baml,dlg_about:System.Windows.Window.ResizeMode,None,False,True,,NoResize
+CNC.Controls.Avalonia.g.ru-RU.resources:about.baml,dlg_about:System.Windows.Window.ShowInTaskbar,None,False,True,,False
+CNC.Controls.Avalonia.g.ru-RU.resources:about.baml,dlg_about:System.Windows.Window.Title,Title,True,True,,About
+CNC.Controls.Avalonia.g.ru-RU.resources:about.baml,dlg_about:System.Windows.Window.WindowStartupLocation,None,False,True,,CenterOwner
+CNC.Controls.Avalonia.g.ru-RU.resources:consolecontrol.baml,btn_clear:System.Windows.Controls.Button.$Content,Button,True,True,,
+CNC.Controls.Avalonia.g.ru-RU.resources:consolecontrol.baml,btn_clear:System.Windows.Controls.ContentControl.Content,Button,True,True,,Clear
+CNC.Controls.Avalonia.g.ru-RU.resources:consolecontrol.baml,btn_clear:System.Windows.FrameworkElement.HorizontalAlignment,None,False,True,,Right
+CNC.Controls.Avalonia.g.ru-RU.resources:consolecontrol.baml,btn_clear:System.Windows.FrameworkElement.Margin,None,False,True,,"0,5,5,0"
+CNC.Controls.Avalonia.g.ru-RU.resources:consolecontrol.baml,btn_clear:System.Windows.FrameworkElement.VerticalAlignment,None,False,True,,Top
+CNC.Controls.Avalonia.g.ru-RU.resources:consolecontrol.baml,btn_clear:System.Windows.FrameworkElement.Width,None,False,True,,75
+CNC.Controls.Avalonia.g.ru-RU.resources:consolecontrol.baml,label_filterRT:System.Windows.Controls.ContentControl.Content,CheckBox,True,True,,Отфильтровать ответы
+CNC.Controls.Avalonia.g.ru-RU.resources:consolecontrol.baml,label_showAll:System.Windows.Controls.ContentControl.Content,CheckBox,True,True,,Показывать все ответы
+CNC.Controls.Avalonia.g.ru-RU.resources:consolecontrol.baml,lbl_filterRT:System.Windows.Controls.CheckBox.$Content,CheckBox,True,True,,
+CNC.Controls.Avalonia.g.ru-RU.resources:consolecontrol.baml,lbl_filterRT:System.Windows.Controls.ContentControl.Content,CheckBox,True,True,,Filter out realtime responses
+CNC.Controls.Avalonia.g.ru-RU.resources:consolecontrol.baml,lbl_filterRT:System.Windows.FrameworkElement.HorizontalAlignment,None,False,True,,Left
+CNC.Controls.Avalonia.g.ru-RU.resources:consolecontrol.baml,lbl_filterRT:System.Windows.FrameworkElement.Margin,None,False,True,,"10,8,0,0"
+CNC.Controls.Avalonia.g.ru-RU.resources:consolecontrol.baml,lbl_filterRT:System.Windows.FrameworkElement.VerticalAlignment,None,False,True,,Top
+CNC.Controls.Avalonia.g.ru-RU.resources:consolecontrol.baml,lbl_showAll:System.Windows.Controls.CheckBox.$Content,CheckBox,True,True,,
+CNC.Controls.Avalonia.g.ru-RU.resources:consolecontrol.baml,lbl_showAll:System.Windows.Controls.ContentControl.Content,CheckBox,True,True,,Show all realtime responses
+CNC.Controls.Avalonia.g.ru-RU.resources:consolecontrol.baml,lbl_showAll:System.Windows.FrameworkElement.HorizontalAlignment,None,False,True,,Left
+CNC.Controls.Avalonia.g.ru-RU.resources:consolecontrol.baml,lbl_showAll:System.Windows.FrameworkElement.Margin,None,False,True,,"10,8,0,0"
+CNC.Controls.Avalonia.g.ru-RU.resources:consolecontrol.baml,lbl_showAll:System.Windows.FrameworkElement.VerticalAlignment,None,False,True,,Top
+CNC.Controls.Avalonia.g.ru-RU.resources:consolecontrol.baml,lbl_verbose:System.Windows.Controls.CheckBox.$Content,CheckBox,True,True,,
+CNC.Controls.Avalonia.g.ru-RU.resources:consolecontrol.baml,lbl_verbose:System.Windows.Controls.ContentControl.Content,CheckBox,True,True,,Verbose
+CNC.Controls.Avalonia.g.ru-RU.resources:consolecontrol.baml,lbl_verbose:System.Windows.FrameworkElement.HorizontalAlignment,None,False,True,,Left
+CNC.Controls.Avalonia.g.ru-RU.resources:consolecontrol.baml,lbl_verbose:System.Windows.FrameworkElement.Margin,None,False,True,,"10,8,0,0"
+CNC.Controls.Avalonia.g.ru-RU.resources:consolecontrol.baml,lbl_verbose:System.Windows.FrameworkElement.VerticalAlignment,None,False,True,,Top
+CNC.Controls.Avalonia.g.ru-RU.resources:consolewindow.baml,dlg_senderConsole:System.Windows.Controls.Control.Background,None,False,True,,\#FFE5E5E5
+CNC.Controls.Avalonia.g.ru-RU.resources:consolewindow.baml,dlg_senderConsole:System.Windows.FrameworkElement.Height,None,False,True,,500
+CNC.Controls.Avalonia.g.ru-RU.resources:consolewindow.baml,dlg_senderConsole:System.Windows.FrameworkElement.MinHeight,None,False,True,,115
+CNC.Controls.Avalonia.g.ru-RU.resources:consolewindow.baml,dlg_senderConsole:System.Windows.FrameworkElement.MinWidth,None,False,True,,350
+CNC.Controls.Avalonia.g.ru-RU.resources:consolewindow.baml,dlg_senderConsole:System.Windows.FrameworkElement.Width,None,False,True,,500
+CNC.Controls.Avalonia.g.ru-RU.resources:consolewindow.baml,dlg_senderConsole:System.Windows.Window.Icon,None,False,True,,App.ico
+CNC.Controls.Avalonia.g.ru-RU.resources:consolewindow.baml,dlg_senderConsole:System.Windows.Window.ShowActivated,None,False,True,,False
+CNC.Controls.Avalonia.g.ru-RU.resources:consolewindow.baml,dlg_senderConsole:System.Windows.Window.ShowInTaskbar,None,False,True,,False
+CNC.Controls.Avalonia.g.ru-RU.resources:consolewindow.baml,dlg_senderConsole:System.Windows.Window.Title,Title,True,True,,Sender Console
+CNC.Controls.Avalonia.g.ru-RU.resources:consolewindow.baml,dlg_senderConsole:System.Windows.Window.WindowStyle,None,True,False,,ToolWindow
+CNC.Controls.Avalonia.g.ru-RU.resources:coolantcontrol.baml,grp_coolant:System.Windows.Controls.HeaderedContentControl.Header,Label,True,True,,Coolant
+CNC.Controls.Avalonia.g.ru-RU.resources:coolantcontrol.baml,grp_coolant:System.Windows.FrameworkElement.HorizontalAlignment,None,False,True,,Left
+CNC.Controls.Avalonia.g.ru-RU.resources:coolantcontrol.baml,grp_coolant:System.Windows.FrameworkElement.VerticalAlignment,None,False,True,,Top
+CNC.Controls.Avalonia.g.ru-RU.resources:coolantcontrol.baml,grp_coolant:System.Windows.FrameworkElement.Width,None,False,True,,216
+CNC.Controls.Avalonia.g.ru-RU.resources:coolantcontrol.baml,lbl_fan:CNC.Controls.ToggleControl.Label,None,False,True,,Обдув
+CNC.Controls.Avalonia.g.ru-RU.resources:coolantcontrol.baml,lbl_fan:System.Windows.Controls.CheckBox.$Content,CheckBox,True,True,,
+CNC.Controls.Avalonia.g.ru-RU.resources:coolantcontrol.baml,lbl_fan:System.Windows.Controls.ContentControl.Content,CheckBox,True,True,,Fan
+CNC.Controls.Avalonia.g.ru-RU.resources:coolantcontrol.baml,lbl_fan:System.Windows.FrameworkElement.HorizontalAlignment,None,False,True,,Left
+CNC.Controls.Avalonia.g.ru-RU.resources:coolantcontrol.baml,lbl_fan:System.Windows.FrameworkElement.Margin,None,False,True,,"20,3,0,0"
+CNC.Controls.Avalonia.g.ru-RU.resources:coolantcontrol.baml,lbl_fan:System.Windows.FrameworkElement.VerticalAlignment,None,False,True,,Top
+CNC.Controls.Avalonia.g.ru-RU.resources:coolantcontrol.baml,lbl_flood:CNC.Controls.ToggleControl.Label,None,False,True,,Полив
+CNC.Controls.Avalonia.g.ru-RU.resources:coolantcontrol.baml,lbl_flood:System.Windows.Controls.CheckBox.$Content,CheckBox,True,True,,
+CNC.Controls.Avalonia.g.ru-RU.resources:coolantcontrol.baml,lbl_flood:System.Windows.Controls.ContentControl.Content,CheckBox,True,True,,Flood
+CNC.Controls.Avalonia.g.ru-RU.resources:coolantcontrol.baml,lbl_flood:System.Windows.FrameworkElement.HorizontalAlignment,None,False,True,,Left
+CNC.Controls.Avalonia.g.ru-RU.resources:coolantcontrol.baml,lbl_flood:System.Windows.FrameworkElement.Margin,None,False,True,,"20,3,0,0"
+CNC.Controls.Avalonia.g.ru-RU.resources:coolantcontrol.baml,lbl_flood:System.Windows.FrameworkElement.VerticalAlignment,None,False,True,,Top
+CNC.Controls.Avalonia.g.ru-RU.resources:coolantcontrol.baml,lbl_mist:CNC.Controls.ToggleControl.Label,None,False,True,,Туман
+CNC.Controls.Avalonia.g.ru-RU.resources:coolantcontrol.baml,lbl_mist:System.Windows.Controls.CheckBox.$Content,CheckBox,True,True,,
+CNC.Controls.Avalonia.g.ru-RU.resources:coolantcontrol.baml,lbl_mist:System.Windows.Controls.ContentControl.Content,CheckBox,True,True,,Mist
+CNC.Controls.Avalonia.g.ru-RU.resources:coolantcontrol.baml,lbl_mist:System.Windows.FrameworkElement.HorizontalAlignment,None,False,True,,Left
+CNC.Controls.Avalonia.g.ru-RU.resources:coolantcontrol.baml,lbl_mist:System.Windows.FrameworkElement.Margin,None,False,True,,"20,3,0,0"
+CNC.Controls.Avalonia.g.ru-RU.resources:coolantcontrol.baml,lbl_mist:System.Windows.FrameworkElement.VerticalAlignment,None,False,True,,Top
+CNC.Controls.Avalonia.g.ru-RU.resources:coordvaluesetcontrol.baml,btn_set:System.Windows.Controls.Button.$Content,Button,True,True,,
+CNC.Controls.Avalonia.g.ru-RU.resources:coordvaluesetcontrol.baml,btn_set:System.Windows.Controls.ContentControl.Content,Button,True,True,,Set
+CNC.Controls.Avalonia.g.ru-RU.resources:coordvaluesetcontrol.baml,btn_set:System.Windows.Controls.Grid.Column,None,False,True,,1
+CNC.Controls.Avalonia.g.ru-RU.resources:coordvaluesetcontrol.baml,btn_set:System.Windows.FrameworkElement.Height,None,False,True,,22
+CNC.Controls.Avalonia.g.ru-RU.resources:coordvaluesetcontrol.baml,btn_set:System.Windows.FrameworkElement.HorizontalAlignment,None,False,True,,Left
+CNC.Controls.Avalonia.g.ru-RU.resources:coordvaluesetcontrol.baml,btn_set:System.Windows.FrameworkElement.Margin,None,False,True,,"0,4"
+CNC.Controls.Avalonia.g.ru-RU.resources:coordvaluesetcontrol.baml,btn_set:System.Windows.FrameworkElement.VerticalAlignment,None,False,True,,Center
+CNC.Controls.Avalonia.g.ru-RU.resources:coordvaluesetcontrol.baml,btn_set:System.Windows.FrameworkElement.Width,None,False,True,,35
+CNC.Controls.Avalonia.g.ru-RU.resources:drocontrol.baml,btn_zeroAll:System.Windows.Controls.Button.$Content,Button,True,True,,
+CNC.Controls.Avalonia.g.ru-RU.resources:drocontrol.baml,btn_zeroAll:System.Windows.Controls.ContentControl.Content,Button,True,True,,Zero all
+CNC.Controls.Avalonia.g.ru-RU.resources:drocontrol.baml,btn_zeroAll:System.Windows.FrameworkElement.Height,None,False,True,,28
+CNC.Controls.Avalonia.g.ru-RU.resources:drocontrol.baml,btn_zeroAll:System.Windows.FrameworkElement.HorizontalAlignment,None,False,True,,Center
+CNC.Controls.Avalonia.g.ru-RU.resources:drocontrol.baml,btn_zeroAll:System.Windows.FrameworkElement.Margin,None,False,True,,"2,3"
+CNC.Controls.Avalonia.g.ru-RU.resources:drocontrol.baml,btn_zeroAll:System.Windows.FrameworkElement.Width,None,False,True,,180
+CNC.Controls.Avalonia.g.ru-RU.resources:drocontrol.baml,btn_zeroAll:System.Windows.UIElement.Focusable,None,False,True,,False
+CNC.Controls.Avalonia.g.ru-RU.resources:drocontrol.baml,grp_dro:System.Windows.Controls.HeaderedContentControl.Header,Label,True,True,,DRO
+CNC.Controls.Avalonia.g.ru-RU.resources:drocontrol.baml,grp_dro:System.Windows.FrameworkElement.HorizontalAlignment,None,False,True,,Center
+CNC.Controls.Avalonia.g.ru-RU.resources:drocontrol.baml,grp_dro:System.Windows.FrameworkElement.VerticalAlignment,None,False,True,,Top
+CNC.Controls.Avalonia.g.ru-RU.resources:drocontrol.baml,grp_dro:System.Windows.FrameworkElement.Width,None,False,True,,216
+CNC.Controls.Avalonia.g.ru-RU.resources:errorsandalarms.baml,tab_alarms:System.Windows.Controls.HeaderedContentControl.Header,Label,True,True,,Коды аварий
+CNC.Controls.Avalonia.g.ru-RU.resources:errorsandalarms.baml,tab_errors:System.Windows.Controls.HeaderedContentControl.Header,Label,True,True,,Коды ошибок
+CNC.Controls.Avalonia.g.ru-RU.resources:errorsandalarms.baml,wnd_errorsAndAlarms:System.Windows.Window.Title,Title,True,True,,Коды аварий контроллера
+CNC.Controls.Avalonia.g.ru-RU.resources:feedcontrol.baml,grp_feedrate:System.Windows.Controls.HeaderedContentControl.Header,Label,True,True,,Feed rate
+CNC.Controls.Avalonia.g.ru-RU.resources:feedcontrol.baml,grp_feedrate:System.Windows.FrameworkElement.Height,None,False,True,,160
+CNC.Controls.Avalonia.g.ru-RU.resources:feedcontrol.baml,grp_feedrate:System.Windows.FrameworkElement.HorizontalAlignment,None,False,True,,Left
+CNC.Controls.Avalonia.g.ru-RU.resources:feedcontrol.baml,grp_feedrate:System.Windows.FrameworkElement.VerticalAlignment,None,False,True,,Top
+CNC.Controls.Avalonia.g.ru-RU.resources:feedcontrol.baml,grp_feedrate:System.Windows.FrameworkElement.Width,None,False,True,,216
+CNC.Controls.Avalonia.g.ru-RU.resources:feedcontrol.baml,lbl_rapids:System.Windows.Controls.ContentControl.Content,Label,True,True,,Rapids:
+CNC.Controls.Avalonia.g.ru-RU.resources:feedcontrol.baml,lbl_rapids:System.Windows.Controls.Grid.Row,None,False,True,,1
+CNC.Controls.Avalonia.g.ru-RU.resources:feedcontrol.baml,lbl_rapids:System.Windows.Controls.Grid.RowSpan,None,False,True,,2
+CNC.Controls.Avalonia.g.ru-RU.resources:feedcontrol.baml,lbl_rapids:System.Windows.Controls.Label.$Content,Label,True,True,,
+CNC.Controls.Avalonia.g.ru-RU.resources:feedcontrol.baml,lbl_rapids:System.Windows.FrameworkElement.Height,None,False,True,,26
+CNC.Controls.Avalonia.g.ru-RU.resources:feedcontrol.baml,lbl_rapids:System.Windows.FrameworkElement.HorizontalAlignment,None,False,True,,Left
+CNC.Controls.Avalonia.g.ru-RU.resources:feedcontrol.baml,lbl_rapids:System.Windows.FrameworkElement.Margin,None,False,True,,"5,20,0,2"
+CNC.Controls.Avalonia.g.ru-RU.resources:feedcontrol.baml,lbl_rapids:System.Windows.FrameworkElement.VerticalAlignment,None,False,True,,Center
+CNC.Controls.Avalonia.g.ru-RU.resources:gcodelistcontrol.baml,hdr_block:System.Windows.Controls.DataGridColumn.Header,None,True,True,,Block
+CNC.Controls.Avalonia.g.ru-RU.resources:gcodelistcontrol.baml,hdr_block:System.Windows.Controls.DataGridColumn.MaxWidth,None,False,True,,60
+CNC.Controls.Avalonia.g.ru-RU.resources:gcodelistcontrol.baml,hdr_block:System.Windows.Controls.DataGridColumn.MinWidth,None,False,True,,50
+CNC.Controls.Avalonia.g.ru-RU.resources:gcodelistcontrol.baml,hdr_block:System.Windows.Controls.DataGridColumn.Width,None,True,False,,50
+CNC.Controls.Avalonia.g.ru-RU.resources:gcodelistcontrol.baml,hdr_block:System.Windows.Controls.DataGridTextColumn.$Content,None,True,True,,
+CNC.Controls.Avalonia.g.ru-RU.resources:gcodelistcontrol.baml,hdr_data:System.Windows.Controls.DataGridColumn.Header,None,True,True,,Data
+CNC.Controls.Avalonia.g.ru-RU.resources:gcodelistcontrol.baml,hdr_data:System.Windows.Controls.DataGridColumn.MinWidth,None,False,True,,280
+CNC.Controls.Avalonia.g.ru-RU.resources:gcodelistcontrol.baml,hdr_data:System.Windows.Controls.DataGridColumn.Width,None,True,False,,*
+CNC.Controls.Avalonia.g.ru-RU.resources:gcodelistcontrol.baml,hdr_data:System.Windows.Controls.DataGridTextColumn.$Content,None,True,True,,
+CNC.Controls.Avalonia.g.ru-RU.resources:gcodelistcontrol.baml,mnu_copyToMDI:System.Windows.Controls.HeaderedItemsControl.Header,Menu,True,True,,Copy to MDI
+CNC.Controls.Avalonia.g.ru-RU.resources:gcodelistcontrol.baml,mnu_sendToController:System.Windows.Controls.HeaderedItemsControl.Header,Menu,True,True,,Send to controller
+CNC.Controls.Avalonia.g.ru-RU.resources:gcodelistcontrol.baml,mnu_startFromHere:System.Windows.Controls.HeaderedItemsControl.Header,Menu,True,True,,Start from here
+CNC.Controls.Avalonia.g.ru-RU.resources:gcodelistcontrol.baml,mnu_ToggleBreak:System.Windows.Controls.HeaderedItemsControl.Header,Menu,True,True,,Toggle Break
+CNC.Controls.Avalonia.g.ru-RU.resources:gcoderotatedialog.baml,btn_cancel:System.Windows.Controls.Button.$Content,Button,True,True,,
+CNC.Controls.Avalonia.g.ru-RU.resources:gcoderotatedialog.baml,btn_cancel:System.Windows.Controls.ContentControl.Content,Button,True,True,,Cancel
+CNC.Controls.Avalonia.g.ru-RU.resources:gcoderotatedialog.baml,btn_cancel:System.Windows.FrameworkElement.HorizontalAlignment,None,False,True,,Left
+CNC.Controls.Avalonia.g.ru-RU.resources:gcoderotatedialog.baml,btn_cancel:System.Windows.FrameworkElement.Margin,None,False,True,,"5,0,0,0"
+CNC.Controls.Avalonia.g.ru-RU.resources:gcoderotatedialog.baml,btn_cancel:System.Windows.FrameworkElement.VerticalAlignment,None,False,True,,Top
+CNC.Controls.Avalonia.g.ru-RU.resources:gcoderotatedialog.baml,btn_cancel:System.Windows.FrameworkElement.Width,None,False,True,,75
+CNC.Controls.Avalonia.g.ru-RU.resources:gcoderotatedialog.baml,btn_ok:System.Windows.Controls.Button.$Content,Button,True,True,,
+CNC.Controls.Avalonia.g.ru-RU.resources:gcoderotatedialog.baml,btn_ok:System.Windows.Controls.ContentControl.Content,Button,True,True,,Ok
+CNC.Controls.Avalonia.g.ru-RU.resources:gcoderotatedialog.baml,btn_ok:System.Windows.FrameworkElement.HorizontalAlignment,None,False,True,,Left
+CNC.Controls.Avalonia.g.ru-RU.resources:gcoderotatedialog.baml,btn_ok:System.Windows.FrameworkElement.VerticalAlignment,None,False,True,,Top
+CNC.Controls.Avalonia.g.ru-RU.resources:gcoderotatedialog.baml,btn_ok:System.Windows.FrameworkElement.Width,None,False,True,,75
+CNC.Controls.Avalonia.g.ru-RU.resources:gcoderotatedialog.baml,fld_angle:CNC.Controls.NumericField.$Content,None,True,True,,
+CNC.Controls.Avalonia.g.ru-RU.resources:gcoderotatedialog.baml,fld_angle:CNC.Controls.NumericField.ColonAt,None,True,True,,50
+CNC.Controls.Avalonia.g.ru-RU.resources:gcoderotatedialog.baml,fld_angle:CNC.Controls.NumericField.Format,None,True,True,,-\#\#0.\#
+CNC.Controls.Avalonia.g.ru-RU.resources:gcoderotatedialog.baml,fld_angle:CNC.Controls.NumericField.Label,None,True,True,,Angle:
+CNC.Controls.Avalonia.g.ru-RU.resources:gcoderotatedialog.baml,fld_angle:CNC.Controls.NumericField.Name,None,True,True,,Angle
+CNC.Controls.Avalonia.g.ru-RU.resources:gcoderotatedialog.baml,fld_angle:CNC.Controls.NumericField.Unit,None,True,True,,degrees
+CNC.Controls.Avalonia.g.ru-RU.resources:gcoderotatedialog.baml,grp_rotationCenter:System.Windows.Controls.HeaderedContentControl.Header,Label,True,True,,Rotation center
+CNC.Controls.Avalonia.g.ru-RU.resources:gcoderotatedialog.baml,grp_rotationCenter:System.Windows.FrameworkElement.HorizontalAlignment,None,False,True,,Left
+CNC.Controls.Avalonia.g.ru-RU.resources:gcoderotatedialog.baml,grp_rotationCenter:System.Windows.FrameworkElement.Margin,None,False,True,,"10,0"
+CNC.Controls.Avalonia.g.ru-RU.resources:gcoderotatedialog.baml,grp_rotationCenter:System.Windows.FrameworkElement.ToolTip,ToolTip,True,True,,"Click to select rotation center relative to job, if not selected X0,Y0 is used."
+CNC.Controls.Avalonia.g.ru-RU.resources:gcoderotatedialog.baml,grp_rotationCenter:System.Windows.FrameworkElement.Width,None,False,True,,100
+CNC.Controls.Avalonia.g.ru-RU.resources:gcodewrapdialog.baml,btn_cancel:System.Windows.Controls.ContentControl.Content,Button,True,True,,Отмена
+CNC.Controls.Avalonia.g.ru-RU.resources:gcodewrapdialog.baml,btn_ok:System.Windows.Controls.ContentControl.Content,Button,True,True,,Ok
+CNC.Controls.Avalonia.g.ru-RU.resources:gcodewrapdialog.baml,fld_diameter:CNC.Controls.NumericField.Label,None,True,True,,Диаметр:
+CNC.Controls.Avalonia.g.ru-RU.resources:gcodewrapdialog.baml,lbl_wrapSource:System.Windows.Controls.ContentControl.Content,Label,True,True,,Свернуть:
+CNC.Controls.Avalonia.g.ru-RU.resources:gcodewrapdialog.baml,lbl_wrapTarget:System.Windows.Controls.ContentControl.Content,Label,True,True,,в:
+CNC.Controls.Avalonia.g.ru-RU.resources:gotobasecontrol.baml,btn_goto:System.Windows.Controls.ContentControl.Content,Button,True,True,,Go
+CNC.Controls.Avalonia.g.ru-RU.resources:gotobasecontrol.baml,btn_gotoG28:System.Windows.Controls.ContentControl.Content,Button,True,True,,Перейти в G28
+CNC.Controls.Avalonia.g.ru-RU.resources:gotobasecontrol.baml,btn_gotoG30:System.Windows.Controls.ContentControl.Content,Button,True,True,,Перейти в G30
+CNC.Controls.Avalonia.g.ru-RU.resources:gotocontrol.baml,btn_gotoG28:System.Windows.Controls.Button.$Content,Button,True,True,,
+CNC.Controls.Avalonia.g.ru-RU.resources:gotocontrol.baml,btn_gotoG28:System.Windows.Controls.ContentControl.Content,Button,True,True,,Goto position 1 (G28)
+CNC.Controls.Avalonia.g.ru-RU.resources:gotocontrol.baml,btn_gotoG28:System.Windows.FrameworkElement.HorizontalAlignment,None,False,True,,Left
+CNC.Controls.Avalonia.g.ru-RU.resources:gotocontrol.baml,btn_gotoG28:System.Windows.FrameworkElement.Margin,None,False,True,,"5,5,0,0"
+CNC.Controls.Avalonia.g.ru-RU.resources:gotocontrol.baml,btn_gotoG28:System.Windows.FrameworkElement.VerticalAlignment,None,False,True,,Top
+CNC.Controls.Avalonia.g.ru-RU.resources:gotocontrol.baml,btn_gotoG28:System.Windows.FrameworkElement.Width,None,False,True,,150
+CNC.Controls.Avalonia.g.ru-RU.resources:gotocontrol.baml,btn_gotoG28:System.Windows.UIElement.Focusable,None,False,True,,False
+CNC.Controls.Avalonia.g.ru-RU.resources:gotocontrol.baml,btn_gotoG30:System.Windows.Controls.Button.$Content,Button,True,True,,
+CNC.Controls.Avalonia.g.ru-RU.resources:gotocontrol.baml,btn_gotoG30:System.Windows.Controls.ContentControl.Content,Button,True,True,,Goto position 2 (G30)
+CNC.Controls.Avalonia.g.ru-RU.resources:gotocontrol.baml,btn_gotoG30:System.Windows.FrameworkElement.HorizontalAlignment,None,False,True,,Left
+CNC.Controls.Avalonia.g.ru-RU.resources:gotocontrol.baml,btn_gotoG30:System.Windows.FrameworkElement.Margin,None,False,True,,"5,5,0,0"
+CNC.Controls.Avalonia.g.ru-RU.resources:gotocontrol.baml,btn_gotoG30:System.Windows.FrameworkElement.VerticalAlignment,None,False,True,,Top
+CNC.Controls.Avalonia.g.ru-RU.resources:gotocontrol.baml,btn_gotoG30:System.Windows.FrameworkElement.Width,None,False,True,,150
+CNC.Controls.Avalonia.g.ru-RU.resources:gotocontrol.baml,btn_gotoG30:System.Windows.UIElement.Focusable,None,False,True,,False
+CNC.Controls.Avalonia.g.ru-RU.resources:gotocontrol.baml,grp_goto:System.Windows.Controls.HeaderedContentControl.Header,Label,True,True,,Переход
+CNC.Controls.Avalonia.g.ru-RU.resources:gotoflyoutcontrol.baml,str_gotoFlyout:System.String.$Content,None,True,True,,_Перейти
+CNC.Controls.Avalonia.g.ru-RU.resources:grblalarmlist.baml,hdr_alarmCode:System.Windows.Controls.DataGridColumn.Header,None,True,True,,Код
+CNC.Controls.Avalonia.g.ru-RU.resources:grblalarmlist.baml,hdr_alarmMessage:System.Windows.Controls.DataGridColumn.Header,None,True,True,,Авария
+CNC.Controls.Avalonia.g.ru-RU.resources:grblerrorlist.baml,hdr_errorCode:System.Windows.Controls.DataGridColumn.Header,None,True,True,,Код
+CNC.Controls.Avalonia.g.ru-RU.resources:grblerrorlist.baml,hdr_errorMessage:System.Windows.Controls.DataGridColumn.Header,None,True,True,,Ошибка
+CNC.Controls.Avalonia.g.ru-RU.resources:jobcontrol.baml,btn_cycleStart:System.Windows.Controls.Button.$Content,Button,True,True,,
+CNC.Controls.Avalonia.g.ru-RU.resources:jobcontrol.baml,btn_cycleStart:System.Windows.Controls.ContentControl.Content,Button,True,True,,Cycle Start
+CNC.Controls.Avalonia.g.ru-RU.resources:jobcontrol.baml,btn_cycleStart:System.Windows.FrameworkElement.ToolTip,ToolTip,True,True,,Alt+R
+CNC.Controls.Avalonia.g.ru-RU.resources:jobcontrol.baml,btn_feedHold:System.Windows.Controls.Button.$Content,Button,True,True,,
+CNC.Controls.Avalonia.g.ru-RU.resources:jobcontrol.baml,btn_feedHold:System.Windows.Controls.ContentControl.Content,Button,True,True,,Feed Hold
+CNC.Controls.Avalonia.g.ru-RU.resources:jobcontrol.baml,btn_feedHold:System.Windows.FrameworkElement.Margin,None,False,True,,"5,0,0,0"
+CNC.Controls.Avalonia.g.ru-RU.resources:jobcontrol.baml,btn_feedHold:System.Windows.FrameworkElement.ToolTip,ToolTip,True,True,,Space
+CNC.Controls.Avalonia.g.ru-RU.resources:jobcontrol.baml,btn_rewind:System.Windows.Controls.Button.$Content,Button,True,True,,
+CNC.Controls.Avalonia.g.ru-RU.resources:jobcontrol.baml,btn_rewind:System.Windows.Controls.ContentControl.Content,Button,True,True,,Rewind
+CNC.Controls.Avalonia.g.ru-RU.resources:jobcontrol.baml,btn_rewind:System.Windows.FrameworkElement.Margin,None,False,True,,"5,0,0,0"
+CNC.Controls.Avalonia.g.ru-RU.resources:jobcontrol.baml,btn_stop:System.Windows.Controls.Button.$Content,Button,True,True,,
+CNC.Controls.Avalonia.g.ru-RU.resources:jobcontrol.baml,btn_stop:System.Windows.Controls.ContentControl.Content,Button,True,True,,Stop
+CNC.Controls.Avalonia.g.ru-RU.resources:jobcontrol.baml,btn_stop:System.Windows.FrameworkElement.Margin,None,False,True,,"5,0,0,0"
+CNC.Controls.Avalonia.g.ru-RU.resources:jobcontrol.baml,btn_stop:System.Windows.FrameworkElement.ToolTip,ToolTip,True,True,,Alt+S
+CNC.Controls.Avalonia.g.ru-RU.resources:jobcontrol.baml,str_checking:System.String.$Content,None,True,True,,Проверка…
+CNC.Controls.Avalonia.g.ru-RU.resources:jobcontrol.baml,str_g28g30:System.String.$Content,None,True,True,,Программа содержит перемещения G28/G30 и станок не базирован.
+CNC.Controls.Avalonia.g.ru-RU.resources:jobcontrol.baml,str_pause:System.String.$Content,None,True,True,,Пауза
+CNC.Controls.Avalonia.g.ru-RU.resources:jobcontrol.baml,str_stop:System.String.$Content,None,True,True,,Стоп
+CNC.Controls.Avalonia.g.ru-RU.resources:jobcontrol.baml,str_toolchanges:System.String.$Content,None,True,True,,"Программа содержит {0} смен инструмента командой M6, лиш некоторые версии Grbl это поддерживают."
+CNC.Controls.Avalonia.g.ru-RU.resources:jobcontrol.baml,str_toolchangeTLO:System.String.$Content,None,True,True,,"Программа содержит {0} смен инструмента, необходимо установиь точку отсчета длинны инструмента стартом."
+CNC.Controls.Avalonia.g.ru-RU.resources:jobcontrol.baml,str_transferComplete:System.String.$Content,None,True,True,,Передача завершена.
+CNC.Controls.Avalonia.g.ru-RU.resources:jogbasecontrol.baml,grp_jogDistance:System.Windows.Controls.HeaderedContentControl.Header,Label,True,True,,Расстояние перемещения
+CNC.Controls.Avalonia.g.ru-RU.resources:jogbasecontrol.baml,grp_jogFeedrate:System.Windows.Controls.HeaderedContentControl.Header,Label,True,True,,Подача
+CNC.Controls.Avalonia.g.ru-RU.resources:jogbasecontrol.baml,lbl_jogContinuous:System.Windows.Controls.ContentControl.Content,RadioButton,True,True,,Continuous
+CNC.Controls.Avalonia.g.ru-RU.resources:jogcontrol.baml,grp_jogDistance:System.Windows.Controls.HeaderedContentControl.Header,Label,True,True,,Distance
+CNC.Controls.Avalonia.g.ru-RU.resources:jogcontrol.baml,grp_jogDistance:System.Windows.FrameworkElement.Height,None,False,True,,114
+CNC.Controls.Avalonia.g.ru-RU.resources:jogcontrol.baml,grp_jogDistance:System.Windows.FrameworkElement.HorizontalAlignment,None,False,True,,Left
+CNC.Controls.Avalonia.g.ru-RU.resources:jogcontrol.baml,grp_jogDistance:System.Windows.FrameworkElement.Margin,None,False,True,,"5,0,0,0"
+CNC.Controls.Avalonia.g.ru-RU.resources:jogcontrol.baml,grp_jogDistance:System.Windows.FrameworkElement.VerticalAlignment,None,False,True,,Top
+CNC.Controls.Avalonia.g.ru-RU.resources:jogcontrol.baml,grp_jogDistance:System.Windows.FrameworkElement.Width,None,False,True,,80
+CNC.Controls.Avalonia.g.ru-RU.resources:jogcontrol.baml,grp_jogFeedrate:System.Windows.Controls.HeaderedContentControl.Header,Label,True,True,,Feed rate
+CNC.Controls.Avalonia.g.ru-RU.resources:jogcontrol.baml,grp_jogFeedrate:System.Windows.FrameworkElement.Height,None,False,True,,114
+CNC.Controls.Avalonia.g.ru-RU.resources:jogcontrol.baml,grp_jogFeedrate:System.Windows.FrameworkElement.HorizontalAlignment,None,False,True,,Left
+CNC.Controls.Avalonia.g.ru-RU.resources:jogcontrol.baml,grp_jogFeedrate:System.Windows.FrameworkElement.Margin,None,False,True,,"5,0,0,4"
+CNC.Controls.Avalonia.g.ru-RU.resources:jogcontrol.baml,grp_jogFeedrate:System.Windows.FrameworkElement.VerticalAlignment,None,False,True,,Top
+CNC.Controls.Avalonia.g.ru-RU.resources:jogcontrol.baml,grp_jogFeedrate:System.Windows.FrameworkElement.Width,None,False,True,,80
+CNC.Controls.Avalonia.g.ru-RU.resources:jogcontrol.baml,grp_uijog:System.Windows.Controls.HeaderedContentControl.Header,Label,True,True,,Пульт
+CNC.Controls.Avalonia.g.ru-RU.resources:jogflyoutcontrol.baml,str_jogFlyout:System.String.$Content,None,True,True,,_Пульт
+CNC.Controls.Avalonia.g.ru-RU.resources:libstrings.baml,str_appconfCreate:System.String.$Content,None,True,True,,Файл конфигурации не найден или поврежден. Создать новый?
+CNC.Controls.Avalonia.g.ru-RU.resources:libstrings.baml,str_appconfCreateFail:System.String.$Content,None,True,True,,Ошибка сохранения файла конфигурации.
+CNC.Controls.Avalonia.g.ru-RU.resources:libstrings.baml,str_appconfNoConnect:System.String.$Content,None,True,True,,Невозможно установиь соединение ({0})
+CNC.Controls.Avalonia.g.ru-RU.resources:libstrings.baml,str_convBlockOfBlocks:System.String.$Content,None,True,True,,Блок: {0}/{1}
+CNC.Controls.Avalonia.g.ru-RU.resources:libstrings.baml,str_convNumBlocks:System.String.$Content,None,True,True,,Блоки: {1}
+CNC.Controls.Avalonia.g.ru-RU.resources:libstrings.baml,str_grblStateAlarm:System.String.$Content,None,True,True,,АВАРИЯ
+CNC.Controls.Avalonia.g.ru-RU.resources:libstrings.baml,str_grblStateCheck:System.String.$Content,None,True,True,,ТЕСТ
+CNC.Controls.Avalonia.g.ru-RU.resources:libstrings.baml,str_grblStateDoor:System.String.$Content,None,True,True,,ДВЕРЬ
+CNC.Controls.Avalonia.g.ru-RU.resources:libstrings.baml,str_grblStateHold:System.String.$Content,None,True,True,,ОСТАНОВ
+CNC.Controls.Avalonia.g.ru-RU.resources:libstrings.baml,str_grblStateHome:System.String.$Content,None,True,True,,БАЗА
+CNC.Controls.Avalonia.g.ru-RU.resources:libstrings.baml,str_grblStateIdle:System.String.$Content,None,True,True,,ГОТОВ
+CNC.Controls.Avalonia.g.ru-RU.resources:libstrings.baml,str_grblStateJog:System.String.$Content,None,True,True,,ДВИЖ.
+CNC.Controls.Avalonia.g.ru-RU.resources:libstrings.baml,str_grblStateRun:System.String.$Content,None,True,True,,АВТО
+CNC.Controls.Avalonia.g.ru-RU.resources:libstrings.baml,str_grblStateSleep:System.String.$Content,None,True,True,,СОН
+CNC.Controls.Avalonia.g.ru-RU.resources:libstrings.baml,str_grblStateTool:System.String.$Content,None,True,True,,ИНСТРУМ.
+CNC.Controls.Avalonia.g.ru-RU.resources:libstrings.baml,str_grblStateUnknown:System.String.$Content,None,True,True,,НЕОПРЕД.
+CNC.Controls.Avalonia.g.ru-RU.resources:libstrings.baml,str_keymappingsSaved:System.String.$Content,None,True,True,,Привязка клавиш сохранена в {0}
+CNC.Controls.Avalonia.g.ru-RU.resources:libstrings.baml,str_msgBadResponseExit:System.String.$Content,None,True,True,,"Unexpected response received from controller: {0}, exiting."
+CNC.Controls.Avalonia.g.ru-RU.resources:libstrings.baml,str_msgDoorExit:System.String.$Content,None,True,True,,"Дверь не закрыта, выйти?"
+CNC.Controls.Avalonia.g.ru-RU.resources:libstrings.baml,str_msgDoorOpen:System.String.$Content,None,True,True,,"Дверь открыта, закрыть и продолжить?"
+CNC.Controls.Avalonia.g.ru-RU.resources:libstrings.baml,str_msgDoorPersist:System.String.$Content,None,True,True,,Статус двери не может быть очищен &lt;Reset&gt;
+CNC.Controls.Avalonia.g.ru-RU.resources:libstrings.baml,str_msgEStop:System.String.$Content,None,True,True,,E-Stop активен! - отключите для продолжения…
+CNC.Controls.Avalonia.g.ru-RU.resources:libstrings.baml,str_msgEStopExit:System.String.$Content,None,True,True,,E-Stop активен! Выйти?
+CNC.Controls.Avalonia.g.ru-RU.resources:libstrings.baml,str_msgHome:System.String.$Content,None,True,True,,"Необходимо выполнить базирование, &lt;База&gt; для продолжения"
+CNC.Controls.Avalonia.g.ru-RU.resources:libstrings.baml,str_msgNoComm:System.String.$Content,None,True,True,,Контроллер не отвечает. Состояние {0}. Перезагрузить?
+CNC.Controls.Avalonia.g.ru-RU.resources:libstrings.baml,str_msgNoCommAlarm:System.String.$Content,None,True,True,,Авария контроллера {0}. Перезапуск…
+CNC.Controls.Avalonia.g.ru-RU.resources:libstrings.baml,str_msgNoResponse:System.String.$Content,None,True,True,,Контроллер не отвечает!
+CNC.Controls.Avalonia.g.ru-RU.resources:libstrings.baml,str_msgNoResponseExit:System.String.$Content,None,True,True,,"No response received from controller, exiting."
+CNC.Controls.Avalonia.g.ru-RU.resources:libstrings.baml,str_msgResetExit:System.String.$Content,None,True,True,,Ошибка перезагрузки. Программа будет завершена.
+CNC.Controls.Avalonia.g.ru-RU.resources:libstrings.baml,str_msgResetFailed:System.String.$Content,None,True,True,,Ошибка перезагрузки. Программа будет завершена.
+CNC.Controls.Avalonia.g.ru-RU.resources:libstrings.baml,str_msgWait:System.String.$Content,None,True,True,,#N/A
+CNC.Controls.Avalonia.g.ru-RU.resources:libstrings.baml,str_rotateG17G18Arcs:System.String.$Content,None,True,True,,GCode содержит дуги в плоскости XZ или YZ (G18/19). Трансляция невозможна. Используйте &apos;Arcs to Lines&apos; при необходимости.
+CNC.Controls.Avalonia.g.ru-RU.resources:libstrings.baml,str_rotateRadiusArcs:System.String.$Content,None,True,True,,Gcode содердит дуги в радиусной записи.  Трансляция невозможна. Используйте &apos;Arcs to Lines&apos; при необходимости.
+CNC.Controls.Avalonia.g.ru-RU.resources:libstrings.baml,str_settingsReloadMismatch:System.String.$Content,None,True,True,,"Some settings were ignored, not supported by the controller."
+CNC.Controls.Avalonia.g.ru-RU.resources:libstrings.baml,str_settingsSaved:System.String.$Content,None,True,True,,Установки сохранены.
+CNC.Controls.Avalonia.g.ru-RU.resources:libstrings.baml,str_themeBlack:System.String.$Content,None,True,True,,Black
+CNC.Controls.Avalonia.g.ru-RU.resources:libstrings.baml,str_themeDark:System.String.$Content,None,True,True,,Dark
+CNC.Controls.Avalonia.g.ru-RU.resources:libstrings.baml,str_themeDefault:System.String.$Content,None,True,True,,Default
+CNC.Controls.Avalonia.g.ru-RU.resources:libstrings.baml,str_themeLight:System.String.$Content,None,True,True,,Light
+CNC.Controls.Avalonia.g.ru-RU.resources:libstrings.baml,str_themeWhite:System.String.$Content,None,True,True,,White
+CNC.Controls.Avalonia.g.ru-RU.resources:libstrings.baml,str_validateMax:System.String.$Content,None,True,True,,Ошибка ввода: max. значение {0}.
+CNC.Controls.Avalonia.g.ru-RU.resources:libstrings.baml,str_validateMin:System.String.$Content,None,True,True,,Ошибка ввода: min. значение {0}.
+CNC.Controls.Avalonia.g.ru-RU.resources:libstrings.baml,str_validateNotIP4:System.String.$Content,None,True,True,,Ошибка ввода: неверный формат IP4 адреса..
+CNC.Controls.Avalonia.g.ru-RU.resources:libstrings.baml,str_validateRange:System.String.$Content,None,True,True,,Ошибка ввода: Разрешенный диапазон {0} - {1}.
+CNC.Controls.Avalonia.g.ru-RU.resources:libstrings.baml,str_verifySendController:System.String.$Content,None,True,True,,Are you sure you want to send the selected blocks to the controller?
+CNC.Controls.Avalonia.g.ru-RU.resources:libstrings.baml,str_verifyStartFrom:System.String.$Content,None,True,True,,Are you sure the controller is in the correct state to start from block {0}?
+CNC.Controls.Avalonia.g.ru-RU.resources:limitscontrol.baml,grp_programLimits:System.Windows.Controls.HeaderedContentControl.Header,Label,True,True,,Program limits
+CNC.Controls.Avalonia.g.ru-RU.resources:limitscontrol.baml,grp_programLimits:System.Windows.FrameworkElement.HorizontalAlignment,None,False,True,,Center
+CNC.Controls.Avalonia.g.ru-RU.resources:limitscontrol.baml,grp_programLimits:System.Windows.FrameworkElement.VerticalAlignment,None,False,True,,Top
+CNC.Controls.Avalonia.g.ru-RU.resources:limitscontrol.baml,grp_programLimits:System.Windows.FrameworkElement.Width,None,False,True,,216
+CNC.Controls.Avalonia.g.ru-RU.resources:machinepositionflyout.baml,lbl_machinePosition:System.Windows.Controls.TextBlock.$Content,Text,True,True,,
+CNC.Controls.Avalonia.g.ru-RU.resources:machinepositionflyout.baml,lbl_machinePosition:System.Windows.Controls.TextBlock.Text,Text,True,True,,Machine Position
+CNC.Controls.Avalonia.g.ru-RU.resources:machinepositionflyout.baml,lbl_machinePosition:System.Windows.FrameworkElement.Margin,None,False,True,,"0,4,0,0"
+CNC.Controls.Avalonia.g.ru-RU.resources:machinepositionflyout.baml,str_mposFlyout:System.String.$Content,None,True,True,,Маш._координаты
+CNC.Controls.Avalonia.g.ru-RU.resources:macroeditor.baml,btn_add:System.Windows.Controls.Button.$Content,Button,True,True,,
+CNC.Controls.Avalonia.g.ru-RU.resources:macroeditor.baml,btn_add:System.Windows.Controls.ContentControl.Content,Button,True,True,,Add
+CNC.Controls.Avalonia.g.ru-RU.resources:macroeditor.baml,btn_add:System.Windows.FrameworkElement.HorizontalAlignment,None,False,True,,Left
+CNC.Controls.Avalonia.g.ru-RU.resources:macroeditor.baml,btn_add:System.Windows.FrameworkElement.Margin,None,False,True,,"170,10,0,0"
+CNC.Controls.Avalonia.g.ru-RU.resources:macroeditor.baml,btn_add:System.Windows.FrameworkElement.VerticalAlignment,None,False,True,,Top
+CNC.Controls.Avalonia.g.ru-RU.resources:macroeditor.baml,btn_add:System.Windows.FrameworkElement.Width,None,False,True,,45
+CNC.Controls.Avalonia.g.ru-RU.resources:macroeditor.baml,btn_cancel:System.Windows.Controls.Button.$Content,Button,True,True,,
+CNC.Controls.Avalonia.g.ru-RU.resources:macroeditor.baml,btn_cancel:System.Windows.Controls.ContentControl.Content,Button,True,True,,Cancel
+CNC.Controls.Avalonia.g.ru-RU.resources:macroeditor.baml,btn_cancel:System.Windows.FrameworkElement.HorizontalAlignment,None,False,True,,Right
+CNC.Controls.Avalonia.g.ru-RU.resources:macroeditor.baml,btn_cancel:System.Windows.FrameworkElement.Margin,None,False,True,,"0,187,55,0"
+CNC.Controls.Avalonia.g.ru-RU.resources:macroeditor.baml,btn_cancel:System.Windows.FrameworkElement.VerticalAlignment,None,False,True,,Top
+CNC.Controls.Avalonia.g.ru-RU.resources:macroeditor.baml,btn_cancel:System.Windows.FrameworkElement.Width,None,False,True,,75
+CNC.Controls.Avalonia.g.ru-RU.resources:macroeditor.baml,btn_ok:System.Windows.Controls.Button.$Content,Button,True,True,,
+CNC.Controls.Avalonia.g.ru-RU.resources:macroeditor.baml,btn_ok:System.Windows.Controls.ContentControl.Content,Button,True,True,,Ok
+CNC.Controls.Avalonia.g.ru-RU.resources:macroeditor.baml,btn_ok:System.Windows.FrameworkElement.HorizontalAlignment,None,False,True,,Left
+CNC.Controls.Avalonia.g.ru-RU.resources:macroeditor.baml,btn_ok:System.Windows.FrameworkElement.Margin,None,False,True,,"55,187,0,0"
+CNC.Controls.Avalonia.g.ru-RU.resources:macroeditor.baml,btn_ok:System.Windows.FrameworkElement.VerticalAlignment,None,False,True,,Top
+CNC.Controls.Avalonia.g.ru-RU.resources:macroeditor.baml,btn_ok:System.Windows.FrameworkElement.Width,None,False,True,,75
+CNC.Controls.Avalonia.g.ru-RU.resources:macroeditor.baml,chk_confirm:System.Windows.Controls.ContentControl.Content,CheckBox,True,True,,Подтверждать перед выполнением
+CNC.Controls.Avalonia.g.ru-RU.resources:macroeditor.baml,dlg_macroEditor:System.Windows.FrameworkElement.Height,None,False,True,,260
+CNC.Controls.Avalonia.g.ru-RU.resources:macroeditor.baml,dlg_macroEditor:System.Windows.FrameworkElement.Width,None,False,True,,310
+CNC.Controls.Avalonia.g.ru-RU.resources:macroeditor.baml,dlg_macroEditor:System.Windows.Window.Icon,None,False,True,,App.ico
+CNC.Controls.Avalonia.g.ru-RU.resources:macroeditor.baml,dlg_macroEditor:System.Windows.Window.ResizeMode,None,False,True,,NoResize
+CNC.Controls.Avalonia.g.ru-RU.resources:macroeditor.baml,dlg_macroEditor:System.Windows.Window.ShowInTaskbar,None,False,True,,False
+CNC.Controls.Avalonia.g.ru-RU.resources:macroeditor.baml,dlg_macroEditor:System.Windows.Window.Title,Title,True,True,,Macro Editor
+CNC.Controls.Avalonia.g.ru-RU.resources:macroeditor.baml,dlg_macroEditor:System.Windows.Window.WindowStartupLocation,None,False,True,,CenterOwner
+CNC.Controls.Avalonia.g.ru-RU.resources:macroexecutecontrol.baml,btn_edit:System.Windows.Controls.Button.$Content,Button,True,True,,
+CNC.Controls.Avalonia.g.ru-RU.resources:macroexecutecontrol.baml,btn_edit:System.Windows.Controls.ContentControl.Content,Button,True,True,,Edit
+CNC.Controls.Avalonia.g.ru-RU.resources:macroexecutecontrol.baml,btn_edit:System.Windows.FrameworkElement.Height,None,False,True,,25
+CNC.Controls.Avalonia.g.ru-RU.resources:macroexecutecontrol.baml,btn_edit:System.Windows.FrameworkElement.HorizontalAlignment,None,False,True,,Right
+CNC.Controls.Avalonia.g.ru-RU.resources:macroexecutecontrol.baml,btn_edit:System.Windows.FrameworkElement.Margin,None,False,True,,"0,0,8,8"
+CNC.Controls.Avalonia.g.ru-RU.resources:macroexecutecontrol.baml,btn_edit:System.Windows.FrameworkElement.VerticalAlignment,None,False,True,,Bottom
+CNC.Controls.Avalonia.g.ru-RU.resources:macroexecutecontrol.baml,btn_edit:System.Windows.FrameworkElement.Width,None,False,True,,50
+CNC.Controls.Avalonia.g.ru-RU.resources:macroexecutecontrol.baml,lbl_noMacrosDefined:System.Windows.Controls.ContentControl.Content,Label,True,True,,"No macros defined, use Edit button to add."
+CNC.Controls.Avalonia.g.ru-RU.resources:macroexecutecontrol.baml,lbl_noMacrosDefined:System.Windows.Controls.Control.HorizontalContentAlignment,None,False,True,,Center
+CNC.Controls.Avalonia.g.ru-RU.resources:macroexecutecontrol.baml,lbl_noMacrosDefined:System.Windows.Controls.Label.$Content,Label,True,True,,
+CNC.Controls.Avalonia.g.ru-RU.resources:macroexecutecontrol.baml,lbl_noMacrosDefined:System.Windows.Controls.TextBlock.Text,Text,True,True,,"Нет ни одного макроса, используйте кнопку Редакт. для добавления."
+CNC.Controls.Avalonia.g.ru-RU.resources:macroexecutecontrol.baml,lbl_noMacrosDefined:System.Windows.FrameworkElement.HorizontalAlignment,None,False,True,,Center
+CNC.Controls.Avalonia.g.ru-RU.resources:macroexecutecontrol.baml,lbl_noMacrosDefined:System.Windows.FrameworkElement.Margin,None,False,True,,"0,80,0,0"
+CNC.Controls.Avalonia.g.ru-RU.resources:macroexecutecontrol.baml,lbl_noMacrosDefined:System.Windows.FrameworkElement.VerticalAlignment,None,False,True,,Top
+CNC.Controls.Avalonia.g.ru-RU.resources:macroexecutecontrol.baml,lbl_noMacrosDefined:System.Windows.FrameworkElement.Width,None,False,True,,280
+CNC.Controls.Avalonia.g.ru-RU.resources:macroexecutecontrol.baml,str_macrosFlyout:System.String.$Content,None,True,True,,_Макрос
+CNC.Controls.Avalonia.g.ru-RU.resources:macroexecutecontrol.baml,str_runMacro:System.String.$Content,None,True,True,,Выполнить макрос {0}?
+CNC.Controls.Avalonia.g.ru-RU.resources:macrotoolbarcontrol.baml,str_runMacro:System.String.$Content,None,True,True,,Выполнить макрос {0}?
+CNC.Controls.Avalonia.g.ru-RU.resources:mdicontrol.baml,btn_send:System.Windows.Controls.Button.$Content,Button,True,True,,
+CNC.Controls.Avalonia.g.ru-RU.resources:mdicontrol.baml,btn_send:System.Windows.Controls.ContentControl.Content,Button,True,True,,Send
+CNC.Controls.Avalonia.g.ru-RU.resources:mdicontrol.baml,btn_send:System.Windows.Controls.Grid.Column,None,False,True,,1
+CNC.Controls.Avalonia.g.ru-RU.resources:mdicontrol.baml,btn_send:System.Windows.FrameworkElement.Height,None,False,True,,22
+CNC.Controls.Avalonia.g.ru-RU.resources:mdicontrol.baml,btn_send:System.Windows.FrameworkElement.HorizontalAlignment,None,False,True,,Right
+CNC.Controls.Avalonia.g.ru-RU.resources:mdicontrol.baml,btn_send:System.Windows.FrameworkElement.Margin,None,False,True,,"3,0"
+CNC.Controls.Avalonia.g.ru-RU.resources:mdicontrol.baml,btn_send:System.Windows.FrameworkElement.VerticalAlignment,None,False,True,,Center
+CNC.Controls.Avalonia.g.ru-RU.resources:mdicontrol.baml,btn_send:System.Windows.FrameworkElement.Width,None,False,True,,42
+CNC.Controls.Avalonia.g.ru-RU.resources:mdicontrol.baml,btn_send:System.Windows.UIElement.Focusable,None,False,True,,False
+CNC.Controls.Avalonia.g.ru-RU.resources:mdicontrol.baml,grp_mdi:System.Windows.Controls.HeaderedContentControl.Header,Label,True,True,,MDI
+CNC.Controls.Avalonia.g.ru-RU.resources:mdicontrol.baml,grp_mdi:System.Windows.FrameworkElement.HorizontalAlignment,None,False,True,,Center
+CNC.Controls.Avalonia.g.ru-RU.resources:mdicontrol.baml,grp_mdi:System.Windows.FrameworkElement.Margin,None,False,True,,"0,0"
+CNC.Controls.Avalonia.g.ru-RU.resources:mdicontrol.baml,grp_mdi:System.Windows.FrameworkElement.VerticalAlignment,None,False,True,,Top
+CNC.Controls.Avalonia.g.ru-RU.resources:mpgpending.baml,lbl_mpgModeActive:System.Windows.Controls.ContentControl.Content,Label,True,True,,"MPG mode active, waiting for it to be disabled..."
+CNC.Controls.Avalonia.g.ru-RU.resources:mpgpending.baml,lbl_mpgModeActive:System.Windows.Controls.Control.FontSize,None,True,True,,16
+CNC.Controls.Avalonia.g.ru-RU.resources:mpgpending.baml,lbl_mpgModeActive:System.Windows.Controls.Label.$Content,Label,True,True,,
+CNC.Controls.Avalonia.g.ru-RU.resources:mpgpending.baml,lbl_mpgModeActive:System.Windows.FrameworkElement.HorizontalAlignment,None,False,True,,Center
+CNC.Controls.Avalonia.g.ru-RU.resources:mpgpending.baml,lbl_mpgModeActive:System.Windows.FrameworkElement.Margin,None,False,True,,0
+CNC.Controls.Avalonia.g.ru-RU.resources:mpgpending.baml,lbl_mpgModeActive:System.Windows.FrameworkElement.VerticalAlignment,None,False,True,,Center
+CNC.Controls.Avalonia.g.ru-RU.resources:offsetview.baml,btn_clear:System.Windows.Controls.Button.$Content,Button,True,True,,
+CNC.Controls.Avalonia.g.ru-RU.resources:offsetview.baml,btn_clear:System.Windows.Controls.ContentControl.Content,Button,True,True,,Clear all
+CNC.Controls.Avalonia.g.ru-RU.resources:offsetview.baml,btn_currPos:System.Windows.Controls.Button.$Content,Button,True,True,,
+CNC.Controls.Avalonia.g.ru-RU.resources:offsetview.baml,btn_currPos:System.Windows.Controls.ContentControl.Content,Button,True,True,,Get current position
+CNC.Controls.Avalonia.g.ru-RU.resources:offsetview.baml,btn_currPos:System.Windows.FrameworkElement.Margin,None,False,True,,"3,0"
+CNC.Controls.Avalonia.g.ru-RU.resources:offsetview.baml,btn_setAll:System.Windows.Controls.Button.$Content,Button,True,True,,
+CNC.Controls.Avalonia.g.ru-RU.resources:offsetview.baml,btn_setAll:System.Windows.Controls.ContentControl.Content,Button,True,True,,Set all
+CNC.Controls.Avalonia.g.ru-RU.resources:offsetview.baml,btn_setAll:System.Windows.FrameworkElement.Margin,None,False,True,,"3,0"
+CNC.Controls.Avalonia.g.ru-RU.resources:offsetview.baml,hdr_offset:System.Windows.Controls.DataGridColumn.Header,None,True,True,,Offset
+CNC.Controls.Avalonia.g.ru-RU.resources:offsetview.baml,hdr_offset:System.Windows.Controls.DataGridColumn.Width,None,True,False,,50
+CNC.Controls.Avalonia.g.ru-RU.resources:offsetview.baml,hdr_offset:System.Windows.Controls.DataGridTextColumn.$Content,None,True,True,,
+CNC.Controls.Avalonia.g.ru-RU.resources:offsetview.baml,lbl_aAxis:CNC.Controls.CoordValueSetControl.$Content,None,True,True,,
+CNC.Controls.Avalonia.g.ru-RU.resources:offsetview.baml,lbl_aAxis:CNC.Controls.CoordValueSetControl.Click,None,True,True,,cvOffset_Click
+CNC.Controls.Avalonia.g.ru-RU.resources:offsetview.baml,lbl_aAxis:CNC.Controls.CoordValueSetControl.Label,None,True,True,,A axis:
+CNC.Controls.Avalonia.g.ru-RU.resources:offsetview.baml,lbl_aAxis:CNC.Controls.CoordValueSetControl.Name,None,True,True,,cvAOffset
+CNC.Controls.Avalonia.g.ru-RU.resources:offsetview.baml,lbl_axis:System.String.$Content,None,True,True,,Ось {0}:
+CNC.Controls.Avalonia.g.ru-RU.resources:offsetview.baml,lbl_bAxis:CNC.Controls.CoordValueSetControl.$Content,None,True,True,,
+CNC.Controls.Avalonia.g.ru-RU.resources:offsetview.baml,lbl_bAxis:CNC.Controls.CoordValueSetControl.Click,None,True,True,,cvOffset_Click
+CNC.Controls.Avalonia.g.ru-RU.resources:offsetview.baml,lbl_bAxis:CNC.Controls.CoordValueSetControl.Label,None,True,True,,B axis:
+CNC.Controls.Avalonia.g.ru-RU.resources:offsetview.baml,lbl_bAxis:CNC.Controls.CoordValueSetControl.Name,None,True,True,,cvBOffset
+CNC.Controls.Avalonia.g.ru-RU.resources:offsetview.baml,lbl_cAxis:CNC.Controls.CoordValueSetControl.$Content,None,True,True,,
+CNC.Controls.Avalonia.g.ru-RU.resources:offsetview.baml,lbl_cAxis:CNC.Controls.CoordValueSetControl.Click,None,True,True,,cvOffset_Click
+CNC.Controls.Avalonia.g.ru-RU.resources:offsetview.baml,lbl_cAxis:CNC.Controls.CoordValueSetControl.Label,None,True,True,,C axis:
+CNC.Controls.Avalonia.g.ru-RU.resources:offsetview.baml,lbl_cAxis:CNC.Controls.CoordValueSetControl.Name,None,True,True,,cvCOffset
+CNC.Controls.Avalonia.g.ru-RU.resources:offsetview.baml,lbl_offset:System.Windows.Controls.ContentControl.Content,Label,True,True,,Offset:
+CNC.Controls.Avalonia.g.ru-RU.resources:offsetview.baml,lbl_offset:System.Windows.Controls.Control.HorizontalContentAlignment,None,False,True,,Right
+CNC.Controls.Avalonia.g.ru-RU.resources:offsetview.baml,lbl_offset:System.Windows.Controls.Label.$Content,Label,True,True,,
+CNC.Controls.Avalonia.g.ru-RU.resources:offsetview.baml,lbl_offset:System.Windows.FrameworkElement.HorizontalAlignment,None,False,True,,Right
+CNC.Controls.Avalonia.g.ru-RU.resources:offsetview.baml,lbl_offset:System.Windows.FrameworkElement.Margin,None,False,True,,"29,0,0,0"
+CNC.Controls.Avalonia.g.ru-RU.resources:offsetview.baml,lbl_offset:System.Windows.FrameworkElement.VerticalAlignment,None,False,True,,Top
+CNC.Controls.Avalonia.g.ru-RU.resources:offsetview.baml,lbl_xAxis:CNC.Controls.CoordValueSetControl.$Content,None,True,True,,
+CNC.Controls.Avalonia.g.ru-RU.resources:offsetview.baml,lbl_xAxis:CNC.Controls.CoordValueSetControl.Click,None,True,True,,cvOffset_Click
+CNC.Controls.Avalonia.g.ru-RU.resources:offsetview.baml,lbl_xAxis:CNC.Controls.CoordValueSetControl.Label,None,True,True,,X axis:
+CNC.Controls.Avalonia.g.ru-RU.resources:offsetview.baml,lbl_xAxis:CNC.Controls.CoordValueSetControl.Name,None,True,True,,cvXOffset
+CNC.Controls.Avalonia.g.ru-RU.resources:offsetview.baml,lbl_yAxis:CNC.Controls.CoordValueSetControl.$Content,None,True,True,,
+CNC.Controls.Avalonia.g.ru-RU.resources:offsetview.baml,lbl_yAxis:CNC.Controls.CoordValueSetControl.Click,None,True,True,,cvOffset_Click
+CNC.Controls.Avalonia.g.ru-RU.resources:offsetview.baml,lbl_yAxis:CNC.Controls.CoordValueSetControl.Label,None,True,True,,Y axis:
+CNC.Controls.Avalonia.g.ru-RU.resources:offsetview.baml,lbl_yAxis:CNC.Controls.CoordValueSetControl.Name,None,True,True,,cvYOffset
+CNC.Controls.Avalonia.g.ru-RU.resources:offsetview.baml,lbl_zAxis:CNC.Controls.CoordValueSetControl.$Content,None,True,True,,
+CNC.Controls.Avalonia.g.ru-RU.resources:offsetview.baml,lbl_zAxis:CNC.Controls.CoordValueSetControl.Click,None,True,True,,cvOffset_Click
+CNC.Controls.Avalonia.g.ru-RU.resources:offsetview.baml,lbl_zAxis:CNC.Controls.CoordValueSetControl.Label,None,True,True,,Z axis:
+CNC.Controls.Avalonia.g.ru-RU.resources:offsetview.baml,lbl_zAxis:CNC.Controls.CoordValueSetControl.Name,None,True,True,,cvZOffset
+CNC.Controls.Avalonia.g.ru-RU.resources:outlinebasecontrol.baml,btn_go:System.Windows.Controls.ContentControl.Content,Button,True,True,,Старт
+CNC.Controls.Avalonia.g.ru-RU.resources:outlinebasecontrol.baml,lbl_feedrate:CNC.Controls.NumericField.Label,None,True,True,,Подача:
+CNC.Controls.Avalonia.g.ru-RU.resources:outlinebasecontrol.baml,txt_line1:System.Windows.Documents.Run.Text,Text,True,True,,Выполнить движение по границам обработки по X и Y.
+CNC.Controls.Avalonia.g.ru-RU.resources:outlinebasecontrol.baml,txt_line2:System.Windows.Documents.Run.Text,Text,True,True,,"Убедитесь, что путь инструмента свободен!"
+CNC.Controls.Avalonia.g.ru-RU.resources:outlinecontrol.baml,grp_outline:System.Windows.Controls.HeaderedContentControl.Header,Label,True,True,,Границы
+CNC.Controls.Avalonia.g.ru-RU.resources:outlineflyout.baml,btn_go:System.Windows.Controls.Button.$Content,Button,True,True,,
+CNC.Controls.Avalonia.g.ru-RU.resources:outlineflyout.baml,btn_go:System.Windows.Controls.ContentControl.Content,Button,True,True,,Go
+CNC.Controls.Avalonia.g.ru-RU.resources:outlineflyout.baml,btn_go:System.Windows.FrameworkElement.Height,None,False,True,,25
+CNC.Controls.Avalonia.g.ru-RU.resources:outlineflyout.baml,btn_go:System.Windows.FrameworkElement.HorizontalAlignment,None,False,True,,Right
+CNC.Controls.Avalonia.g.ru-RU.resources:outlineflyout.baml,btn_go:System.Windows.FrameworkElement.Margin,None,False,True,,"0,0,8,8"
+CNC.Controls.Avalonia.g.ru-RU.resources:outlineflyout.baml,btn_go:System.Windows.FrameworkElement.VerticalAlignment,None,False,True,,Bottom
+CNC.Controls.Avalonia.g.ru-RU.resources:outlineflyout.baml,btn_go:System.Windows.FrameworkElement.Width,None,False,True,,50
+CNC.Controls.Avalonia.g.ru-RU.resources:outlineflyout.baml,lbl_feedrate:CNC.Controls.NumericField.$Content,None,True,True,,
+CNC.Controls.Avalonia.g.ru-RU.resources:outlineflyout.baml,lbl_feedrate:CNC.Controls.NumericField.Format,None,True,True,,\#\#\#0
+CNC.Controls.Avalonia.g.ru-RU.resources:outlineflyout.baml,lbl_feedrate:CNC.Controls.NumericField.Label,None,True,True,,Feed rate:
+CNC.Controls.Avalonia.g.ru-RU.resources:outlineflyout.baml,lbl_feedrate:System.Windows.FrameworkElement.HorizontalAlignment,None,False,True,,Left
+CNC.Controls.Avalonia.g.ru-RU.resources:outlineflyout.baml,lbl_feedrate:System.Windows.FrameworkElement.Margin,None,False,True,,"5,75,0,0"
+CNC.Controls.Avalonia.g.ru-RU.resources:outlineflyout.baml,lbl_feedrate:System.Windows.FrameworkElement.VerticalAlignment,None,False,True,,Top
+CNC.Controls.Avalonia.g.ru-RU.resources:outlineflyout.baml,str_outlineFlyout:System.String.$Content,None,True,True,,_Границы
+CNC.Controls.Avalonia.g.ru-RU.resources:outlineflyout.baml,txt_line1:System.Windows.Documents.Run.$Content,Text,True,True,,
+CNC.Controls.Avalonia.g.ru-RU.resources:outlineflyout.baml,txt_line1:System.Windows.Documents.Run.Text,Text,True,True,,Execute moves to outline X and Y program limits.
+CNC.Controls.Avalonia.g.ru-RU.resources:outlineflyout.baml,txt_line2:System.Windows.Documents.Run.$Content,Text,True,True,,
+CNC.Controls.Avalonia.g.ru-RU.resources:outlineflyout.baml,txt_line2:System.Windows.Documents.Run.Text,Text,True,True,,Ensure tool tip is clear of any obstructions!
+CNC.Controls.Avalonia.g.ru-RU.resources:outlineflyout.baml,txt_line2:System.Windows.Documents.TextElement.FontWeight,None,True,True,,Bold
+CNC.Controls.Avalonia.g.ru-RU.resources:outlineflyout.baml,txt_line2:System.Windows.Documents.TextElement.Foreground,None,False,True,,\#FFFF0000
+CNC.Controls.Avalonia.g.ru-RU.resources:overridecontrol.baml,lbl_override:System.Windows.Controls.ContentControl.Content,Label,True,True,,Override
+CNC.Controls.Avalonia.g.ru-RU.resources:overridecontrol.baml,lbl_override:System.Windows.Controls.Control.HorizontalContentAlignment,None,False,True,,Right
+CNC.Controls.Avalonia.g.ru-RU.resources:overridecontrol.baml,lbl_override:System.Windows.Controls.Label.$Content,Label,True,True,,
+CNC.Controls.Avalonia.g.ru-RU.resources:overridecontrol.baml,lbl_override:System.Windows.FrameworkElement.Height,None,False,True,,24
+CNC.Controls.Avalonia.g.ru-RU.resources:overridecontrol.baml,lbl_override:System.Windows.FrameworkElement.VerticalAlignment,None,False,True,,Center
+CNC.Controls.Avalonia.g.ru-RU.resources:overridecontrol.baml,lbl_override:System.Windows.FrameworkElement.Width,None,False,True,,56
+CNC.Controls.Avalonia.g.ru-RU.resources:portdialog.baml,btn_cancel:System.Windows.Controls.Button.$Content,Button,True,True,,
+CNC.Controls.Avalonia.g.ru-RU.resources:portdialog.baml,btn_cancel:System.Windows.Controls.ContentControl.Content,Button,True,True,,Cancel
+CNC.Controls.Avalonia.g.ru-RU.resources:portdialog.baml,btn_cancel:System.Windows.FrameworkElement.Height,None,False,True,,23
+CNC.Controls.Avalonia.g.ru-RU.resources:portdialog.baml,btn_cancel:System.Windows.FrameworkElement.Margin,None,False,True,,"5,0,0,0"
+CNC.Controls.Avalonia.g.ru-RU.resources:portdialog.baml,btn_cancel:System.Windows.FrameworkElement.Width,None,False,True,,70
+CNC.Controls.Avalonia.g.ru-RU.resources:portdialog.baml,btn_ok:System.Windows.Controls.Button.$Content,Button,True,True,,
+CNC.Controls.Avalonia.g.ru-RU.resources:portdialog.baml,btn_ok:System.Windows.Controls.ContentControl.Content,Button,True,True,,Ok
+CNC.Controls.Avalonia.g.ru-RU.resources:portdialog.baml,btn_ok:System.Windows.FrameworkElement.Height,None,False,True,,23
+CNC.Controls.Avalonia.g.ru-RU.resources:portdialog.baml,btn_ok:System.Windows.FrameworkElement.Width,None,False,True,,70
+CNC.Controls.Avalonia.g.ru-RU.resources:portdialog.baml,dlg_connection:System.Windows.FrameworkElement.Height,None,False,True,,195
+CNC.Controls.Avalonia.g.ru-RU.resources:portdialog.baml,dlg_connection:System.Windows.FrameworkElement.Width,None,False,True,,400
+CNC.Controls.Avalonia.g.ru-RU.resources:portdialog.baml,dlg_connection:System.Windows.Window.Icon,None,False,True,,App.ico
+CNC.Controls.Avalonia.g.ru-RU.resources:portdialog.baml,dlg_connection:System.Windows.Window.ResizeMode,None,False,True,,NoResize
+CNC.Controls.Avalonia.g.ru-RU.resources:portdialog.baml,dlg_connection:System.Windows.Window.Title,Title,True,True,,Sender connection
+CNC.Controls.Avalonia.g.ru-RU.resources:portdialog.baml,dlg_title:System.Windows.Window.Title,Title,True,True,,Подключение контроллера
+CNC.Controls.Avalonia.g.ru-RU.resources:portdialog.baml,lbl_ipAddress:System.Windows.Controls.ContentControl.Content,Label,True,True,,IP address:
+CNC.Controls.Avalonia.g.ru-RU.resources:portdialog.baml,lbl_ipAddress:System.Windows.Controls.Control.HorizontalContentAlignment,None,False,True,,Right
+CNC.Controls.Avalonia.g.ru-RU.resources:portdialog.baml,lbl_ipAddress:System.Windows.Controls.Label.$Content,Label,True,True,,
+CNC.Controls.Avalonia.g.ru-RU.resources:portdialog.baml,lbl_ipAddress:System.Windows.FrameworkElement.HorizontalAlignment,None,False,True,,Left
+CNC.Controls.Avalonia.g.ru-RU.resources:portdialog.baml,lbl_ipAddress:System.Windows.FrameworkElement.Width,None,False,True,,80
+CNC.Controls.Avalonia.g.ru-RU.resources:portdialog.baml,lbl_netPort:System.Windows.Controls.ContentControl.Content,Label,True,True,,Port:
+CNC.Controls.Avalonia.g.ru-RU.resources:portdialog.baml,lbl_netPort:System.Windows.Controls.Control.HorizontalContentAlignment,None,False,True,,Right
+CNC.Controls.Avalonia.g.ru-RU.resources:portdialog.baml,lbl_netPort:System.Windows.Controls.Label.$Content,Label,True,True,,
+CNC.Controls.Avalonia.g.ru-RU.resources:portdialog.baml,lbl_netPort:System.Windows.FrameworkElement.HorizontalAlignment,None,False,True,,Left
+CNC.Controls.Avalonia.g.ru-RU.resources:portdialog.baml,lbl_netPort:System.Windows.FrameworkElement.Width,None,False,True,,80
+CNC.Controls.Avalonia.g.ru-RU.resources:portdialog.baml,lbl_onConnect:System.Windows.Controls.ContentControl.Content,Label,True,True,,On connect:
+CNC.Controls.Avalonia.g.ru-RU.resources:portdialog.baml,lbl_onConnect:System.Windows.Controls.Control.HorizontalContentAlignment,None,False,True,,Right
+CNC.Controls.Avalonia.g.ru-RU.resources:portdialog.baml,lbl_onConnect:System.Windows.Controls.Label.$Content,Label,True,True,,
+CNC.Controls.Avalonia.g.ru-RU.resources:portdialog.baml,lbl_onConnect:System.Windows.FrameworkElement.HorizontalAlignment,None,False,True,,Left
+CNC.Controls.Avalonia.g.ru-RU.resources:portdialog.baml,lbl_onConnect:System.Windows.FrameworkElement.VerticalAlignment,None,False,True,,Center
+CNC.Controls.Avalonia.g.ru-RU.resources:portdialog.baml,lbl_onConnect:System.Windows.FrameworkElement.Width,None,False,True,,80
+CNC.Controls.Avalonia.g.ru-RU.resources:portdialog.baml,lbl_serialBaud:System.Windows.Controls.ContentControl.Content,Label,True,True,,Baud rate:
+CNC.Controls.Avalonia.g.ru-RU.resources:portdialog.baml,lbl_serialPort:System.Windows.Controls.ContentControl.Content,Label,True,True,,Port:
+CNC.Controls.Avalonia.g.ru-RU.resources:portdialog.baml,lbl_serialPort:System.Windows.Controls.Control.HorizontalContentAlignment,None,False,True,,Right
+CNC.Controls.Avalonia.g.ru-RU.resources:portdialog.baml,lbl_serialPort:System.Windows.Controls.Label.$Content,Label,True,True,,
+CNC.Controls.Avalonia.g.ru-RU.resources:portdialog.baml,lbl_serialPort:System.Windows.FrameworkElement.HorizontalAlignment,None,False,True,,Left
+CNC.Controls.Avalonia.g.ru-RU.resources:portdialog.baml,lbl_serialPort:System.Windows.FrameworkElement.VerticalAlignment,None,False,True,,Center
+CNC.Controls.Avalonia.g.ru-RU.resources:portdialog.baml,lbl_serialPort:System.Windows.FrameworkElement.Width,None,False,True,,80
+CNC.Controls.Avalonia.g.ru-RU.resources:portdialog.baml,lbl_websocket:System.Windows.Controls.CheckBox.$Content,CheckBox,True,True,,
+CNC.Controls.Avalonia.g.ru-RU.resources:portdialog.baml,lbl_websocket:System.Windows.Controls.ContentControl.Content,CheckBox,True,True,,WebSocket
+CNC.Controls.Avalonia.g.ru-RU.resources:portdialog.baml,lbl_websocket:System.Windows.FrameworkElement.Margin,None,False,True,,"80,5,0,0"
+CNC.Controls.Avalonia.g.ru-RU.resources:portdialog.baml,tab_network:System.Windows.Controls.HeaderedContentControl.Header,Label,True,True,,Network
+CNC.Controls.Avalonia.g.ru-RU.resources:portdialog.baml,tab_serial:System.Windows.Controls.HeaderedContentControl.Header,Label,True,True,,Serial
+CNC.Controls.Avalonia.g.ru-RU.resources:sdcardview.baml,btn_upload:System.Windows.Controls.Button.$Content,Button,True,True,,
+CNC.Controls.Avalonia.g.ru-RU.resources:sdcardview.baml,btn_upload:System.Windows.Controls.ContentControl.Content,Button,True,True,,Upload
+CNC.Controls.Avalonia.g.ru-RU.resources:sdcardview.baml,btn_upload:System.Windows.FrameworkElement.HorizontalAlignment,None,False,True,,Left
+CNC.Controls.Avalonia.g.ru-RU.resources:sdcardview.baml,btn_upload:System.Windows.FrameworkElement.Margin,None,False,True,,"428,460,0,0"
+CNC.Controls.Avalonia.g.ru-RU.resources:sdcardview.baml,btn_upload:System.Windows.FrameworkElement.VerticalAlignment,None,False,True,,Top
+CNC.Controls.Avalonia.g.ru-RU.resources:sdcardview.baml,btn_upload:System.Windows.FrameworkElement.Width,None,False,True,,75
+CNC.Controls.Avalonia.g.ru-RU.resources:sdcardview.baml,chk_viewAll:System.Windows.Controls.ContentControl.Content,CheckBox,True,True,,List CNC files only
+CNC.Controls.Avalonia.g.ru-RU.resources:sdcardview.baml,dgr_sdcard:System.Windows.Controls.DataGrid.$Content,None,False,True,,
+CNC.Controls.Avalonia.g.ru-RU.resources:sdcardview.baml,dgr_sdcard:System.Windows.Controls.DataGrid.AutoGenerateColumns,None,False,True,,False
+CNC.Controls.Avalonia.g.ru-RU.resources:sdcardview.baml,dgr_sdcard:System.Windows.Controls.DataGrid.CanUserAddRows,None,False,True,,False
+CNC.Controls.Avalonia.g.ru-RU.resources:sdcardview.baml,dgr_sdcard:System.Windows.Controls.DataGrid.CanUserReorderColumns,None,False,True,,False
+CNC.Controls.Avalonia.g.ru-RU.resources:sdcardview.baml,dgr_sdcard:System.Windows.Controls.DataGrid.CanUserResizeColumns,None,False,True,,False
+CNC.Controls.Avalonia.g.ru-RU.resources:sdcardview.baml,dgr_sdcard:System.Windows.Controls.DataGrid.CanUserResizeRows,None,False,True,,False
+CNC.Controls.Avalonia.g.ru-RU.resources:sdcardview.baml,dgr_sdcard:System.Windows.Controls.DataGrid.CanUserSortColumns,None,False,True,,False
+CNC.Controls.Avalonia.g.ru-RU.resources:sdcardview.baml,dgr_sdcard:System.Windows.Controls.DataGrid.IsReadOnly,None,False,True,,True
+CNC.Controls.Avalonia.g.ru-RU.resources:sdcardview.baml,dgr_sdcard:System.Windows.Controls.DataGrid.SelectionMode,None,True,False,,Single
+CNC.Controls.Avalonia.g.ru-RU.resources:sdcardview.baml,dgr_sdcard:System.Windows.Controls.DataGrid.SelectionUnit,None,True,False,,FullRow
+CNC.Controls.Avalonia.g.ru-RU.resources:sdcardview.baml,dgr_sdcard:System.Windows.FrameworkElement.Height,None,False,True,,450
+CNC.Controls.Avalonia.g.ru-RU.resources:sdcardview.baml,dgr_sdcard:System.Windows.FrameworkElement.HorizontalAlignment,None,False,True,,Left
+CNC.Controls.Avalonia.g.ru-RU.resources:sdcardview.baml,dgr_sdcard:System.Windows.FrameworkElement.Margin,None,False,True,,"30,30,0,0"
+CNC.Controls.Avalonia.g.ru-RU.resources:sdcardview.baml,dgr_sdcard:System.Windows.FrameworkElement.ToolTip,ToolTip,True,True,,"Right click for menu, double click to run file."
+CNC.Controls.Avalonia.g.ru-RU.resources:sdcardview.baml,dgr_sdcard:System.Windows.FrameworkElement.VerticalAlignment,None,False,True,,Top
+CNC.Controls.Avalonia.g.ru-RU.resources:sdcardview.baml,dgr_sdcard:System.Windows.FrameworkElement.Width,None,False,True,,380
+CNC.Controls.Avalonia.g.ru-RU.resources:sdcardview.baml,hdr_name:System.Windows.Controls.DataGridColumn.Header,None,True,True,,Name
+CNC.Controls.Avalonia.g.ru-RU.resources:sdcardview.baml,hdr_name:System.Windows.Controls.DataGridColumn.Width,None,True,False,,*
+CNC.Controls.Avalonia.g.ru-RU.resources:sdcardview.baml,hdr_name:System.Windows.Controls.DataGridTextColumn.$Content,None,True,True,,
+CNC.Controls.Avalonia.g.ru-RU.resources:sdcardview.baml,hdr_size:System.Windows.Controls.DataGridColumn.Header,None,True,True,,Size
+CNC.Controls.Avalonia.g.ru-RU.resources:sdcardview.baml,hdr_size:System.Windows.Controls.DataGridColumn.Width,None,True,False,,70
+CNC.Controls.Avalonia.g.ru-RU.resources:sdcardview.baml,hdr_size:System.Windows.Controls.DataGridTextColumn.$Content,None,True,True,,
+CNC.Controls.Avalonia.g.ru-RU.resources:sdcardview.baml,mnu_delete:System.Windows.Controls.HeaderedItemsControl.Header,Menu,True,True,,Delete
+CNC.Controls.Avalonia.g.ru-RU.resources:sdcardview.baml,mnu_delete:System.Windows.Controls.MenuItem.$Content,Menu,True,True,,
+CNC.Controls.Avalonia.g.ru-RU.resources:sdcardview.baml,mnu_downloadRun:System.Windows.Controls.HeaderedItemsControl.Header,Menu,True,True,,Загрузить и вып_олнить
+CNC.Controls.Avalonia.g.ru-RU.resources:sdcardview.baml,mnu_enableRewind:System.Windows.Controls.HeaderedItemsControl.Header,Menu,True,True,,Enable rewind
+CNC.Controls.Avalonia.g.ru-RU.resources:sdcardview.baml,mnu_enableRewind:System.Windows.Controls.MenuItem.$Content,Menu,True,True,,
+CNC.Controls.Avalonia.g.ru-RU.resources:sdcardview.baml,mnu_enableRewind:System.Windows.Controls.MenuItem.IsCheckable,None,False,True,,True
+CNC.Controls.Avalonia.g.ru-RU.resources:sdcardview.baml,mnu_run:System.Windows.Controls.HeaderedItemsControl.Header,Menu,True,True,,Run
+CNC.Controls.Avalonia.g.ru-RU.resources:sdcardview.baml,mnu_run:System.Windows.Controls.MenuItem.$Content,Menu,True,True,,
+CNC.Controls.Avalonia.g.ru-RU.resources:sdcardview.baml,mnu_viewAll:System.Windows.Controls.HeaderedItemsControl.Header,Menu,True,True,,List CNC files only
+CNC.Controls.Avalonia.g.ru-RU.resources:sdcardview.baml,str_deleteFile:System.String.$Content,None,True,True,,Удалить {0}?
+CNC.Controls.Avalonia.g.ru-RU.resources:sdcardview.baml,str_downloadAndRun:System.String.$Content,None,True,True,,Загрузить и выполнить {0}?
+CNC.Controls.Avalonia.g.ru-RU.resources:sdcardview.baml,str_downloading:System.String.$Content,None,True,True,,Загрузка {0}...
+CNC.Controls.Avalonia.g.ru-RU.resources:sdcardview.baml,str_illegalName:System.String.$Content,None,True,True,,"Файл: {0}\\n!,?,~ и ПРОБЕЛ не поддерживаются в имени файла, пожалуйста переименуйте."
+CNC.Controls.Avalonia.g.ru-RU.resources:sdcardview.baml,str_noCard:System.String.$Content,None,True,True,,No card mounted.
+CNC.Controls.Avalonia.g.ru-RU.resources:sdcardview.baml,str_notConnection:System.String.$Content,None,True,True,,Нет связи.
+CNC.Controls.Avalonia.g.ru-RU.resources:sdcardview.baml,str_runMacro:System.String.$Content,None,True,True,,Run macro {0} with no parameters?
+CNC.Controls.Avalonia.g.ru-RU.resources:sdcardview.baml,str_transferAborted:System.String.$Content,None,True,True,,Передача прервана.
+CNC.Controls.Avalonia.g.ru-RU.resources:sdcardview.baml,str_transferDone:System.String.$Content,None,True,True,,Передача завершена.
+CNC.Controls.Avalonia.g.ru-RU.resources:sdcardview.baml,str_transferring:System.String.$Content,None,True,True,,Предано {0} из {1} байт...
+CNC.Controls.Avalonia.g.ru-RU.resources:sdcardview.baml,str_uploading:System.String.$Content,None,True,True,,Загрузка...
+CNC.Controls.Avalonia.g.ru-RU.resources:signalscontrol.baml,grp_signals:System.Windows.Controls.HeaderedContentControl.Header,Label,True,True,,Signals
+CNC.Controls.Avalonia.g.ru-RU.resources:signalscontrol.baml,grp_signals:System.Windows.FrameworkElement.Height,None,False,True,,60
+CNC.Controls.Avalonia.g.ru-RU.resources:signalscontrol.baml,grp_signals:System.Windows.FrameworkElement.HorizontalAlignment,None,False,True,,Left
+CNC.Controls.Avalonia.g.ru-RU.resources:signalscontrol.baml,grp_signals:System.Windows.FrameworkElement.VerticalAlignment,None,False,True,,Top
+CNC.Controls.Avalonia.g.ru-RU.resources:signalscontrol.baml,grp_signals:System.Windows.FrameworkElement.Width,None,False,True,,216
+CNC.Controls.Avalonia.g.ru-RU.resources:signalscontrol.baml,lbl_signalBlockDelete:System.Windows.FrameworkElement.ToolTip,ToolTip,True,True,,Удалить блок
+CNC.Controls.Avalonia.g.ru-RU.resources:signalscontrol.baml,lbl_signalCycleStart:System.Windows.FrameworkElement.ToolTip,ToolTip,True,True,,Запуск программы.
+CNC.Controls.Avalonia.g.ru-RU.resources:signalscontrol.baml,lbl_signalEStop:System.Windows.FrameworkElement.ToolTip,ToolTip,True,True,,E-Stop
+CNC.Controls.Avalonia.g.ru-RU.resources:signalscontrol.baml,lbl_signalFeedHold:System.Windows.FrameworkElement.ToolTip,ToolTip,True,True,,Запрет движения
+CNC.Controls.Avalonia.g.ru-RU.resources:signalscontrol.baml,lbl_signalMotorFault:System.Windows.FrameworkElement.ToolTip,ToolTip,True,True,,Motor fault
+CNC.Controls.Avalonia.g.ru-RU.resources:signalscontrol.baml,lbl_signalMotorWarning:System.Windows.FrameworkElement.ToolTip,ToolTip,True,True,,Сообщения мотора
+CNC.Controls.Avalonia.g.ru-RU.resources:signalscontrol.baml,lbl_signalOptionalStop:System.Windows.FrameworkElement.ToolTip,ToolTip,True,True,,Не обязательная остановка
+CNC.Controls.Avalonia.g.ru-RU.resources:signalscontrol.baml,lbl_signalProbe:System.Windows.FrameworkElement.ToolTip,ToolTip,True,True,,Датчик
+CNC.Controls.Avalonia.g.ru-RU.resources:signalscontrol.baml,lbl_signalReset:System.Windows.FrameworkElement.ToolTip,ToolTip,True,True,,Сброс
+CNC.Controls.Avalonia.g.ru-RU.resources:signalscontrol.baml,lbl_signalSafetyDoor:System.Windows.FrameworkElement.ToolTip,ToolTip,True,True,,Дверь безопасности
+CNC.Controls.Avalonia.g.ru-RU.resources:spindlecontrol.baml,grp_spindle:System.Windows.Controls.HeaderedContentControl.Header,Label,True,True,,Spindle
+CNC.Controls.Avalonia.g.ru-RU.resources:spindlecontrol.baml,grp_spindle:System.Windows.FrameworkElement.Height,None,False,True,,125
+CNC.Controls.Avalonia.g.ru-RU.resources:spindlecontrol.baml,grp_spindle:System.Windows.FrameworkElement.HorizontalAlignment,None,False,True,,Left
+CNC.Controls.Avalonia.g.ru-RU.resources:spindlecontrol.baml,grp_spindle:System.Windows.FrameworkElement.VerticalAlignment,None,False,True,,Top
+CNC.Controls.Avalonia.g.ru-RU.resources:spindlecontrol.baml,grp_spindle:System.Windows.FrameworkElement.Width,None,False,True,,216
+CNC.Controls.Avalonia.g.ru-RU.resources:spindlecontrol.baml,lbl_ccw:System.Windows.Controls.ContentControl.Content,RadioButton,True,True,,CCW
+CNC.Controls.Avalonia.g.ru-RU.resources:spindlecontrol.baml,lbl_ccw:System.Windows.Controls.RadioButton.$Content,RadioButton,True,True,,
+CNC.Controls.Avalonia.g.ru-RU.resources:spindlecontrol.baml,lbl_ccw:System.Windows.FrameworkElement.Height,None,False,True,,16
+CNC.Controls.Avalonia.g.ru-RU.resources:spindlecontrol.baml,lbl_ccw:System.Windows.FrameworkElement.HorizontalAlignment,None,False,True,,Left
+CNC.Controls.Avalonia.g.ru-RU.resources:spindlecontrol.baml,lbl_ccw:System.Windows.FrameworkElement.Margin,None,False,True,,"5,0"
+CNC.Controls.Avalonia.g.ru-RU.resources:spindlecontrol.baml,lbl_ccw:System.Windows.FrameworkElement.VerticalAlignment,None,False,True,,Center
+CNC.Controls.Avalonia.g.ru-RU.resources:spindlecontrol.baml,lbl_cw:System.Windows.Controls.ContentControl.Content,RadioButton,True,True,,CW
+CNC.Controls.Avalonia.g.ru-RU.resources:spindlecontrol.baml,lbl_cw:System.Windows.Controls.RadioButton.$Content,RadioButton,True,True,,
+CNC.Controls.Avalonia.g.ru-RU.resources:spindlecontrol.baml,lbl_cw:System.Windows.FrameworkElement.Height,None,False,True,,16
+CNC.Controls.Avalonia.g.ru-RU.resources:spindlecontrol.baml,lbl_cw:System.Windows.FrameworkElement.HorizontalAlignment,None,False,True,,Left
+CNC.Controls.Avalonia.g.ru-RU.resources:spindlecontrol.baml,lbl_cw:System.Windows.FrameworkElement.Margin,None,False,True,,"5,0"
+CNC.Controls.Avalonia.g.ru-RU.resources:spindlecontrol.baml,lbl_cw:System.Windows.FrameworkElement.VerticalAlignment,None,False,True,,Center
+CNC.Controls.Avalonia.g.ru-RU.resources:spindlecontrol.baml,lbl_off:System.Windows.Controls.ContentControl.Content,RadioButton,True,True,,Off
+CNC.Controls.Avalonia.g.ru-RU.resources:spindlecontrol.baml,lbl_off:System.Windows.Controls.RadioButton.$Content,RadioButton,True,True,,
+CNC.Controls.Avalonia.g.ru-RU.resources:spindlecontrol.baml,lbl_off:System.Windows.FrameworkElement.Height,None,False,True,,16
+CNC.Controls.Avalonia.g.ru-RU.resources:spindlecontrol.baml,lbl_off:System.Windows.FrameworkElement.HorizontalAlignment,None,False,True,,Left
+CNC.Controls.Avalonia.g.ru-RU.resources:spindlecontrol.baml,lbl_off:System.Windows.FrameworkElement.VerticalAlignment,None,False,True,,Center
+CNC.Controls.Avalonia.g.ru-RU.resources:spindlecontrol.baml,lbl_rpm:System.Windows.Controls.ContentControl.Content,Label,True,True,,RPM
+CNC.Controls.Avalonia.g.ru-RU.resources:spindlecontrol.baml,lbl_rpm:System.Windows.Controls.Control.HorizontalContentAlignment,None,False,True,,Right
+CNC.Controls.Avalonia.g.ru-RU.resources:spindlecontrol.baml,lbl_rpm:System.Windows.Controls.Label.$Content,Label,True,True,,
+CNC.Controls.Avalonia.g.ru-RU.resources:spindlecontrol.baml,lbl_rpm:System.Windows.FrameworkElement.Height,None,False,True,,24
+CNC.Controls.Avalonia.g.ru-RU.resources:spindlecontrol.baml,lbl_rpm:System.Windows.FrameworkElement.VerticalAlignment,None,False,True,,Center
+CNC.Controls.Avalonia.g.ru-RU.resources:spindlecontrol.baml,lbl_rpm:System.Windows.FrameworkElement.Width,None,False,True,,34
+CNC.Controls.Avalonia.g.ru-RU.resources:statuscontrol.baml,btn_home:System.Windows.Controls.Button.$Content,Button,True,True,,
+CNC.Controls.Avalonia.g.ru-RU.resources:statuscontrol.baml,btn_home:System.Windows.Controls.ContentControl.Content,Button,True,True,,Home
+CNC.Controls.Avalonia.g.ru-RU.resources:statuscontrol.baml,btn_home:System.Windows.FrameworkElement.ToolTip,ToolTip,True,True,,Ctrl+H
+CNC.Controls.Avalonia.g.ru-RU.resources:statuscontrol.baml,btn_reset:System.Windows.Controls.Button.$Content,Button,True,True,,
+CNC.Controls.Avalonia.g.ru-RU.resources:statuscontrol.baml,btn_reset:System.Windows.Controls.ContentControl.Content,Button,True,True,,Reset
+CNC.Controls.Avalonia.g.ru-RU.resources:statuscontrol.baml,btn_reset:System.Windows.Controls.Control.Background,None,False,True,,\#FFFF0000
+CNC.Controls.Avalonia.g.ru-RU.resources:statuscontrol.baml,btn_reset:System.Windows.Controls.Control.FontFamily,Font,True,True,,Segoe UI Semibold
+CNC.Controls.Avalonia.g.ru-RU.resources:statuscontrol.baml,btn_reset:System.Windows.Controls.Control.FontSize,None,True,True,,14
+CNC.Controls.Avalonia.g.ru-RU.resources:statuscontrol.baml,btn_reset:System.Windows.Controls.Control.Foreground,None,False,True,,\#FFFFFFFF
+CNC.Controls.Avalonia.g.ru-RU.resources:statuscontrol.baml,btn_reset:System.Windows.FrameworkElement.Margin,None,False,True,,"5,0,0,0"
+CNC.Controls.Avalonia.g.ru-RU.resources:statuscontrol.baml,btn_reset:System.Windows.FrameworkElement.ToolTip,ToolTip,True,True,,Ctrl+Shift+R
+CNC.Controls.Avalonia.g.ru-RU.resources:statuscontrol.baml,btn_unlock:System.Windows.Controls.Button.$Content,Button,True,True,,
+CNC.Controls.Avalonia.g.ru-RU.resources:statuscontrol.baml,btn_unlock:System.Windows.Controls.ContentControl.Content,Button,True,True,,Unlock
+CNC.Controls.Avalonia.g.ru-RU.resources:statuscontrol.baml,btn_unlock:System.Windows.FrameworkElement.Margin,None,False,True,,"5,0,0,0"
+CNC.Controls.Avalonia.g.ru-RU.resources:statuscontrol.baml,btn_unlock:System.Windows.FrameworkElement.ToolTip,ToolTip,True,True,,Ctrl+U
+CNC.Controls.Avalonia.g.ru-RU.resources:statuscontrol.baml,lbl_check:System.Windows.Controls.ContentControl.Content,Label,True,True,,Check
+CNC.Controls.Avalonia.g.ru-RU.resources:statuscontrol.baml,lbl_check:System.Windows.Controls.Label.$Content,Label,True,True,,
+CNC.Controls.Avalonia.g.ru-RU.resources:statuscontrol.baml,lbl_check:System.Windows.FrameworkElement.Height,None,False,True,,26
+CNC.Controls.Avalonia.g.ru-RU.resources:statuscontrol.baml,lbl_check:System.Windows.FrameworkElement.VerticalAlignment,None,False,True,,Center
+CNC.Controls.Avalonia.g.ru-RU.resources:statuscontrol.baml,lbl_state:System.Windows.Controls.ContentControl.Content,Label,True,True,,State:
+CNC.Controls.Avalonia.g.ru-RU.resources:statuscontrol.baml,lbl_state:System.Windows.Controls.Control.HorizontalContentAlignment,None,False,True,,Right
+CNC.Controls.Avalonia.g.ru-RU.resources:statuscontrol.baml,lbl_state:System.Windows.Controls.Label.$Content,Label,True,True,,
+CNC.Controls.Avalonia.g.ru-RU.resources:statuscontrol.baml,lbl_state:System.Windows.FrameworkElement.Height,None,False,True,,26
+CNC.Controls.Avalonia.g.ru-RU.resources:statuscontrol.baml,lbl_state:System.Windows.FrameworkElement.HorizontalAlignment,None,False,True,,Left
+CNC.Controls.Avalonia.g.ru-RU.resources:statuscontrol.baml,lbl_state:System.Windows.FrameworkElement.VerticalAlignment,None,False,True,,Center
+CNC.Controls.Avalonia.g.ru-RU.resources:statuscontrol.baml,lbl_state:System.Windows.FrameworkElement.Width,None,False,True,,40
+CNC.Controls.Avalonia.g.ru-RU.resources:statuscontrol.baml,str_clearEStop:System.String.$Content,None,True,True,,Снимите E-Stop перед &lt;Сбросом&gt;&gt;
+CNC.Controls.Avalonia.g.ru-RU.resources:thcmonitorcontrol.baml,str_ThcFlyout:System.String.$Content,None,True,True,,_THC монитор
+CNC.Controls.Avalonia.g.ru-RU.resources:toolview.baml,btn_clear:System.Windows.Controls.Button.$Content,Button,True,True,,
+CNC.Controls.Avalonia.g.ru-RU.resources:toolview.baml,btn_clear:System.Windows.Controls.ContentControl.Content,Button,True,True,,Clear all
+CNC.Controls.Avalonia.g.ru-RU.resources:toolview.baml,btn_currPos:System.Windows.Controls.Button.$Content,Button,True,True,,
+CNC.Controls.Avalonia.g.ru-RU.resources:toolview.baml,btn_currPos:System.Windows.Controls.ContentControl.Content,Button,True,True,,Get current position
+CNC.Controls.Avalonia.g.ru-RU.resources:toolview.baml,btn_currPos:System.Windows.FrameworkElement.Margin,None,False,True,,"3,0"
+CNC.Controls.Avalonia.g.ru-RU.resources:toolview.baml,btn_setAll:System.Windows.Controls.Button.$Content,Button,True,True,,
+CNC.Controls.Avalonia.g.ru-RU.resources:toolview.baml,btn_setAll:System.Windows.Controls.ContentControl.Content,Button,True,True,,Set all
+CNC.Controls.Avalonia.g.ru-RU.resources:toolview.baml,btn_setAll:System.Windows.FrameworkElement.Margin,None,False,True,,"3,0"
+CNC.Controls.Avalonia.g.ru-RU.resources:toolview.baml,grd_tools:System.Windows.Controls.DataGrid.$Content,None,False,True,,
+CNC.Controls.Avalonia.g.ru-RU.resources:toolview.baml,grd_tools:System.Windows.Controls.DataGrid.AutoGenerateColumns,None,False,True,,False
+CNC.Controls.Avalonia.g.ru-RU.resources:toolview.baml,grd_tools:System.Windows.Controls.DataGrid.CanUserAddRows,None,False,True,,False
+CNC.Controls.Avalonia.g.ru-RU.resources:toolview.baml,grd_tools:System.Windows.Controls.DataGrid.CanUserReorderColumns,None,False,True,,False
+CNC.Controls.Avalonia.g.ru-RU.resources:toolview.baml,grd_tools:System.Windows.Controls.DataGrid.CanUserResizeColumns,None,False,True,,False
+CNC.Controls.Avalonia.g.ru-RU.resources:toolview.baml,grd_tools:System.Windows.Controls.DataGrid.CanUserResizeRows,None,False,True,,False
+CNC.Controls.Avalonia.g.ru-RU.resources:toolview.baml,grd_tools:System.Windows.Controls.DataGrid.CanUserSortColumns,None,False,True,,False
+CNC.Controls.Avalonia.g.ru-RU.resources:toolview.baml,grd_tools:System.Windows.Controls.DataGrid.IsReadOnly,None,False,True,,True
+CNC.Controls.Avalonia.g.ru-RU.resources:toolview.baml,grd_tools:System.Windows.Controls.DataGrid.SelectionMode,None,True,False,,Single
+CNC.Controls.Avalonia.g.ru-RU.resources:toolview.baml,grd_tools:System.Windows.Controls.DataGrid.SelectionUnit,None,True,False,,FullRow
+CNC.Controls.Avalonia.g.ru-RU.resources:toolview.baml,grd_tools:System.Windows.Controls.Grid.Row,None,False,True,,0
+CNC.Controls.Avalonia.g.ru-RU.resources:toolview.baml,grd_tools:System.Windows.FrameworkElement.HorizontalAlignment,None,False,True,,Left
+CNC.Controls.Avalonia.g.ru-RU.resources:toolview.baml,grd_tools:System.Windows.FrameworkElement.Margin,None,False,True,,"10,10,0,0"
+CNC.Controls.Avalonia.g.ru-RU.resources:toolview.baml,grd_tools:System.Windows.FrameworkElement.VerticalAlignment,None,False,True,,Top
+CNC.Controls.Avalonia.g.ru-RU.resources:toolview.baml,grd_tools:System.Windows.FrameworkElement.Width,None,False,True,,Auto
+CNC.Controls.Avalonia.g.ru-RU.resources:toolview.baml,hdr_tool:System.Windows.Controls.DataGridColumn.Header,None,True,True,,Tool
+CNC.Controls.Avalonia.g.ru-RU.resources:toolview.baml,hdr_tool:System.Windows.Controls.DataGridColumn.Width,None,True,False,,50
+CNC.Controls.Avalonia.g.ru-RU.resources:toolview.baml,hdr_tool:System.Windows.Controls.DataGridTextColumn.$Content,None,True,True,,
+CNC.Controls.Avalonia.g.ru-RU.resources:toolview.baml,lbl_tipRadius:CNC.Controls.CoordValueSetControl.$Content,None,True,True,,
+CNC.Controls.Avalonia.g.ru-RU.resources:toolview.baml,lbl_tipRadius:CNC.Controls.CoordValueSetControl.Click,None,True,True,,cvOffset_Click
+CNC.Controls.Avalonia.g.ru-RU.resources:toolview.baml,lbl_tipRadius:CNC.Controls.CoordValueSetControl.Label,None,True,True,,Tip radius:
+CNC.Controls.Avalonia.g.ru-RU.resources:toolview.baml,lbl_tipRadius:CNC.Controls.CoordValueSetControl.Name,None,True,True,,cvTipRadius
+CNC.Controls.Avalonia.g.ru-RU.resources:toolview.baml,lbl_tipRadius:System.Windows.UIElement.IsEnabled,None,False,True,,False
+CNC.Controls.Avalonia.g.ru-RU.resources:toolview.baml,lbl_tool:System.Windows.Controls.ContentControl.Content,Label,True,True,,Tool:
+CNC.Controls.Avalonia.g.ru-RU.resources:toolview.baml,lbl_tool:System.Windows.Controls.Control.HorizontalContentAlignment,None,False,True,,Right
+CNC.Controls.Avalonia.g.ru-RU.resources:toolview.baml,lbl_tool:System.Windows.Controls.Label.$Content,Label,True,True,,
+CNC.Controls.Avalonia.g.ru-RU.resources:toolview.baml,lbl_tool:System.Windows.FrameworkElement.HorizontalAlignment,None,False,True,,Right
+CNC.Controls.Avalonia.g.ru-RU.resources:toolview.baml,lbl_tool:System.Windows.FrameworkElement.Margin,None,False,True,,"37,0,0,0"
+CNC.Controls.Avalonia.g.ru-RU.resources:toolview.baml,lbl_tool:System.Windows.FrameworkElement.VerticalAlignment,None,False,True,,Top
+CNC.Controls.Avalonia.g.ru-RU.resources:toolview.baml,lbl_xAxis:CNC.Controls.CoordValueSetControl.$Content,None,True,True,,
+CNC.Controls.Avalonia.g.ru-RU.resources:toolview.baml,lbl_xAxis:CNC.Controls.CoordValueSetControl.Click,None,True,True,,cvOffset_Click
+CNC.Controls.Avalonia.g.ru-RU.resources:toolview.baml,lbl_xAxis:CNC.Controls.CoordValueSetControl.Label,None,True,True,,X axis:
+CNC.Controls.Avalonia.g.ru-RU.resources:toolview.baml,lbl_xAxis:CNC.Controls.CoordValueSetControl.Name,None,True,True,,cvXOffset
+CNC.Controls.Avalonia.g.ru-RU.resources:toolview.baml,lbl_yAxis:CNC.Controls.CoordValueSetControl.$Content,None,True,True,,
+CNC.Controls.Avalonia.g.ru-RU.resources:toolview.baml,lbl_yAxis:CNC.Controls.CoordValueSetControl.Click,None,True,True,,cvOffset_Click
+CNC.Controls.Avalonia.g.ru-RU.resources:toolview.baml,lbl_yAxis:CNC.Controls.CoordValueSetControl.Label,None,True,True,,Y axis:
+CNC.Controls.Avalonia.g.ru-RU.resources:toolview.baml,lbl_yAxis:CNC.Controls.CoordValueSetControl.Name,None,True,True,,cvYOffset
+CNC.Controls.Avalonia.g.ru-RU.resources:toolview.baml,lbl_zAxis:CNC.Controls.CoordValueSetControl.$Content,None,True,True,,
+CNC.Controls.Avalonia.g.ru-RU.resources:toolview.baml,lbl_zAxis:CNC.Controls.CoordValueSetControl.Click,None,True,True,,cvOffset_Click
+CNC.Controls.Avalonia.g.ru-RU.resources:toolview.baml,lbl_zAxis:CNC.Controls.CoordValueSetControl.Label,None,True,True,,Z axis:
+CNC.Controls.Avalonia.g.ru-RU.resources:toolview.baml,lbl_zAxis:CNC.Controls.CoordValueSetControl.Name,None,True,True,,cvZOffset
+CNC.Controls.Avalonia.g.ru-RU.resources:workparameterscontrol.baml,grp_workparams:System.Windows.Controls.HeaderedContentControl.Header,Label,True,True,,Work Parameters
+CNC.Controls.Avalonia.g.ru-RU.resources:workparameterscontrol.baml,grp_workparams:System.Windows.FrameworkElement.Height,None,False,True,,Auto
+CNC.Controls.Avalonia.g.ru-RU.resources:workparameterscontrol.baml,grp_workparams:System.Windows.FrameworkElement.HorizontalAlignment,None,False,True,,Left
+CNC.Controls.Avalonia.g.ru-RU.resources:workparameterscontrol.baml,grp_workparams:System.Windows.FrameworkElement.VerticalAlignment,None,False,True,,Top
+CNC.Controls.Avalonia.g.ru-RU.resources:workparameterscontrol.baml,grp_workparams:System.Windows.FrameworkElement.Width,None,False,True,,216
+CNC.Controls.Avalonia.g.ru-RU.resources:workparameterscontrol.baml,lbl_offset:System.Windows.Controls.ContentControl.Content,Label,True,True,,Offset:
+CNC.Controls.Avalonia.g.ru-RU.resources:workparameterscontrol.baml,lbl_offset:System.Windows.Controls.Control.HorizontalContentAlignment,None,False,True,,Right
+CNC.Controls.Avalonia.g.ru-RU.resources:workparameterscontrol.baml,lbl_offset:System.Windows.Controls.Label.$Content,Label,True,True,,
+CNC.Controls.Avalonia.g.ru-RU.resources:workparameterscontrol.baml,lbl_offset:System.Windows.FrameworkElement.Height,None,False,True,,26
+CNC.Controls.Avalonia.g.ru-RU.resources:workparameterscontrol.baml,lbl_offset:System.Windows.FrameworkElement.HorizontalAlignment,None,False,True,,Right
+CNC.Controls.Avalonia.g.ru-RU.resources:workparameterscontrol.baml,lbl_offset:System.Windows.FrameworkElement.Margin,None,False,True,,"0,7"
+CNC.Controls.Avalonia.g.ru-RU.resources:workparameterscontrol.baml,lbl_offset:System.Windows.FrameworkElement.VerticalAlignment,None,False,True,,Center
+CNC.Controls.Avalonia.g.ru-RU.resources:workparameterscontrol.baml,lbl_offset:System.Windows.FrameworkElement.Width,None,False,True,,45
+CNC.Controls.Avalonia.g.ru-RU.resources:workparameterscontrol.baml,lbl_probe:System.Windows.Controls.ContentControl.Content,Label,True,True,,Probe:
+CNC.Controls.Avalonia.g.ru-RU.resources:workparameterscontrol.baml,lbl_tlo:CNC.Controls.LEDControl.$Content,None,False,True,,
+CNC.Controls.Avalonia.g.ru-RU.resources:workparameterscontrol.baml,lbl_tlo:CNC.Controls.LEDControl.Label,None,False,True,,TLO
+CNC.Controls.Avalonia.g.ru-RU.resources:workparameterscontrol.baml,lbl_tlo:System.Windows.Controls.Grid.Column,None,False,True,,1
+CNC.Controls.Avalonia.g.ru-RU.resources:workparameterscontrol.baml,lbl_tlo:System.Windows.Controls.Grid.Row,None,False,True,,1
+CNC.Controls.Avalonia.g.ru-RU.resources:workparameterscontrol.baml,lbl_tlo:System.Windows.FrameworkElement.Margin,None,False,True,,"10,0,0,0"
+CNC.Controls.Avalonia.g.ru-RU.resources:workparameterscontrol.baml,lbl_tlo_refd:CNC.Controls.LEDControl.$Content,None,False,True,,
+CNC.Controls.Avalonia.g.ru-RU.resources:workparameterscontrol.baml,lbl_tlo_refd:CNC.Controls.LEDControl.Label,None,False,True,,TLO ref&apos;d
+CNC.Controls.Avalonia.g.ru-RU.resources:workparameterscontrol.baml,lbl_tlo_refd:System.Windows.Controls.Grid.Column,None,False,True,,2
+CNC.Controls.Avalonia.g.ru-RU.resources:workparameterscontrol.baml,lbl_tlo_refd:System.Windows.Controls.Grid.ColumnSpan,None,False,True,,2
+CNC.Controls.Avalonia.g.ru-RU.resources:workparameterscontrol.baml,lbl_tlo_refd:System.Windows.Controls.Grid.Row,None,False,True,,1
+CNC.Controls.Avalonia.g.ru-RU.resources:workparameterscontrol.baml,lbl_tlo_refd:System.Windows.FrameworkElement.Margin,None,False,True,,"10,0,0,0"
+CNC.Controls.Avalonia.g.ru-RU.resources:workparameterscontrol.baml,lbl_tool:System.Windows.Controls.ContentControl.Content,Label,True,True,,Tool:
+CNC.Controls.Avalonia.g.ru-RU.resources:workparameterscontrol.baml,lbl_tool:System.Windows.Controls.Control.HorizontalContentAlignment,None,False,True,,Right
+CNC.Controls.Avalonia.g.ru-RU.resources:workparameterscontrol.baml,lbl_tool:System.Windows.Controls.Grid.Column,None,False,True,,2
+CNC.Controls.Avalonia.g.ru-RU.resources:workparameterscontrol.baml,lbl_tool:System.Windows.Controls.Label.$Content,Label,True,True,,
+CNC.Controls.Avalonia.g.ru-RU.resources:workparameterscontrol.baml,lbl_tool:System.Windows.FrameworkElement.Height,None,False,True,,26
+CNC.Controls.Avalonia.g.ru-RU.resources:workparameterscontrol.baml,lbl_tool:System.Windows.FrameworkElement.HorizontalAlignment,None,False,True,,Right
+CNC.Controls.Avalonia.g.ru-RU.resources:workparameterscontrol.baml,lbl_tool:System.Windows.FrameworkElement.VerticalAlignment,None,False,True,,Center
+CNC.Controls.Avalonia.g.ru-RU.resources:workparameterscontrol.baml,lbl_tool:System.Windows.FrameworkElement.Width,None,False,True,,36

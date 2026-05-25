@@ -9,9 +9,15 @@ namespace CNC.Controls.Avalonia.Services;
 /// </summary>
 public sealed class GrblCommandRouter
 {
+    readonly ProgramService? _program;
     readonly Queue<string> _pending = new();
     GrblViewModel? _model;
     bool _awaitingResponse;
+
+    public GrblCommandRouter(ProgramService? program = null)
+    {
+        _program = program ?? new ProgramService();
+    }
 
     public void Attach(GrblViewModel model)
     {
@@ -56,7 +62,7 @@ public sealed class GrblCommandRouter
 
     public void Send(string command)
     {
-        if (string.IsNullOrEmpty(command) || Comms.com is not { IsOpen: true })
+        if (string.IsNullOrEmpty(command) || Comms.com == null)
             return;
 
         if (command.Length == 1)
@@ -68,7 +74,7 @@ public sealed class GrblCommandRouter
         try
         {
             var parsed = command;
-            GCodeFileService.Instance.Parser.ParseBlock(ref parsed, true);
+            (_program ?? new ProgramService()).Parser.ParseBlock(ref parsed, true);
             _pending.Enqueue(command);
             if (!_awaitingResponse)
                 FlushPending();
@@ -81,7 +87,7 @@ public sealed class GrblCommandRouter
 
     void FlushPending()
     {
-        if (_pending.Count == 0 || Comms.com is not { IsOpen: true })
+        if (_pending.Count == 0 || Comms.com == null)
             return;
 
         _awaitingResponse = true;

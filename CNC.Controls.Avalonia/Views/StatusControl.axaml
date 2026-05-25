@@ -24,7 +24,7 @@
     <TextBlock x:Name="LblState" Grid.Column="0" Text="State:" VerticalAlignment="Center"
                Margin="0,0,4,0"
                Foreground="{DynamicResource ThemeForegroundBrush}"
-               loc:Localize.Key="CNC.Controls.WPF.statuscontrol.lbl_state"/>
+               loc:Localize.Key="CNC.Controls.Avalonia.statuscontrol.lbl_state"/>
 
     <TextBox x:Name="txtState" Grid.Column="1"
              IsReadOnly="True" Focusable="False"
@@ -43,6 +43,6 @@
             VerticalContentAlignment="Center"
             HorizontalAlignment="Right"
             Focusable="False" Classes="danger"
-            loc:Localize.Key="CNC.Controls.WPF.statuscontrol.btn_reset"/>
+            loc:Localize.Key="CNC.Controls.Avalonia.statuscontrol.btn_reset"/>
   </Grid>
 </UserControl>

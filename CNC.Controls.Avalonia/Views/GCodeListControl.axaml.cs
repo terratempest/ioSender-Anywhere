@@ -5,6 +5,7 @@ using Avalonia.Input;
 using Avalonia.Interactivity;
 using Avalonia.Platform.Storage;
 using CNC.Controls.Avalonia.Services;
+using CNC.Controls.Avalonia.ViewModels;
 using CNC.Core;
 using CNC.Localization.Avalonia;
 
@@ -12,6 +13,7 @@ namespace CNC.Controls.Avalonia.Views;
 
 public partial class GCodeListControl : UserControl
 {
+    readonly GCodeListViewModel _viewModel;
     readonly Dictionary<GCodeBlock, PropertyChangedEventHandler> _blockHandlers = new();
 
     GrblViewModel? _model;
@@ -22,21 +24,26 @@ public partial class GCodeListControl : UserControl
     public static readonly StyledProperty<bool> MultipleSelectedProperty =
         AvaloniaProperty.Register<GCodeListControl, bool>(nameof(MultipleSelected));
 
-    public GCodeListControl()
+    public GCodeListControl(ProgramService? program = null, MachineCommandService? commands = null)
     {
+        _viewModel = new(program, commands);
         InitializeComponent();
         GCodeGrid.ContextMenu!.DataContext = this;
         DragDrop.SetAllowDrop(GCodeGrid, true);
         GCodeGrid.AddHandler(DragDrop.DragOverEvent, OnDragOver);
         GCodeGrid.AddHandler(DragDrop.DropEvent, OnDrop);
-        GCodeFileService.Instance.ProgramLoading += OnProgramLoading;
-        GCodeFileService.Instance.ProgramChanged += OnProgramChanged;
+        _viewModel.ProgramLoading += OnProgramLoading;
+        _viewModel.ProgramChanged += OnProgramChanged;
         Loaded += (_, _) =>
         {
             ApplyLocalization();
             BindProgram();
         };
         Unloaded += (_, _) => DetachModel();
+    }
+
+    public GCodeListControl() : this(null, null)
+    {
     }
 
     void ApplyLocalization()
@@ -66,7 +73,12 @@ public partial class GCodeListControl : UserControl
         if (DataContext is GrblViewModel vm)
         {
             _model = vm;
+            _viewModel.Model = vm;
             vm.PropertyChanged += OnViewModelPropertyChanged;
+        }
+        else
+        {
+            _viewModel.Model = null;
         }
         BindProgram();
     }
@@ -76,6 +88,7 @@ public partial class GCodeListControl : UserControl
         if (_model is INotifyPropertyChanged pc)
             pc.PropertyChanged -= OnViewModelPropertyChanged;
         _model = null;
+        _viewModel.Model = null;
     }
 
     void OnProgramLoading()
@@ -96,7 +109,7 @@ public partial class GCodeListControl : UserControl
     void BindProgram()
     {
         DetachBlockHandlers();
-        GCodeGrid.ItemsSource = GCodeFileService.Instance.Data;
+        GCodeGrid.ItemsSource = _viewModel.Data;
         if (_model != null && _model.ScrollPosition >= 0)
             ScrollToBlock(_model.ScrollPosition);
     }
@@ -111,10 +124,10 @@ public partial class GCodeListControl : UserControl
 
     void ScrollToBlock(int index)
     {
-        if (index < 0 || index >= GCodeFileService.Instance.Data.Count)
+        if (index < 0 || index >= _viewModel.Data.Count)
             return;
 
-        var block = GCodeFileService.Instance.Data[index];
+        var block = _viewModel.Data[index];
         GCodeGrid.SelectedItem = block;
         GCodeGrid.ScrollIntoView(block, null);
     }
@@ -165,36 +178,30 @@ public partial class GCodeListControl : UserControl
             return;
 
         var index = GCodeGrid.SelectedIndex;
-        SingleSelected = GCodeGrid.SelectedItems.Count == 1 && _model.StartFromBlock.CanExecute(index);
-        MultipleSelected = GCodeGrid.SelectedItems.Count >= 1 && _model.StartFromBlock.CanExecute(index);
+        SingleSelected = GCodeGrid.SelectedItems.Count == 1 && _viewModel.CanStartFrom(index);
+        MultipleSelected = GCodeGrid.SelectedItems.Count >= 1 && _viewModel.CanStartFrom(index);
     }
 
     void OnStartHereClick(object? sender, RoutedEventArgs e)
     {
-        if (_model != null && GCodeGrid.SelectedIndex >= 0)
-            _model.StartFromBlock.Execute(GCodeGrid.SelectedIndex);
+        _viewModel.StartFrom(GCodeGrid.SelectedIndex);
     }
 
     void OnCopyMdiClick(object? sender, RoutedEventArgs e)
     {
-        if (_model != null && GCodeGrid.SelectedItem is GCodeBlock block)
-            _model.MDIText = block.DisplayData;
+        if (GCodeGrid.SelectedItem is GCodeBlock block)
+            _viewModel.CopyToMdi(block);
     }
 
     void OnToggleBreakClick(object? sender, RoutedEventArgs e)
     {
         if (GCodeGrid.SelectedItem is GCodeBlock block)
-            block.BreakAt ^= true;
+            _viewModel.ToggleBreak(block);
     }
 
     void OnSendControllerClick(object? sender, RoutedEventArgs e)
     {
-        if (_model is null)
-            return;
-
-        var rows = GCodeGrid.SelectedItems.Cast<GCodeBlock>().OrderBy(b => b.Row).ToList();
-        foreach (var row in rows)
-            _model.ExecuteCommand(row.Data);
+        _viewModel.SendToController(GCodeGrid.SelectedItems.Cast<GCodeBlock>());
     }
 
     void OnDragOver(object? sender, DragEventArgs e)
@@ -211,7 +218,7 @@ public partial class GCodeListControl : UserControl
             return;
 
         var path = e.Data.GetFiles()?.OfType<IStorageFile>().FirstOrDefault()?.TryGetLocalPath();
-        if (!string.IsNullOrEmpty(path))
-            GCodeFileService.Instance.Load(path);
+        if (path != null)
+            _viewModel.LoadDroppedFile(path);
     }
 }

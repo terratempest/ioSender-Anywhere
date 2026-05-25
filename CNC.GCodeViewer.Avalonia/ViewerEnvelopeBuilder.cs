@@ -21,7 +21,7 @@ internal static class ViewerEnvelopeBuilder
             bounds.SizeZ);
     }
 
-    public static List<NumericVector3> WorkAreaBox()
+    public static List<NumericVector3> WorkAreaBox(GrblViewModel? grbl)
     {
         if (!GrblInfo.HomingEnabled)
             return [];
@@ -32,7 +32,6 @@ internal static class ViewerEnvelopeBuilder
         if (x <= 0d || z <= 0d)
             return [];
 
-        var grbl = GCodeViewerContext.Grbl;
         var ox = grbl?.WorkPositionOffset.X ?? 0d;
         var oy = grbl?.WorkPositionOffset.Y ?? 0d;
         var oz = grbl?.WorkPositionOffset.Z ?? 0d;

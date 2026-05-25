@@ -6,7 +6,7 @@ using CoreModifiers = CNC.Core.Input.ModifierKeys;
 
 namespace CNC.Controls.Avalonia.Utilities;
 
-/// <summary>Maps Avalonia key events to <see cref="KeyEventInfo"/> (WPF-compatible key codes).</summary>
+/// <summary>Maps Avalonia key events to <see cref="KeyEventInfo"/>.</summary>
 internal static class AvaloniaKeyBridge
 {
     public static KeyEventInfo ToKeyEventInfo(KeyEventArgs e, bool isUp)
@@ -41,7 +41,7 @@ internal static class AvaloniaKeyBridge
         return result;
     }
 
-    /// <summary>WPF <c>System.Windows.Input.Key</c> values used by <see cref="CNC.Core.KeypressHandler"/>.</summary>
+    /// <summary>Legacy key values used by <see cref="CNC.Core.KeypressHandler"/>.</summary>
     static CoreKey MapKey(AvKey key) => key switch
     {
         AvKey.Left => CoreKey.Left,
@@ -78,7 +78,7 @@ internal static class AvaloniaKeyBridge
         AvKey.NumPad6 => CoreKey.NumPad6,
         AvKey.NumPad7 => CoreKey.NumPad7,
         AvKey.NumPad8 => CoreKey.NumPad8,
-        // WPF Key.* values (not virtual-key codes)
+        // Legacy Key.* values, not virtual-key codes.
         AvKey.Space => (CoreKey)18,
         AvKey.F1 => (CoreKey)90,
         AvKey.F2 => (CoreKey)91,

@@ -1,0 +1,112 @@
+CNC.Controls.Config.g.de-DE.resources:appconfigview.baml,btn_saveKeyMap:System.Windows.Controls.ContentControl.Content,Button,True,True,,Save keymappings
+CNC.Controls.Config.g.de-DE.resources:appconfigview.baml,btn_saveSettings:System.Windows.Controls.ContentControl.Content,Button,True,True,,Einstellungen speichern
+CNC.Controls.Config.g.de-DE.resources:appconfigview.baml,msg_restart:System.String.$Content,None,True,True,,Nach einer Änderung der Einstellungen ist ein Neustart erforderlich!
+CNC.Controls.Config.g.de-DE.resources:basicconfigcontrol.baml,fld_maxBuffer:CNC.Controls.NumericField.Label,None,False,True,,Max Puffer:
+CNC.Controls.Config.g.de-DE.resources:basicconfigcontrol.baml,fld_maxBuffer:CNC.Controls.NumericField.Unit,None,False,True,,bytes
+CNC.Controls.Config.g.de-DE.resources:basicconfigcontrol.baml,fld_maxBuffer:System.Windows.FrameworkElement.ToolTip,ToolTip,True,True,,Maximal genutzte serielle Puffergröße (begrenzt auf 90 % des angegebenen Wertes).
+CNC.Controls.Config.g.de-DE.resources:basicconfigcontrol.baml,fld_pollInterval:CNC.Controls.NumericField.Label,None,False,True,,Abfrageintervall:
+CNC.Controls.Config.g.de-DE.resources:basicconfigcontrol.baml,fld_pollInterval:CNC.Controls.NumericField.Unit,None,False,True,,ms
+CNC.Controls.Config.g.de-DE.resources:basicconfigcontrol.baml,fld_pollInterval:System.Windows.FrameworkElement.ToolTip,ToolTip,True,True,,Zeit zwischen den an den Controller gesendeten Statusanfragen.
+CNC.Controls.Config.g.de-DE.resources:basicconfigcontrol.baml,fld_resetDelay:CNC.Controls.NumericField.Label,None,False,True,,Reset Verzögerung:
+CNC.Controls.Config.g.de-DE.resources:basicconfigcontrol.baml,fld_resetDelay:CNC.Controls.NumericField.Unit,None,False,True,,ms
+CNC.Controls.Config.g.de-DE.resources:basicconfigcontrol.baml,fld_resetDelay:System.Windows.FrameworkElement.ToolTip,ToolTip,True,True,,"Verzögerung, damit der Controller das Booten beenden kann, bevor die Kommunikation beginnt."
+CNC.Controls.Config.g.de-DE.resources:basicconfigcontrol.baml,grb_mainConfig:System.Windows.Controls.HeaderedContentControl.Header,Label,True,True,,Hauptmenü
+CNC.Controls.Config.g.de-DE.resources:basicconfigcontrol.baml,lbl_addLineNumbers:System.Windows.Controls.ContentControl.Content,CheckBox,True,True,,Add line numbers
+CNC.Controls.Config.g.de-DE.resources:basicconfigcontrol.baml,lbl_addLineNumbers:System.Windows.FrameworkElement.ToolTip,ToolTip,True,True,,Add linenumbers if the controller is configured to report them.
+CNC.Controls.Config.g.de-DE.resources:basicconfigcontrol.baml,lbl_agressiveBuffering:System.Windows.Controls.ContentControl.Content,CheckBox,True,True,,Aggressives Puffern
+CNC.Controls.Config.g.de-DE.resources:basicconfigcontrol.baml,lbl_agressiveBuffering:System.Windows.FrameworkElement.ToolTip,ToolTip,True,True,,Puffert mehr als einen GCode-Block in der Steuerung für eine reibungslosere Ausführung. Nur für grblHAL!
+CNC.Controls.Config.g.de-DE.resources:basicconfigcontrol.baml,lbl_autoCompressGcode:System.Windows.Controls.ContentControl.Content,CheckBox,True,True,,Gcode bei Transformationen automatisch komprimieren
+CNC.Controls.Config.g.de-DE.resources:basicconfigcontrol.baml,lbl_autoCompressGcode:System.Windows.FrameworkElement.ToolTip,ToolTip,True,True,,Entfernt überflüssige GCode-Befehlselemente.
+CNC.Controls.Config.g.de-DE.resources:basicconfigcontrol.baml,lbl_FilterOk:System.Windows.Controls.ContentControl.Content,CheckBox,True,True,,&quot;OK&quot; Antworten ausfiltern
+CNC.Controls.Config.g.de-DE.resources:basicconfigcontrol.baml,lbl_FilterOk:System.Windows.FrameworkElement.ToolTip,ToolTip,True,True,,"Aktivieren, wenn ok-Antworten die Konsolenprotokollierung überfordern, was typischerweise beim Senden vieler kurzer Befehle der Fall ist."
+CNC.Controls.Config.g.de-DE.resources:basicconfigcontrol.baml,lbl_keepMdiFocus:System.Windows.Controls.ContentControl.Content,CheckBox,True,True,,MDI im Vordergrund behalten
+CNC.Controls.Config.g.de-DE.resources:basicconfigcontrol.baml,lbl_keepMdiFocus:System.Windows.FrameworkElement.ToolTip,ToolTip,True,True,,Puffert mehr als einen GCode-Block in der Steuerung für eine reibungslosere Ausführung. Nur für grblHAL!
+CNC.Controls.Config.g.de-DE.resources:basicconfigcontrol.baml,lbl_restoreWindowSize:System.Windows.Controls.ContentControl.Content,CheckBox,True,True,,Letzte Fenstergröße beim Starten wiederherstellen
+CNC.Controls.Config.g.de-DE.resources:basicconfigcontrol.baml,lbl_restoreWindowSize:System.Windows.FrameworkElement.ToolTip,ToolTip,True,True,,Fenstergröße beim nächsten Start wiederherstellen.
+CNC.Controls.Config.g.de-DE.resources:basicconfigcontrol.baml,lbl_sendComments:System.Windows.Controls.ContentControl.Content,CheckBox,True,True,,Send comments
+CNC.Controls.Config.g.de-DE.resources:basicconfigcontrol.baml,lbl_sendComments:System.Windows.FrameworkElement.ToolTip,ToolTip,True,True,,Send complete comments.
+CNC.Controls.Config.g.de-DE.resources:basicconfigcontrol.baml,lbl_theme:System.Windows.Controls.ContentControl.Content,Label,True,True,,Theme:
+CNC.Controls.Config.g.de-DE.resources:grblconfigcontrol.baml,btn_backup:System.Windows.Controls.ContentControl.Content,Button,True,True,,Backup
+CNC.Controls.Config.g.de-DE.resources:grblconfigcontrol.baml,btn_reload:System.Windows.Controls.ContentControl.Content,Button,True,True,,Neu Laden
+CNC.Controls.Config.g.de-DE.resources:grblconfigcontrol.baml,btn_reload:System.Windows.FrameworkElement.ToolTip,ToolTip,True,True,,Einstellungen von Steuerung neu laden
+CNC.Controls.Config.g.de-DE.resources:grblconfigcontrol.baml,btn_restore:System.Windows.Controls.ContentControl.Content,Button,True,True,,Wiederherstellen
+CNC.Controls.Config.g.de-DE.resources:grblconfigcontrol.baml,btn_save:System.Windows.Controls.ContentControl.Content,Button,True,True,,Speichern
+CNC.Controls.Config.g.de-DE.resources:grblconfigcontrol.baml,btn_save:System.Windows.FrameworkElement.ToolTip,ToolTip,True,True,,Speichern Sie die geänderten Einstellungen in der Steuerung.
+CNC.Controls.Config.g.de-DE.resources:grblconfigcontrol.baml,fld_findSetting:CNC.Controls.NumericField.KeyDown,None,True,True,,searchField_KeyDown
+CNC.Controls.Config.g.de-DE.resources:grblconfigcontrol.baml,fld_findSetting:CNC.Controls.NumericField.Label,None,True,True,,Setting:
+CNC.Controls.Config.g.de-DE.resources:grblconfigcontrol.baml,fld_findSetting:CNC.Controls.NumericField.Unit,None,True,True,,
+CNC.Controls.Config.g.de-DE.resources:grblconfigcontrol.baml,fld_findSetting:System.Windows.FrameworkElement.ToolTip,ToolTip,True,True,,Search for setting
+CNC.Controls.Config.g.de-DE.resources:grblconfigcontrol.baml,hdr_settingId:System.Windows.Controls.DataGridColumn.Header,None,True,True,,Id
+CNC.Controls.Config.g.de-DE.resources:grblconfigcontrol.baml,hdr_settingName:System.Windows.Controls.DataGridColumn.Header,None,True,True,,Name
+CNC.Controls.Config.g.de-DE.resources:grblconfigcontrol.baml,hdr_settingUnit:System.Windows.Controls.DataGridColumn.Header,None,True,True,,Einheit
+CNC.Controls.Config.g.de-DE.resources:grblconfigcontrol.baml,hdr_settingValue:System.Windows.Controls.DataGridColumn.Header,None,True,True,,Wert
+CNC.Controls.Config.g.de-DE.resources:grblconfigcontrol.baml,str_saveSettings:System.String.$Content,None,True,True,,"Settings changed, save now?"
+CNC.Controls.Config.g.de-DE.resources:grblconfigcontrol.baml,str_settingsError:System.String.$Content,None,True,True,,"Setting {0} returned {1}, continue?"
+CNC.Controls.Config.g.de-DE.resources:grblconfigcontrol.baml,str_settingsFail:System.String.$Content,None,True,True,,Bummer...\\nContinue loading?
+CNC.Controls.Config.g.de-DE.resources:grblconfigcontrol.baml,str_settingsInvalid:System.String.$Content,None,True,True,,The file does not contain any settings.
+CNC.Controls.Config.g.de-DE.resources:grblconfigcontrol.baml,str_settingsReloadMismatch:System.String.$Content,None,True,True,,"{0} settings were ignored, not supported by the controller."
+CNC.Controls.Config.g.de-DE.resources:grblconfigcontrol.baml,str_settingsRestore:System.String.$Content,None,True,True,,Restore settings from file
+CNC.Controls.Config.g.de-DE.resources:grblconfigcontrol.baml,str_settingsTimeout:System.String.$Content,None,True,True,,"Timed out while setting {0}, continue?"
+CNC.Controls.Config.g.de-DE.resources:grblconfigcontrol.baml,str_settingsWritten:System.String.$Content,None,True,True,,All settings written to {0} in the sender folder.
+CNC.Controls.Config.g.de-DE.resources:grblconfigview.baml,fld_findSetting:CNC.Controls.NumericField.Unit,None,True,True,,
+CNC.Controls.Config.g.de-DE.resources:grblconfigview.baml,tab_basicConfig:System.Windows.Controls.HeaderedContentControl.Header,Label,True,True,,Basic settings
+CNC.Controls.Config.g.de-DE.resources:grblconfigview.baml,tab_pidTuner:System.Windows.Controls.HeaderedContentControl.Header,Label,True,True,,PID Tuner
+CNC.Controls.Config.g.de-DE.resources:grblconfigview.baml,tab_stepperCalibration:System.Windows.Controls.HeaderedContentControl.Header,Label,True,True,,Stepper calibration
+CNC.Controls.Config.g.de-DE.resources:grblconfigview.baml,tab_trinamic:System.Windows.Controls.HeaderedContentControl.Header,Label,True,True,,Trinamic tuner
+CNC.Controls.Config.g.de-DE.resources:jogconfigcontrol.baml,fld_fastDistance:CNC.Controls.NumericField.Label,None,False,True,,Distanz Schnellvorschub:
+CNC.Controls.Config.g.de-DE.resources:jogconfigcontrol.baml,fld_fastFeedrate:CNC.Controls.NumericField.Label,None,False,True,,Vorschub Schnell:
+CNC.Controls.Config.g.de-DE.resources:jogconfigcontrol.baml,fld_fastFeedrate:CNC.Controls.NumericField.Unit,None,False,True,,mm/min
+CNC.Controls.Config.g.de-DE.resources:jogconfigcontrol.baml,fld_slowDistance:CNC.Controls.NumericField.Label,None,False,True,,Distanz Langsamvorschub:
+CNC.Controls.Config.g.de-DE.resources:jogconfigcontrol.baml,fld_slowFeedrate:CNC.Controls.NumericField.Label,None,False,True,,Vorschub Langsam:
+CNC.Controls.Config.g.de-DE.resources:jogconfigcontrol.baml,fld_slowFeedrate:CNC.Controls.NumericField.Unit,None,False,True,,mm/min
+CNC.Controls.Config.g.de-DE.resources:jogconfigcontrol.baml,fld_stepDistance:CNC.Controls.NumericField.Label,None,False,True,,Distanz Einzelschritt:
+CNC.Controls.Config.g.de-DE.resources:jogconfigcontrol.baml,fld_stepFeedrate:CNC.Controls.NumericField.Label,None,False,True,,Vorschub Einzelschritt:
+CNC.Controls.Config.g.de-DE.resources:jogconfigcontrol.baml,fld_stepFeedrate:CNC.Controls.NumericField.Unit,None,False,True,,mm/min
+CNC.Controls.Config.g.de-DE.resources:jogconfigcontrol.baml,grp_kbdJogging:System.Windows.Controls.HeaderedContentControl.Header,Label,True,True,,Tastatur-Jogging
+CNC.Controls.Config.g.de-DE.resources:jogconfigcontrol.baml,lbl_enable:System.Windows.Controls.ContentControl.Content,CheckBox,True,True,,Aktivieren
+CNC.Controls.Config.g.de-DE.resources:jogconfigcontrol.baml,lbl_linkStepToUi:System.Windows.Controls.ContentControl.Content,CheckBox,True,True,,Link step distance to UI jogging
+CNC.Controls.Config.g.de-DE.resources:jogconfigcontrol.baml,pnl_kbdJogging:System.Windows.FrameworkElement.ToolTip,ToolTip,True,True,,Warnung! - Grbl hat Fehler bei der Jog-Abschaltung (beim Lösen der Taste).
+CNC.Controls.Config.g.de-DE.resources:joguiconfigcontrol.baml,grp_uiJogging:System.Windows.Controls.HeaderedContentControl.Header,Label,True,True,,UI jogging
+CNC.Controls.Config.g.de-DE.resources:joguiconfigcontrol.baml,lbl_distance0:CNC.Controls.NumericField.Label,None,False,True,,Distanz 0:
+CNC.Controls.Config.g.de-DE.resources:joguiconfigcontrol.baml,lbl_distance0:CNC.Controls.NumericField.Unit,None,False,True,,mm
+CNC.Controls.Config.g.de-DE.resources:joguiconfigcontrol.baml,lbl_distance1:CNC.Controls.NumericField.Label,None,False,True,,Distanz 1:
+CNC.Controls.Config.g.de-DE.resources:joguiconfigcontrol.baml,lbl_distance1:CNC.Controls.NumericField.Unit,None,False,True,,mm
+CNC.Controls.Config.g.de-DE.resources:joguiconfigcontrol.baml,lbl_distance2:CNC.Controls.NumericField.Label,None,False,True,,Distanz 2:
+CNC.Controls.Config.g.de-DE.resources:joguiconfigcontrol.baml,lbl_distance2:CNC.Controls.NumericField.Unit,None,False,True,,mm
+CNC.Controls.Config.g.de-DE.resources:joguiconfigcontrol.baml,lbl_distance3:CNC.Controls.NumericField.Label,None,False,True,,Distanz 3:
+CNC.Controls.Config.g.de-DE.resources:joguiconfigcontrol.baml,lbl_distance3:CNC.Controls.NumericField.Unit,None,False,True,,mm
+CNC.Controls.Config.g.de-DE.resources:joguiconfigcontrol.baml,lbl_feedrate0:CNC.Controls.NumericField.Label,None,False,True,,Vorschub 0:
+CNC.Controls.Config.g.de-DE.resources:joguiconfigcontrol.baml,lbl_feedrate0:CNC.Controls.NumericField.Unit,None,False,True,,mm/min
+CNC.Controls.Config.g.de-DE.resources:joguiconfigcontrol.baml,lbl_feedrate1:CNC.Controls.NumericField.Label,None,False,True,,Vorschub 1:
+CNC.Controls.Config.g.de-DE.resources:joguiconfigcontrol.baml,lbl_feedrate1:CNC.Controls.NumericField.Unit,None,False,True,,mm/min
+CNC.Controls.Config.g.de-DE.resources:joguiconfigcontrol.baml,lbl_feedrate2:CNC.Controls.NumericField.Label,None,False,True,,Vorschub 2:
+CNC.Controls.Config.g.de-DE.resources:joguiconfigcontrol.baml,lbl_feedrate2:CNC.Controls.NumericField.Unit,None,False,True,,mm/min
+CNC.Controls.Config.g.de-DE.resources:joguiconfigcontrol.baml,lbl_feedrate3:CNC.Controls.NumericField.Label,None,False,True,,Vorschub 3:
+CNC.Controls.Config.g.de-DE.resources:joguiconfigcontrol.baml,lbl_feedrate3:CNC.Controls.NumericField.Unit,None,False,True,,mm/min
+CNC.Controls.Config.g.de-DE.resources:steppercalibrationwizard.baml,btn_goneg:System.Windows.Controls.ContentControl.Content,Button,True,True,,Go-
+CNC.Controls.Config.g.de-DE.resources:steppercalibrationwizard.baml,btn_goneg:System.Windows.FrameworkElement.ToolTip,ToolTip,True,True,,Press to move in the negative direction.
+CNC.Controls.Config.g.de-DE.resources:steppercalibrationwizard.baml,btn_gopos:System.Windows.Controls.ContentControl.Content,Button,True,True,,Go+
+CNC.Controls.Config.g.de-DE.resources:steppercalibrationwizard.baml,btn_gopos:System.Windows.FrameworkElement.ToolTip,ToolTip,True,True,,Press to move in the positive direction.
+CNC.Controls.Config.g.de-DE.resources:steppercalibrationwizard.baml,btn_stop:System.Windows.Controls.ContentControl.Content,Button,True,True,,Stop
+CNC.Controls.Config.g.de-DE.resources:steppercalibrationwizard.baml,btn_update:System.Windows.Controls.ContentControl.Content,Button,True,True,,Save
+CNC.Controls.Config.g.de-DE.resources:steppercalibrationwizard.baml,fld_distance:CNC.Controls.NumericField.Label,None,True,True,,Distance:
+CNC.Controls.Config.g.de-DE.resources:steppercalibrationwizard.baml,fld_measured:CNC.Controls.NumericField.Label,None,True,True,,Measured:
+CNC.Controls.Config.g.de-DE.resources:steppercalibrationwizard.baml,fld_measured:CNC.Controls.NumericField.Tooltip2,None,True,True,,Actual distance.
+CNC.Controls.Config.g.de-DE.resources:steppercalibrationwizard.baml,fld_resolution:CNC.Controls.NumericField.IsReadOnly,None,True,True,,True
+CNC.Controls.Config.g.de-DE.resources:steppercalibrationwizard.baml,fld_resolution:CNC.Controls.NumericField.Label,None,True,True,,Resolution:
+CNC.Controls.Config.g.de-DE.resources:steppercalibrationwizard.baml,lbl_axis:System.Windows.Controls.ContentControl.Content,Label,True,True,,Axis:
+CNC.Controls.Config.g.de-DE.resources:steppercalibrationwizard.baml,str_CalibrationInstructions1:System.String.$Content,None,True,True,,"1. Select the axis to calibrate, Resolution is set from the underlying setting."
+CNC.Controls.Config.g.de-DE.resources:steppercalibrationwizard.baml,str_CalibrationInstructions2:System.String.$Content,None,True,True,,2. Jog to the starting positition in the same direction as the first &quot;Go&quot; move and mark it.
+CNC.Controls.Config.g.de-DE.resources:steppercalibrationwizard.baml,str_CalibrationInstructions3:System.String.$Content,None,True,True,,"3. Enter the Distance to measure, Measured distance is linked to Distance so will be equal."
+CNC.Controls.Config.g.de-DE.resources:steppercalibrationwizard.baml,str_CalibrationInstructions4:System.String.$Content,None,True,True,,"4. Press the appropriate &quot;Go&quot; button to move the entered distance, measure and enter the value in the Measured field."
+CNC.Controls.Config.g.de-DE.resources:steppercalibrationwizard.baml,str_CalibrationInstructions5:System.String.$Content,None,True,True,,5. Press the opposite &quot;Go&quot; button to move back to the origin.\\nThis step can be skipped but avoids repositioning manually to the marked start position if multiple measurements are to be performed.
+CNC.Controls.Config.g.de-DE.resources:steppercalibrationwizard.baml,str_CalibrationInstructions6:System.String.$Content,None,True,True,,6. Press the &quot;Save&quot; button to update the setting.
+CNC.Controls.Config.g.de-DE.resources:steppercalibrationwizard.baml,str_CalibrationInstructions7:System.String.$Content,None,True,True,,7. Repeat from step 4 (or 3). until the measured distance matches the commanded distance with the required accuracy.
+CNC.Controls.Config.g.de-DE.resources:steppercalibrationwizard.baml,str_CalibrationWarnings:System.String.$Content,None,True,True,,Make sure there is room for the axis to move and avoid collision. Return move will add 0.5mm overshoot to remove any backlash from subsequent measurements.
+CNC.Controls.Config.g.de-DE.resources:stripgcodeconfigcontrol.baml,grp_gcodeStrip:System.Windows.Controls.HeaderedContentControl.Header,Label,True,True,,GCode Befehle überspringen
+CNC.Controls.Config.g.de-DE.resources:trinamicview.baml,btn_getStatus:System.Windows.Controls.ContentControl.Content,Button,True,True,,Status ermitteln
+CNC.Controls.Config.g.de-DE.resources:trinamicview.baml,btn_getStatusAll:System.Windows.Controls.ContentControl.Content,Button,True,True,,Status aller Treiber ermitteln
+CNC.Controls.Config.g.de-DE.resources:trinamicview.baml,grp_stallGuard:System.Windows.Controls.HeaderedContentControl.Header,Label,True,True,,stallGuard
+CNC.Controls.Config.g.de-DE.resources:trinamicview.baml,lbl_configure:System.Windows.Controls.ContentControl.Content,Button,True,True,,Konfiguration
+CNC.Controls.Config.g.de-DE.resources:trinamicview.baml,lbl_sgLoad:System.Windows.Controls.ContentControl.Content,Label,True,True,,Laden (SG_Ergebnis)
+CNC.Controls.Config.g.de-DE.resources:trinamicview.baml,lbl_stallGuardEnable:System.Windows.Controls.ContentControl.Content,CheckBox,True,True,,Filter aktivieren (SFILT)

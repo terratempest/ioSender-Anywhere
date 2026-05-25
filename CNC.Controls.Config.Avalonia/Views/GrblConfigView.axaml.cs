@@ -1,5 +1,6 @@
 using Avalonia.Controls;
 using Avalonia.Interactivity;
+using CNC.App;
 using CNC.Core;
 using CNC.Controls.Avalonia.Utilities;
 
@@ -8,8 +9,22 @@ namespace CNC.Controls.Config;
 public partial class GrblConfigView : UserControl
 {
     bool _activated;
+    public GrblConfigView() : this(null)
+    {
+    }
 
-    public GrblConfigView() => InitializeComponent();
+    public GrblConfigView(BaseConfig? appBase)
+    {
+        InitializeComponent();
+        Configure(appBase);
+    }
+
+    public void Configure(BaseConfig? appBase)
+    {
+        var pollInterval = appBase?.PollInterval ?? 200;
+        trinamicControl.PollInterval = pollInterval;
+        stepperCalibration.PollInterval = pollInterval;
+    }
 
     public void Activate(bool activate)
     {

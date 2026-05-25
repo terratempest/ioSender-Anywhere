@@ -95,3 +95,4 @@ ioSender.g.en-US.resources:mainwindow.baml,tab_home:System.Windows.Controls.Head
 ioSender.g.en-US.resources:mainwindow.baml,mnu_settings:System.Windows.Controls.HeaderedItemsControl.Header,Menu,True,True,,_Settings
 ioSender.g.en-US.resources:mainwindow.baml,mnu_grblSettings:System.Windows.Controls.HeaderedItemsControl.Header,Menu,True,True,,Settings: _Grbl
 ioSender.g.en-US.resources:mainwindow.baml,mnu_appSettings:System.Windows.Controls.HeaderedItemsControl.Header,Menu,True,True,,Settings: _App
+ioSender.g.en-US.resources:workspace.baml,editor_mdiTouch:System.String.$Content,None,True,True,,MDI (Touch)
