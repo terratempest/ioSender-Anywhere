@@ -4,7 +4,7 @@
              xmlns:loc="using:CNC.Localization.Avalonia"
              xmlns:media="using:Avalonia.Media"
              x:Class="CNC.Controls.Avalonia.Views.OverrideControl"
-             Height="30" Width="240">
+             Height="60" Width="300">
   <UserControl.Resources>
     <conv:EncoderModeToColorConverter x:Key="EncoderModeConverter"/>
     <conv:BoolToBrushConverter x:Key="ToColorConverter"/>

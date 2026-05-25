@@ -1,5 +1,7 @@
+using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Controls.Primitives;
+using Avalonia.Layout;
 using CNC.App.Workspace;
 using ioSender.Workspace.Controls;
 using ioSender.Workspace.Editors;
@@ -10,8 +12,10 @@ public sealed class SplitLayoutBuilder
 {
     readonly WorkspaceEditorFactory _factory;
     readonly Action? _onSplitterResizeCompleted;
-    readonly Dictionary<WorkspaceSplit, GridSplitter> _splitters = new();
+    readonly Dictionary<WorkspaceSplit, WorkspaceGridSplitter> _splitters = new();
     readonly Dictionary<WorkspaceLeaf, WorkspaceRegionChrome> _regions = new();
+    const double SplitterHitTargetThickness = 5;
+    const double SplitterOverlap = (SplitterHitTargetThickness - 1) / 2;
 
     public SplitLayoutBuilder(WorkspaceEditorFactory factory, Action? onSplitterResizeCompleted = null)
     {
@@ -51,8 +55,8 @@ public sealed class SplitLayoutBuilder
             Grid.SetColumn(splitter, 1);
             Grid.SetColumn(second, 2);
             grid.Children.Add(first);
-            grid.Children.Add(splitter);
             grid.Children.Add(second);
+            grid.Children.Add(splitter);
         }
         else
         {
@@ -68,25 +72,32 @@ public sealed class SplitLayoutBuilder
             Grid.SetRow(splitter, 1);
             Grid.SetRow(second, 2);
             grid.Children.Add(first);
-            grid.Children.Add(splitter);
             grid.Children.Add(second);
+            grid.Children.Add(splitter);
         }
 
         return grid;
     }
 
-    GridSplitter CreateSplitter(WorkspaceSplit split, GridResizeDirection direction, bool editMode)
+    WorkspaceGridSplitter CreateSplitter(WorkspaceSplit split, GridResizeDirection direction, bool editMode)
     {
-        var splitter = new GridSplitter
+        var isColumnSplitter = direction == GridResizeDirection.Columns;
+        var splitter = new WorkspaceGridSplitter
         {
-            Width = direction == GridResizeDirection.Columns ? 1 : double.NaN,
-            Height = direction == GridResizeDirection.Rows ? 1 : double.NaN,
-            MinWidth = direction == GridResizeDirection.Columns ? 1 : 0,
-            MinHeight = direction == GridResizeDirection.Rows ? 1 : 0,
-            MaxWidth = direction == GridResizeDirection.Columns ? 1 : double.PositiveInfinity,
-            MaxHeight = direction == GridResizeDirection.Rows ? 1 : double.PositiveInfinity,
+            Width = isColumnSplitter ? SplitterHitTargetThickness : double.NaN,
+            Height = isColumnSplitter ? double.NaN : SplitterHitTargetThickness,
+            MinWidth = isColumnSplitter ? SplitterHitTargetThickness : 0,
+            MinHeight = isColumnSplitter ? 0 : SplitterHitTargetThickness,
+            MaxWidth = isColumnSplitter ? SplitterHitTargetThickness : double.PositiveInfinity,
+            MaxHeight = isColumnSplitter ? double.PositiveInfinity : SplitterHitTargetThickness,
+            HorizontalAlignment = isColumnSplitter ? HorizontalAlignment.Center : HorizontalAlignment.Stretch,
+            VerticalAlignment = isColumnSplitter ? VerticalAlignment.Stretch : VerticalAlignment.Center,
+            Margin = isColumnSplitter
+                ? new Thickness(-SplitterOverlap, 0)
+                : new Thickness(0, -SplitterOverlap),
             ResizeDirection = direction,
             IsEnabled = editMode,
+            IsHitTestVisible = editMode,
         };
         splitter.Classes.Add("workspace-splitter");
 
@@ -99,10 +110,13 @@ public sealed class SplitLayoutBuilder
     public void SetEditMode(bool editMode)
     {
         foreach (var splitter in _splitters.Values)
+        {
             splitter.IsEnabled = editMode;
+            splitter.IsHitTestVisible = editMode;
+        }
     }
 
-    void UpdateRatioFromGrid(WorkspaceSplit split, GridSplitter splitter)
+    void UpdateRatioFromGrid(WorkspaceSplit split, WorkspaceGridSplitter splitter)
     {
         if (splitter.Parent is not Grid grid)
             return;
@@ -112,20 +126,23 @@ public sealed class SplitLayoutBuilder
             var col = Grid.GetColumn(splitter);
             if (col != 1)
                 return;
-            var total = grid.Bounds.Width;
+            var firstCol = grid.ColumnDefinitions[0];
+            var secondCol = grid.ColumnDefinitions[2];
+            var firstWidth = firstCol.ActualWidth;
+            var total = firstWidth + secondCol.ActualWidth;
             if (total <= 0)
                 return;
-            var firstCol = grid.ColumnDefinitions[0];
-            var firstWidth = firstCol.ActualWidth;
             split.Ratio = ClampRatio(firstWidth / total);
         }
         else
         {
-            var total = grid.Bounds.Height;
+            var firstRow = grid.RowDefinitions[0];
+            var secondRow = grid.RowDefinitions[2];
+            var firstHeight = firstRow.ActualHeight;
+            var total = firstHeight + secondRow.ActualHeight;
             if (total <= 0)
                 return;
-            var firstRow = grid.RowDefinitions[0];
-            split.Ratio = ClampRatio(firstRow.ActualHeight / total);
+            split.Ratio = ClampRatio(firstHeight / total);
         }
     }
 

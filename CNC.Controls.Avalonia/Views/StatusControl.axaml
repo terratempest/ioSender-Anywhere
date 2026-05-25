@@ -1,12 +1,17 @@
 <UserControl xmlns="https://github.com/avaloniaui"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              xmlns:conv="using:CNC.Controls.Avalonia.Converters"
              xmlns:loc="using:CNC.Localization.Avalonia"
              xmlns:core="using:CNC.Core"
              x:Class="CNC.Controls.Avalonia.Views.StatusControl"
              x:DataType="core:GrblViewModel"
+             mc:Ignorable="d"
+             d:DesignWidth="350"
+             d:DesignHeight="100"
              MinWidth="216"
-             MinHeight="36"
+             MinHeight="24"
              HorizontalAlignment="Stretch"
              VerticalAlignment="Stretch">
 
@@ -14,7 +19,7 @@
     <conv:GrblStateToColorConverter x:Key="ToColorConverter"/>
   </UserControl.Resources>
 
-  <Grid Margin="4" ColumnDefinitions="Auto,*,Auto"
+  <Grid Margin="4" ColumnDefinitions="Auto,*,Auto" MaxHeight="48" MinHeight="24"
         HorizontalAlignment="Stretch" VerticalAlignment="Stretch">
     <TextBlock x:Name="LblState" Grid.Column="0" Text="State:" VerticalAlignment="Center"
                Margin="0,0,4,0"
@@ -23,7 +28,7 @@
 
     <TextBox x:Name="txtState" Grid.Column="1"
              IsReadOnly="True" Focusable="False"
-             MinHeight="28"
+             MinHeight="24" Padding="0"
              HorizontalAlignment="Stretch" VerticalAlignment="Stretch"
              HorizontalContentAlignment="Center" VerticalContentAlignment="Center"
              TextAlignment="Center" FontWeight="SemiBold"
@@ -33,7 +38,10 @@
 
     <Button x:Name="btnReset" Grid.Column="2"
             Content="Reset" ToolTip.Tip="Ctrl+Shift+R"
-            Width="72" MinHeight="28" Margin="4,0,0,0"
+            Width="72" MinHeight="24" Margin="4,0,0,0" Padding="0"
+            HorizontalContentAlignment="Center"
+            VerticalContentAlignment="Center"
+            HorizontalAlignment="Right"
             Focusable="False" Classes="danger"
             loc:Localize.Key="CNC.Controls.WPF.statuscontrol.btn_reset"/>
   </Grid>

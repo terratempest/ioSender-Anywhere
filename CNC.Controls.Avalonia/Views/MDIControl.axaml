@@ -4,25 +4,52 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              xmlns:local="using:CNC.Controls.Avalonia.Views"
              xmlns:loc="using:CNC.Localization.Avalonia"
-             mc:Ignorable="d" d:DesignWidth="450" d:DesignHeight="50"
+             mc:Ignorable="d" d:DesignWidth="500" d:DesignHeight="70"
              x:Class="CNC.Controls.Avalonia.Views.MDIControl"
-             x:DataType="local:MDIControl">
-  <Border BorderBrush="{DynamicResource ThemeBorderLowBrush}" BorderThickness="1" Padding="4" CornerRadius="4">
-    <StackPanel>
-      <TextBlock x:Name="LblMdi" Text="MDI" FontWeight="SemiBold" Margin="0,0,0,4"
-                 loc:Localize.Key="CNC.Controls.WPF.mdicontrol.grp_mdi" loc:Localize.Fallback="MDI"/>
-      <StackPanel Orientation="Horizontal" Spacing="6">
-        <ComboBox x:Name="MdiCombo"
-                  MinWidth="140"
-                  ItemsSource="{Binding Commands}"
-                  SelectionChanged="OnMdiSelectionChanged"/>
-        <TextBox x:Name="MdiText"
-                 MinWidth="300"
-                 Text="{Binding Command, Mode=TwoWay}"
-                 KeyDown="OnMdiKeyDown"/>
-        <Button x:Name="BtnSend" Content="Send" Width="50" Click="OnSendClick"
-                loc:Localize.Key="CNC.Controls.WPF.mdicontrol.btn_send" loc:Localize.Fallback="Send"/>
-      </StackPanel>
-    </StackPanel>
-  </Border>
+             x:DataType="local:MDIControl"
+             MinWidth="200"
+             MinHeight="32"
+             HorizontalAlignment="Stretch"
+             VerticalAlignment="Stretch">
+
+  <UserControl.Styles>
+    <Style Selector="Button.mdi-history-button">
+      <Setter Property="Background" Value="Transparent"/>
+      <Setter Property="BorderThickness" Value="0"/>
+      <Setter Property="Padding" Value="0"/>
+      <Setter Property="Focusable" Value="False"/>
+      <Setter Property="HorizontalContentAlignment" Value="Center"/>
+      <Setter Property="VerticalContentAlignment" Value="Center"/>
+    </Style>
+  </UserControl.Styles>
+
+  <Grid ColumnDefinitions="*,Auto"
+        Margin="4"
+        HorizontalAlignment="Stretch" VerticalAlignment="Top">
+    <Grid Grid.Column="0">
+      <TextBox x:Name="MdiText"
+               MinWidth="100"
+               Text="{Binding Command, RelativeSource={RelativeSource AncestorType=UserControl}, Mode=TwoWay}"
+               HorizontalAlignment="Stretch"
+               VerticalContentAlignment="Center"
+               Padding="8,0,34,0"
+               KeyDown="OnMdiKeyDown"/>
+      <Button x:Name="BtnHistory" Classes="mdi-history-button"
+              Width="28"
+              HorizontalAlignment="Right" VerticalAlignment="Stretch"
+              Click="OnHistoryClick">
+        <Path Data="M7,9 L12,14 L17,9 Z"
+              Fill="{DynamicResource ThemeForegroundBrush}"
+              Width="12" Height="8"
+              Stretch="Uniform"/>
+      </Button>
+    </Grid>
+
+    <Button x:Name="BtnSend" Grid.Column="1" Content="Send" MinWidth="58" Margin="6,0,0,0"
+            Padding="8,0"
+            HorizontalAlignment="Right" VerticalAlignment="Stretch"
+            HorizontalContentAlignment="Center" VerticalContentAlignment="Center"
+            Click="OnSendClick"
+            loc:Localize.Key="CNC.Controls.WPF.mdicontrol.btn_send" loc:Localize.Fallback="Send"/>
+  </Grid>
 </UserControl>

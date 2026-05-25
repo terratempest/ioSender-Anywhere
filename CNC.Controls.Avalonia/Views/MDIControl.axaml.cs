@@ -20,9 +20,18 @@ public partial class MDIControl : UserControl
     {
         InitializeComponent();
         Commands = new ObservableCollection<string>();
+        if (Design.IsDesignMode)
+        {
+            Command = "G0 X0 Y0";
+            Commands.Add("$H");
+            Commands.Add("G0 X0 Y0");
+        }
+
         Loaded += (_, _) =>
         {
-            Localize.Apply(LblMdi);
+            if (Design.IsDesignMode)
+                return;
+
             Localize.Apply(BtnSend);
         };
     }
@@ -39,15 +48,9 @@ public partial class MDIControl : UserControl
         set => SetValue(CommandsProperty, value);
     }
 
-    private void OnSendClick(object? sender, RoutedEventArgs e) => SendMdi();
+    void OnSendClick(object? sender, RoutedEventArgs e) => SendMdi();
 
-    private void OnMdiSelectionChanged(object? sender, SelectionChangedEventArgs e)
-    {
-        if (MdiCombo.SelectedItem is string cmd)
-            Command = cmd;
-    }
-
-    private void OnMdiKeyDown(object? sender, KeyEventArgs e)
+    void OnMdiKeyDown(object? sender, KeyEventArgs e)
     {
         if (e.Key == Key.Enter)
         {
@@ -56,13 +59,37 @@ public partial class MDIControl : UserControl
         }
     }
 
-    private void SendMdi()
+    void OnHistoryClick(object? sender, RoutedEventArgs e)
     {
-        if (DataContext is GrblViewModel vm && !string.IsNullOrWhiteSpace(Command))
+        if (Commands.Count == 0)
+            return;
+
+        var menu = new ContextMenu();
+        foreach (var command in Commands.Reverse())
         {
-            vm.MDICommand.Execute(Command.Trim());
-            if (!Commands.Contains(Command))
-                Commands.Add(Command);
+            var item = new MenuItem { Header = command };
+            item.Click += (_, _) =>
+            {
+                Command = command;
+                MdiText.CaretIndex = Command.Length;
+                MdiText.Focus();
+            };
+            menu.Items.Add(item);
         }
+
+        menu.Open(BtnHistory);
+    }
+
+    void SendMdi()
+    {
+        var command = Command.Trim();
+        if (DataContext is not GrblViewModel vm || string.IsNullOrWhiteSpace(command))
+            return;
+
+        vm.MDICommand.Execute(command);
+        if (!Commands.Contains(command))
+            Commands.Add(command);
+        Command = string.Empty;
+        MdiText.Focus();
     }
 }

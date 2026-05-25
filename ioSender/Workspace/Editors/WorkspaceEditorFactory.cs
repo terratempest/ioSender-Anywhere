@@ -89,46 +89,51 @@ public sealed class WorkspaceEditorFactory
     {
         WorkspaceEditorId.Program => new GCodeListControl
         {
-            MinWidth = 200,
             HorizontalAlignment = Avalonia.Layout.HorizontalAlignment.Stretch,
             VerticalAlignment = Avalonia.Layout.VerticalAlignment.Stretch,
         },
         WorkspaceEditorId.Viewer3D => new RenderControl
         {
-            MinWidth = 200,
             HorizontalAlignment = Avalonia.Layout.HorizontalAlignment.Stretch,
             VerticalAlignment = Avalonia.Layout.VerticalAlignment.Stretch,
         },
         WorkspaceEditorId.Console => new ConsoleControl(),
-        WorkspaceEditorId.Mdi => new MDIControl(),
+        WorkspaceEditorId.Mdi => new MDIControl
+        {
+            HorizontalAlignment = Avalonia.Layout.HorizontalAlignment.Stretch,
+            VerticalAlignment = Avalonia.Layout.VerticalAlignment.Stretch,
+        },
         WorkspaceEditorId.MdiTouch => new MDITouchControl
         {
-            MinWidth = 360,
             HorizontalAlignment = Avalonia.Layout.HorizontalAlignment.Stretch,
             VerticalAlignment = Avalonia.Layout.VerticalAlignment.Stretch,
         },
         WorkspaceEditorId.Dro => new DROControl(),
         WorkspaceEditorId.Signals => new SignalsControl(),
-        WorkspaceEditorId.Status => new StatusControl(),
-        WorkspaceEditorId.Jog => new JogControl { MinWidth = 280, HorizontalAlignment = Avalonia.Layout.HorizontalAlignment.Stretch },
+        WorkspaceEditorId.Status => new StatusControl
+        {
+            HorizontalAlignment = Avalonia.Layout.HorizontalAlignment.Stretch,
+        },
+        WorkspaceEditorId.Jog => new JogControl { HorizontalAlignment = Avalonia.Layout.HorizontalAlignment.Stretch },
         WorkspaceEditorId.Outline => new OutlineControl(),
         WorkspaceEditorId.Goto => new GotoControl(),
         WorkspaceEditorId.WorkParams => new WorkParametersControl
         {
-            MinWidth = 200,
             HorizontalAlignment = Avalonia.Layout.HorizontalAlignment.Stretch,
             VerticalAlignment = Avalonia.Layout.VerticalAlignment.Stretch,
         },
         WorkspaceEditorId.Spindle => new SpindleControl
         {
-            MinWidth = 220,
             HorizontalAlignment = Avalonia.Layout.HorizontalAlignment.Stretch,
             VerticalAlignment = Avalonia.Layout.VerticalAlignment.Stretch,
         },
-        WorkspaceEditorId.Coolant => new CoolantControl(),
+        WorkspaceEditorId.Coolant => new CoolantControl
+        {
+            HorizontalAlignment = Avalonia.Layout.HorizontalAlignment.Stretch,
+            VerticalAlignment = Avalonia.Layout.VerticalAlignment.Stretch,
+        },
         WorkspaceEditorId.Feed => new FeedControl
         {
-            MinWidth = 220,
             HorizontalAlignment = Avalonia.Layout.HorizontalAlignment.Stretch,
             VerticalAlignment = Avalonia.Layout.VerticalAlignment.Stretch,
         },

@@ -37,7 +37,6 @@ public partial class SpindleControl : UserControl
     public SpindleControl()
 
     {
-
         InitializeComponent();
 
         DataContextChanged += SpindleControl_DataContextChanged;
@@ -50,10 +49,18 @@ public partial class SpindleControl : UserControl
         cbxSpindle.SelectionChanged += cbxSpindle_SelectionChanged;
         Loaded += (_, _) =>
         {
+            if (Design.IsDesignMode)
+            {
+                ApplyDesignPreviewValues();
+                return;
+            }
+
             ApplyLocalization();
             UpdateRpmText(force: true);
         };
 
+        if (Design.IsDesignMode)
+            ApplyDesignPreviewValues();
     }
 
 
@@ -61,6 +68,8 @@ public partial class SpindleControl : UserControl
     void ApplyLocalization()
 
     {
+        if (Design.IsDesignMode)
+            return;
 
         Localize.Apply(LblRpm);
 
@@ -71,6 +80,18 @@ public partial class SpindleControl : UserControl
         Localize.Apply(rbSpindleCCW);
 
         Localize.Apply(BtnSetRpm);
+
+    }
+
+    void ApplyDesignPreviewValues()
+
+    {
+
+        txtRPM.Text = "12000";
+
+        LblActualRpm.Text = "RPM:11500";
+
+        LblRpmOverride.Text = "RPM % 85";
 
     }
 
@@ -107,7 +128,6 @@ public partial class SpindleControl : UserControl
             newPc.PropertyChanged += OnDataContextPropertyChanged;
 
         UpdateRpmText(force: true);
-
         UpdateSpindleStateEnabled();
 
     }

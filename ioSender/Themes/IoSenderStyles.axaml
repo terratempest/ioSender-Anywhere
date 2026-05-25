@@ -1,5 +1,6 @@
 <Styles xmlns="https://github.com/avaloniaui"
-        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:workspaceControls="using:ioSender.Workspace.Controls">
 
   <Styles.Resources>
     <SolidColorBrush x:Key="IoSenderWarningBrush" Color="#EF5350"/>
@@ -41,6 +42,14 @@
   </Style>
 
   <Style Selector="GridSplitter.workspace-splitter:pointerover">
+    <Setter Property="Background" Value="{DynamicResource ThemeBorderMidBrush}"/>
+  </Style>
+
+  <Style Selector="workspaceControls|WorkspaceGridSplitter.workspace-splitter">
+    <Setter Property="Background" Value="{DynamicResource ThemeBorderLowBrush}"/>
+  </Style>
+
+  <Style Selector="workspaceControls|WorkspaceGridSplitter.workspace-splitter:pointerover">
     <Setter Property="Background" Value="{DynamicResource ThemeBorderMidBrush}"/>
   </Style>
 
