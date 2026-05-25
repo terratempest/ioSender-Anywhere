@@ -1,0 +1,91 @@
+<Styles xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+
+  <Design.PreviewWith>
+    <Grid RowDefinitions="*,4,*,4,*" Width="200" Height="200" Margin="4">
+      <ComboBox Grid.Row="0" SelectedIndex="0" >
+        <ComboBoxItem>G54</ComboBoxItem>
+        <ComboBoxItem>G55</ComboBoxItem>
+        <ComboBoxItem>G56</ComboBoxItem>
+      </ComboBox>
+      <ComboBox Grid.Row="2" Classes="dropdown-select " SelectedIndex="1">
+        <ComboBoxItem>Tool 1</ComboBoxItem>
+        <ComboBoxItem>Tool 2</ComboBoxItem>
+      </ComboBox>
+      <Grid Grid.Row="4" ColumnDefinitions="*,4,*" >
+        <ComboBox Grid.Column="0" Classes="dropdown-select" SelectedIndex="1">
+          <ComboBoxItem>Tool 1</ComboBoxItem>
+          <ComboBoxItem>Tool 2</ComboBoxItem>
+        </ComboBox>
+        <ComboBox Grid.Column="2" Classes="dropdown-select" SelectedIndex="1">
+          <ComboBoxItem>Tool 1</ComboBoxItem>
+          <ComboBoxItem>Tool 2</ComboBoxItem>
+        </ComboBox>
+      </Grid>
+    </Grid>
+  </Design.PreviewWith>
+
+  <Style Selector="ComboBox">
+    <Setter Property="MinHeight" Value="24"/>
+
+    <Setter Property="Padding" Value="8,0,0,0"/>
+    <Setter Property="HorizontalContentAlignment" Value="Stretch"/>
+    <Setter Property="VerticalContentAlignment" Value="Center"/>
+    <Setter Property="Background"  Value="{DynamicResource ThemeControlHighBrush}"/>
+    <Setter Property="Foreground"  Value="{DynamicResource ThemeForegroundBrush}"/>
+    <Setter Property="BorderBrush" Value="{DynamicResource ThemeBorderMidBrush}"/>
+    <Setter Property="BorderThickness" Value="1"/>
+    <Setter Property="CornerRadius" Value="3"/>
+    <Setter Property="Focusable" Value="False"/>
+    <Setter Property="HorizontalAlignment" Value="Stretch"/>
+    <Setter Property="VerticalAlignment" Value="Stretch"/>
+  </Style>
+
+  <Style Selector="ComboBox:pointerover">
+    <Setter Property="Background" Value="{DynamicResource ThemeControlHighlightMidBrush}"/>
+    <Setter Property="BorderBrush" Value="{DynamicResource ThemeBorderHighBrush}"/>
+  </Style>
+
+  <Style Selector="ComboBox:pressed">
+    <Setter Property="Background" Value="{DynamicResource ThemeControlHighlightLowBrush}"/>
+    <Setter Property="BorderBrush" Value="{DynamicResource ThemeAccentBrushLow}"/>
+  </Style>
+
+  <Style Selector="ComboBox:focus">
+    <Setter Property="BorderBrush" Value="{DynamicResource ThemeAccentBrush}"/>
+  </Style>
+
+  <Style Selector="ComboBox:disabled">
+    <Setter Property="Opacity" Value="0.55"/>
+  </Style>
+
+  <Style Selector="ComboBox.dropdown-select.compact">
+    <Setter Property="MinHeight" Value="22"/>
+    <Setter Property="Padding" Value="6,0"/>
+  </Style>
+
+  <Style Selector="ComboBoxItem">
+    <Setter Property="MinHeight" Value="24"/>
+    <Setter Property="Padding" Value="8,0"/>
+    <Setter Property="HorizontalContentAlignment" Value="Center"/>
+    <Setter Property="VerticalContentAlignment" Value="Center"/>
+    <Setter Property="Foreground" Value="{DynamicResource ThemeForegroundBrush}"/>
+    <Setter Property="Background" Value="{DynamicResource ThemeControlLowBrush}"/>
+  </Style>
+
+  <Style Selector="ComboBoxItem.jog-selector-item">
+    <Setter Property="Padding" Value="0"/>
+  </Style>
+
+  <Style Selector="ComboBoxItem:pointerover">
+    <Setter Property="Background" Value="{DynamicResource ThemeControlHighlightMidBrush}"/>
+  </Style>
+
+  <Style Selector="ComboBoxItem:selected">
+    <Setter Property="Background" Value="{DynamicResource ThemeAccentBrushLow}"/>
+  </Style>
+
+  <Style Selector="ComboBoxItem:selected:pointerover">
+    <Setter Property="Background" Value="{DynamicResource ThemeAccentBrushLow}"/>
+  </Style>
+</Styles>

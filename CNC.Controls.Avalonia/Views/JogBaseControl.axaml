@@ -1,16 +1,20 @@
 <UserControl xmlns="https://github.com/avaloniaui"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              xmlns:controls="using:CNC.Controls.Avalonia.Controls"
              xmlns:primitives="using:Avalonia.Controls.Primitives"
              xmlns:conv="using:CNC.Controls.Avalonia.Converters"
              xmlns:loc="using:CNC.Localization.Avalonia"
              xmlns:gcode="using:CNC.GCode"
+             mc:Ignorable="d" d:DesignWidth="500" d:DesignHeight="300"
              x:Class="CNC.Controls.Avalonia.Views.JogBaseControl"
              Loaded="JogControl_Loaded"
              SizeChanged="OnSizeChanged"
-             MinWidth="280"
              HorizontalAlignment="Stretch"
              VerticalAlignment="Stretch">
+
+
 
   <UserControl.Resources>
     <ResourceDictionary>
@@ -32,7 +36,7 @@
     </ResourceDictionary>
   </UserControl.Resources>
 
-  <Grid x:Name="RootGrid" RowDefinitions="36,*">
+  <Grid x:Name="RootGrid">
 
     <Grid.IsEnabled>
       <MultiBinding Converter="{StaticResource LogicalOrConverter}">
@@ -41,40 +45,8 @@
       </MultiBinding>
     </Grid.IsEnabled>
 
-    <!-- Row 1: distance presets (equal-width buttons fill available width) -->
-    <Grid x:Name="DistanceRow" Grid.Row="0" ColumnDefinitions="Auto,*,Auto" Margin="4,4,4,2">
-      <TextBlock x:Name="LblDistance" Grid.Column="0" Text="Distance" VerticalAlignment="Center"
-                 Margin="0,0,6,0" Foreground="{DynamicResource ThemeForegroundBrush}"
-                 loc:Localize.Key="CNC.Controls.Avalonia.jogbasecontrol.grp_jogDistance" loc:Localize.Fallback="Distance"/>
-      <Grid x:Name="DistanceChips" Grid.Column="1" ColumnDefinitions="*,*,*,*,*">
-        <primitives:ToggleButton Grid.Column="0" Classes="jog-option" Tag="3" Margin="0,0,2,0"
-                     Click="DistanceOption_Click"
-                     IsChecked="{Binding JogData.StepSize, RelativeSource={RelativeSource AncestorType=UserControl}, Mode=OneWay, Converter={StaticResource EnumToCheckedConverter}, ConverterParameter=Step3}"
-                     Content="{Binding JogData.Distance3, RelativeSource={RelativeSource AncestorType=UserControl}}"/>
-        <primitives:ToggleButton Grid.Column="1" Classes="jog-option" Tag="2" Margin="2,0,2,0"
-                     Click="DistanceOption_Click"
-                     IsChecked="{Binding JogData.StepSize, RelativeSource={RelativeSource AncestorType=UserControl}, Mode=OneWay, Converter={StaticResource EnumToCheckedConverter}, ConverterParameter=Step2}"
-                     Content="{Binding JogData.Distance2, RelativeSource={RelativeSource AncestorType=UserControl}}"/>
-        <primitives:ToggleButton Grid.Column="2" Classes="jog-option" Tag="1" Margin="2,0,2,0"
-                     Click="DistanceOption_Click"
-                     IsChecked="{Binding JogData.StepSize, RelativeSource={RelativeSource AncestorType=UserControl}, Mode=OneWay, Converter={StaticResource EnumToCheckedConverter}, ConverterParameter=Step1}"
-                     Content="{Binding JogData.Distance1, RelativeSource={RelativeSource AncestorType=UserControl}}"/>
-        <primitives:ToggleButton Grid.Column="3" Classes="jog-option" Tag="0" Margin="2,0,2,0"
-                     Click="DistanceOption_Click"
-                     IsChecked="{Binding JogData.StepSize, RelativeSource={RelativeSource AncestorType=UserControl}, Mode=OneWay, Converter={StaticResource EnumToCheckedConverter}, ConverterParameter=Step0}"
-                     Content="{Binding JogData.Distance0, RelativeSource={RelativeSource AncestorType=UserControl}}"/>
-        <primitives:ToggleButton x:Name="RbContinuous" Grid.Column="4" Classes="jog-option" Tag="4" Margin="2,0,0,0"
-                     Click="DistanceOption_Click"
-                     IsChecked="{Binding JogData.StepSize, RelativeSource={RelativeSource AncestorType=UserControl}, Mode=OneWay, Converter={StaticResource EnumToCheckedConverter}, ConverterParameter=Continuous}"
-                     Content="Continuous"
-                     loc:Localize.Key="CNC.Controls.Avalonia.jogbasecontrol.lbl_jogContinuous" loc:Localize.Fallback="Continuous"/>
-      </Grid>
-      <TextBlock Grid.Column="2" Text="{Binding Unit}" VerticalAlignment="Center" Margin="6,0,0,0"
-                 Foreground="{DynamicResource ThemeForegroundBrush}" FontSize="11"/>
-    </Grid>
-
-    <!-- Row 2: jog pad (stretch) + feed column (fixed width) -->
-    <Grid x:Name="BodyGrid" Grid.Row="1" Margin="4,0,4,4" ColumnDefinitions="*,72" ClipToBounds="True">
+    <!-- Jog pad + selectors -->
+    <Grid x:Name="BodyGrid" Margin="4" ColumnDefinitions="*,110" ClipToBounds="True">
 
       <Grid x:Name="PadArea" Grid.Column="0" ClipToBounds="True">
         <StackPanel x:Name="JogPadHost" Orientation="Horizontal"
@@ -222,31 +194,34 @@
         </StackPanel>
       </Grid>
 
-      <!-- Feed column: fixed width, fills body height -->
-      <Grid x:Name="FeedPanel" Grid.Column="1" Margin="6,0,0,0"
-            VerticalAlignment="Stretch" RowDefinitions="Auto,*">
-        <TextBlock x:Name="LblFeedRate" Grid.Row="0" FontWeight="SemiBold" Margin="0,0,0,4"
-                   Foreground="{DynamicResource ThemeForegroundBrush}" HorizontalAlignment="Center"
+      <Grid x:Name="SelectorPanel" Grid.Column="1" Margin="8,0,0,0"
+            RowDefinitions="*,*,0,*,*,*" VerticalAlignment="Stretch">
+        <TextBlock x:Name="LblDistance" Grid.Row="0" Text="Distance" FontWeight="SemiBold" Margin="0,0,0,4"
+                   Foreground="{DynamicResource ThemeForegroundBrush}" HorizontalAlignment="Stretch" VerticalAlignment="Bottom" TextAlignment="Left"
+                   loc:Localize.Key="CNC.Controls.Avalonia.jogbasecontrol.grp_jogDistance" loc:Localize.Fallback="Distance"/>
+        <ComboBox Grid.Row="1" x:Name="DistanceCombo" Classes="dropdown-select jog-selector" VerticalAlignment="Stretch" MaxHeight="84"
+                  HorizontalContentAlignment="Center" VerticalContentAlignment="Center"
+                  SelectionChanged="DistanceCombo_SelectionChanged">
+          <ComboBoxItem x:Name="DistanceStep3Item" Classes="jog-selector-item" Tag="3"/>
+          <ComboBoxItem x:Name="DistanceStep2Item" Classes="jog-selector-item" Tag="2"/>
+          <ComboBoxItem x:Name="DistanceStep1Item" Classes="jog-selector-item" Tag="1"/>
+          <ComboBoxItem x:Name="DistanceStep0Item" Classes="jog-selector-item" Tag="0"/>
+          <ComboBoxItem x:Name="DistanceContinuousItem" Classes="jog-selector-item" Tag="4"/>
+        </ComboBox>
+
+
+        <TextBlock x:Name="LblFeedRate" Grid.Row="3" FontWeight="SemiBold" Margin="0,0,0,4"
+                   Foreground="{DynamicResource ThemeForegroundBrush}" HorizontalAlignment="Stretch" VerticalAlignment="Bottom" TextAlignment="Left"
                    Text="{Binding FeedrateUnit, StringFormat='Feed {0}'}"
                    loc:Localize.Key="CNC.Controls.Avalonia.jogbasecontrol.grp_jogFeedrate" loc:Localize.Fallback="Feed"/>
-        <Grid x:Name="FeedChips" Grid.Row="1" RowDefinitions="*,*,*,*">
-          <primitives:ToggleButton Grid.Row="0" Classes="jog-option" Tag="3" Margin="0,0,0,2"
-                       Click="FeedOption_Click"
-                       IsChecked="{Binding JogData.Feed, RelativeSource={RelativeSource AncestorType=UserControl}, Mode=OneWay, Converter={StaticResource EnumToCheckedConverter}, ConverterParameter=Feed3}"
-                       Content="{Binding JogData.Feedrate3, RelativeSource={RelativeSource AncestorType=UserControl}}"/>
-          <primitives:ToggleButton Grid.Row="1" Classes="jog-option" Tag="2" Margin="0,0,0,2"
-                       Click="FeedOption_Click"
-                       IsChecked="{Binding JogData.Feed, RelativeSource={RelativeSource AncestorType=UserControl}, Mode=OneWay, Converter={StaticResource EnumToCheckedConverter}, ConverterParameter=Feed2}"
-                       Content="{Binding JogData.Feedrate2, RelativeSource={RelativeSource AncestorType=UserControl}}"/>
-          <primitives:ToggleButton Grid.Row="2" Classes="jog-option" Tag="1" Margin="0,0,0,2"
-                       Click="FeedOption_Click"
-                       IsChecked="{Binding JogData.Feed, RelativeSource={RelativeSource AncestorType=UserControl}, Mode=OneWay, Converter={StaticResource EnumToCheckedConverter}, ConverterParameter=Feed1}"
-                       Content="{Binding JogData.Feedrate1, RelativeSource={RelativeSource AncestorType=UserControl}}"/>
-          <primitives:ToggleButton Grid.Row="3" Classes="jog-option" Tag="0"
-                       Click="FeedOption_Click"
-                       IsChecked="{Binding JogData.Feed, RelativeSource={RelativeSource AncestorType=UserControl}, Mode=OneWay, Converter={StaticResource EnumToCheckedConverter}, ConverterParameter=Feed0}"
-                       Content="{Binding JogData.Feedrate0, RelativeSource={RelativeSource AncestorType=UserControl}}"/>
-        </Grid>
+        <ComboBox x:Name="FeedCombo" Grid.Row="4" Classes="dropdown-select jog-selector" VerticalAlignment="Stretch" MaxHeight="84"
+                  HorizontalContentAlignment="Center" VerticalContentAlignment="Center"
+                  SelectionChanged="FeedCombo_SelectionChanged">
+          <ComboBoxItem x:Name="Feed3Item" Classes="jog-selector-item" Tag="3"/>
+          <ComboBoxItem x:Name="Feed2Item" Classes="jog-selector-item" Tag="2"/>
+          <ComboBoxItem x:Name="Feed1Item" Classes="jog-selector-item" Tag="1"/>
+          <ComboBoxItem x:Name="Feed0Item" Classes="jog-selector-item" Tag="0"/>
+        </ComboBox>
       </Grid>
     </Grid>
   </Grid>

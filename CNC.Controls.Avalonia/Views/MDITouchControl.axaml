@@ -1,8 +1,7 @@
 <UserControl xmlns="https://github.com/avaloniaui"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              x:Class="CNC.Controls.Avalonia.Views.MDITouchControl"
-             MinWidth="360"
-             MinHeight="250"
+
              HorizontalAlignment="Stretch"
              VerticalAlignment="Stretch">
 
@@ -15,6 +14,7 @@
       <Setter Property="CornerRadius" Value="3"/>
       <Setter Property="MinWidth" Value="0"/>
       <Setter Property="MinHeight" Value="0"/>
+      <Setter Property="Padding" Value="0"/>
       <Setter Property="HorizontalAlignment" Value="Stretch"/>
       <Setter Property="VerticalAlignment" Value="Stretch"/>
       <Setter Property="FontSize" Value="18"/>
@@ -42,7 +42,7 @@
       <TextBox x:Name="MdiText"
                Text="{Binding Command, RelativeSource={RelativeSource AncestorType=UserControl}, Mode=TwoWay}"
                HorizontalAlignment="Stretch" VerticalAlignment="Stretch"
-               VerticalContentAlignment="Center"
+               VerticalContentAlignment="Center" HorizontalContentAlignment="Stretch"
                Padding="8,0,34,0"
                FontSize="18"
                KeyDown="OnMdiKeyDown"/>

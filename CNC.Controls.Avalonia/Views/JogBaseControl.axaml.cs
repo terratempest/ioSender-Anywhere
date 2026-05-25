@@ -28,7 +28,7 @@ public partial class JogBaseControl : UserControl
         AvaloniaProperty.Register<JogBaseControl, bool>(nameof(IsQueueStatusVisible));
 
     const Key Xplus = Key.J, Xminus = Key.H, Yplus = Key.K, Yminus = Key.L, Zplus = Key.I, Zminus = Key.M, Aplus = Key.U, Aminus = Key.N;
-    const double FeedColumnWidth = 72;
+    const double SelectorColumnWidth = 110;
     const double PadGap = 4;
     const double MinCellSize = 24;
 
@@ -108,7 +108,10 @@ public partial class JogBaseControl : UserControl
 
     void JogData_PropertyChanged(object? sender, PropertyChangedEventArgs e)
     {
-        if (e.PropertyName is not (nameof(JogViewModel.Distance) or nameof(JogViewModel.StepSize)))
+        if (e.PropertyName is not (nameof(JogViewModel.Distance) or nameof(JogViewModel.StepSize) or nameof(JogViewModel.Feed)))
+            return;
+        SyncJogSelectors();
+        if (e.PropertyName == nameof(JogViewModel.Feed))
             return;
         if (DataContext is not GrblViewModel model)
             return;
@@ -129,6 +132,7 @@ public partial class JogBaseControl : UserControl
     {
         _mode = model.IsMetric ? "G21" : "G20";
         JogData.SetMetric(model.IsMetric);
+        SyncJogSelectors();
     }
 
     static bool TryGetTagIndex(object? tag, out int index)
@@ -159,6 +163,7 @@ public partial class JogBaseControl : UserControl
     {
         ApplyLocalization();
         WireControls();
+        SyncJogSelectors();
         ApplyPadLayout();
 
         if (DataContext is not GrblViewModel model)
@@ -311,7 +316,7 @@ public partial class JogBaseControl : UserControl
     {
         Localize.Apply(LblDistance);
         Localize.Apply(LblFeedRate);
-        Localize.Apply(RbContinuous);
+        SyncJogSelectors();
     }
 
     void OnSizeChanged(object? sender, SizeChangedEventArgs e) => ApplyPadLayout();
@@ -321,8 +326,9 @@ public partial class JogBaseControl : UserControl
         if (BodyGrid.Bounds.Width <= 0 || BodyGrid.Bounds.Height <= 0)
             return;
 
-        var padW = Math.Max(0, BodyGrid.Bounds.Width - FeedColumnWidth - BodyGrid.Margin.Left - BodyGrid.Margin.Right - 6);
+        var padW = Math.Max(0, BodyGrid.Bounds.Width - SelectorColumnWidth - BodyGrid.Margin.Left - BodyGrid.Margin.Right - SelectorPanel.Margin.Left);
         var padH = Math.Max(0, BodyGrid.Bounds.Height - BodyGrid.Margin.Top - BodyGrid.Margin.Bottom);
+        SyncJogSelectorItemHeights();
         var coreCols = 3 + (ZColumn.IsVisible ? 1 : 0);
         var extraCols = 0;
         foreach (var child in ExtraAxesHost.Children)
@@ -402,22 +408,71 @@ public partial class JogBaseControl : UserControl
         control.VerticalAlignment = VerticalAlignment.Center;
     }
 
-    void DistanceOption_Click(object? sender, RoutedEventArgs e)
+    void SyncJogSelectors()
     {
-        if (sender is ToggleButton rb && TryGetTagIndex(rb.Tag, out var index))
+        UpdateJogSelectorContent();
+        SetComboSelectedTag(DistanceCombo, (int)JogData.StepSize);
+        SetComboSelectedTag(FeedCombo, (int)JogData.Feed);
+    }
+
+    void UpdateJogSelectorContent()
+    {
+        DistanceStep3Item.Content = JogData.Distance3.ToString();
+        DistanceStep2Item.Content = JogData.Distance2.ToString();
+        DistanceStep1Item.Content = JogData.Distance1.ToString();
+        DistanceStep0Item.Content = JogData.Distance0.ToString();
+        DistanceContinuousItem.Content = Localize.T("CNC.Controls.Avalonia.jogbasecontrol.lbl_jogContinuous", "Continuous");
+
+        Feed3Item.Content = JogData.Feedrate3.ToString();
+        Feed2Item.Content = JogData.Feedrate2.ToString();
+        Feed1Item.Content = JogData.Feedrate1.ToString();
+        Feed0Item.Content = JogData.Feedrate0.ToString();
+
+        SyncJogSelectorItemHeights();
+    }
+
+    static void SetComboSelectedTag(ComboBox combo, int tag)
+    {
+        foreach (var item in combo.Items.OfType<ComboBoxItem>())
         {
-            rb.IsChecked = true;
+            if (TryGetTagIndex(item.Tag, out var index) && index == tag)
+            {
+                if (!ReferenceEquals(combo.SelectedItem, item))
+                    combo.SelectedItem = item;
+                return;
+            }
+        }
+    }
+
+    void SyncJogSelectorItemHeights()
+    {
+        SetItemHeights(DistanceCombo);
+        SetItemHeights(FeedCombo);
+    }
+
+    static void SetItemHeights(ComboBox combo)
+    {
+        if (combo.Bounds.Height <= 0)
+            return;
+
+        foreach (var item in combo.Items.OfType<ComboBoxItem>())
+            item.Height = combo.Bounds.Height;
+    }
+
+    void DistanceCombo_SelectionChanged(object? sender, SelectionChangedEventArgs e)
+    {
+        if (sender is ComboBox { SelectedItem: ComboBoxItem item } && TryGetTagIndex(item.Tag, out var index))
+        {
             var step = (JogViewModel.JogStep)index;
             if (JogData.StepSize != step)
                 JogData.StepSize = step;
         }
     }
 
-    void FeedOption_Click(object? sender, RoutedEventArgs e)
+    void FeedCombo_SelectionChanged(object? sender, SelectionChangedEventArgs e)
     {
-        if (sender is ToggleButton rb && TryGetTagIndex(rb.Tag, out var index))
+        if (sender is ComboBox { SelectedItem: ComboBoxItem item } && TryGetTagIndex(item.Tag, out var index))
         {
-            rb.IsChecked = true;
             var feed = (JogViewModel.JogFeed)index;
             if (JogData.Feed != feed)
                 JogData.Feed = feed;
@@ -548,4 +603,5 @@ public partial class JogBaseControl : UserControl
         if (sender is Button btn && !JogCommand(JogAxisCommand(btn)))
             ReleasePointerCapture(sender, e);
     }
+
 }

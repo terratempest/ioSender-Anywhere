@@ -38,10 +38,11 @@
 
     <Button x:Name="btnReset" Grid.Column="2"
             Content="Reset" ToolTip.Tip="Ctrl+Shift+R"
-            Width="72" MinHeight="24" Margin="4,0,0,0" Padding="0"
-            HorizontalContentAlignment="Center"
+            Width="72" Margin="4,0,0,0" Padding="0"
+            HorizontalContentAlignment="Center" 
             VerticalContentAlignment="Center"
             HorizontalAlignment="Right"
+            VerticalAlignment= "Stretch"
             Focusable="False" Classes="danger"
             loc:Localize.Key="CNC.Controls.Avalonia.statuscontrol.btn_reset"/>
   </Grid>

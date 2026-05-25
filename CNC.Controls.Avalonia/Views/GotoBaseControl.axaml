@@ -3,7 +3,7 @@
              xmlns:conv="using:CNC.Controls.Avalonia.Converters"
              x:Class="CNC.Controls.Avalonia.Views.GotoBaseControl"
              Focusable="False"
-             d:DesignHeight="95" d:DesignWidth="140"
+             d:DesignHeight="150" d:DesignWidth="200"
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              mc:Ignorable="d">
