@@ -12,6 +12,7 @@ public sealed partial class ProbingViewModel
     int _centerPass;
     int _centerTotalPasses = 1;
     bool _canApplyTransform;
+    bool _workpieceLockXY = true;
     double _workpieceSizeX;
     double _workpieceSizeY;
     int _passes = 1;
@@ -29,13 +30,62 @@ public sealed partial class ProbingViewModel
     public double WorkpieceSizeX
     {
         get => _workpieceSizeX;
-        set { _workpieceSizeX = value; OnPropertyChanged(); }
+        set
+        {
+            if (Math.Abs(_workpieceSizeX - value) < double.Epsilon)
+                return;
+
+            _workpieceSizeX = value;
+            OnPropertyChanged();
+            if (_workpieceLockXY && Math.Abs(_workpieceSizeY - value) >= double.Epsilon)
+            {
+                _workpieceSizeY = value;
+                OnPropertyChanged(nameof(WorkpieceSizeY));
+            }
+        }
     }
 
     public double WorkpieceSizeY
     {
         get => _workpieceSizeY;
-        set { _workpieceSizeY = value; OnPropertyChanged(); }
+        set
+        {
+            if (Math.Abs(_workpieceSizeY - value) < double.Epsilon)
+                return;
+
+            _workpieceSizeY = value;
+            OnPropertyChanged();
+            if (_workpieceLockXY && Math.Abs(_workpieceSizeX - value) >= double.Epsilon)
+            {
+                _workpieceSizeX = value;
+                OnPropertyChanged(nameof(WorkpieceSizeX));
+            }
+        }
+    }
+
+    public bool WorkpieceLockXY
+    {
+        get => _workpieceLockXY;
+        set
+        {
+            if (_workpieceLockXY == value)
+                return;
+
+            _workpieceLockXY = value;
+            OnPropertyChanged();
+            OnPropertyChanged(nameof(WorkpiecLockXY));
+            if (_workpieceLockXY && Math.Abs(_workpieceSizeY - _workpieceSizeX) >= double.Epsilon)
+            {
+                _workpieceSizeY = _workpieceSizeX;
+                OnPropertyChanged(nameof(WorkpieceSizeY));
+            }
+        }
+    }
+
+    public bool WorkpiecLockXY
+    {
+        get => WorkpieceLockXY;
+        set => WorkpieceLockXY = value;
     }
 
     public int Passes

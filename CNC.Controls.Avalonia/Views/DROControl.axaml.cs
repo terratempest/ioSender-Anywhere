@@ -293,6 +293,7 @@ public partial class DROControl : UserControl
 
         if (e.Key == AvaloniaKey.Enter && sender is NumericTextBox box && box.Tag is int idx)
         {
+            box.CommitText();
             if (box.Value != _orgpos)
                 AxisPositionChanged(GrblInfo.AxisIndexToLetter(idx), box.Value);
             FindAxisForReadout(box)?.EndWorkEdit(false);

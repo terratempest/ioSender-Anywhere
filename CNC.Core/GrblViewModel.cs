@@ -79,7 +79,7 @@ namespace CNC.Core
         public Action<string> OnGrblReset;
         public Action<string> OnRealtimeStatusProcessed;
         public Action<string> OnWCOUpdated;
-        public Action<Position> OnCameraProbe;
+        public Action<Position>? OnCameraProbe;
 
         public delegate void GrblResetHandler();
         public event EventHandler OnCycleStart;

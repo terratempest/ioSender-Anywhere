@@ -7,20 +7,18 @@ using CoreModifiers = CNC.Core.Input.ModifierKeys;
 namespace CNC.Controls.Avalonia.Utilities;
 
 /// <summary>Maps Avalonia key events to <see cref="KeyEventInfo"/>.</summary>
-internal static class AvaloniaKeyBridge
+public static class AvaloniaKeyBridge
 {
     public static KeyEventInfo ToKeyEventInfo(KeyEventArgs e, bool isUp)
     {
         var key = MapKey(e.Key);
-        var systemKey = CoreKey.None;
-
         KeyInputState.Modifiers = MapModifiers(e.KeyModifiers);
         KeyInputState.IsTextInputFocused = e.Source is global::Avalonia.Controls.TextBox;
 
         return new KeyEventInfo
         {
             Key = key,
-            SystemKey = systemKey,
+            SystemKey = key,
             Modifiers = KeyInputState.Modifiers,
             IsUp = isUp,
             IsRepeat = false

@@ -47,6 +47,7 @@ public sealed partial class ProbingViewModel : ProbingPanelViewModel
     string _previewText = string.Empty;
     bool _isCorner;
     bool _allowMeasure;
+    bool _wasMetric = true;
     double _workpieceXYEdgeOffset;
 
     public ProbingViewModel(BaseConfig? config = null)
@@ -145,14 +146,24 @@ public sealed partial class ProbingViewModel : ProbingPanelViewModel
                 return;
             _probingType = value;
             OnPropertyChanged();
-            OnPropertyChanged(nameof(OffsetEnable));
-            OnPropertyChanged(nameof(XYOffsetEnable));
-            OnPropertyChanged(nameof(TouchPlateXYEnabled));
-            OnPropertyChanged(nameof(ProbeDiameterEnable));
-            OnPropertyChanged(nameof(TouchPlateHeightEnable));
-            OnPropertyChanged(nameof(FixtureHeightEnable));
+            NotifySidebarVisibility();
         }
     }
+
+    public void NotifySidebarVisibility()
+    {
+        OnPropertyChanged(nameof(ProbeDiameterEnable));
+        OnPropertyChanged(nameof(TouchPlateHeightEnable));
+        OnPropertyChanged(nameof(FixtureHeightEnable));
+        OnPropertyChanged(nameof(XYOffsetEnable));
+        OnPropertyChanged(nameof(OffsetEnable));
+        OnPropertyChanged(nameof(ShowClearancesSection));
+        OnPropertyChanged(nameof(TouchPlateXYEnabled));
+        OnPropertyChanged(nameof(ShowTouchPlateSection));
+    }
+
+    public bool ShowTouchPlateSection =>
+        TouchPlateHeightEnable || FixtureHeightEnable;
 
     public bool AllowMeasure
     {
@@ -185,9 +196,9 @@ public sealed partial class ProbingViewModel : ProbingPanelViewModel
 
             _edge = value;
             OnPropertyChanged();
-            OnPropertyChanged(nameof(ProbeDiameterEnable));
             OnPropertyChanged(nameof(ProbeVerticalEdge));
             ProbeCorner = _edge is Edge.A or Edge.B or Edge.C or Edge.D;
+            NotifySidebarVisibility();
             if (_probingType == ProbingType.Rotation && value != Edge.AB)
                 AddAction = false;
         }
@@ -200,9 +211,8 @@ public sealed partial class ProbingViewModel : ProbingPanelViewModel
         {
             _probeZ = value;
             OnPropertyChanged();
-            OnPropertyChanged(nameof(TouchPlateHeightEnable));
-            OnPropertyChanged(nameof(XYOffsetEnable));
             OnPropertyChanged(nameof(ProbeVerticalEdge));
+            NotifySidebarVisibility();
         }
     }
 
@@ -240,10 +250,11 @@ public sealed partial class ProbingViewModel : ProbingPanelViewModel
         {
             _isCorner = value;
             OnPropertyChanged();
-            OnPropertyChanged(nameof(OffsetEnable));
-            OnPropertyChanged(nameof(XYOffsetEnable));
+            NotifySidebarVisibility();
         }
     }
+
+    public bool ShowClearancesSection => XYOffsetEnable || OffsetEnable;
 
     public bool ProbeVerticalEdge => _edge is not Edge.None and not Edge.Z;
 
@@ -288,8 +299,7 @@ public sealed partial class ProbingViewModel : ProbingPanelViewModel
         {
             _probeFixture = value;
             OnPropertyChanged();
-            OnPropertyChanged(nameof(FixtureHeightEnable));
-            OnPropertyChanged(nameof(TouchPlateHeightEnable));
+            NotifySidebarVisibility();
             if (_probeFixture)
                 AddAction = false;
         }
@@ -314,7 +324,7 @@ public sealed partial class ProbingViewModel : ProbingPanelViewModel
         {
             _referenceToolOffset = value;
             OnPropertyChanged();
-            OnPropertyChanged(nameof(FixtureHeightEnable));
+            NotifySidebarVisibility();
         }
     }
 
@@ -406,6 +416,9 @@ public sealed partial class ProbingViewModel : ProbingPanelViewModel
                 GrblParserState.Get(true);
         }
 
+        if (!(_wasMetric = GrblParserState.IsMetric))
+            WaitForResponse("G21");
+
         ProbeVerified = !ValidateProbeConnected;
         DistanceMode = GrblParserState.DistanceMode;
         Tool = Grbl.Tool == GrblConstants.NO_TOOL ? "0" : Grbl.Tool;
@@ -434,6 +447,9 @@ public sealed partial class ProbingViewModel : ProbingPanelViewModel
 
         if (Grbl.GrblError != 0)
             WaitForResponse("");
+
+        if (!_wasMetric)
+            WaitForResponse("G20");
 
         WaitForResponse(DistanceMode == DistanceMode.Absolute ? "G90" : "G91");
         Grbl.Poller.SetState(0);

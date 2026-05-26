@@ -1,19 +1,28 @@
 <UserControl xmlns="https://github.com/avaloniaui"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:controls="using:CNC.Controls.Avalonia.Controls"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              x:Class="CNC.Controls.Avalonia.Views.NumericField"
              x:Name="numericField"
-             Height="28" Width="175">
-  <Grid x:Name="grid" ColumnDefinitions="70,Auto,*">
+             mc:Ignorable="d"
+             d:DesignWidth="240"
+             d:DesignHeight="24"
+             >
+
+  <Grid x:Name="grid" ColumnDefinitions="*,Auto,Auto">
     <TextBlock x:Name="label"
-               Text="{Binding Label, RelativeSource={RelativeSource AncestorType=UserControl}}"
-               Grid.Column="0" HorizontalAlignment="Right" VerticalAlignment="Center" Margin="0,0,4,0"/>
-    <controls:NumericTextBox x:Name="data" Grid.Column="1" Width="64" Height="24"
-                             IsReadOnly="{Binding IsReadOnly, RelativeSource={RelativeSource AncestorType=UserControl}}"
-                             Value="{Binding Value, RelativeSource={RelativeSource AncestorType=UserControl}, Mode=TwoWay}"
-                             Format="{Binding Format, RelativeSource={RelativeSource AncestorType=UserControl}, Mode=OneWay}"/>
+      Text="{Binding Label, RelativeSource={RelativeSource AncestorType=UserControl}}"
+      Grid.Column="0" HorizontalAlignment="Right" VerticalAlignment="Center" Margin="0,0,4,0" FontSize="12"
+    />
+    <controls:NumericTextBox x:Name="data" Grid.Column="1" HorizontalAlignment="Right" 
+      IsReadOnly="{Binding IsReadOnly, RelativeSource={RelativeSource AncestorType=UserControl}}"
+      Value ="{Binding Value, RelativeSource={RelativeSource AncestorType=UserControl}, Mode=TwoWay}"
+      Format="{Binding Format, RelativeSource={RelativeSource AncestorType=UserControl}, Mode=OneWay}"
+    />
     <TextBlock x:Name="unit"
-               Text="{Binding Unit, RelativeSource={RelativeSource AncestorType=UserControl}}"
-               Grid.Column="2" VerticalAlignment="Center" Margin="4,0,0,0"/>
+      Text="{Binding Unit, RelativeSource={RelativeSource AncestorType=UserControl}}"
+      Grid.Column="2" VerticalAlignment="Center" HorizontalAlignment="Right" Margin="4,0,0,0" FontSize="12"
+    />
   </Grid>
 </UserControl>

@@ -11,7 +11,7 @@ internal static class ProbingStrings
     public const string FailedCancelled = "Probing failed or was cancelled!";
     public const string ProbingAtX0Y0 = "Probing at X0 Y0";
     public const string NoVerifyContinue = "Probe is not asserted. Continue anyway?";
-    public const string VerifyStart = "Probe verified — ready to start.";
+    public const string VerifyStart = "Probe verified - ready to start.";
     public const string ErrorProbingDistance = "XY clearance + probe radius must be less than probe distance!";
     public const string ErrorLatchDistance = "Latch distance must be less than probe distance!";
     public const string IllegalPosition = "Illegal probe position, try again.";
@@ -24,7 +24,7 @@ internal static class ProbingStrings
     public const string PositionUnknown = "Probing failed, machine position not known.";
     public const string ProbingCompleted = "Probing completed.";
     public const string ProbingFailed = "Probing failed";
-    public const string ProbedAngle = "Probed angle: {0}°";
+    public const string ProbedAngle = "Probed angle: {0} deg";
     public const string AreaOriginConfirm = "Move to height map origin X{0} Y{1}?";
     public const string ProbingPointOf = "Probing point {0} of {1}";
     public const string CenterCompleted = "Probing completed. Size X={0} Y={1}";

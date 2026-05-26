@@ -3,8 +3,7 @@
              xmlns:conv="using:CNC.Controls.Avalonia.Converters"
              xmlns:controls="using:CNC.Controls.Avalonia.Controls"
              xmlns:local="using:CNC.Controls.Probing"
-             x:Class="CNC.Controls.Probing.CenterFinderControl"
-             Height="370" Width="625">
+             x:Class="CNC.Controls.Probing.CenterFinderControl">
   <UserControl.Resources>
     <conv:LogicalNotConverter x:Key="IsNotRunningConverter"/>
     <conv:BoolToVisibleConverter x:Key="ToVisibleConverter"/>
@@ -43,7 +42,7 @@
             <TextBlock Grid.Row="0" Text="X size:" VerticalAlignment="Center" Margin="0,0,6,4"/>
             <controls:NumericTextBox Grid.Row="0" Grid.Column="1" Value="{Binding WorkpieceSizeX, Mode=TwoWay}" Format="0.###" Margin="0,0,0,4"/>
             <CheckBox Grid.RowSpan="2" Grid.Column="2" Content="Lock" VerticalAlignment="Center" Margin="8,0,0,0"
-                      IsChecked="{Binding WorkpiecLockXY, Mode=TwoWay}"
+                      IsChecked="{Binding WorkpieceLockXY, Mode=TwoWay}"
                       ToolTip.Tip="Unlock and set X or Y size to 0 to probe in one direction only."/>
             <TextBlock Grid.Row="1" Text="Y size:" VerticalAlignment="Center" Margin="0,0,6,0"/>
             <controls:NumericTextBox Grid.Row="1" Grid.Column="1" Value="{Binding WorkpieceSizeY, Mode=TwoWay}" Format="0.###"/>

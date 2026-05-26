@@ -349,7 +349,7 @@ namespace CNC.Core
 
             this.allowJog = allowJog;
 
-            if(IsJoggingEnabled && e.IsDown && CanJog && !(KeyInputState.Modifiers == ModifierKeys.Alt || KeyInputState.Modifiers == (ModifierKeys.Control | ModifierKeys.Shift) || KeyInputState.Modifiers == ModifierKeys.Windows))
+            if(!KeyInputState.IsTextInputFocused && IsJoggingEnabled && e.IsDown && CanJog && !(KeyInputState.Modifiers == ModifierKeys.Alt || KeyInputState.Modifiers == (ModifierKeys.Control | ModifierKeys.Shift) || KeyInputState.Modifiers == ModifierKeys.Windows))
                 jogKey = jogKeys.Where(p => p.Key == e.Key && p.Command != string.Empty).FirstOrDefault();
 
             if (jogKey != null)
@@ -478,6 +478,9 @@ namespace CNC.Core
 
             IsRepeating = e.IsRepeat;
 
+            if (KeyInputState.IsTextInputFocused && IsTextNavigationKey(e.Key))
+                return false;
+
             if (KeyInputState.Modifiers == ModifierKeys.Alt)
             {
                 var handler = handlers.Where(k => k.Modifiers == KeyInputState.Modifiers && k.Key == e.SystemKey && k.OnUp == e.IsUp && k.context == context).FirstOrDefault();
@@ -505,6 +508,8 @@ namespace CNC.Core
 
             return jogkeyPressed;
         }
+
+        static bool IsTextNavigationKey(Key key) => key is Key.Left or Key.Right or Key.Up or Key.Down or Key.PageUp or Key.PageDown or Key.Home or Key.End;
 
         public void JogCancel()
         {

@@ -8,9 +8,7 @@
 
              xmlns:local="using:CNC.Controls.Probing"
 
-             x:Class="CNC.Controls.Probing.EdgeFinderControl"
-
-             Height="370" Width="510">
+             x:Class="CNC.Controls.Probing.EdgeFinderControl">
 
   <UserControl.Resources>
 

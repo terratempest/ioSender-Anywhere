@@ -26,6 +26,7 @@
     <ProjectReference Include="..\CNC.Platform.Windows\CNC.Platform.Windows.csproj" />
     <ProjectReference Include="..\CNC.Core\CNC.Core.csproj" />
     <ProjectReference Include="..\CNC.Controls.Avalonia\CNC.Controls.Avalonia.csproj" />
+    <ProjectReference Include="..\CNC.Controls.Probing.Avalonia\CNC.Controls.Probing.Avalonia.csproj" />
   </ItemGroup>
 
 </Project>

@@ -4,6 +4,7 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              xmlns:conv="using:CNC.Controls.Avalonia.Converters"
              xmlns:controls="using:CNC.Controls.Avalonia.Controls"
+             xmlns:views="using:CNC.Controls.Avalonia.Views"
              xmlns:local="using:CNC.Controls.Probing"
              xmlns:loc="using:CNC.Localization.Avalonia"
              mc:Ignorable="d"
@@ -12,168 +13,277 @@
 
   <UserControl.Resources>
     <conv:LogicalNotConverter x:Key="IsNotRunningConverter"/>
+    <conv:BoolToVisibleConverter x:Key="IsVisibleConverter"/>
+    <conv:LogicalNotConverter x:Key="IsNotVisibleConverter">
+      <conv:LogicalNotConverter.FinalConverter>
+        <conv:BoolToVisibleConverter/>
+      </conv:LogicalNotConverter.FinalConverter>
+    </conv:LogicalNotConverter>
     <local:ProbingMacroActiveBrushConverter x:Key="MacroActiveBrushConverter"/>
   </UserControl.Resources>
 
   <Grid>
-  <DockPanel x:Name="ProbingRoot" Background="Transparent" VerticalAlignment="Stretch" HorizontalAlignment="Stretch">
-    <DockPanel x:Name="SidebarHost" DockPanel.Dock="Left" Margin="5,5,5,0" Width="240"
-               HorizontalAlignment="Left" VerticalAlignment="Stretch">
-      <StackPanel DockPanel.Dock="Top" Spacing="5">
-        <StackPanel Orientation="Horizontal" Spacing="4">
-          <TextBlock Text="Profile:" VerticalAlignment="Center" Width="48" TextAlignment="Right"/>
-          <ComboBox x:Name="ProfileCombo" Width="155" Height="22"
-                    ItemsSource="{Binding Profiles}"
-                    SelectedItem="{Binding Profile, Mode=TwoWay}"
-                    DisplayMemberBinding="{Binding Name}"/>
-          <Button x:Name="ProfileMenuBtn" Content="..." Width="22" Height="22" Click="OnProfileMenuClick"/>
-        </StackPanel>
+    <Grid x:Name="ProbingVmRoot"
+          ColumnDefinitions="260,*"
+          RowDefinitions="*"
+          Margin="4">
 
-        <Border BorderBrush="{DynamicResource ThemeBorderLowBrush}" BorderThickness="1" Padding="6" CornerRadius="2">
-          <StackPanel Spacing="4">
-            <TextBlock Text="Probe tip/tool" FontWeight="SemiBold"/>
-            <Grid ColumnDefinitions="Auto,*" RowDefinitions="Auto">
-              <TextBlock Grid.Column="0" Text="Diameter:" VerticalAlignment="Center" Margin="0,0,6,0"/>
-              <controls:NumericTextBox Grid.Column="1" Value="{Binding ProbeDiameter, Mode=TwoWay}" Format="0.###"/>
+      <Border Grid.Column="0"
+              BorderBrush="{DynamicResource ThemeBorderLowBrush}"
+              BorderThickness="1"
+              Padding="4"
+              CornerRadius="2"
+              Background="{DynamicResource ThemeControlLowBrush}">
+        <ScrollViewer HorizontalScrollBarVisibility="Disabled"
+                      VerticalScrollBarVisibility="Auto">
+          <StackPanel x:Name="SidebarHost" Spacing="5">
+            <Grid ColumnDefinitions="Auto,*,Auto">
+              <TextBlock Grid.Column="0" Text="Profile:" VerticalAlignment="Center" TextAlignment="Right" Margin="0,0,6,0"/>
+              <Grid Grid.Column="1" ColumnDefinitions="*,22">
+                <TextBox x:Name="ProfileNameBox"
+                         MinHeight="22"
+                         VerticalContentAlignment="Center"
+                         Padding="6,0,4,0"/>
+                <Button x:Name="ProfileDropDownBtn"
+                        Grid.Column="1"
+                        Classes="panel-action compact"
+                        Content="&#9660;"
+                        Width="22"
+                        MinHeight="22"
+                        Padding="0"
+                        Focusable="False"
+                        Click="OnProfileDropDownClick"/>
+                <Popup x:Name="ProfilePopup"
+                       PlacementTarget="{Binding #ProfileNameBox}"
+                       Placement="Bottom"
+                       IsLightDismissEnabled="True">
+                  <ListBox x:Name="ProfileList"
+                           MinWidth="180"
+                           MaxHeight="200"
+                           ItemsSource="{Binding Profiles}"
+                           SelectionChanged="OnProfileListSelectionChanged">
+                    <ListBox.ItemTemplate>
+                      <DataTemplate>
+                        <TextBlock Text="{Binding Name}"/>
+                      </DataTemplate>
+                    </ListBox.ItemTemplate>
+                  </ListBox>
+                </Popup>
+              </Grid>
+              <Button x:Name="ProfileMenuBtn"
+                      Grid.Column="2"
+                      Classes="panel-action compact"
+                      Content="..."
+                      Width="26"
+                      Margin="4,0,0,0"
+                      Click="OnProfileMenuClick"/>
             </Grid>
+
+            <Border Classes="panel-chrome"
+                    IsVisible="{Binding ProbeDiameterEnable, Converter={StaticResource IsVisibleConverter}}"
+                    IsEnabled="{Binding ProbeDiameterEnable}">
+              <StackPanel Spacing="2">
+                <TextBlock Text="Probe tip/tool" FontWeight="SemiBold"/>
+                <views:NumericField Label="Diameter:"
+                                    Value="{Binding ProbeDiameter, Mode=TwoWay}"
+                                    IsEnabled="{Binding ProbeDiameterEnable}"
+                                    Format="0.###"
+                                    Unit="mm"
+                                    Width="220"
+                                    HorizontalAlignment="Stretch"/>
+              </StackPanel>
+            </Border>
+
+            <Border Classes="panel-chrome"
+                    IsVisible="{Binding ShowTouchPlateSection, Converter={StaticResource IsVisibleConverter}}"
+                    IsEnabled="{Binding ShowTouchPlateSection}">
+              <StackPanel Spacing="2">
+                <TextBlock Text="Touch plate/fixture height" FontWeight="SemiBold"/>
+                <views:NumericField Label="Touch plate:"
+                                    Value="{Binding TouchPlateHeight, Mode=TwoWay}"
+                                    IsEnabled="{Binding TouchPlateHeightEnable}"
+                                    IsVisible="{Binding TouchPlateHeightEnable, Converter={StaticResource IsVisibleConverter}}"
+                                    Format="0.###"
+                                    Unit="mm"
+                                    Width="220"
+                                    HorizontalAlignment="Stretch"/>
+                <views:NumericField Label="Fixture:"
+                                    Value="{Binding FixtureHeight, Mode=TwoWay}"
+                                    IsEnabled="{Binding FixtureHeightEnable}"
+                                    IsVisible="{Binding FixtureHeightEnable, Converter={StaticResource IsVisibleConverter}}"
+                                    Format="0.###"
+                                    Unit="mm"
+                                    Width="220"
+                                    HorizontalAlignment="Stretch"/>
+              </StackPanel>
+            </Border>
+
+            <Border Classes="panel-chrome">
+              <StackPanel Spacing="2">
+                <TextBlock Text="Probing distances and speed" FontWeight="SemiBold"/>
+                <views:NumericField Label="Rapids feed rate:"
+                                    Value="{Binding RapidsFeedRate, Mode=TwoWay}"
+                                    Format="###0"
+                                    Unit="mm/min"
+                                    Width="220"
+                                    HorizontalAlignment="Stretch"/>
+                <views:NumericField Label="Search feed rate:"
+                                    Value="{Binding ProbeFeedRate, Mode=TwoWay}"
+                                    Format="###0"
+                                    Unit="mm/min"
+                                    Width="220"
+                                    HorizontalAlignment="Stretch"/>
+                <views:NumericField Label="Latch feed rate:"
+                                    Value="{Binding LatchFeedRate, Mode=TwoWay}"
+                                    Format="###0"
+                                    Unit="mm/min"
+                                    Width="220"
+                                    HorizontalAlignment="Stretch"/>
+                <views:NumericField Label="Probing distance:"
+                                    Value="{Binding ProbeDistance, Mode=TwoWay}"
+                                    Format="0.000"
+                                    Unit="mm"
+                                    Width="220"
+                                    HorizontalAlignment="Stretch"/>
+                <views:NumericField Label="Latch distance:"
+                                    Value="{Binding LatchDistance, Mode=TwoWay}"
+                                    Format="0.000"
+                                    Unit="mm"
+                                    Width="220"
+                                    HorizontalAlignment="Stretch"/>
+              </StackPanel>
+            </Border>
+
+            <Border Classes="panel-chrome"
+                    IsVisible="{Binding ShowClearancesSection, Converter={StaticResource IsVisibleConverter}}"
+                    IsEnabled="{Binding ShowClearancesSection}">
+              <StackPanel Spacing="2">
+                <TextBlock Text="Probing clearances" FontWeight="SemiBold"/>
+                <views:NumericField Label="XY clearance:"
+                                    Value="{Binding XYClearance, Mode=TwoWay}"
+                                    IsEnabled="{Binding XYOffsetEnable}"
+                                    IsVisible="{Binding XYOffsetEnable, Converter={StaticResource IsVisibleConverter}}"
+                                    Format="0.000"
+                                    Unit="mm"
+                                    Width="220"
+                                    HorizontalAlignment="Stretch"/>
+                <views:NumericField Label="Offset:"
+                                    Value="{Binding Offset, Mode=TwoWay}"
+                                    IsEnabled="{Binding OffsetEnable}"
+                                    IsVisible="{Binding OffsetEnable, Converter={StaticResource IsVisibleConverter}}"
+                                    Format="0.000"
+                                    Unit="mm"
+                                    Width="220"
+                                    HorizontalAlignment="Stretch"/>
+                <views:NumericField Label="Depth:"
+                                    Value="{Binding Depth, Mode=TwoWay}"
+                                    IsEnabled="{Binding XYOffsetEnable}"
+                                    IsVisible="{Binding XYOffsetEnable, Converter={StaticResource IsVisibleConverter}}"
+                                    Format="0.000"
+                                    Unit="mm"
+                                    Width="220"
+                                    HorizontalAlignment="Stretch"/>
+              </StackPanel>
+            </Border>
+
+            <Border Classes="panel-chrome"
+                    IsVisible="{Binding XYOffsetEnable, Converter={StaticResource IsVisibleConverter}}"
+                    IsEnabled="{Binding XYOffsetEnable}">
+              <StackPanel Spacing="4">
+                <TextBlock Text="Probe/touchplate XY offsets" FontWeight="SemiBold"/>
+                <Grid ColumnDefinitions="Auto,*,Auto,*">
+                  <TextBlock Text="X:" VerticalAlignment="Center" Margin="0,0,4,0"/>
+                  <controls:NumericTextBox Grid.Column="1" Value="{Binding ProbeOffsetX, Mode=TwoWay}" Format="0.###"/>
+                  <TextBlock Grid.Column="2" Text="Y:" VerticalAlignment="Center" Margin="8,0,4,0"/>
+                  <controls:NumericTextBox Grid.Column="3" Value="{Binding ProbeOffsetY, Mode=TwoWay}" Format="0.###"/>
+                </Grid>
+                <CheckBox Content="Is touch plate"
+                          IsChecked="{Binding TouchPlateIsXY, Mode=TwoWay}"
+                          IsEnabled="{Binding TouchPlateXYEnabled}"
+                          IsVisible="{Binding TouchPlateXYEnabled, Converter={StaticResource IsVisibleConverter}}"/>
+              </StackPanel>
+            </Border>
+
+            <Button x:Name="JogButton"
+                    Content="Keyboard jogging disabled"
+                    Margin="0,2,0,0"
+                    Focusable="True"
+                    GotFocus="OnJogGotFocus"
+                    LostFocus="OnJogLostFocus"/>
+
+            <TextBlock Text="{Binding Position}" MinHeight="22" TextWrapping="NoWrap"/>
           </StackPanel>
-        </Border>
+        </ScrollViewer>
+      </Border>
 
-        <Border BorderBrush="{DynamicResource ThemeBorderLowBrush}" BorderThickness="1" Padding="6" CornerRadius="2">
-          <StackPanel Spacing="4">
-            <TextBlock Text="Touch plate/fixture height" FontWeight="SemiBold"/>
-            <Grid ColumnDefinitions="Auto,*" RowDefinitions="Auto,Auto">
-              <TextBlock Grid.Row="0" Grid.Column="0" Text="Touch plate:" VerticalAlignment="Center" Margin="0,0,6,4"/>
-              <controls:NumericTextBox Grid.Row="0" Grid.Column="1" Value="{Binding TouchPlateHeight, Mode=TwoWay}" Format="0.###" Margin="0,0,0,4"/>
-              <TextBlock Grid.Row="1" Grid.Column="0" Text="Fixture:" VerticalAlignment="Center" Margin="0,0,6,0"/>
-              <controls:NumericTextBox Grid.Row="1" Grid.Column="1" Value="{Binding FixtureHeight, Mode=TwoWay}" Format="0.###"/>
-            </Grid>
+      <Grid Grid.Column="1" RowDefinitions="*,Auto">
+        <TabControl x:Name="WizardTabs"
+                    Grid.Row="0"
+                    HorizontalAlignment="Stretch"
+                    VerticalAlignment="Stretch"
+                    SelectionChanged="OnTabSelectionChanged">
+          <TabItem Header="Tool length offset">
+            <local:ToolLengthControl HorizontalAlignment="Stretch" VerticalAlignment="Stretch"/>
+          </TabItem>
+          <TabItem Header="Edge finder, external">
+            <local:EdgeFinderControl HorizontalAlignment="Stretch" VerticalAlignment="Stretch"/>
+          </TabItem>
+          <TabItem Header="Edge finder, internal">
+            <local:EdgeFinderIntControl HorizontalAlignment="Stretch" VerticalAlignment="Stretch"/>
+          </TabItem>
+          <TabItem Header="Rotation">
+            <local:RotationControl HorizontalAlignment="Stretch" VerticalAlignment="Stretch"/>
+          </TabItem>
+          <TabItem Header="Center finder">
+            <local:CenterFinderControl HorizontalAlignment="Stretch" VerticalAlignment="Stretch"/>
+          </TabItem>
+          <TabItem Header="Height map">
+            <local:HeightMapControl HorizontalAlignment="Stretch" VerticalAlignment="Stretch"/>
+          </TabItem>
+        </TabControl>
+
+        <Grid Grid.Row="1" ColumnDefinitions="*,128" RowDefinitions="Auto,Auto">
+          <TextBlock Grid.Row="0" Grid.Column="0"
+                     Text="{Binding Instructions}"
+                     TextWrapping="Wrap"
+                     MinHeight="48"/>
+          <StackPanel Grid.Row="0" Grid.Column="1" Spacing="4">
+            <ComboBox x:Name="ProbeCombo"
+                      Classes="dropdown-select compact"
+                      ItemsSource="{Binding Grbl.Probes}"
+                      SelectedValue="{Binding Grbl.Probe, Mode=OneWay}"
+                      SelectedValueBinding="{Binding Id}"
+                      DisplayMemberBinding="{Binding Name}"
+                      IsVisible="{Binding Grbl.MultiProbe, Converter={StaticResource IsVisibleConverter}}"
+                      IsEnabled="{Binding Grbl.IsJobRunning, Converter={StaticResource IsNotRunningConverter}}"
+                      SelectionChanged="OnProbeSelectionChanged"/>
+            <Button x:Name="MacroButton"
+                    Content="Pre/post macros"
+                    HorizontalAlignment="Stretch"
+                    ToolTip.Tip="{Binding Macro.ActiveMacroName}"
+                    Background="{Binding Macro.SelectedMacro, Converter={StaticResource MacroActiveBrushConverter}}"
+                    IsEnabled="{Binding Grbl.IsJobRunning, Converter={StaticResource IsNotRunningConverter}}"
+                    Click="OnMacroButtonClick"/>
           </StackPanel>
-        </Border>
-
-        <Border BorderBrush="{DynamicResource ThemeBorderLowBrush}" BorderThickness="1" Padding="6" CornerRadius="2">
-          <StackPanel Spacing="4">
-            <TextBlock Text="Probing distances and speed" FontWeight="SemiBold"/>
-            <StackPanel Spacing="3">
-              <Grid ColumnDefinitions="Auto,*">
-                <TextBlock Grid.Column="0" Text="Rapids feed:" VerticalAlignment="Center" Margin="0,0,6,0"/>
-                <controls:NumericTextBox Grid.Column="1" Value="{Binding RapidsFeedRate, Mode=TwoWay}" Format="####0"/>
-              </Grid>
-              <Grid ColumnDefinitions="Auto,*">
-                <TextBlock Grid.Column="0" Text="Search feed:" VerticalAlignment="Center" Margin="0,0,6,0"/>
-                <controls:NumericTextBox Grid.Column="1" Value="{Binding ProbeFeedRate, Mode=TwoWay}" Format="####0"/>
-              </Grid>
-              <Grid ColumnDefinitions="Auto,*">
-                <TextBlock Grid.Column="0" Text="Latch feed:" VerticalAlignment="Center" Margin="0,0,6,0"/>
-                <controls:NumericTextBox Grid.Column="1" Value="{Binding LatchFeedRate, Mode=TwoWay}" Format="####0"/>
-              </Grid>
-              <Grid ColumnDefinitions="Auto,*">
-                <TextBlock Grid.Column="0" Text="Probe distance:" VerticalAlignment="Center" Margin="0,0,6,0"/>
-                <controls:NumericTextBox Grid.Column="1" Value="{Binding ProbeDistance, Mode=TwoWay}" Format="0.###"/>
-              </Grid>
-              <Grid ColumnDefinitions="Auto,*">
-                <TextBlock Grid.Column="0" Text="Latch distance:" VerticalAlignment="Center" Margin="0,0,6,0"/>
-                <controls:NumericTextBox Grid.Column="1" Value="{Binding LatchDistance, Mode=TwoWay}" Format="0.###"/>
-              </Grid>
-            </StackPanel>
-          </StackPanel>
-        </Border>
-
-        <Border BorderBrush="{DynamicResource ThemeBorderLowBrush}" BorderThickness="1" Padding="6" CornerRadius="2">
-          <StackPanel Spacing="4">
-            <TextBlock Text="Probing clearances" FontWeight="SemiBold"/>
-            <StackPanel Spacing="3">
-              <Grid ColumnDefinitions="Auto,*">
-                <TextBlock Grid.Column="0" Text="XY clearance:" VerticalAlignment="Center" Margin="0,0,6,0"/>
-                <controls:NumericTextBox Grid.Column="1" Value="{Binding XYClearance, Mode=TwoWay}" Format="0.###"/>
-              </Grid>
-              <Grid ColumnDefinitions="Auto,*">
-                <TextBlock Grid.Column="0" Text="Offset:" VerticalAlignment="Center" Margin="0,0,6,0"/>
-                <controls:NumericTextBox Grid.Column="1" Value="{Binding Offset, Mode=TwoWay}" Format="0.###"/>
-              </Grid>
-              <Grid ColumnDefinitions="Auto,*">
-                <TextBlock Grid.Column="0" Text="Depth:" VerticalAlignment="Center" Margin="0,0,6,0"/>
-                <controls:NumericTextBox Grid.Column="1" Value="{Binding Depth, Mode=TwoWay}" Format="0.###"/>
-              </Grid>
-            </StackPanel>
-          </StackPanel>
-        </Border>
-
-        <Border BorderBrush="{DynamicResource ThemeBorderLowBrush}" BorderThickness="1" Padding="6" CornerRadius="2">
-          <StackPanel Spacing="4">
-            <TextBlock Text="Probe/touchplate XY offsets" FontWeight="SemiBold"/>
-            <Grid ColumnDefinitions="Auto,*,Auto,*">
-              <TextBlock Grid.Column="0" Text="X:" VerticalAlignment="Center"/>
-              <controls:NumericTextBox Grid.Column="1" Value="{Binding ProbeOffsetX, Mode=TwoWay}" Format="0.###"/>
-              <TextBlock Grid.Column="2" Text="Y:" VerticalAlignment="Center"/>
-              <controls:NumericTextBox Grid.Column="3" Value="{Binding ProbeOffsetY, Mode=TwoWay}" Format="0.###"/>
-            </Grid>
-            <CheckBox Content="Is touch plate" IsChecked="{Binding TouchPlateIsXY, Mode=TwoWay}"/>
-          </StackPanel>
-        </Border>
-
-        <TextBlock Text="{Binding Position}" Height="25"/>
-      </StackPanel>
-    </DockPanel>
-
-    <StackPanel DockPanel.Dock="Right" Margin="0,10,0,0" Width="635"
-                HorizontalAlignment="Left" VerticalAlignment="Top">
-      <TabControl x:Name="WizardTabs" HorizontalAlignment="Stretch" VerticalAlignment="Top"
-                  SelectionChanged="OnTabSelectionChanged">
-        <TabItem Header="Tool length offset">
-          <local:ToolLengthControl/>
-        </TabItem>
-        <TabItem Header="Edge finder, external">
-          <local:EdgeFinderControl/>
-        </TabItem>
-        <TabItem Header="Edge finder, internal">
-          <local:EdgeFinderIntControl/>
-        </TabItem>
-        <TabItem Header="Rotation">
-          <local:RotationControl/>
-        </TabItem>
-        <TabItem Header="Center finder">
-          <local:CenterFinderControl/>
-        </TabItem>
-        <TabItem Header="Height map">
-          <local:HeightMapControl/>
-        </TabItem>
-      </TabControl>
-      <Grid Margin="0,2,0,0">
-        <Grid.ColumnDefinitions>
-          <ColumnDefinition Width="*"/>
-          <ColumnDefinition Width="125"/>
-        </Grid.ColumnDefinitions>
-        <TextBlock Grid.Column="0" Text="{Binding Instructions}" TextWrapping="Wrap" Height="70" Margin="0,2,0,0"/>
-        <StackPanel Grid.Column="1" Margin="5,5,0,0" Spacing="5">
-          <ComboBox x:Name="MacroCombo" Width="120" Height="22"
-                    ItemsSource="{Binding Macro.Macros}"
-                    SelectedItem="{Binding Macro.SelectedMacro, Mode=TwoWay}"
-                    DisplayMemberBinding="{Binding Name}"
-                    IsEnabled="{Binding Grbl.IsJobRunning, Converter={StaticResource IsNotRunningConverter}}"/>
-          <Button x:Name="MacroButton" Content="Pre/post macros" HorizontalAlignment="Left" Height="25" Width="120"
-                  ToolTip.Tip="{Binding Macro.ActiveMacroName}"
-                  Background="{Binding Macro.SelectedMacro, Converter={StaticResource MacroActiveBrushConverter}}"
-                  IsEnabled="{Binding Grbl.IsJobRunning, Converter={StaticResource IsNotRunningConverter}}"
-                  Click="OnMacroButtonClick"/>
-        </StackPanel>
+          <TextBlock Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="2"
+                     TextWrapping="Wrap"
+                     Classes="warning-text"
+                     Text="Warning! Use with care - incorrect parameters may damage your probe!"
+                     loc:Localize.Key="CNC.Controls.Probing.probingview.str_probeWarning"
+                     loc:Localize.Fallback="Warning! Use with care - incorrect parameters may damage your probe!"/>
+        </Grid>
       </Grid>
-      <TextBlock Margin="0,4,0,0" TextWrapping="Wrap" Classes="warning-text"
-                 Text="Warning! Use with care - incorrect parameters may damage your probe!"
-                 loc:Localize.Key="CNC.Controls.Probing.probingview.str_probeWarning"
-                 loc:Localize.Fallback="Warning! Use with care - incorrect parameters may damage your probe!"/>
-    </StackPanel>
-  </DockPanel>
+    </Grid>
 
-  <Border x:Name="DisconnectedOverlay" Classes="disconnected-overlay"
-          IsVisible="False" ZIndex="20">
-    <StackPanel VerticalAlignment="Center" HorizontalAlignment="Center" Spacing="8" Margin="24">
-      <TextBlock FontSize="16" FontWeight="SemiBold" Classes="overlay-message"
-                 loc:Localize.Key="ioSender.probing.str_notConnectedTitle" loc:Localize.Fallback="Not connected to controller"/>
-      <TextBlock TextWrapping="Wrap" MaxWidth="420" Classes="overlay-message" Opacity="0.9"
-                 loc:Localize.Key="ioSender.probing.str_notConnectedBody"
-                 loc:Localize.Fallback="Connect from the toolbar before running probing cycles."/>
-    </StackPanel>
-  </Border>
+    <Border x:Name="DisconnectedOverlay" Classes="disconnected-overlay"
+            IsVisible="False" ZIndex="20">
+      <StackPanel VerticalAlignment="Center" HorizontalAlignment="Center" Spacing="8" Margin="24">
+        <TextBlock FontSize="16" FontWeight="SemiBold" Classes="overlay-message"
+                   loc:Localize.Key="ioSender.probing.str_notConnectedTitle" loc:Localize.Fallback="Not connected to controller"/>
+        <TextBlock TextWrapping="Wrap" MaxWidth="420" Classes="overlay-message" Opacity="0.9"
+                   loc:Localize.Key="ioSender.probing.str_notConnectedBody"
+                   loc:Localize.Fallback="Connect from the toolbar before running probing cycles."/>
+      </StackPanel>
+    </Border>
   </Grid>
 </UserControl>

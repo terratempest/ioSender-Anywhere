@@ -1,11 +1,15 @@
 using Avalonia;
 using Avalonia.Controls;
+using Avalonia.Controls.Primitives;
+using Avalonia.Input;
 using Avalonia.Interactivity;
 using Avalonia.VisualTree;
 using Avalonia.Controls.ApplicationLifetimes;
 using CNC.App;
+using CNC.Controls.Avalonia.Utilities;
 using CNC.Core;
 using CNC.Core.Input;
+using CoreKey = CNC.Core.Input.Key;
 
 namespace CNC.Controls.Probing;
 
@@ -15,9 +19,13 @@ public partial class ProbingView : UserControl, IKeyHandlerContext
 
     object? IKeyHandlerContext.DataContext => DataContext;
     readonly ProbingViewModel _vm;
+    bool _initialized;
+    TabItem? _activeWizardTab;
     bool _active;
     bool _keyboardMapped;
+    bool _jogEnabled;
     bool _cycleStartSignal;
+    GrblViewModel? _activeGrbl;
 
     public ProbingView() : this(null)
     {
@@ -27,10 +35,14 @@ public partial class ProbingView : UserControl, IKeyHandlerContext
     {
         _vm = new ProbingViewModel(config);
         InitializeComponent();
-        SidebarHost.DataContext = _vm;
-        WizardTabs.DataContext = _vm;
+        ProbingVmRoot.DataContext = _vm;
+        _initialized = true;
+        WizardTabs.PropertyChanged += OnWizardTabsPropertyChanged;
+        CommitWizardTabChange(null, WizardTabs.SelectedItem as TabItem);
         DataContextChanged += OnDataContextChanged;
         DetachedFromVisualTree += (_, _) => DeactivateProbing();
+        AddHandler(InputElement.KeyDownEvent, OnPreviewKeyDown, RoutingStrategies.Tunnel);
+        AddHandler(InputElement.KeyUpEvent, OnPreviewKeyUp, RoutingStrategies.Tunnel);
     }
 
     public void Activate(bool activate)
@@ -50,18 +62,22 @@ public partial class ProbingView : UserControl, IKeyHandlerContext
     void ActivateProbing(GrblViewModel grbl)
     {
         _active = true;
+        _activeGrbl = grbl;
         UpdateConnectionOverlay();
         grbl.IsProbing = true;
 
         if (!_keyboardMapped)
         {
-            grbl.Keyboard.AddHandler(Key.R, ModifierKeys.Alt, _ => StartActiveTab(), this);
-            grbl.Keyboard.AddHandler(Key.S, ModifierKeys.Alt, _ => StopActiveTab(), this);
+            grbl.Keyboard.AddHandler(CoreKey.R, ModifierKeys.Alt, _ => StartActiveTab(), this);
+            grbl.Keyboard.AddHandler(CoreKey.S, ModifierKeys.Alt, _ => StopActiveTab(), this);
+            grbl.Keyboard.AddHandler(CoreKey.C, ModifierKeys.Alt, _ => ProbeConnectedToggle(), this);
             _keyboardMapped = true;
         }
 
         _vm.Attach(grbl);
+        ProfileNameBox.Text = _vm.Profile?.Name ?? string.Empty;
         _vm.OnActivated();
+        grbl.OnCameraProbe += AddCameraPosition;
 
         if (GrblInfo.IsGrblHAL && Comms.com != null)
             Comms.com.WriteByte(GrblConstants.CMD_STATUS_REPORT_ALL);
@@ -71,6 +87,7 @@ public partial class ProbingView : UserControl, IKeyHandlerContext
 
         _cycleStartSignal = grbl.Signals.Value.HasFlag(Signals.CycleStart);
         ActivateSelectedTab(true);
+        SyncSidebarFromSelectedTab();
     }
 
     void DeactivateProbing()
@@ -78,15 +95,17 @@ public partial class ProbingView : UserControl, IKeyHandlerContext
         if (!_active)
             return;
 
-        if (DataContext is GrblViewModel grbl)
+        if (_activeGrbl is { } grbl)
         {
             grbl.PropertyChanged -= Grbl_PropertyChanged;
+            grbl.OnCameraProbe -= AddCameraPosition;
             grbl.IsProbing = false;
         }
 
         ActivateSelectedTab(false);
         _vm.OnDeactivated();
         _vm.Detach();
+        _activeGrbl = null;
         _active = false;
         UpdateConnectionOverlay();
     }
@@ -99,34 +118,120 @@ public partial class ProbingView : UserControl, IKeyHandlerContext
 
     void OnDataContextChanged(object? sender, EventArgs e)
     {
-        if (DataContext is GrblViewModel grbl && _active)
+        if (!_active || DataContext is not GrblViewModel grbl || ReferenceEquals(grbl, _activeGrbl))
+            return;
+
+        ActivateSelectedTab(false);
+
+        if (_activeGrbl is { } oldGrbl)
         {
-            _vm.Attach(grbl);
-            _vm.OnActivated();
+            oldGrbl.PropertyChanged -= Grbl_PropertyChanged;
+            oldGrbl.OnCameraProbe -= AddCameraPosition;
+            oldGrbl.IsProbing = false;
+            _vm.OnDeactivated();
         }
+
+        _activeGrbl = grbl;
+        grbl.IsProbing = true;
+        _vm.Attach(grbl);
+        ProfileNameBox.Text = _vm.Profile?.Name ?? string.Empty;
+        _vm.OnActivated();
+        grbl.OnCameraProbe += AddCameraPosition;
+        grbl.PropertyChanged += Grbl_PropertyChanged;
+        grbl.IgnoreNextCycleStart = true;
+        _cycleStartSignal = grbl.Signals.Value.HasFlag(Signals.CycleStart);
+        ActivateSelectedTab(true);
+        SyncSidebarFromSelectedTab();
+        UpdateConnectionOverlay();
     }
 
     void OnTabSelectionChanged(object? sender, SelectionChangedEventArgs e)
     {
-        if (!Equals(e.Source, sender) || e.RemovedItems.Count == 0 && e.AddedItems.Count == 0)
+        if (!_initialized || WizardTabs == null || !ReferenceEquals(sender, WizardTabs))
             return;
 
-        if (e.RemovedItems.Count > 0 && e.RemovedItems[0] is TabItem removed)
-            GetProbeTab(removed)?.Activate(false);
+        if (e.RemovedItems.Count == 0 && e.AddedItems.Count == 0)
+            return;
 
-        if (e.AddedItems.Count == 1 && e.AddedItems[0] is TabItem added)
+        var removed = e.RemovedItems.Count > 0 ? e.RemovedItems[0] as TabItem : null;
+        var added = e.AddedItems.Count > 0 ? e.AddedItems[0] as TabItem : WizardTabs.SelectedItem as TabItem;
+        CommitWizardTabChange(removed, added);
+        e.Handled = true;
+    }
+
+    void OnWizardTabsPropertyChanged(object? sender, AvaloniaPropertyChangedEventArgs e)
+    {
+        if (!_initialized || e.Property != SelectingItemsControl.SelectedItemProperty)
+            return;
+
+        var added = e.NewValue as TabItem;
+        if (ReferenceEquals(added, _activeWizardTab))
+            return;
+
+        CommitWizardTabChange(_activeWizardTab, added);
+    }
+
+    void CommitWizardTabChange(TabItem? removed, TabItem? added)
+    {
+        if (added == null)
+            added = WizardTabs?.SelectedItem as TabItem;
+
+        if (added == null)
+            return;
+
+        if (ReferenceEquals(added, _activeWizardTab) && removed == null)
         {
-            var view = GetProbeTab(added);
-            if (view != null)
+            _vm.NotifySidebarVisibility();
+            return;
+        }
+
+        if (removed != null && !ReferenceEquals(removed, added))
+        {
+            var removedTab = GetProbeTab(removed);
+            if (removedTab != null)
             {
-                _vm.ProbingType = view.ProbingType;
-                _vm.Positions.Clear();
-                _vm.Message = string.Empty;
-                view.Activate(true);
+                if (_active)
+                    removedTab.Activate(false);
+                _vm.OnProbeTabActivated(removedTab.ProbingType, false);
             }
         }
 
-        e.Handled = true;
+        var view = GetProbeTab(added);
+        if (view == null)
+            return;
+
+        ApplySelectedWizardTab(added, view);
+    }
+
+    void ApplySelectedWizardTab(TabItem tab, IProbeTab view)
+    {
+        _activeWizardTab = tab;
+        var allowsMeasure = view.ProbingType is ProbingType.EdgeFinderExternal or ProbingType.EdgeFinderInternal or ProbingType.CenterFinder;
+        if (!allowsMeasure && _vm.CoordinateMode == ProbingViewModel.CoordMode.Measure)
+            _vm.CoordinateMode = ProbingViewModel.CoordMode.G10;
+
+        _vm.AllowMeasure = false;
+        _vm.ProbingType = view.ProbingType;
+        _vm.Positions.Clear();
+        _vm.Message = string.Empty;
+        _vm.PreviewEnable = false;
+        _vm.OnProbeTabActivated(view.ProbingType, true);
+        if (_active)
+            view.Activate(true);
+        _vm.NotifySidebarVisibility();
+    }
+
+    void SyncSidebarFromSelectedTab()
+    {
+        var tab = GetSelectedProbeTab();
+        if (tab == null)
+            return;
+
+        var type = tab.ProbingType;
+        if (_vm.ProbingType != type)
+            _vm.ProbingType = type;
+        else
+            _vm.NotifySidebarVisibility();
     }
 
     void Grbl_PropertyChanged(object? sender, System.ComponentModel.PropertyChangedEventArgs e)
@@ -155,6 +260,18 @@ public partial class ProbingView : UserControl, IKeyHandlerContext
 
     static IProbeTab? GetProbeTab(TabItem tab)
     {
+        if (tab.Content is IProbeTab contentProbeTab)
+            return contentProbeTab;
+
+        if (tab.Content is Control contentControl)
+        {
+            foreach (var child in contentControl.GetVisualDescendants().OfType<Control>())
+            {
+                if (child is IProbeTab probeTab)
+                    return probeTab;
+            }
+        }
+
         foreach (var child in tab.GetVisualDescendants().OfType<Control>())
         {
             if (child is IProbeTab probeTab)
@@ -164,15 +281,28 @@ public partial class ProbingView : UserControl, IKeyHandlerContext
         return null;
     }
 
-    IProbeTab? GetSelectedProbeTab() =>
-        WizardTabs.SelectedItem is TabItem tab ? GetProbeTab(tab) : null;
+    IProbeTab? GetSelectedProbeTab()
+    {
+        if (WizardTabs?.SelectedItem is not TabItem tab)
+            return null;
 
-    void ActivateSelectedTab(bool activate) => GetSelectedProbeTab()?.Activate(activate);
+        return GetProbeTab(tab);
+    }
+
+    void ActivateSelectedTab(bool activate)
+    {
+        var tab = GetSelectedProbeTab();
+        if (tab == null)
+            return;
+
+        _vm.OnProbeTabActivated(tab.ProbingType, activate);
+        tab.Activate(activate);
+    }
 
     bool StartActiveTab()
     {
         if (DataContext is GrblViewModel grbl && !grbl.IsJobRunning)
-            GetSelectedProbeTab()?.Start();
+            GetSelectedProbeTab()?.Start(_vm.PreviewEnable);
         return true;
     }
 
@@ -182,15 +312,96 @@ public partial class ProbingView : UserControl, IKeyHandlerContext
         return true;
     }
 
+    bool ProbeConnectedToggle()
+    {
+        if (Comms.com is { IsOpen: true })
+            Comms.com.WriteByte(GrblConstants.CMD_PROBE_CONNECTED_TOGGLE);
+        return true;
+    }
+
+    void AddCameraPosition(Position position)
+    {
+        if (DataContext is not GrblViewModel { IsProbing: true })
+            return;
+
+        if (_vm.CameraPositions == 0)
+        {
+            _vm.PreviewText = string.Empty;
+            _vm.PreviewEnable = true;
+        }
+
+        _vm.Positions.Add(position);
+        var count = _vm.Positions.Count;
+        _vm.CameraPositions = count;
+        if (count == _vm.CameraPositions)
+        {
+            var line = string.Format(
+                "Camera position {0}, X: {1}, Y: {2}",
+                count,
+                position.X.ToInvariantString(),
+                position.Y.ToInvariantString());
+            _vm.PreviewText += string.IsNullOrEmpty(_vm.PreviewText) ? line : "\n" + line;
+        }
+
+        JogButton.Focus();
+    }
+
+    void OnPreviewKeyDown(object? sender, KeyEventArgs e)
+    {
+        if (ProcessKeyPreview(e, isUp: false))
+            e.Handled = true;
+    }
+
+    void OnPreviewKeyUp(object? sender, KeyEventArgs e)
+    {
+        if (ProcessKeyPreview(e, isUp: true))
+            e.Handled = true;
+    }
+
+    bool ProcessKeyPreview(KeyEventArgs e, bool isUp)
+    {
+        if (DataContext is not GrblViewModel grbl)
+            return false;
+
+        var info = AvaloniaKeyBridge.ToKeyEventInfo(e, isUp);
+        var allowJog = e.KeyModifiers == (global::Avalonia.Input.KeyModifiers.Control | global::Avalonia.Input.KeyModifiers.Shift) || _jogEnabled;
+        return grbl.Keyboard.ProcessKeypress(info, allowJog, this);
+    }
+
+    void OnJogGotFocus(object? sender, GotFocusEventArgs e) => SetJogFocus(true);
+
+    void OnJogLostFocus(object? sender, RoutedEventArgs e) => SetJogFocus(false);
+
+    void SetJogFocus(bool focused)
+    {
+        if (DataContext is not GrblViewModel grbl)
+            return;
+
+        if (grbl.Keyboard.IsJogging)
+            grbl.Keyboard.JogCancel();
+
+        _jogEnabled = focused && grbl.Keyboard.CanJog2;
+        JogButton.Content = _jogEnabled ? "Keyboard jogging active" : "Keyboard jogging disabled";
+    }
+
+    void OnProbeSelectionChanged(object? sender, SelectionChangedEventArgs e)
+    {
+        if (sender is ComboBox { IsDropDownOpen: true } && e.AddedItems.Count == 1 && e.AddedItems[0] is Probe probe && DataContext is GrblViewModel grbl)
+            grbl.ExecuteCommand(string.Format(GrblCommand.ProbeSelect, probe.Id));
+    }
+
     void OnProfileMenuClick(object? sender, RoutedEventArgs e)
     {
+        var selectedName = _vm.Profile?.Name?.Trim();
+        var typedName = ProfileNameBox.Text?.Trim();
+        var isSameName = !string.IsNullOrEmpty(typedName) && string.Equals(selectedName, typedName, StringComparison.Ordinal);
         var menu = new ContextMenu
         {
             Items =
             {
-                new MenuItem { Header = "Add", Name = "mnuAdd" },
-                new MenuItem { Header = "Update", Name = "mnuUpdate" },
-                new MenuItem { Header = "Delete", Name = "mnuDelete" }
+                new MenuItem { Header = "Add", Name = "mnuAdd", IsEnabled = !isSameName && !string.IsNullOrWhiteSpace(typedName) },
+                new MenuItem { Header = "Update", Name = "mnuUpdate", IsEnabled = isSameName && _vm.Profile != null },
+                new MenuItem { Header = "Delete", Name = "mnuDelete", IsEnabled = isSameName && _vm.Profiles.Count > 1 }
             }
         };
 
@@ -217,9 +428,7 @@ public partial class ProbingView : UserControl, IKeyHandlerContext
         if (sender is not MenuItem item)
             return;
 
-        var name = ProfileCombo.SelectedItem is ProbingProfile profile
-            ? profile.Name?.Trim()
-            : null;
+        var name = ProfileNameBox.Text?.Trim();
         if (string.IsNullOrEmpty(name))
             name = "<Default>";
 
@@ -242,5 +451,22 @@ public partial class ProbingView : UserControl, IKeyHandlerContext
         }
 
         _vm.ProfileStore.Save();
+        ProfileList.ItemsSource = null;
+        ProfileList.ItemsSource = _vm.Profiles;
+        ProfileNameBox.Text = _vm.Profile?.Name ?? string.Empty;
+    }
+
+    void OnProfileDropDownClick(object? sender, RoutedEventArgs e) =>
+        ProfilePopup.IsOpen = !ProfilePopup.IsOpen;
+
+    void OnProfileListSelectionChanged(object? sender, SelectionChangedEventArgs e)
+    {
+        if (ProfileList.SelectedItem is not ProbingProfile profile)
+            return;
+
+        _vm.Profile = profile;
+        ProfileNameBox.Text = profile.Name ?? string.Empty;
+        ProfilePopup.IsOpen = false;
+        ProfileList.SelectedItem = null;
     }
 }

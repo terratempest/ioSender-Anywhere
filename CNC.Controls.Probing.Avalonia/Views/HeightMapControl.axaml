@@ -4,8 +4,7 @@
              xmlns:controls="using:CNC.Controls.Avalonia.Controls"
              xmlns:local="using:CNC.Controls.Probing"
              xmlns:viewer="using:CNC.GCodeViewer.Avalonia.Views"
-             x:Class="CNC.Controls.Probing.HeightMapControl"
-             Height="370" Width="600">
+             x:Class="CNC.Controls.Probing.HeightMapControl">
   <UserControl.Resources>
     <conv:LogicalNotConverter x:Key="IsNotRunningConverter"/>
   </UserControl.Resources>

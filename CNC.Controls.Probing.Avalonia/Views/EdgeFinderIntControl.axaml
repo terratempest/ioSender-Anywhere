@@ -3,8 +3,7 @@
              xmlns:conv="using:CNC.Controls.Avalonia.Converters"
              xmlns:controls="using:CNC.Controls.Avalonia.Controls"
              xmlns:local="using:CNC.Controls.Probing"
-             x:Class="CNC.Controls.Probing.EdgeFinderIntControl"
-             Height="370" Width="510">
+             x:Class="CNC.Controls.Probing.EdgeFinderIntControl">
   <UserControl.Resources>
     <conv:LogicalNotConverter x:Key="IsNotRunningConverter"/>
     <conv:EnumValueToBooleanConverter x:Key="EnumToEdgeConverter"/>

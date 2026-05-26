@@ -28,6 +28,9 @@
           <Button Content="Clear" Width="55" Height="22" Click="OnClearG92Click"/>
         </Border>
       </Grid>
+      <RadioButton Content="Measure only"
+                   IsChecked="{Binding CoordinateMode, Mode=TwoWay, Converter={StaticResource EnumToCheckedConverter}, ConverterParameter=Measure}"
+                   IsVisible="{Binding AllowMeasure, Converter={StaticResource IsVisibleConverter}}"/>
     </StackPanel>
   </Border>
 </UserControl>

@@ -43,6 +43,8 @@ public class ProbingPanelViewModel : ViewModelBase
 
         _grbl = grbl;
         _profiles.Load();
+        OnPropertyChanged(nameof(Grbl));
+        OnPropertyChanged(nameof(Profiles));
         Profile = Profiles.FirstOrDefault();
         _grbl.PropertyChanged += OnGrblPropertyChanged;
         UpdatePosition();
@@ -53,6 +55,7 @@ public class ProbingPanelViewModel : ViewModelBase
         if (_grbl != null)
             _grbl.PropertyChanged -= OnGrblPropertyChanged;
         _grbl = null;
+        OnPropertyChanged(nameof(Grbl));
     }
 
     public ProbingProfile? Profile

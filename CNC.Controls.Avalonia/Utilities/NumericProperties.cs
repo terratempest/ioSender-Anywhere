@@ -1,6 +1,5 @@
 using System.Globalization;
 using Avalonia;
-using Avalonia.Controls;
 using CNC.Core;
 
 namespace CNC.Controls.Avalonia.Utilities;
@@ -14,18 +13,20 @@ public class NumericProperties
     public string DisplayFormat = string.Empty;
     public NumberStyles Styles;
 
-    public static string MetricFormat => NumberFormatInfo.CurrentInfo.NegativeSign + GrblConstants.FORMAT_METRIC;
-    public static string ImperialFormat => NumberFormatInfo.CurrentInfo.NegativeSign + GrblConstants.FORMAT_IMPERIAL;
+    const string NegativeSign = "-";
+
+    public static string MetricFormat => NegativeSign + GrblConstants.FORMAT_METRIC;
+    public static string ImperialFormat => NegativeSign + GrblConstants.FORMAT_IMPERIAL;
 
     public NumericProperties() => Parse(MetricFormat);
 
     public void Parse(string format)
     {
-        AllowSign = format.StartsWith('-');
+        AllowSign = format.StartsWith(NegativeSign, StringComparison.Ordinal);
         DisplayFormat = AllowSign ? format[1..] : format;
         Length = format.Length - (AllowSign ? 1 : 0);
-        AllowDP = format.Contains('.');
-        Precision = AllowDP ? Length - format.LastIndexOf('.') - (AllowSign ? 0 : 1) : 0;
+        AllowDP = DisplayFormat.Contains('.', StringComparison.Ordinal);
+        Precision = AllowDP ? DisplayFormat.Length - DisplayFormat.LastIndexOf('.') - 1 : 0;
         Styles = (AllowDP ? NumberStyles.AllowDecimalPoint : NumberStyles.None) |
                  (AllowSign ? NumberStyles.AllowLeadingSign : NumberStyles.None);
     }
@@ -33,31 +34,54 @@ public class NumericProperties
     public static void OnFormatChanged(AvaloniaObject d, NumericProperties np, string format)
     {
         np.Parse(format);
-        if (d is Control control)
-            control.Width = UIUtils.MeasureText("".PadRight(np.Length, '9'), control).Width + (d is Controls.NumericTextBox ? 12 : 20);
     }
 
     public static bool IsStringNumeric(string value, NumericProperties np)
+        => IsValidPartialText(value, np);
+
+    public static bool IsValidPartialText(string value, NumericProperties np)
     {
-        var ok = true;
         var len = value.Length;
         var i = 0;
         var dp = -1;
 
-        if (np.AllowSign && value.StartsWith(NumberFormatInfo.CurrentInfo.NegativeSign))
+        if (value.StartsWith(NegativeSign, StringComparison.Ordinal))
+        {
+            if (!np.AllowSign)
+                return false;
             i++;
+        }
 
         for (; i < len; i++)
         {
             if (np.AllowDP && dp == -1 && value[i] == '.')
+            {
                 dp = i;
-            else
-                ok &= char.IsDigit(value[i]);
+                continue;
+            }
+
+            if (!char.IsDigit(value[i]))
+                return false;
         }
 
-        if (ok && dp >= 0)
-            ok = len - dp - 1 <= np.Precision;
+        return dp < 0 || len - dp - 1 <= np.Precision;
+    }
 
-        return ok && len <= np.Length;
+    public static bool TryParseCommittedText(string value, NumericProperties np, out double result)
+    {
+        result = double.NaN;
+        if (!IsValidPartialText(value, np))
+            return false;
+
+        if (value.Length == 0)
+            return true;
+
+        if (value == NegativeSign)
+            return false;
+
+        if (value is "." or "-.")
+            return false;
+
+        return double.TryParse(value, np.Styles, CultureInfo.InvariantCulture, out result);
     }
 }

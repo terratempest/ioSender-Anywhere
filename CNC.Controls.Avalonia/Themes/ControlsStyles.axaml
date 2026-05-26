@@ -32,4 +32,12 @@
     <Setter Property="Opacity" Value="0.65"/>
   </Style>
 
+  <Style Selector="controls|NumericTextBox">
+    <Setter Property="MinHeight" Value="0"/>
+    <Setter Property="TextAlignment" Value="Right"/>
+    <Setter Property="Background" Value="{DynamicResource ThemeControlLowBrush}"/>
+    <Setter Property="BorderBrush" Value="{DynamicResource ThemeBorderMidBrush}"/>
+    <Setter Property="Foreground" Value="{DynamicResource ThemeForegroundBrush}"/>
+  </Style>
+
 </Styles>
