@@ -8,6 +8,15 @@
     <Setter Property="FontWeight" Value="SemiBold"/>
   </Style>
 
+  <Style Selector="Button.important">
+    <Setter Property="Background" Value="Salmon"/>
+    <Setter Property="Padding" Value="8"/>
+    <Setter Property="HorizontalAlignment" Value="Center"/>
+    <Setter Property="VerticalAlignment" Value="Center"/>
+    <Setter Property="HorizontalContentAlignment" Value="Center"/>
+    <Setter Property="VerticalContentAlignment" Value="Center"/>
+  </Style>
+
   <Style Selector="Button.panel-action">
     <Setter Property="Background" Value="{DynamicResource ThemeControlHighBrush}"/>
     <Setter Property="Foreground" Value="{DynamicResource ThemeForegroundBrush}"/>

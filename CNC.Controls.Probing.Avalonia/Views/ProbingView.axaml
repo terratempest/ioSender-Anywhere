@@ -8,7 +8,7 @@
              xmlns:local="using:CNC.Controls.Probing"
              xmlns:loc="using:CNC.Localization.Avalonia"
              mc:Ignorable="d"
-             d:DesignHeight="515" d:DesignWidth="900"
+             d:DesignHeight="600" d:DesignWidth="900"
              x:Class="CNC.Controls.Probing.ProbingView">
 
   <UserControl.Resources>
@@ -218,59 +218,141 @@
 
       <Grid Grid.Column="1" RowDefinitions="*,Auto">
         <TabControl x:Name="WizardTabs"
-                    Grid.Row="0"
-                    HorizontalAlignment="Stretch"
-                    VerticalAlignment="Stretch"
-                    SelectionChanged="OnTabSelectionChanged">
-          <TabItem Header="Tool length offset">
-            <local:ToolLengthControl HorizontalAlignment="Stretch" VerticalAlignment="Stretch"/>
+          Grid.Row="0"
+          HorizontalAlignment="Stretch"
+          VerticalAlignment="Stretch"
+          SelectionChanged="OnTabSelectionChanged"
+          >
+
+          <TabControl.Styles>
+            <Style Selector="TabControl#WizardTabs">
+              <Setter Property="Template">
+                <ControlTemplate>
+                  <Grid RowDefinitions="Auto,*">
+                    <Border Margin="4,0,4,0">
+                      <ItemsPresenter Name="PART_ItemsPresenter">
+                        <ItemsPresenter.ItemsPanel>
+                          <ItemsPanelTemplate>
+                            <WrapPanel/>
+                          </ItemsPanelTemplate>
+                        </ItemsPresenter.ItemsPanel>
+                      </ItemsPresenter>
+                    </Border>
+                    <ContentPresenter Name="PART_SelectedContentHost"
+                                      Grid.Row="1"
+                                      Content="{TemplateBinding SelectedContent}"
+                                      ContentTemplate="{TemplateBinding SelectedContentTemplate}"
+                                      HorizontalContentAlignment="{TemplateBinding HorizontalContentAlignment}"
+                                      VerticalContentAlignment="{TemplateBinding VerticalContentAlignment}"/>
+                  </Grid>
+                </ControlTemplate>
+              </Setter>
+            </Style>
+
+            <Style Selector="TabItem">
+              <Setter Property="Background" Value="{DynamicResource ThemeControlMidBrush}"/>
+              <Setter Property="Foreground" Value="{DynamicResource ThemeForegroundBrush}"/>
+              <Setter Property="MinHeight" Value="36"/>
+              <Setter Property="Margin" Value="0"/>
+              <Setter Property="Template">
+                <ControlTemplate>
+                  <Border Name="PART_LayoutRoot"
+                    MinHeight="{TemplateBinding MinHeight}"
+                    Background="{TemplateBinding Background}"
+                    BorderBrush="{DynamicResource ThemeBorderMidBrush}"
+                    BorderThickness="1,1,1,0"
+                    CornerRadius="12,12,0,0" 
+                    Padding="8,0">
+                    <ContentPresenter Content="{TemplateBinding Header}"
+                      FontSize="{TemplateBinding FontSize}"
+                      VerticalAlignment="Center"/>
+                  </Border>
+                </ControlTemplate>
+              </Setter>
+            </Style>
+
+
+            <Style Selector="TabItem:selected">
+              <Setter Property="Background" Value="{DynamicResource ThemeControlHighBrush}"/>
+              <Setter Property="Foreground" Value="{DynamicResource ThemeForegroundBrush}"/>
+
+              <Setter Property="ZIndex" Value="10"/> 
+            </Style>
+
+            <Style Selector="Border.probing-tab-content">
+              <Setter Property="Background" Value="{DynamicResource ThemeControlLowBrush}"/>
+              <Setter Property="BorderBrush" Value="{DynamicResource ThemeBorderLowBrush}"/>
+              <Setter Property="BorderThickness" Value="1"/>
+              <Setter Property="Margin" Value="4,0,4,0"/>
+              <Setter Property="Padding" Value="0"/>
+            </Style>
+          </TabControl.Styles>
+
+          <TabItem Header="Tool length offset" FontSize="16" >
+            <Border Classes="probing-tab-content">
+              <local:ToolLengthControl HorizontalAlignment="Stretch" VerticalAlignment="Stretch"/>
+            </Border>
           </TabItem>
-          <TabItem Header="Edge finder, external">
-            <local:EdgeFinderControl HorizontalAlignment="Stretch" VerticalAlignment="Stretch"/>
+          <TabItem Header="Edge finder, external" FontSize="16">
+            <Border Classes="probing-tab-content">
+              <local:EdgeFinderControl HorizontalAlignment="Stretch" VerticalAlignment="Stretch"/>
+            </Border>
           </TabItem>
-          <TabItem Header="Edge finder, internal">
-            <local:EdgeFinderIntControl HorizontalAlignment="Stretch" VerticalAlignment="Stretch"/>
+          <TabItem Header="Edge finder, internal" FontSize="16">
+            <Border Classes="probing-tab-content">
+              <local:EdgeFinderIntControl HorizontalAlignment="Stretch" VerticalAlignment="Stretch"/>
+            </Border>
           </TabItem>
-          <TabItem Header="Rotation">
-            <local:RotationControl HorizontalAlignment="Stretch" VerticalAlignment="Stretch"/>
+          <TabItem Header="Rotation" FontSize="16">
+            <Border Classes="probing-tab-content">
+              <local:RotationControl HorizontalAlignment="Stretch" VerticalAlignment="Stretch"/>
+            </Border>
           </TabItem>
-          <TabItem Header="Center finder">
-            <local:CenterFinderControl HorizontalAlignment="Stretch" VerticalAlignment="Stretch"/>
+          <TabItem Header="Center finder" FontSize="16">
+            <Border Classes="probing-tab-content">
+              <local:CenterFinderControl HorizontalAlignment="Stretch" VerticalAlignment="Stretch"/>
+            </Border>
           </TabItem>
-          <TabItem Header="Height map">
-            <local:HeightMapControl HorizontalAlignment="Stretch" VerticalAlignment="Stretch"/>
+          <TabItem Header="Height map" FontSize="16" >
+            <Border Classes="probing-tab-content">
+              <local:HeightMapControl HorizontalAlignment="Stretch" VerticalAlignment="Stretch"/>
+            </Border>
           </TabItem>
         </TabControl>
 
-        <Grid Grid.Row="1" ColumnDefinitions="*,128" RowDefinitions="Auto,Auto">
+        <Grid Grid.Row="1" ColumnDefinitions="*,128" RowDefinitions="Auto,Auto" Margin="8">
           <TextBlock Grid.Row="0" Grid.Column="0"
                      Text="{Binding Instructions}"
                      TextWrapping="Wrap"
                      MinHeight="48"/>
           <StackPanel Grid.Row="0" Grid.Column="1" Spacing="4">
             <ComboBox x:Name="ProbeCombo"
-                      Classes="dropdown-select compact"
-                      ItemsSource="{Binding Grbl.Probes}"
-                      SelectedValue="{Binding Grbl.Probe, Mode=OneWay}"
-                      SelectedValueBinding="{Binding Id}"
-                      DisplayMemberBinding="{Binding Name}"
-                      IsVisible="{Binding Grbl.MultiProbe, Converter={StaticResource IsVisibleConverter}}"
-                      IsEnabled="{Binding Grbl.IsJobRunning, Converter={StaticResource IsNotRunningConverter}}"
-                      SelectionChanged="OnProbeSelectionChanged"/>
-            <Button x:Name="MacroButton"
-                    Content="Pre/post macros"
-                    HorizontalAlignment="Stretch"
-                    ToolTip.Tip="{Binding Macro.ActiveMacroName}"
-                    Background="{Binding Macro.SelectedMacro, Converter={StaticResource MacroActiveBrushConverter}}"
-                    IsEnabled="{Binding Grbl.IsJobRunning, Converter={StaticResource IsNotRunningConverter}}"
-                    Click="OnMacroButtonClick"/>
+              Classes="dropdown-select compact"
+              ItemsSource="{Binding Grbl.Probes}"
+              SelectedValue="{Binding Grbl.Probe, Mode=OneWay}"
+              SelectedValueBinding="{Binding Id}"
+              DisplayMemberBinding="{Binding Name}"
+              IsVisible="{Binding Grbl.MultiProbe, Converter={StaticResource IsVisibleConverter}}"
+              IsEnabled="{Binding Grbl.IsJobRunning, Converter={StaticResource IsNotRunningConverter}}"
+              SelectionChanged="OnProbeSelectionChanged"
+              Padding="8"
+              PlaceholderText="Primary"
+            />
+            <Button x:Name="MacroButton" 
+              Content="Pre/post macros"
+              HorizontalAlignment="Stretch"
+              ToolTip.Tip="{Binding Macro.ActiveMacroName}"
+              IsEnabled="{Binding Grbl.IsJobRunning, Converter={StaticResource IsNotRunningConverter}}"
+              Click="OnMacroButtonClick"/>
           </StackPanel>
           <TextBlock Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="2"
-                     TextWrapping="Wrap"
-                     Classes="warning-text"
-                     Text="Warning! Use with care - incorrect parameters may damage your probe!"
-                     loc:Localize.Key="CNC.Controls.Probing.probingview.str_probeWarning"
-                     loc:Localize.Fallback="Warning! Use with care - incorrect parameters may damage your probe!"/>
+            TextWrapping="Wrap"
+            FontWeight="Bold"
+            Foreground="Red"
+            Classes="warning-text"
+            Text="Warning! Use with care - incorrect parameters may damage your probe!"
+            loc:Localize.Key="CNC.Controls.Probing.probingview.str_probeWarning"
+            loc:Localize.Fallback="Warning! Use with care - incorrect parameters may damage your probe!"/>
         </Grid>
       </Grid>
     </Grid>
