@@ -17,6 +17,9 @@ namespace CNC.Controls.Avalonia.Views;
 /// <summary>Job transport buttons wired to <see cref="JobStreamingService"/> file streaming.</summary>
 public partial class JobControl : UserControl, IKeyHandlerContext
 {
+    const double ButtonGap = 6;
+    const double VerticalLayoutMinHeight = 180;
+
     static bool _keyboardMappingsOk;
 
     readonly MachineCommandService _commands;
@@ -76,6 +79,57 @@ public partial class JobControl : UserControl, IKeyHandlerContext
         Localize.Apply(BtnHold);
         Localize.Apply(BtnStop);
         Localize.Apply(BtnRewind);
+    }
+
+    void OnLoaded(object? sender, RoutedEventArgs e) => ApplyButtonLayout();
+
+    void OnSizeChanged(object? sender, SizeChangedEventArgs e) => ApplyButtonLayout();
+
+    void ApplyButtonLayout()
+    {
+        if (BtnGrid.Bounds.Width <= 0 || BtnGrid.Bounds.Height <= 0)
+            return;
+
+        var vertical = BtnGrid.Bounds.Height > VerticalLayoutMinHeight;
+        var buttons = new[] { BtnStart, BtnHold, BtnStop, BtnRewind };
+
+        BtnGrid.RowDefinitions.Clear();
+        BtnGrid.ColumnDefinitions.Clear();
+
+        if (vertical)
+        {
+            for (var i = 0; i < 7; i++)
+            {
+                BtnGrid.RowDefinitions.Add(i % 2 == 0
+                    ? new RowDefinition(GridLength.Star)
+                    : new RowDefinition(ButtonGap, GridUnitType.Pixel));
+            }
+
+            BtnGrid.ColumnDefinitions.Add(new ColumnDefinition(GridLength.Star));
+
+            for (var i = 0; i < buttons.Length; i++)
+            {
+                Grid.SetColumn(buttons[i], 0);
+                Grid.SetRow(buttons[i], i * 2);
+            }
+        }
+        else
+        {
+            for (var i = 0; i < 7; i++)
+            {
+                BtnGrid.ColumnDefinitions.Add(i % 2 == 0
+                    ? new ColumnDefinition(GridLength.Star)
+                    : new ColumnDefinition(ButtonGap, GridUnitType.Pixel));
+            }
+
+            BtnGrid.RowDefinitions.Add(new RowDefinition(GridLength.Star));
+
+            for (var i = 0; i < buttons.Length; i++)
+            {
+                Grid.SetRow(buttons[i], 0);
+                Grid.SetColumn(buttons[i], i * 2);
+            }
+        }
     }
 
     void OnDataContextChanged(object? sender, EventArgs e)
