@@ -68,5 +68,11 @@ public sealed class FeedPanelViewModel
 
     public void RapidsOverrideReset() => Send(GrblConstants.CMD_RAPID_OVR_RESET);
 
+    public void SendOverrideCommands(byte[] commands, int len)
+    {
+        for (var i = 0; i < len; i++)
+            _commands.SendRealtime(commands[i]);
+    }
+
     void Send(byte command) => _commands.SendRealtime(command);
 }

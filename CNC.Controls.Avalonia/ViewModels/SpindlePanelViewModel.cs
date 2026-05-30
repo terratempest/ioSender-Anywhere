@@ -93,5 +93,23 @@ public sealed class SpindlePanelViewModel
             || double.TryParse(value, NumberStyles.Float, CultureInfo.CurrentCulture, out rpm);
     }
 
+    public void SendOverride(byte command) => _commands.SendRealtime(command);
+
+    public void SendOverrideCommands(byte[] commands, int len)
+    {
+        for (var i = 0; i < len; i++)
+            _commands.SendRealtime(commands[i]);
+    }
+
+    public bool TrySetRpmFromValue(double rpm)
+    {
+        if (Model == null || rpm < 0d)
+            return false;
+
+        Model.RPM = rpm;
+        _commands.ExecuteCommand(Model, "S" + rpm.ToInvariantString());
+        return true;
+    }
+
     void Send(byte command) => _commands.SendRealtime(command);
 }

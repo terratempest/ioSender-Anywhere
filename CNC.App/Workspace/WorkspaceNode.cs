@@ -7,6 +7,10 @@ namespace CNC.App.Workspace;
 [XmlInclude(typeof(WorkspaceTabGroup))]
 public abstract class WorkspaceNode
 {
+    public double LockedWidth { get; set; }
+
+    public double LockedHeight { get; set; }
+
     public WorkspaceLeaf AsLeaf() => this as WorkspaceLeaf
         ?? throw new InvalidOperationException("Node is not a leaf.");
 
@@ -61,25 +65,25 @@ public abstract class WorkspaceNode
 
     public WorkspaceNode Clone() => this switch
     {
-        WorkspaceLeaf leaf => new WorkspaceLeaf { Editor = leaf.Editor, Id = Guid.NewGuid() },
+        WorkspaceLeaf leaf => CopyLocks(leaf, new WorkspaceLeaf { Editor = leaf.Editor, Id = Guid.NewGuid() }),
         WorkspaceSplit split => new WorkspaceSplit
         {
             Orientation = split.Orientation,
             Ratio = split.Ratio,
             First = split.First.Clone(),
             Second = split.Second.Clone(),
-        },
+        }.WithLocksFrom(split),
         WorkspaceTabGroup tabGroup => CloneTabGroup(tabGroup),
         _ => throw new InvalidOperationException("Unknown node type."),
     };
 
     static WorkspaceTabGroup CloneTabGroup(WorkspaceTabGroup tabGroup)
     {
-        var clone = new WorkspaceTabGroup
+        var clone = CopyLocks(tabGroup, new WorkspaceTabGroup
         {
             Id = Guid.NewGuid(),
             TabStripPlacement = tabGroup.TabStripPlacement,
-        };
+        });
 
         foreach (var tab in tabGroup.Tabs)
         {
@@ -94,4 +98,14 @@ public abstract class WorkspaceNode
 
         return clone;
     }
+
+    static T CopyLocks<T>(WorkspaceNode source, T target)
+        where T : WorkspaceNode
+    {
+        target.LockedWidth = source.LockedWidth;
+        target.LockedHeight = source.LockedHeight;
+        return target;
+    }
+
+    WorkspaceNode WithLocksFrom(WorkspaceNode source) => CopyLocks(source, this);
 }

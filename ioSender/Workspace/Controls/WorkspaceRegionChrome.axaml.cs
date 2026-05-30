@@ -26,10 +26,13 @@ public partial class WorkspaceRegionChrome : Border
     public event EventHandler? SplitHorizontalRequested;
     public event EventHandler? SplitVerticalRequested;
     public event EventHandler? JoinRequested;
+    public event EventHandler? LockSettingsChanged;
     public event EventHandler<WorkspaceEditorId>? ChangeEditorRequested;
 
     bool _isDropTarget;
     ContextMenu? _editContextMenu;
+    MenuItem? _lockWidthItem;
+    MenuItem? _lockHeightItem;
     JogControl? _jogHeaderStatusSource;
 
     public WorkspaceRegionChrome()
@@ -267,9 +270,15 @@ public partial class WorkspaceRegionChrome : Border
     public void BuildContextMenu()
     {
         var menu = new ContextMenu();
+        menu.Opened += (_, _) => UpdateLockMenuItems();
         menu.Items.Add(MakeItem("Split horizontally", () => RequestSplit(SplitHorizontalRequested)));
         menu.Items.Add(MakeItem("Split vertically", () => RequestSplit(SplitVerticalRequested)));
         menu.Items.Add(MakeItem("Join with neighbor", () => RequestJoin()));
+        menu.Items.Add(new Separator());
+        _lockWidthItem = MakeItem(string.Empty, ToggleLockedWidth);
+        _lockHeightItem = MakeItem(string.Empty, ToggleLockedHeight);
+        menu.Items.Add(_lockWidthItem);
+        menu.Items.Add(_lockHeightItem);
         menu.Items.Add(new Separator());
 
         var change = new MenuItem { Header = "Change panel" };
@@ -284,6 +293,7 @@ public partial class WorkspaceRegionChrome : Border
         _editContextMenu = menu;
         ContextMenu = null;
         TitleBar.ContextMenu = IsEditMode ? _editContextMenu : null;
+        UpdateLockMenuItems();
     }
 
     void RequestSplit(EventHandler? handler)
@@ -307,6 +317,45 @@ public partial class WorkspaceRegionChrome : Border
         if (TitleBar.ContextMenu is { } menu)
             menu.Close();
     }
+
+    void ToggleLockedWidth()
+    {
+        if (LayoutNode is not { } node)
+            return;
+
+        node.LockedWidth = node.LockedWidth > 0 ? 0 : Bounds.Width;
+        UpdateLockMenuItems();
+        CloseTitleBarMenu();
+        Dispatcher.UIThread.Post(
+            () => LockSettingsChanged?.Invoke(this, EventArgs.Empty),
+            DispatcherPriority.Loaded);
+    }
+
+    void ToggleLockedHeight()
+    {
+        if (LayoutNode is not { } node)
+            return;
+
+        node.LockedHeight = node.LockedHeight > 0 ? 0 : Bounds.Height;
+        UpdateLockMenuItems();
+        CloseTitleBarMenu();
+        Dispatcher.UIThread.Post(
+            () => LockSettingsChanged?.Invoke(this, EventArgs.Empty),
+            DispatcherPriority.Loaded);
+    }
+
+    void UpdateLockMenuItems()
+    {
+        if (_lockWidthItem is not null)
+            _lockWidthItem.Header = FormatLockHeader("Lock width", LayoutNode?.LockedWidth ?? 0);
+        if (_lockHeightItem is not null)
+            _lockHeightItem.Header = FormatLockHeader("Lock height", LayoutNode?.LockedHeight ?? 0);
+    }
+
+    static string FormatLockHeader(string label, double value) =>
+        value > 0
+            ? $"[x] {label} ({Math.Round(value)} px)"
+            : label;
 
     static MenuItem MakeItem(string header, Action action)
     {

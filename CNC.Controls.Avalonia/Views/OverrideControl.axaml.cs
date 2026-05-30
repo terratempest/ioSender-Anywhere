@@ -1,6 +1,9 @@
 using Avalonia;
+using Avalonia.Collections;
 using Avalonia.Controls;
 using Avalonia.Input;
+using Avalonia.Media;
+using CNC.Controls.Avalonia.Converters;
 using CNC.Core;
 using CNC.Localization.Avalonia;
 
@@ -12,6 +15,9 @@ public partial class OverrideControl : UserControl
 
     public delegate void CommandGeneratedHandler(byte[] commands, int len);
     public event CommandGeneratedHandler? CommandGenerated;
+
+    public static readonly StyledProperty<bool> ShowLabelProperty =
+        AvaloniaProperty.Register<OverrideControl, bool>(nameof(ShowLabel), true);
 
     public static readonly StyledProperty<bool> OverrideDisabledProperty =
         AvaloniaProperty.Register<OverrideControl, bool>(nameof(OverrideDisabled));
@@ -29,10 +35,10 @@ public partial class OverrideControl : UserControl
         AvaloniaProperty.Register<OverrideControl, int>(nameof(TickFrequency), 1);
 
     public static readonly StyledProperty<double> SliderValueProperty =
-        AvaloniaProperty.Register<OverrideControl, double>(nameof(SliderValue));
+        AvaloniaProperty.Register<OverrideControl, double>(nameof(SliderValue), 100d);
 
     public static readonly StyledProperty<double> ValueProperty =
-        AvaloniaProperty.Register<OverrideControl, double>(nameof(Value));
+        AvaloniaProperty.Register<OverrideControl, double>(nameof(Value), 100d);
 
     public static readonly StyledProperty<GrblEncoderMode> EncoderModeProperty =
         AvaloniaProperty.Register<OverrideControl, GrblEncoderMode>(nameof(EncoderMode), GrblEncoderMode.Unknown);
@@ -40,10 +46,21 @@ public partial class OverrideControl : UserControl
     public OverrideControl()
     {
         InitializeComponent();
-        btnOvReset.Click += (_, _) => CommandGenerated?.Invoke(new[] { ResetCommand }, 1);
+        SliderValue = Value;
+        btnOvReset.Click += (_, _) => ResetOverride();
         slider.PointerPressed += (_, _) => _lastValue = Math.Round(Value);
         slider.PointerCaptureLost += (_, _) => SendOverrideCommands();
-        Loaded += (_, _) => Localize.Apply(lblOverride);
+        Loaded += (_, _) =>
+        {
+            Localize.Apply(lblOverride);
+            UpdateOverrideTextForeground();
+        };
+    }
+
+    public bool ShowLabel
+    {
+        get => GetValue(ShowLabelProperty);
+        set => SetValue(ShowLabelProperty, value);
     }
 
     public byte ResetCommand { get; set; }
@@ -67,6 +84,30 @@ public partial class OverrideControl : UserControl
             c.txtOverride.Text = Math.Round((double)e.NewValue!).ToString() + "%");
         ValueProperty.Changed.AddClassHandler<OverrideControl>((c, e) =>
             c.SliderValue = Math.Round((double)e.NewValue!));
+        ShowLabelProperty.Changed.AddClassHandler<OverrideControl>((c, e) =>
+            c.lblOverride.IsVisible = (bool)e.NewValue!);
+        OverrideDisabledProperty.Changed.AddClassHandler<OverrideControl>((c, _) =>
+            c.UpdateOverrideTextForeground());
+        TicksProperty.Changed.AddClassHandler<OverrideControl>((c, e) =>
+        {
+            if (e.NewValue is double[] ticks)
+                c.slider.Ticks = new AvaloniaList<double>(ticks);
+        });
+    }
+
+    void UpdateOverrideTextForeground()
+    {
+        txtOverride.Foreground = OverrideDisabled
+            ? Brushes.Red
+            : ControlConverters.ThemeBrush("ThemeForegroundBrush", Brushes.White);
+    }
+
+    void ResetOverride()
+    {
+        SliderValue = 100d;
+
+        if (ResetCommand != 0)
+            CommandGenerated?.Invoke(new[] { ResetCommand }, 1);
     }
 
     void SendOverrideCommands()

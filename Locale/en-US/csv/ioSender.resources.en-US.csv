@@ -93,8 +93,10 @@ ioSender.g.en-US.resources:workspace.baml,editor_outline:System.String.$Content,
 ioSender.g.en-US.resources:workspace.baml,editor_goto:System.String.$Content,None,True,True,,Goto
 ioSender.g.en-US.resources:workspace.baml,editor_workparams:System.String.$Content,None,True,True,,Work Parameters
 ioSender.g.en-US.resources:workspace.baml,editor_spindle:System.String.$Content,None,True,True,,Spindle
+ioSender.g.en-US.resources:workspace.baml,editor_spindleTouch:System.String.$Content,None,True,True,,Spindle (Touch)
 ioSender.g.en-US.resources:workspace.baml,editor_coolant:System.String.$Content,None,True,True,,Coolant
 ioSender.g.en-US.resources:workspace.baml,editor_feed:System.String.$Content,None,True,True,,Feed
+ioSender.g.en-US.resources:workspace.baml,editor_feedTouch:System.String.$Content,None,True,True,,Feed (Touch)
 ioSender.g.en-US.resources:workspace.baml,editor_jobbar:System.String.$Content,None,True,True,,Job
 ioSender.g.en-US.resources:mainwindow.baml,tab_home:System.Windows.Controls.HeaderedContentControl.Header,Label,True,True,,Home
 ioSender.g.en-US.resources:mainwindow.baml,mnu_settings:System.Windows.Controls.HeaderedItemsControl.Header,Menu,True,True,,_Settings

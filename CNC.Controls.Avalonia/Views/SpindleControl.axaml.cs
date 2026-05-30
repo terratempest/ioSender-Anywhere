@@ -1,10 +1,8 @@
 using System.ComponentModel;
-
 using Avalonia;
 using Avalonia.Controls;
-using Avalonia.Controls.Primitives;
+using Avalonia.Input;
 using Avalonia.Interactivity;
-
 using CNC.Controls.Avalonia.Services;
 using CNC.Controls.Avalonia.ViewModels;
 using CNC.Core;
@@ -32,24 +30,24 @@ public partial class SpindleControl : UserControl
 
         DataContextChanged += SpindleControl_DataContextChanged;
 
-        rbSpindleOff.CommandParameter = "M5";
-        rbSpindleCW.CommandParameter = "M3{0}";
-        rbSpindleCCW.CommandParameter = "M4{0}";
-        cbxSpindle.SelectionChanged += cbxSpindle_SelectionChanged;
+        rbSpindleOff.Tag = "M5";
+        rbSpindleCW.Tag = "M3{0}";
+        rbSpindleCCW.Tag = "M4{0}";
+
+        overrideControl.ResetCommand = GrblConstants.CMD_SPINDLE_OVR_RESET;
+        overrideControl.FineMinusCommand = GrblConstants.CMD_SPINDLE_OVR_FINE_MINUS;
+        overrideControl.FinePlusCommand = GrblConstants.CMD_SPINDLE_OVR_FINE_PLUS;
+        overrideControl.CoarseMinusCommand = GrblConstants.CMD_SPINDLE_OVR_COARSE_MINUS;
+        overrideControl.CoarsePlusCommand = GrblConstants.CMD_SPINDLE_OVR_COARSE_PLUS;
+        overrideControl.CommandGenerated += OverrideControl_CommandGenerated;
+
         Loaded += (_, _) =>
         {
             if (Design.IsDesignMode)
-            {
-                ApplyDesignPreviewValues();
                 return;
-            }
 
             ApplyLocalization();
-            UpdateRpmText(force: true);
         };
-
-        if (Design.IsDesignMode)
-            ApplyDesignPreviewValues();
     }
 
     public bool IsSpindleStateEnabled
@@ -58,25 +56,15 @@ public partial class SpindleControl : UserControl
         set => SetValue(IsSpindleStateEnabledProperty, value);
     }
 
-    public new bool IsFocused => txtRPM.IsFocused;
+    public new bool IsFocused => cvRPM.IsFocused;
 
     void ApplyLocalization()
     {
-        if (Design.IsDesignMode)
-            return;
-
-        Localize.Apply(LblRpm);
+        Localize.Apply(lblRPM);
+        Localize.Apply(lblOverride);
         Localize.Apply(rbSpindleOff);
         Localize.Apply(rbSpindleCW);
         Localize.Apply(rbSpindleCCW);
-        Localize.Apply(BtnSetRpm);
-    }
-
-    void ApplyDesignPreviewValues()
-    {
-        txtRPM.Text = "12000";
-        LblActualRpm.Text = "RPM:11500";
-        LblRpmOverride.Text = "RPM % 85";
     }
 
     void SpindleControl_DataContextChanged(object? sender, EventArgs e)
@@ -90,7 +78,6 @@ public partial class SpindleControl : UserControl
         if (_subscribedModel is INotifyPropertyChanged newPc)
             newPc.PropertyChanged += OnDataContextPropertyChanged;
 
-        UpdateRpmText(force: true);
         UpdateSpindleStateEnabled();
     }
 
@@ -98,15 +85,6 @@ public partial class SpindleControl : UserControl
     {
         if (e.PropertyName is nameof(GrblViewModel.GrblState) or nameof(GrblViewModel.IsJobRunning))
             UpdateSpindleStateEnabled();
-
-        if (e.PropertyName is nameof(GrblViewModel.SpindleSetpointRPM) or nameof(GrblViewModel.IsJobRunning))
-            UpdateRpmText(force: e.PropertyName == nameof(GrblViewModel.IsJobRunning));
-    }
-
-    void UpdateRpmText(bool force = false)
-    {
-        if (_viewModel.UpdateRpmText(force, txtRPM.IsFocused))
-            txtRPM.Text = _viewModel.RpmText;
     }
 
     void UpdateSpindleStateEnabled()
@@ -115,15 +93,18 @@ public partial class SpindleControl : UserControl
         IsSpindleStateEnabled = _viewModel.IsSpindleStateEnabled;
     }
 
-    void BtnSetRpm_Click(object? sender, RoutedEventArgs e)
+    void cvRPM_KeyUp(object? sender, KeyEventArgs e)
     {
-        if (_viewModel.TrySetRpm(txtRPM.Text, out var normalizedRpmText))
-            txtRPM.Text = normalizedRpmText;
+        if (e.Key != Key.Enter || _viewModel.Model?.IsJobRunning == true)
+            return;
+
+        if (_viewModel.TrySetRpmFromValue(cvRPM.Value))
+            e.Handled = true;
     }
 
     void rbSpindle_Click(object? sender, RoutedEventArgs e)
     {
-        if (sender is not ToggleButton rb || rb.CommandParameter is not string commandTemplate)
+        if (sender is not Control { Tag: string commandTemplate })
             return;
 
         _viewModel.SelectSpindleState(commandTemplate);
@@ -140,29 +121,6 @@ public partial class SpindleControl : UserControl
         _viewModel.ChangeSpindle(spindle);
     }
 
-    bool UseCoarseOverrideStep => RbStepCoarse.IsChecked == true;
-
-    void BtnOvrPlus_Click(object? sender, RoutedEventArgs e)
-    {
-        _viewModel.UseCoarseOverrideStep = UseCoarseOverrideStep;
-        _viewModel.OverridePlus();
-    }
-
-    void BtnOvrMinus_Click(object? sender, RoutedEventArgs e)
-    {
-        _viewModel.UseCoarseOverrideStep = UseCoarseOverrideStep;
-        _viewModel.OverrideMinus();
-    }
-
-    void BtnOvrReset_Click(object? sender, RoutedEventArgs e) =>
-        _viewModel.OverrideReset();
-
-    void OvrStep_Click(object? sender, RoutedEventArgs e)
-    {
-        if (sender is not ToggleButton selected)
-            return;
-
-        RbStepFine.IsChecked = selected == RbStepFine;
-        RbStepCoarse.IsChecked = selected == RbStepCoarse;
-    }
+    void OverrideControl_CommandGenerated(byte[] commands, int len) =>
+        _viewModel.SendOverrideCommands(commands, len);
 }

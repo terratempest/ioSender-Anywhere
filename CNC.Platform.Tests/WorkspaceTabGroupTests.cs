@@ -35,16 +35,38 @@ public class WorkspaceTabGroupTests
             Id = Guid.NewGuid(),
             ActiveTabId = active.Id,
             TabStripPlacement = WorkspaceTabStripPlacement.Top,
+            LockedWidth = 250,
+            LockedHeight = 180,
             Tabs = [inactive, active],
         };
 
         var clone = Assert.IsType<WorkspaceTabGroup>(group.Clone());
 
         Assert.NotEqual(group.Id, clone.Id);
+        Assert.Equal(250, clone.LockedWidth);
+        Assert.Equal(180, clone.LockedHeight);
         Assert.Equal(WorkspaceTabStripPlacement.Top, clone.TabStripPlacement);
         Assert.Equal([WorkspaceEditorId.Jog, WorkspaceEditorId.Console], clone.Tabs.Select(t => t.Editor).ToArray());
         Assert.All(clone.Tabs, t => Assert.DoesNotContain(group.Tabs, original => original.Id == t.Id));
         Assert.Equal(WorkspaceEditorId.Console, clone.Tabs.Single(t => t.Id == clone.ActiveTabId).Editor);
+    }
+
+    [Fact]
+    public void Clone_preserves_leaf_locks_with_new_id()
+    {
+        var leaf = new WorkspaceLeaf
+        {
+            Editor = WorkspaceEditorId.Jog,
+            LockedWidth = 280,
+            LockedHeight = 200,
+        };
+
+        var clone = Assert.IsType<WorkspaceLeaf>(leaf.Clone());
+
+        Assert.NotEqual(leaf.Id, clone.Id);
+        Assert.Equal(WorkspaceEditorId.Jog, clone.Editor);
+        Assert.Equal(280, clone.LockedWidth);
+        Assert.Equal(200, clone.LockedHeight);
     }
 
     [Fact]

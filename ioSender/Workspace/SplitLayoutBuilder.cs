@@ -54,9 +54,9 @@ public sealed class SplitLayoutBuilder
 
         if (split.Orientation == WorkspaceSplitOrientation.Horizontal)
         {
-            grid.ColumnDefinitions.Add(new ColumnDefinition(new GridLength(ratio, GridUnitType.Star)));
+            grid.ColumnDefinitions.Add(new ColumnDefinition(GetGridLength(split.First, WorkspaceLockAxis.Width, ratio)));
             grid.ColumnDefinitions.Add(new ColumnDefinition(GridLength.Auto));
-            grid.ColumnDefinitions.Add(new ColumnDefinition(new GridLength(1 - ratio, GridUnitType.Star)));
+            grid.ColumnDefinitions.Add(new ColumnDefinition(GetGridLength(split.Second, WorkspaceLockAxis.Width, 1 - ratio)));
 
             var first = BuildNode(split.First, editMode, wireRegion);
             var splitter = CreateSplitter(split, GridResizeDirection.Columns, editMode);
@@ -71,9 +71,9 @@ public sealed class SplitLayoutBuilder
         }
         else
         {
-            grid.RowDefinitions.Add(new RowDefinition(new GridLength(ratio, GridUnitType.Star)));
+            grid.RowDefinitions.Add(new RowDefinition(GetGridLength(split.First, WorkspaceLockAxis.Height, ratio)));
             grid.RowDefinitions.Add(new RowDefinition(GridLength.Auto));
-            grid.RowDefinitions.Add(new RowDefinition(new GridLength(1 - ratio, GridUnitType.Star)));
+            grid.RowDefinitions.Add(new RowDefinition(GetGridLength(split.Second, WorkspaceLockAxis.Height, 1 - ratio)));
 
             var first = BuildNode(split.First, editMode, wireRegion);
             var splitter = CreateSplitter(split, GridResizeDirection.Rows, editMode);
@@ -93,6 +93,7 @@ public sealed class SplitLayoutBuilder
     WorkspaceGridSplitter CreateSplitter(WorkspaceSplit split, GridResizeDirection direction, bool editMode)
     {
         var isColumnSplitter = direction == GridResizeDirection.Columns;
+        var hasLockedBranch = HasLockedBranch(split);
         var splitter = new WorkspaceGridSplitter
         {
             Width = isColumnSplitter ? SplitterHitTargetThickness : double.NaN,
@@ -107,8 +108,9 @@ public sealed class SplitLayoutBuilder
                 ? new Thickness(-SplitterOverlap, 0)
                 : new Thickness(0, -SplitterOverlap),
             ResizeDirection = direction,
-            IsEnabled = editMode,
-            IsHitTestVisible = editMode,
+            IsEnabled = editMode && !hasLockedBranch,
+            IsHitTestVisible = editMode && !hasLockedBranch,
+            Tag = hasLockedBranch,
         };
         splitter.Classes.Add("workspace-splitter");
 
@@ -122,6 +124,13 @@ public sealed class SplitLayoutBuilder
     {
         foreach (var splitter in _splitters.Values)
         {
+            if (splitter.Tag is bool hasLockedBranch && hasLockedBranch)
+            {
+                splitter.IsEnabled = false;
+                splitter.IsHitTestVisible = false;
+                continue;
+            }
+
             splitter.IsEnabled = editMode;
             splitter.IsHitTestVisible = editMode;
         }
@@ -200,4 +209,21 @@ public sealed class SplitLayoutBuilder
     }
 
     static double ClampRatio(double ratio) => Math.Clamp(ratio, 0.08, 0.92);
+
+    static GridLength GetGridLength(WorkspaceNode node, WorkspaceLockAxis axis, double starValue)
+    {
+        var lockedSize = WorkspaceLayoutLocks.ResolveLockedSize(node, axis);
+        return lockedSize > 0
+            ? new GridLength(lockedSize, GridUnitType.Pixel)
+            : new GridLength(starValue, GridUnitType.Star);
+    }
+
+    static bool HasLockedBranch(WorkspaceSplit split)
+    {
+        var axis = split.Orientation == WorkspaceSplitOrientation.Horizontal
+            ? WorkspaceLockAxis.Width
+            : WorkspaceLockAxis.Height;
+        return WorkspaceLayoutLocks.ResolveLockedSize(split.First, axis) > 0
+            || WorkspaceLayoutLocks.ResolveLockedSize(split.Second, axis) > 0;
+    }
 }

@@ -1,9 +1,7 @@
 <UserControl xmlns="https://github.com/avaloniaui"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
-             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              xmlns:controls="using:CNC.Controls.Avalonia.Controls"
-             xmlns:primitives="using:Avalonia.Controls.Primitives"
+             xmlns:views="using:CNC.Controls.Avalonia.Views"
              xmlns:conv="using:CNC.Controls.Avalonia.Converters"
              xmlns:loc="using:CNC.Localization.Avalonia"
              xmlns:gcode="using:CNC.GCode"
@@ -11,13 +9,12 @@
              x:Class="CNC.Controls.Avalonia.Views.SpindleControl"
              x:Name="root"
              x:DataType="core:GrblViewModel"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              mc:Ignorable="d"
-             d:DesignWidth="190"
-             d:DesignHeight="250"
-             MinWidth="80"
-             MinHeight="80"
-             HorizontalAlignment="Stretch"
-             VerticalAlignment="Stretch">
+             d:DesignWidth="250"
+             d:DesignHeight="150"
+             >
 
   <UserControl.Resources>
     <ResourceDictionary>
@@ -26,149 +23,108 @@
       </ResourceDictionary.MergedDictionaries>
       <conv:LogicalNotConverter x:Key="LogicalNotConverter"/>
       <conv:BoolToVisibleConverter x:Key="IsVisibleConverter"/>
-      <conv:ActualRpmDisplayConverter x:Key="ActualRpmDisplayConverter"/>
       <conv:SpindleStateIsActiveConverter x:Key="SpindleStateIsActiveConverter"/>
     </ResourceDictionary>
   </UserControl.Resources>
-  <Grid Margin="4" RowDefinitions="Auto,*,Auto,Auto,*,Auto"
-        HorizontalAlignment="Stretch" VerticalAlignment="Stretch">
 
-    <ComboBox x:Name="cbxSpindle" Grid.Row="0" Height="24" HorizontalAlignment="Stretch"
-              ItemsSource="{Binding Spindles}" SelectedValue="{Binding SpindleNum, Mode=OneWay}"
-              IsEnabled="{Binding GcodeCommandsAllowed}"
-              IsVisible="{Binding MultiSpindle, Converter={StaticResource IsVisibleConverter}}">
-      <ComboBox.ItemTemplate>
-        <DataTemplate>
-          <TextBlock Text="{Binding Name}"/>
-        </DataTemplate>
-      </ComboBox.ItemTemplate>
-    </ComboBox>
+  <Grid Margin="4" RowDefinitions="Auto,Auto">
 
-    <Grid Grid.Row="1" RowDefinitions="*,*" VerticalAlignment="Stretch" Margin="0,4,0,0"
-          IsEnabled="{Binding IsSpindleStateEnabled, ElementName=root}">
-      <Grid Grid.Row="0" ColumnDefinitions="*,*">
-        <primitives:ToggleButton x:Name="rbSpindleCW" Grid.Column="0" Classes="panel-toggle" Content="CW" Margin="0,0,2,2"
+    <Grid Grid.Row="0" ColumnDefinitions="Auto,Auto,*" TextElement.FontSize="12">
+      <StackPanel Grid.Column="0" Orientation="Horizontal" Spacing="4" VerticalAlignment="Top">
+        <TextBlock x:Name="lblRPM"
+                   Text="RPM"
+                   VerticalAlignment="Center"
+                   Foreground="{DynamicResource ThemeForegroundBrush}"
+                   loc:Localize.Key="CNC.Controls.Avalonia.spindlecontrol.lbl_rpm"
+                   loc:Localize.Fallback="RPM"/>
+
+        <controls:NumericTextBox x:Name="cvRPM"
+                                 Format="####0"
+                                 Height="30"
+                                 MinHeight="30"
+                                 PreviewText="00000"
+                                 Value="{Binding RPM, Mode=TwoWay}"
+                                 IsEnabled="{Binding IsJobRunning, Converter={StaticResource LogicalNotConverter}}"
+                                 KeyUp="cvRPM_KeyUp"/>
+      </StackPanel>
+
+      <StackPanel Grid.Column="1" Orientation="Vertical"
+                  IsEnabled="{Binding IsSpindleStateEnabled, ElementName=root}">
+        <RadioButton x:Name="rbSpindleOff" GroupName="SpindleDirection" Content="Off" Margin="0,-4"
+                     loc:Localize.Key="CNC.Controls.Avalonia.spindlecontrol.lbl_off" loc:Localize.Fallback="Off"
+                     Click="rbSpindle_Click">
+          <RadioButton.RenderTransform>
+            <ScaleTransform ScaleX="0.8" ScaleY="0.8"/>
+          </RadioButton.RenderTransform>
+          <RadioButton.IsChecked>
+            <MultiBinding Converter="{StaticResource SpindleStateIsActiveConverter}">
+              <Binding Path="SpindleState"/>
+              <Binding Source="{x:Static gcode:SpindleState.Off}"/>
+            </MultiBinding>
+          </RadioButton.IsChecked>
+        </RadioButton>
+
+        <RadioButton x:Name="rbSpindleCW" GroupName="SpindleDirection" Content="CW" Margin="0,-4"
                      loc:Localize.Key="CNC.Controls.Avalonia.spindlecontrol.lbl_cw" loc:Localize.Fallback="CW"
                      Click="rbSpindle_Click">
-          <primitives:ToggleButton.IsChecked>
+          <RadioButton.RenderTransform>
+            <ScaleTransform ScaleX="0.8" ScaleY="0.8"/>
+          </RadioButton.RenderTransform>
+          <RadioButton.IsChecked>
             <MultiBinding Converter="{StaticResource SpindleStateIsActiveConverter}">
               <Binding Path="SpindleState"/>
               <Binding Source="{x:Static gcode:SpindleState.CW}"/>
             </MultiBinding>
-          </primitives:ToggleButton.IsChecked>
-        </primitives:ToggleButton>
-        <primitives:ToggleButton x:Name="rbSpindleCCW" Grid.Column="1" Classes="panel-toggle" Content="CCW" Margin="2,0,0,2"
+          </RadioButton.IsChecked>
+        </RadioButton>
+
+        <RadioButton x:Name="rbSpindleCCW" GroupName="SpindleDirection" Content="CCW" Margin="0,-4"
                      loc:Localize.Key="CNC.Controls.Avalonia.spindlecontrol.lbl_ccw" loc:Localize.Fallback="CCW"
-                     Click="rbSpindle_Click"
-                     IsVisible="{Binding IsSpindleReversible, Converter={StaticResource IsVisibleConverter}}">
-          <primitives:ToggleButton.IsChecked>
+                     Click="rbSpindle_Click">
+          <RadioButton.RenderTransform>
+            <ScaleTransform ScaleX="0.8" ScaleY="0.8"/>
+          </RadioButton.RenderTransform>
+          <RadioButton.IsChecked>
             <MultiBinding Converter="{StaticResource SpindleStateIsActiveConverter}">
               <Binding Path="SpindleState"/>
               <Binding Source="{x:Static gcode:SpindleState.CCW}"/>
             </MultiBinding>
-          </primitives:ToggleButton.IsChecked>
-        </primitives:ToggleButton>
-      </Grid>
-      <primitives:ToggleButton x:Name="rbSpindleOff" Grid.Row="1" Classes="panel-toggle" Content="Off" Margin="0,2,0,0"
-                   loc:Localize.Key="CNC.Controls.Avalonia.spindlecontrol.lbl_off" loc:Localize.Fallback="Off"
-                   Click="rbSpindle_Click">
-        <primitives:ToggleButton.IsChecked>
-          <MultiBinding Converter="{StaticResource SpindleStateIsActiveConverter}">
-            <Binding Path="SpindleState"/>
-            <Binding Source="{x:Static gcode:SpindleState.Off}"/>
-          </MultiBinding>
-        </primitives:ToggleButton.IsChecked>
-      </primitives:ToggleButton>
-    </Grid>
+          </RadioButton.IsChecked>
+        </RadioButton>
+      </StackPanel>
 
-    <Grid Grid.Row="2"
-          ColumnDefinitions="Auto,*,Auto"
-          VerticalAlignment="Center"
-          Margin="0,4,0,0">
-
-      <Viewbox Grid.Column="0"
-              Stretch="Uniform"
-              StretchDirection="DownOnly"
-              MaxWidth="48"
-              HorizontalAlignment="Left"
-              VerticalAlignment="Center"
-              Margin="0,0,4,0">
-        <TextBlock x:Name="LblRpm"
-                  Text="RPM"
-                  Foreground="{DynamicResource ThemeForegroundBrush}"
-                  loc:Localize.Key="CNC.Controls.Avalonia.spindlecontrol.lbl_rpm"
-                  loc:Localize.Fallback="RPM"/>
-      </Viewbox>
-
-      <Border Grid.Column="1"
-              MinHeight="24"
-              MinWidth="58"
-              HorizontalAlignment="Stretch"
-              VerticalAlignment="Center"
-              Background="{DynamicResource ThemeControlLowBrush}"
-              BorderBrush="{DynamicResource ThemeBorderMidBrush}"
-              BorderThickness="1"
-              CornerRadius="2"
-              Padding="2,0">
-        <TextBox x:Name="txtRPM"
-                HorizontalAlignment="Stretch"
-                VerticalAlignment="Stretch"
-                HorizontalContentAlignment="Center"
-                VerticalContentAlignment="Center"
-                Background="Transparent"
-                BorderThickness="0"
-                Padding="2,0"
-                Foreground="{DynamicResource ThemeForegroundBrush}"
+      <ComboBox x:Name="cbxSpindle"
+                Grid.Column="2"
+                VerticalAlignment="Top"
+                ItemsSource="{Binding Spindles}"
+                MaxWidth="150"
+                SelectedValue="{Binding SpindleNum, Mode=OneWay}"
                 IsEnabled="{Binding IsJobRunning, Converter={StaticResource LogicalNotConverter}}"
-                TextAlignment="Center"
-                Text="12000"/>
-      </Border>
-
-      <Button x:Name="BtnSetRpm"
-              Grid.Column="2"
-              Classes="panel-action compact"
-              HorizontalAlignment="Right"
-              HorizontalContentAlignment="Stretch"
-              VerticalContentAlignment="Stretch"
-              MaxWidth="48"
-              Margin="2,0,0,0"
-              IsEnabled="{Binding IsJobRunning, Converter={StaticResource LogicalNotConverter}}"
-              Click="BtnSetRpm_Click">
-        <Viewbox Stretch="Uniform"
-                StretchDirection="DownOnly">
-          <TextBlock Width="44"
-                    Text="Set RPM"
-                    TextWrapping="Wrap"
-                    TextAlignment="Center"
-                    MaxLines="2"
-                    loc:Localize.Key="CNC.Controls.Avalonia.spindlecontrol.lbl_set_rpm"
-                    loc:Localize.Fallback="Set RPM"/>
-        </Viewbox>
-      </Button>
+                IsVisible="{Binding MultiSpindle, Converter={StaticResource IsVisibleConverter}}"
+                SelectionChanged="cbxSpindle_SelectionChanged">
+        <ComboBox.ItemTemplate>
+          <DataTemplate>
+            <TextBlock Text="{Binding Name}"/>
+          </DataTemplate>
+        </ComboBox.ItemTemplate>
+      </ComboBox>
     </Grid>
+    <Grid Grid.Row="1" ColumnDefinitions="Auto, *" TextElement.FontSize="12">
+      <TextBlock x:Name="lblOverride"
+          Grid.Column="0"
+          Text="Override"
+          VerticalAlignment="Center"
+          Foreground="{DynamicResource ThemeForegroundBrush}"
+          loc:Localize.Key="CNC.Controls.Avalonia.overridecontrol.lbl_override"
+          loc:Localize.Fallback="Override"/>
 
-    <TextBlock x:Name="LblActualRpm" Grid.Row="3" VerticalAlignment="Center" HorizontalAlignment="Center" Margin="0,4,0,0"
-                 Foreground="{DynamicResource ThemeForegroundBrush}" FontSize="11"
-                 Text="{Binding RPM, Converter={StaticResource ActualRpmDisplayConverter}, FallbackValue='RPM:11500'}"/>    
-
-    <Grid Grid.Row="4" ColumnDefinitions="*,*,*" VerticalAlignment="Stretch" Margin="0,4,0,0"
-          IsEnabled="{Binding RPMOverrideDisabled, Converter={StaticResource LogicalNotConverter}}">
-      <Button x:Name="BtnOvrPlus" Grid.Column="0" Classes="panel-action" Content="+" Margin="0,0,2,0" Click="BtnOvrPlus_Click"/>
-      <Button x:Name="BtnOvrMinus" Grid.Column="1" Classes="panel-action" Content="−" Margin="2,0,2,0" Click="BtnOvrMinus_Click"/>
-      <Button x:Name="BtnOvrReset" Grid.Column="2" Classes="panel-action" Content="↺" Margin="2,0,0,0" Click="BtnOvrReset_Click"/>
-    </Grid>
-
-    <Grid Grid.Row="5" ColumnDefinitions="*,*,*" VerticalAlignment="Center" Margin="0,4,0,0" 
-          IsEnabled="{Binding RPMOverrideDisabled, Converter={StaticResource LogicalNotConverter}}">
-      <primitives:ToggleButton x:Name="RbStepFine" Grid.Column="0" Classes="panel-toggle compact" Content="X1" Margin="0,0,2,0"
-                   IsChecked="True"
-                   Click="OvrStep_Click"/>
-      <primitives:ToggleButton x:Name="RbStepCoarse" Grid.Column="1" Classes="panel-toggle compact" Content="X10" Margin="2,0,2,0"
-                   Click="OvrStep_Click"/>
-      <TextBlock x:Name="LblRpmOverride" Grid.Column="2" VerticalAlignment="Center" HorizontalAlignment="Right" Margin="2,0,0,0"
-                 TextWrapping="Wrap"
-                 Foreground="{DynamicResource ThemeForegroundBrush}" FontSize="11"
-                 Text="{Binding RPMOverride, StringFormat='RPM % {0:0}', FallbackValue='RPM % 85'}"/>
-    </Grid>
+      <views:OverrideControl x:Name="overrideControl"
+        Grid.Column="1"
+        ShowLabel="False"
+        Value="{Binding RPMOverride, Mode=OneWay}"
+        OverrideDisabled="{Binding RPMOverrideDisabled}"
+        IsEnabled="{Binding RPMOverrideDisabled, Converter={StaticResource LogicalNotConverter}}"
+        EncoderMode="SpindleRPM"/>
+  </Grid>
   </Grid>
 </UserControl>

@@ -145,6 +145,11 @@ public partial class WorkspaceHost : UserControl
             if (chrome.LayoutNode is { } node)
                 OnJoin(node);
         };
+        chrome.LockSettingsChanged += (_, _) =>
+        {
+            PersistCurrentLayout();
+            Rebuild();
+        };
         chrome.ChangeEditorRequested += (_, id) => OnChangeEditor(chrome, id);
         chrome.DropCompleted += (_, target) => OnDropSwap(target);
     }
