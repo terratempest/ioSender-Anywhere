@@ -14,6 +14,7 @@ using CNC.Controls.Probing;
 using CNC.Core;
 using CNC.Localization.Avalonia;
 using ioSender.Navigation;
+using ioSender.QuickAccess;
 using ioSender.Services;
 using ioSender.ViewModels;
 using ioSender.Views;
@@ -38,6 +39,8 @@ public partial class MainWindow : Window
     private GrblConfigView? _grblConfigView;
     private AppConfigView? _appConfigView;
     private bool _restoringPlacement;
+    private QuickAccessSidebarController? _quickAccess;
+    private bool _suppressSidebarMenuSync;
 
     public MainWindow()
     {
@@ -59,12 +62,80 @@ public partial class MainWindow : Window
         UpdateConnectionUi();
         UpdateProgramFileButtons();
         UpdateLayoutMenuEnabled();
+        InitializeQuickAccessSidebar();
         WireShellTabHeaders();
         MnuView.SubmenuOpened += (_, _) => UpdateLayoutMenuEnabled();
         MnuLayouts.SubmenuOpened += (_, _) => RebuildLayoutsMenu();
         Opened += OnMainWindowOpened;
         Closing += OnMainWindowClosing;
         PositionChanged += (_, _) => SaveWindowPlacement();
+    }
+
+    void InitializeQuickAccessSidebar()
+    {
+        _quickAccess = new QuickAccessSidebarController(
+            LeftQuickAccess,
+            RightQuickAccess,
+            QuickAccessBackdrop,
+            _viewModel);
+        SyncQuickAccessFromConfig();
+    }
+
+    void SyncQuickAccessFromConfig()
+    {
+        var cfg = QuickAccessSidebarService.Config;
+        cfg.MigrateLegacyDockOnce();
+
+        _suppressSidebarMenuSync = true;
+        try
+        {
+            MnuSidebarLeft.IsChecked = cfg.ShowLeft;
+            MnuSidebarRight.IsChecked = cfg.ShowRight;
+        }
+        finally
+        {
+            _suppressSidebarMenuSync = false;
+        }
+
+        _quickAccess?.ApplyConfig(cfg);
+    }
+
+    void OnSidebarLeftMenuClick(object? sender, RoutedEventArgs e)
+    {
+        e.Handled = true;
+        DeferApplySidebarMenuFromView();
+    }
+
+    void OnSidebarRightMenuClick(object? sender, RoutedEventArgs e)
+    {
+        e.Handled = true;
+        DeferApplySidebarMenuFromView();
+    }
+
+    void DeferApplySidebarMenuFromView() =>
+        Dispatcher.UIThread.Post(ApplySidebarMenuFromView, DispatcherPriority.Loaded);
+
+    void OnQuickAccessBackdropPressed(object? sender, Avalonia.Input.PointerPressedEventArgs e)
+    {
+        _quickAccess?.ClosePanel();
+        e.Handled = true;
+    }
+
+    void ApplySidebarMenuFromView()
+    {
+        if (_suppressSidebarMenuSync)
+            return;
+
+        var cfg = QuickAccessSidebarService.Config;
+        cfg.ShowLeft = MnuSidebarLeft.IsChecked == true;
+        cfg.ShowRight = MnuSidebarRight.IsChecked == true;
+        cfg.Enabled = cfg.ShowLeft || cfg.ShowRight;
+
+        if ((cfg.ShowLeft || cfg.ShowRight) && cfg.Tabs.Count == 0)
+            QuickAccessSidebarDefaults.EnsureDefaultTabs(cfg);
+
+        QuickAccessSidebarService.Persist();
+        _quickAccess?.ApplyConfig(cfg);
     }
 
     void WireShellTabHeaders()
@@ -89,6 +160,7 @@ public partial class MainWindow : Window
         _shellReady = true;
         JobViewControl.WorkspaceHost.IsEditMode = MnuLockLayout.IsChecked != true;
         JobViewControl.WorkspaceHost.LayoutChanged += (_, _) => UpdateLayoutMenuEnabled();
+        SyncQuickAccessFromConfig();
         RegisterGCodeExtensions();
         NavigateTo(ShellPage.Home, fromTabControl: false);
         BringToForeground();

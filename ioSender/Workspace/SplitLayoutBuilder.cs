@@ -12,18 +12,26 @@ public sealed class SplitLayoutBuilder
 {
     readonly WorkspaceEditorFactory _factory;
     readonly Action? _onSplitterResizeCompleted;
+    readonly Action? _onLayoutPersistRequested;
+    readonly Action? _onActiveEditorsChanged;
     readonly Dictionary<WorkspaceSplit, WorkspaceGridSplitter> _splitters = new();
-    readonly Dictionary<WorkspaceLeaf, WorkspaceRegionChrome> _regions = new();
+    readonly Dictionary<WorkspaceNode, WorkspaceRegionChrome> _regions = new();
     const double SplitterHitTargetThickness = 5;
     const double SplitterOverlap = (SplitterHitTargetThickness - 1) / 2;
 
-    public SplitLayoutBuilder(WorkspaceEditorFactory factory, Action? onSplitterResizeCompleted = null)
+    public SplitLayoutBuilder(
+        WorkspaceEditorFactory factory,
+        Action? onSplitterResizeCompleted = null,
+        Action? onLayoutPersistRequested = null,
+        Action? onActiveEditorsChanged = null)
     {
         _factory = factory;
         _onSplitterResizeCompleted = onSplitterResizeCompleted;
+        _onLayoutPersistRequested = onLayoutPersistRequested;
+        _onActiveEditorsChanged = onActiveEditorsChanged;
     }
 
-    public IReadOnlyDictionary<WorkspaceLeaf, WorkspaceRegionChrome> Regions => _regions;
+    public IReadOnlyDictionary<WorkspaceNode, WorkspaceRegionChrome> Regions => _regions;
 
     public Control Build(WorkspaceNode root, bool editMode, Action<WorkspaceRegionChrome>? wireRegion)
     {
@@ -36,6 +44,9 @@ public sealed class SplitLayoutBuilder
     {
         if (node is WorkspaceLeaf leaf)
             return BuildLeaf(leaf, editMode, wireRegion);
+
+        if (node is WorkspaceTabGroup tabGroup)
+            return BuildTabGroup(tabGroup, editMode, wireRegion);
 
         var split = node.AsSplit();
         var grid = new Grid();
@@ -161,6 +172,29 @@ public sealed class SplitLayoutBuilder
         chrome.SetEditorContent(editor);
 
         _regions[leaf] = chrome;
+        wireRegion?.Invoke(chrome);
+        return chrome;
+    }
+
+    WorkspaceRegionChrome BuildTabGroup(WorkspaceTabGroup tabGroup, bool editMode, Action<WorkspaceRegionChrome>? wireRegion)
+    {
+        var chrome = new WorkspaceRegionChrome
+        {
+            EditorId = WorkspaceEditorId.TabGroup,
+            LayoutNode = tabGroup,
+            IsEditMode = editMode,
+        };
+        chrome.RefreshTitle();
+
+        var control = new WorkspaceTabGroupControl(
+            tabGroup,
+            _factory,
+            () => _onLayoutPersistRequested?.Invoke(),
+            () => _onActiveEditorsChanged?.Invoke(),
+            chrome.SetTitleText);
+        chrome.SetEditorContent(control);
+
+        _regions[tabGroup] = chrome;
         wireRegion?.Invoke(chrome);
         return chrome;
     }

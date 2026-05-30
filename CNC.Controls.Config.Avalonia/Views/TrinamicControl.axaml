@@ -19,15 +19,13 @@
   <DockPanel>
     <DockPanel DockPanel.Dock="Left" Width="520" Margin="5,5,5,0">
       <StackPanel DockPanel.Dock="Top">
-        <Border BorderBrush="{DynamicResource ThemeBorderLowBrush}" BorderThickness="1"
-                Width="514" Height="242" HorizontalAlignment="Left">
+        <GroupBox Header="Load (SG_RESULT)" Width="514" Height="268" HorizontalAlignment="Left">
           <Canvas x:Name="SgPlot" Background="{DynamicResource ThemeControlLowBrush}" Width="512" Height="240"/>
-        </Border>
+        </GroupBox>
 
-        <Grid Margin="0,4,0,0">
-          <StackPanel Orientation="Horizontal" Spacing="5">
-            <RadioButton x:Name="rbX" Content="X" GroupName="SgAxis" IsChecked="True" IsCheckedChanged="OnAxisChecked"/>
-            <RadioButton x:Name="rbY" Content="Y" GroupName="SgAxis" IsCheckedChanged="OnAxisChecked">
+        <StackPanel Orientation="Horizontal" Spacing="5" Margin="0,5,0,0">
+            <RadioButton x:Name="rbX" Content="X" FontSize="12" GroupName="SgAxis" IsChecked="True" IsCheckedChanged="OnAxisChecked"/>
+            <RadioButton x:Name="rbY" Content="Y" FontSize="12" GroupName="SgAxis" IsCheckedChanged="OnAxisChecked">
               <RadioButton.IsVisible>
                 <MultiBinding Converter="{StaticResource IsAxisVisibleConverter}">
                   <Binding Path="AxisEnabledFlags"/>
@@ -35,7 +33,7 @@
                 </MultiBinding>
               </RadioButton.IsVisible>
             </RadioButton>
-            <RadioButton x:Name="rbZ" Content="Z" GroupName="SgAxis" IsCheckedChanged="OnAxisChecked">
+            <RadioButton x:Name="rbZ" Content="Z" FontSize="12" GroupName="SgAxis" IsCheckedChanged="OnAxisChecked">
               <RadioButton.IsVisible>
                 <MultiBinding Converter="{StaticResource IsAxisVisibleConverter}">
                   <Binding Path="AxisEnabledFlags"/>
@@ -43,7 +41,7 @@
                 </MultiBinding>
               </RadioButton.IsVisible>
             </RadioButton>
-            <RadioButton x:Name="rbA" Content="A" GroupName="SgAxis" IsCheckedChanged="OnAxisChecked">
+            <RadioButton x:Name="rbA" Content="A" FontSize="12" GroupName="SgAxis" IsCheckedChanged="OnAxisChecked">
               <RadioButton.IsVisible>
                 <MultiBinding Converter="{StaticResource IsAxisVisibleConverter}">
                   <Binding Path="AxisEnabledFlags"/>
@@ -51,7 +49,7 @@
                 </MultiBinding>
               </RadioButton.IsVisible>
             </RadioButton>
-            <RadioButton x:Name="rbB" Content="B" GroupName="SgAxis" IsCheckedChanged="OnAxisChecked">
+            <RadioButton x:Name="rbB" Content="B" FontSize="12" GroupName="SgAxis" IsCheckedChanged="OnAxisChecked">
               <RadioButton.IsVisible>
                 <MultiBinding Converter="{StaticResource IsAxisVisibleConverter}">
                   <Binding Path="AxisEnabledFlags"/>
@@ -59,7 +57,7 @@
                 </MultiBinding>
               </RadioButton.IsVisible>
             </RadioButton>
-            <RadioButton x:Name="rbC" Content="C" GroupName="SgAxis" IsCheckedChanged="OnAxisChecked">
+            <RadioButton x:Name="rbC" Content="C" FontSize="12" GroupName="SgAxis" IsCheckedChanged="OnAxisChecked">
               <RadioButton.IsVisible>
                 <MultiBinding Converter="{StaticResource IsAxisVisibleConverter}">
                   <Binding Path="AxisEnabledFlags"/>
@@ -67,26 +65,20 @@
                 </MultiBinding>
               </RadioButton.IsVisible>
             </RadioButton>
-          </StackPanel>
-          <TextBlock Text="Load (SG_RESULT)" Foreground="Blue" HorizontalAlignment="Right" VerticalAlignment="Center"/>
-        </Grid>
+        </StackPanel>
 
-        <Border BorderBrush="{DynamicResource ThemeBorderLowBrush}" BorderThickness="1"
-                Margin="0,6,0,0" Padding="8" CornerRadius="2">
-          <StackPanel Spacing="6">
-            <TextBlock Text="stallGuard" FontWeight="SemiBold"/>
+        <GroupBox Header="stallGuard" Margin="0,6,0,0">
             <StackPanel Orientation="Horizontal" Spacing="5">
               <Slider x:Name="sgSlider" Width="169" Minimum="{Binding #root.SGValueMin}"
                       Maximum="{Binding #root.SGValueMax}" Value="{Binding #root.SGValue, Mode=TwoWay}"
                       PointerReleased="OnSgSliderReleased"/>
               <TextBox Width="36" Text="{Binding #root.SGValue, StringFormat={}{0:0}}" IsReadOnly="True"
-                       HorizontalContentAlignment="Right"/>
-              <Button Content="Configure" Width="72" Click="OnConfigureSgClick"/>
-              <CheckBox Content="Enable filter (SFILT)" IsChecked="{Binding #root.SFiltEnabled, Mode=TwoWay}"
+                       FontSize="12" HorizontalContentAlignment="Right"/>
+              <Button Content="Configure" Width="90" FontSize="12" HorizontalContentAlignment="Center" Click="OnConfigureSgClick"/>
+              <CheckBox Content="Enable filter (SFILT)" FontSize="12" IsChecked="{Binding #root.SFiltEnabled, Mode=TwoWay}"
                         Margin="8,0,0,0" VerticalAlignment="Center"/>
             </StackPanel>
-          </StackPanel>
-        </Border>
+        </GroupBox>
 
         <Grid Margin="0,5,0,0">
           <cnc:StatusControl HorizontalAlignment="Left" VerticalAlignment="Bottom"/>
@@ -96,17 +88,19 @@
 
       <StackPanel DockPanel.Dock="Bottom" Margin="0,5,0,0">
         <cnc:MDIControl x:Name="mdiControl"/>
-        <TextBlock x:Name="txtPosition" Margin="0,5,0,0" Width="235"/>
+        <TextBlock x:Name="txtPosition" Margin="0,5,0,0" Width="235" FontSize="12"/>
       </StackPanel>
     </DockPanel>
 
-    <Grid Margin="8,5,5,5" RowDefinitions="*,Auto">
-      <TextBox Grid.Row="0" Text="{Binding #root.DriverStatus}" IsReadOnly="True" AcceptsReturn="True"
-               TextWrapping="Wrap" FontFamily="Consolas,Courier New,monospace" FontSize="12"/>
-      <StackPanel Grid.Row="1" Orientation="Horizontal" Spacing="5" Margin="0,4,0,0">
-        <Button Content="Get status" Width="130" Click="OnGetStateClick"/>
-        <Button Content="Get status, all drivers" Width="170" Click="OnGetStateAllClick"/>
-      </StackPanel>
-    </Grid>
+    <GroupBox Header="Driver status" Margin="8,5,5,5">
+      <Grid RowDefinitions="*,Auto">
+        <TextBox Grid.Row="0" Text="{Binding #root.DriverStatus}" IsReadOnly="True" AcceptsReturn="True"
+                 TextWrapping="Wrap" FontFamily="Consolas,Courier New,monospace" FontSize="12"/>
+        <StackPanel Grid.Row="1" Orientation="Horizontal" Spacing="5" Margin="0,8,0,0">
+          <Button Content="Get status" Width="130" FontSize="12" HorizontalContentAlignment="Center" Click="OnGetStateClick"/>
+          <Button Content="Get status, all drivers" Width="170" FontSize="12" HorizontalContentAlignment="Center" Click="OnGetStateAllClick"/>
+        </StackPanel>
+      </Grid>
+    </GroupBox>
   </DockPanel>
 </UserControl>

@@ -138,6 +138,13 @@ public static class WorkspaceLayoutDefaults
         string.Equals(name, PresetCompact, StringComparison.OrdinalIgnoreCase)
         || string.Equals(name, PresetExpanded, StringComparison.OrdinalIgnoreCase);
 
-    public static bool IsValid(WorkspaceNode? root) =>
-        root is not null && root.EnumerateEditors().Any();
+    public static bool IsValid(WorkspaceNode? root) => root is not null && HasRegion(root);
+
+    static bool HasRegion(WorkspaceNode node) => node switch
+    {
+        WorkspaceLeaf => true,
+        WorkspaceTabGroup => true,
+        WorkspaceSplit split => HasRegion(split.First) || HasRegion(split.Second),
+        _ => false,
+    };
 }

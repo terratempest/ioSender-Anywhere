@@ -1,5 +1,6 @@
 using Avalonia.Controls;
 using Avalonia.Interactivity;
+using Avalonia.Controls.Primitives;
 using CNC.App;
 using CNC.Controls.Avalonia.Services;
 
@@ -17,6 +18,8 @@ public partial class AppConfigView : UserControl
     {
         _appConfig = appConfig;
         InitializeComponent();
+        SettingsList.SelectedIndex = 0;
+        ShowSettingsPage(0);
         if (appConfig != null)
             DataContext = appConfig.Base;
         Loaded += OnLoaded;
@@ -30,6 +33,26 @@ public partial class AppConfigView : UserControl
         var mode = baseConfig.Jog.Mode;
         jogUiConfig.IsVisible = mode != JogConfig.JogMode.Keypad;
         jogConfig.IsVisible = mode != JogConfig.JogMode.UI;
+    }
+
+    void OnSettingsSelectionChanged(object? sender, SelectionChangedEventArgs e)
+    {
+        _ = e;
+
+        var selectedIndex = sender is SelectingItemsControl list ? list.SelectedIndex : 0;
+        ShowSettingsPage(selectedIndex);
+    }
+
+    void ShowSettingsPage(int selectedIndex)
+    {
+        ProbingPage.IsVisible = selectedIndex == 0;
+        JogPage.IsVisible = selectedIndex == 1;
+        AppearancePage.IsVisible = selectedIndex == 2;
+        MachinePage.IsVisible = selectedIndex == 3;
+        CameraPage.IsVisible = selectedIndex == 4;
+        ViewerPage.IsVisible = selectedIndex == 5;
+        StripPage.IsVisible = selectedIndex == 6;
+        KeyboardPage.IsVisible = selectedIndex == 7;
     }
 
     void OnSaveClick(object? sender, RoutedEventArgs e)

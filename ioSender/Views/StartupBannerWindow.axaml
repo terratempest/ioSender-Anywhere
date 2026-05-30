@@ -6,7 +6,7 @@
         Height="180"
         CanResize="False"
         ShowInTaskbar="False"
-        SystemDecorations="None"
+        WindowDecorations="None"
         WindowStartupLocation="CenterScreen"
         Background="{DynamicResource ThemeBackgroundBrush}">
   <Border Padding="24"

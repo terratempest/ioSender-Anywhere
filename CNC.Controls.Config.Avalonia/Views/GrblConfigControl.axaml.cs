@@ -2,9 +2,11 @@ using System.Collections.Generic;
 using System.IO;
 using System.Threading;
 using Avalonia.Controls;
+using Avalonia.Controls.Primitives;
 using Avalonia.Input;
 using Avalonia.Interactivity;
 using Avalonia.Platform.Storage;
+using Avalonia.VisualTree;
 using CNC.Core;
 using CNC.Controls.Avalonia.Utilities;
 
@@ -126,8 +128,7 @@ public partial class GrblConfigControl : UserControl, IGrblConfigTab
 
     void OnSizeChanged(object? sender, SizeChangedEventArgs e)
     {
-        if (e.NewSize.Height > 80)
-            txtDescription.Height = Math.Max(e.NewSize.Height - 120, 120);
+        _ = e;
     }
 
     void OnGridSelectionChanged(object? sender, SelectionChangedEventArgs e)
@@ -144,6 +145,24 @@ public partial class GrblConfigControl : UserControl, IGrblConfigTab
             details.IsVisible = false;
     }
 
+    void OnTreePointerReleased(object? sender, PointerReleasedEventArgs e)
+    {
+        if (e.Source is not Control source)
+            return;
+
+        if (source.GetVisualAncestors().OfType<ToggleButton>().Any())
+            return;
+
+        var item = source as TreeViewItem ??
+                   source.GetVisualAncestors().OfType<TreeViewItem>().FirstOrDefault();
+
+        if (item?.DataContext is not GrblSettingGroup)
+            return;
+
+        item.IsExpanded = !item.IsExpanded;
+        e.Handled = true;
+    }
+
     void ShowSetting(GrblSettingDetails setting, bool assign)
     {
         details.IsVisible = true;
@@ -154,6 +173,7 @@ public partial class GrblConfigControl : UserControl, IGrblConfigTab
         searchField.Value = setting.Id;
         txtSettingTitle.Text = $"${setting.Id} — {setting.Name}";
         txtValue.Text = setting.Value ?? string.Empty;
+        BuildValueEditor(setting);
         txtDescription.Text = setting.Description;
         UpdateButtons();
     }
@@ -163,12 +183,155 @@ public partial class GrblConfigControl : UserControl, IGrblConfigTab
         if (_selected == null)
             return;
 
-        var text = txtValue.Text ?? string.Empty;
+        var text = txtValue.IsVisible
+            ? txtValue.Text ?? string.Empty
+            : GetValueEditorText(_selected);
+
         if (text != (_selected.Value ?? string.Empty))
             _selected.Value = text;
     }
 
-    void OnValueLostFocus(object? sender, RoutedEventArgs e) => CommitValueEdit();
+    void OnValueLostFocus(object? sender, FocusChangedEventArgs e) => CommitValueEdit();
+
+    void BuildValueEditor(GrblSettingDetails setting)
+    {
+        valueEditorPanel.Children.Clear();
+        valueEditorPanel.IsVisible = false;
+        txtValue.IsVisible = true;
+
+        switch (setting.DataType)
+        {
+            case GrblSettingDetails.DataTypes.BOOL:
+                txtValue.IsVisible = false;
+                valueEditorPanel.IsVisible = true;
+                valueEditorPanel.Children.Add(new CheckBox
+                {
+                    Content = "Enabled",
+                    FontSize = 12,
+                    IsChecked = ParseSettingInt(setting.Value) != 0
+                });
+                break;
+
+            case GrblSettingDetails.DataTypes.BITFIELD:
+            case GrblSettingDetails.DataTypes.XBITFIELD:
+            case GrblSettingDetails.DataTypes.AXISMASK:
+                txtValue.IsVisible = false;
+                valueEditorPanel.IsVisible = true;
+                AddBitfieldEditor(setting);
+                break;
+
+            case GrblSettingDetails.DataTypes.RADIOBUTTONS:
+                txtValue.IsVisible = false;
+                valueEditorPanel.IsVisible = true;
+                AddRadioEditor(setting);
+                break;
+        }
+    }
+
+    string GetValueEditorText(GrblSettingDetails setting)
+    {
+        switch (setting.DataType)
+        {
+            case GrblSettingDetails.DataTypes.BOOL:
+                return valueEditorPanel.Children.OfType<CheckBox>().FirstOrDefault()?.IsChecked == true ? "1" : "0";
+
+            case GrblSettingDetails.DataTypes.BITFIELD:
+            case GrblSettingDetails.DataTypes.XBITFIELD:
+            case GrblSettingDetails.DataTypes.AXISMASK:
+                var value = 0;
+                foreach (var checkBox in valueEditorPanel.Children.OfType<CheckBox>())
+                {
+                    if (checkBox.Tag is int bit && checkBox.IsChecked == true)
+                        value |= 1 << bit;
+                }
+                return value.ToString();
+
+            case GrblSettingDetails.DataTypes.RADIOBUTTONS:
+                return valueEditorPanel.Children.OfType<RadioButton>()
+                    .Where(radio => radio.IsChecked == true)
+                    .Select(radio => radio.Tag?.ToString() ?? setting.Value ?? string.Empty)
+                    .FirstOrDefault() ?? setting.Value ?? string.Empty;
+        }
+
+        return txtValue.Text ?? string.Empty;
+    }
+
+    void AddBitfieldEditor(GrblSettingDetails setting)
+    {
+        var value = ParseSettingInt(setting.Value);
+        var labels = GetBitLabels(setting, value);
+
+        for (var bit = 0; bit < labels.Count; bit++)
+        {
+            valueEditorPanel.Children.Add(new CheckBox
+            {
+                Content = labels[bit],
+                FontSize = 12,
+                Tag = bit,
+                IsChecked = (value & (1 << bit)) != 0
+            });
+        }
+    }
+
+    void AddRadioEditor(GrblSettingDetails setting)
+    {
+        var selected = ParseSettingInt(setting.Value);
+        var options = SplitSettingFormat(setting.Format);
+        if (options.Count == 0)
+            options.Add(setting.Value ?? "0");
+
+        var groupName = $"setting{setting.Id}";
+        for (var index = 0; index < options.Count; index++)
+        {
+            valueEditorPanel.Children.Add(new RadioButton
+            {
+                Content = options[index],
+                FontSize = 12,
+                GroupName = groupName,
+                Tag = index,
+                IsChecked = index == selected
+            });
+        }
+    }
+
+    static List<string> GetBitLabels(GrblSettingDetails setting, int value)
+    {
+        if (setting.DataType == GrblSettingDetails.DataTypes.AXISMASK)
+        {
+            var axes = Math.Max(GrblInfo.NumAxes, HighestBit(value) + 1);
+            return Enumerable.Range(0, axes)
+                .Select(GrblInfo.AxisIndexToLetter)
+                .ToList();
+        }
+
+        var labels = SplitSettingFormat(setting.Format);
+        var count = Math.Max(labels.Count, HighestBit(value) + 1);
+        if (count == 0)
+            count = 8;
+
+        while (labels.Count < count)
+            labels.Add($"Bit {labels.Count}");
+
+        return labels;
+    }
+
+    static List<string> SplitSettingFormat(string format) =>
+        format.Split(',', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries).ToList();
+
+    static int ParseSettingInt(string? value) =>
+        int.TryParse(value, out var parsed) ? parsed : 0;
+
+    static int HighestBit(int value)
+    {
+        var bit = -1;
+        while (value != 0)
+        {
+            bit++;
+            value >>= 1;
+        }
+
+        return bit;
+    }
 
     void OnReloadClick(object? sender, RoutedEventArgs e)
     {

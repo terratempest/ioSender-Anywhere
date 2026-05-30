@@ -3,6 +3,7 @@ namespace CNC.App.Workspace;
 /// <summary>Assignable workspace panel identifiers.</summary>
 public enum WorkspaceEditorId
 {
+    TabGroup,
     Program,
     Viewer3D,
     Console,

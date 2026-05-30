@@ -5,8 +5,6 @@ using CNC.Controls.Avalonia.Views;
 using CNC.Controls.Config;
 using CNC.Controls.Lathe;
 using CNC.Controls.Probing;
-using CNC.Core;
-using CNC.GCodeViewer.Avalonia;
 using CNC.GCodeViewer.Avalonia.Views;
 using ioSender.Services;
 using ioSender.ViewModels;
@@ -18,10 +16,7 @@ public sealed class WorkspaceEditorFactory
 {
     readonly Dictionary<Guid, Control> _cache = new();
     readonly Dictionary<Guid, WorkspaceEditorId> _editorByLeaf = new();
-    readonly object _grblContext;
-    readonly object? _appConfigContext;
-    readonly AppSession _session;
-    readonly GCodeViewerSession _viewerSession;
+    readonly WorkspaceEditorControlFactory _controlFactory;
 
     public WorkspaceEditorFactory(
         object grblContext,
@@ -29,31 +24,30 @@ public sealed class WorkspaceEditorFactory
         AppSession? session = null,
         ProgramService? programService = null)
     {
-        _session = session ?? AppHostContext.Session;
-        _grblContext = ResolveGrblContext(grblContext);
-        _appConfigContext = appConfigContext ?? _session.AppConfig.Base;
-        var program = programService ?? _session.Program;
-        _viewerSession = new GCodeViewerSession(
-            _session.AppConfig,
-            (GrblViewModel)_grblContext,
-            () => program.Tokens);
+        _controlFactory = new WorkspaceEditorControlFactory(
+            grblContext,
+            appConfigContext,
+            session,
+            programService);
     }
 
     public Control GetOrCreate(WorkspaceLeaf leaf)
+        => GetOrCreate(leaf.Id, leaf.Editor);
+
+    public Control GetOrCreate(WorkspaceTabEntry tab)
+        => GetOrCreate(tab.Id, tab.Editor);
+
+    Control GetOrCreate(Guid id, WorkspaceEditorId editorId)
     {
-        if (_cache.TryGetValue(leaf.Id, out var existing)
-            && _editorByLeaf.TryGetValue(leaf.Id, out var cachedEditor)
-            && cachedEditor == leaf.Editor)
+        if (_cache.TryGetValue(id, out var existing)
+            && _editorByLeaf.TryGetValue(id, out var cachedEditor)
+            && cachedEditor == editorId)
             return existing;
 
-        Remove(leaf);
-        var control = Create(leaf.Editor);
-        var desc = WorkspaceEditorCatalog.Get(leaf.Editor);
-        if (desc.RequiresGrblDataContext)
-            control.DataContext = _grblContext;
-
-        _cache[leaf.Id] = control;
-        _editorByLeaf[leaf.Id] = leaf.Editor;
+        Remove(id);
+        var control = _controlFactory.Create(editorId);
+        _cache[id] = control;
+        _editorByLeaf[id] = editorId;
         return control;
     }
 
@@ -64,14 +58,17 @@ public sealed class WorkspaceEditorFactory
 
     public void Invalidate(WorkspaceLeaf leaf) => Remove(leaf);
 
-    public void Remove(WorkspaceLeaf leaf)
+    public void Remove(WorkspaceLeaf leaf) => Remove(leaf.Id);
+
+    public void Remove(WorkspaceTabEntry tab) => Remove(tab.Id);
+
+    void Remove(Guid id)
     {
-        if (_cache.Remove(leaf.Id, out var control))
+        if (_cache.Remove(id, out var control))
             ReleaseControl(control);
-        _editorByLeaf.Remove(leaf.Id);
+        _editorByLeaf.Remove(id);
     }
 
-    /// <summary>Detaches all cached editors before the workspace visual tree is torn down.</summary>
     public void ReleaseAllFromVisualTree()
     {
         foreach (var control in _cache.Values.ToList())
@@ -80,7 +77,7 @@ public sealed class WorkspaceEditorFactory
 
     public void PruneToTree(WorkspaceNode root)
     {
-        var live = root.EnumerateLeaves().Select(l => l.Id).ToHashSet();
+        var live = EnumerateCacheIds(root).ToHashSet();
         foreach (var id in _cache.Keys.ToList())
         {
             if (live.Contains(id))
@@ -92,85 +89,35 @@ public sealed class WorkspaceEditorFactory
         }
     }
 
-    static void ReleaseControl(Control control)
+    static IEnumerable<Guid> EnumerateCacheIds(WorkspaceNode node)
+    {
+        switch (node)
+        {
+            case WorkspaceLeaf leaf:
+                yield return leaf.Id;
+                break;
+            case WorkspaceSplit split:
+                foreach (var id in EnumerateCacheIds(split.First))
+                    yield return id;
+                foreach (var id in EnumerateCacheIds(split.Second))
+                    yield return id;
+                break;
+            case WorkspaceTabGroup tabGroup:
+                foreach (var tab in tabGroup.Tabs)
+                    yield return tab.Id;
+                break;
+        }
+    }
+
+    public static void ReleaseControl(Control control)
     {
         if (control is RenderControl viewer)
             viewer.Close();
         WorkspaceRegionChrome.DetachEditor(control);
     }
 
-    Control Create(WorkspaceEditorId id) => id switch
-    {
-        WorkspaceEditorId.Program => new GCodeListControl(_session.Program, _session.MachineCommands)
-        {
-            HorizontalAlignment = Avalonia.Layout.HorizontalAlignment.Stretch,
-            VerticalAlignment = Avalonia.Layout.VerticalAlignment.Stretch,
-        },
-        WorkspaceEditorId.Viewer3D => new RenderControl
-        {
-            Session = _viewerSession,
-            HorizontalAlignment = Avalonia.Layout.HorizontalAlignment.Stretch,
-            VerticalAlignment = Avalonia.Layout.VerticalAlignment.Stretch,
-        },
-        WorkspaceEditorId.Console => new ConsoleControl(),
-        WorkspaceEditorId.Mdi => new MDIControl
-        {
-            HorizontalAlignment = Avalonia.Layout.HorizontalAlignment.Stretch,
-            VerticalAlignment = Avalonia.Layout.VerticalAlignment.Stretch,
-        },
-        WorkspaceEditorId.MdiTouch => new MDITouchControl
-        {
-            HorizontalAlignment = Avalonia.Layout.HorizontalAlignment.Stretch,
-            VerticalAlignment = Avalonia.Layout.VerticalAlignment.Stretch,
-        },
-        WorkspaceEditorId.Dro => new DROControl(),
-        WorkspaceEditorId.Signals => new SignalsControl(),
-        WorkspaceEditorId.Status => new StatusControl
-        {
-            HorizontalAlignment = Avalonia.Layout.HorizontalAlignment.Stretch,
-        },
-        WorkspaceEditorId.Jog => new JogControl { HorizontalAlignment = Avalonia.Layout.HorizontalAlignment.Stretch },
-        WorkspaceEditorId.Outline => new OutlineControl(_session.AppConfig),
-        WorkspaceEditorId.Goto => new GotoControl(),
-        WorkspaceEditorId.WorkParams => new WorkParametersControl
-        {
-            HorizontalAlignment = Avalonia.Layout.HorizontalAlignment.Stretch,
-            VerticalAlignment = Avalonia.Layout.VerticalAlignment.Stretch,
-        },
-        WorkspaceEditorId.Spindle => new SpindleControl(_session.MachineCommands)
-        {
-            HorizontalAlignment = Avalonia.Layout.HorizontalAlignment.Stretch,
-            VerticalAlignment = Avalonia.Layout.VerticalAlignment.Stretch,
-        },
-        WorkspaceEditorId.Coolant => new CoolantControl
-        {
-            HorizontalAlignment = Avalonia.Layout.HorizontalAlignment.Stretch,
-            VerticalAlignment = Avalonia.Layout.VerticalAlignment.Stretch,
-        },
-        WorkspaceEditorId.Feed => new FeedControl(_session.MachineCommands)
-        {
-            HorizontalAlignment = Avalonia.Layout.HorizontalAlignment.Stretch,
-            VerticalAlignment = Avalonia.Layout.VerticalAlignment.Stretch,
-        },
-        WorkspaceEditorId.JobBar => new JobBarEditorControl(_session.AppConfig.Base, _session.MachineCommands),
-        WorkspaceEditorId.Probing => new ProbingView(_session.AppConfig.Base),
-        WorkspaceEditorId.SdCard => new SDCardView(),
-        WorkspaceEditorId.Lathe => new LatheWizardsView(),
-        WorkspaceEditorId.Offsets => new OffsetView(),
-        WorkspaceEditorId.Tools => new ToolView(),
-        WorkspaceEditorId.GrblConfig => new GrblConfigView(_session.AppConfig.Base),
-        WorkspaceEditorId.AppConfig => CreateAppConfig(),
-        _ => new TextBlock { Text = id.ToString() },
-    };
-
-    Control CreateAppConfig()
-    {
-        var view = new AppConfigView(_session.AppConfig) { DataContext = _appConfigContext };
-        return view;
-    }
-
-    static object ResolveGrblContext(object context) =>
-        context is MainWindowViewModel shell
+    internal static object ResolveGrblContext(object context) =>
+        context is ViewModels.MainWindowViewModel shell
             ? shell.Grbl
             : context;
 

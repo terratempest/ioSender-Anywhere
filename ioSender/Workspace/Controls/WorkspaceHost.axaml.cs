@@ -112,7 +112,11 @@ public partial class WorkspaceHost : UserControl
         _factory.ReleaseAllFromVisualTree();
         _regionChromes.Clear();
         RootPanel.Children.Clear();
-        _builder = new SplitLayoutBuilder(_factory, OnSplitterResizeCompleted);
+        _builder = new SplitLayoutBuilder(
+            _factory,
+            OnSplitterResizeCompleted,
+            PersistCurrentLayout,
+            SyncActiveEditors);
         var content = _builder.Build(_root, IsEditMode, chrome =>
         {
             WireRegion(chrome);
@@ -128,65 +132,71 @@ public partial class WorkspaceHost : UserControl
     {
         chrome.SplitHorizontalRequested += (_, _) =>
         {
-            if (chrome.LayoutNode is WorkspaceLeaf leaf)
-                OnSplit(leaf, WorkspaceSplitOrientation.Horizontal);
+            if (chrome.LayoutNode is { } node)
+                OnSplit(node, WorkspaceSplitOrientation.Horizontal);
         };
         chrome.SplitVerticalRequested += (_, _) =>
         {
-            if (chrome.LayoutNode is WorkspaceLeaf leaf)
-                OnSplit(leaf, WorkspaceSplitOrientation.Vertical);
+            if (chrome.LayoutNode is { } node)
+                OnSplit(node, WorkspaceSplitOrientation.Vertical);
         };
         chrome.JoinRequested += (_, _) =>
         {
-            if (chrome.LayoutNode is WorkspaceLeaf leaf)
-                OnJoin(leaf);
+            if (chrome.LayoutNode is { } node)
+                OnJoin(node);
         };
         chrome.ChangeEditorRequested += (_, id) => OnChangeEditor(chrome, id);
         chrome.DropCompleted += (_, target) => OnDropSwap(target);
     }
 
-    void OnSplit(WorkspaceLeaf leaf, WorkspaceSplitOrientation orientation)
+    void OnSplit(WorkspaceNode node, WorkspaceSplitOrientation orientation)
     {
         if (_factory is null)
             return;
 
-        if (!WorkspaceLayoutCommands.TrySplitLeaf(_root, leaf, orientation, out var newRoot))
+        if (!WorkspaceLayoutCommands.TrySplitRegion(_root, node, orientation, out var newRoot))
             return;
 
         _root = newRoot;
-        WorkspaceLayoutService.SaveRoot(_root);
-        WorkspaceLayoutService.Persist();
+        PersistCurrentLayout();
         WorkspaceDragBroker.Clear();
         Rebuild();
     }
 
-    void OnJoin(WorkspaceLeaf leaf)
+    void OnJoin(WorkspaceNode node)
     {
         if (_factory is null)
             return;
 
-        if (!WorkspaceLayoutCommands.TryJoinLeaf(_root, leaf, out var newRoot))
+        if (!WorkspaceLayoutCommands.TryJoinRegion(_root, node, out var newRoot))
             return;
 
-        _factory.Remove(leaf);
         _root = newRoot;
-        WorkspaceLayoutService.SaveRoot(_root);
-        WorkspaceLayoutService.Persist();
+        PersistCurrentLayout();
         WorkspaceDragBroker.Clear();
         Rebuild();
     }
 
     void OnChangeEditor(WorkspaceRegionChrome chrome, WorkspaceEditorId id)
     {
-        if (chrome.LayoutNode is not WorkspaceLeaf leaf || leaf.Editor == id || _factory is null)
+        if (chrome.LayoutNode is not { } node || _factory is null)
             return;
 
-        leaf.Editor = id;
-        ApplyLeafToChrome(leaf, chrome);
+        if (node is WorkspaceLeaf leaf && leaf.Editor == id)
+            return;
+        if (node is WorkspaceTabGroup && id == WorkspaceEditorId.TabGroup)
+            return;
 
-        WorkspaceLayoutService.SaveRoot(_root);
-        WorkspaceLayoutService.Persist();
-        SyncActiveEditors();
+        WorkspaceNode replacement = id == WorkspaceEditorId.TabGroup
+            ? new WorkspaceTabGroup()
+            : new WorkspaceLeaf { Editor = id };
+
+        if (!WorkspaceLayoutCommands.TryReplaceRegion(_root, node, replacement, out var newRoot))
+            return;
+
+        _root = newRoot;
+        PersistCurrentLayout();
+        Rebuild();
     }
 
     void OnDropSwap(WorkspaceRegionChrome target)
@@ -194,15 +204,13 @@ public partial class WorkspaceHost : UserControl
         if (WorkspaceDragBroker.Source is not { } source || ReferenceEquals(source, target) || _factory is null)
             return;
 
-        if (source.LayoutNode is WorkspaceLeaf sourceLeaf
-            && target.LayoutNode is WorkspaceLeaf targetLeaf)
+        if (source.LayoutNode is { } sourceNode
+            && target.LayoutNode is { } targetNode
+            && WorkspaceLayoutCommands.TrySwapRegions(_root, sourceNode, targetNode, out var newRoot))
         {
-            WorkspaceLayoutCommands.SwapEditors(sourceLeaf, targetLeaf);
-            ApplyLeafToChrome(sourceLeaf, source);
-            ApplyLeafToChrome(targetLeaf, target);
-            WorkspaceLayoutService.SaveRoot(_root);
-            WorkspaceLayoutService.Persist();
-            SyncActiveEditors();
+            _root = newRoot;
+            PersistCurrentLayout();
+            Rebuild();
         }
 
         WorkspaceDragBroker.Clear();
@@ -220,24 +228,28 @@ public partial class WorkspaceHost : UserControl
 
     void OnSplitterResizeCompleted()
     {
+        PersistCurrentLayout();
+    }
+
+    void PersistCurrentLayout()
+    {
         WorkspaceLayoutService.SaveRoot(_root);
         WorkspaceLayoutService.Persist();
     }
 
     void SyncActiveEditors()
     {
-        var activated = new List<WorkspaceEditorId>();
+        var activated = _root.EnumerateEditors().Distinct().ToList();
         foreach (var leaf in _root.EnumerateLeaves())
         {
             var control = _factory!.GetOrCreate(leaf);
             var desc = WorkspaceEditorCatalog.Get(leaf.Editor);
             if (desc.SupportsActivation)
                 WorkspaceEditorFactory.SetActivation(control, true);
-            activated.Add(leaf.Editor);
         }
 
         _activeEditors = _root.EnumerateEditors().ToHashSet();
-        ActiveEditorsChanged?.Invoke(this, activated.Distinct().ToList());
+        ActiveEditorsChanged?.Invoke(this, activated);
     }
 
     void RefreshToolpathViews()

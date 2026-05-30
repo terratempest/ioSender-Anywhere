@@ -4,29 +4,31 @@
              xmlns:platform="using:CNC.Platform.Abstractions"
              x:Class="CNC.Controls.Config.AppMachineConfigPanel"
              Width="310">
-  <Border BorderBrush="{DynamicResource ThemeBorderLowBrush}"
-          BorderThickness="1" Padding="8" CornerRadius="2">
-    <StackPanel Spacing="4">
-      <TextBlock Text="Main" FontWeight="SemiBold"/>
+  <GroupBox Header="Machine" BorderBrush="{DynamicResource ThemeBorderLowBrush}">
+    <WrapPanel Orientation="Vertical" ItemWidth="290">
       <cnc:NumericField Label="Reset delay:" Unit="ms" Format="###0"
                         Value="{Binding ResetDelay, Mode=TwoWay}"/>
       <cnc:NumericField Label="Poll interval:" Unit="ms" Format="###0"
                         Value="{Binding PollInterval, Mode=TwoWay}"/>
       <cnc:NumericField Label="Max buffer:" Unit="bytes" Format="###0"
                         Value="{Binding MaxBufferSize, Mode=TwoWay}"/>
-      <CheckBox Content="Aggressive buffering" IsChecked="{Binding UseBuffering, Mode=TwoWay}"
+      <CheckBox Content="Aggressive buffering" FontSize="12" IsChecked="{Binding UseBuffering, Mode=TwoWay}"
                 ToolTip.Tip="Buffers more than one G-code block (grblHAL)."/>
-      <CheckBox Content="Keep MDI focus" IsChecked="{Binding KeepMdiFocus, Mode=TwoWay}"/>
-      <CheckBox Content='Filter "ok" response' IsChecked="{Binding FilterOkResponse, Mode=TwoWay}"/>
-      <CheckBox Content="Auto-compress gcode on transforms" IsChecked="{Binding AutoCompress, Mode=TwoWay}"/>
-      <CheckBox Content="Restore last window size and position on startup" IsChecked="{Binding KeepWindowSize, Mode=TwoWay}"/>
-      <CheckBox Content="Send comments" IsChecked="{Binding SendComments, Mode=TwoWay}"/>
-      <CheckBox Content="Add line numbers" IsChecked="{Binding AddLineNumbers, Mode=TwoWay}"/>
-      <TextBlock Text="Layout" Margin="0,6,0,0"/>
-      <ComboBox SelectedItem="{Binding LayoutMode, Mode=TwoWay}">
-        <platform:UiLayoutMode>Compact</platform:UiLayoutMode>
-        <platform:UiLayoutMode>Expanded</platform:UiLayoutMode>
-      </ComboBox>
-    </StackPanel>
-  </Border>
+      <CheckBox Content="Keep MDI focus" FontSize="12" IsChecked="{Binding KeepMdiFocus, Mode=TwoWay}"/>
+      <CheckBox Content='Filter "ok" response' FontSize="12" IsChecked="{Binding FilterOkResponse, Mode=TwoWay}"/>
+      <CheckBox Content="Auto-compress gcode on transforms" FontSize="12" IsChecked="{Binding AutoCompress, Mode=TwoWay}"/>
+      <CheckBox Content="Restore last window size and position on startup" FontSize="12" IsChecked="{Binding KeepWindowSize, Mode=TwoWay}"/>
+      <CheckBox Content="Send comments" FontSize="12" IsChecked="{Binding SendComments, Mode=TwoWay}"/>
+      <CheckBox Content="Add line numbers" FontSize="12" IsChecked="{Binding AddLineNumbers, Mode=TwoWay}"/>
+
+      <Grid ColumnDefinitions="90,*" Margin="0,8,0,0">
+        <TextBlock Grid.Column="0" Text="Layout:" FontSize="12" HorizontalAlignment="Right" VerticalAlignment="Center"/>
+        <ComboBox Grid.Column="1" Margin="4,0,0,0" Width="120" FontSize="12"
+                  HorizontalAlignment="Left" SelectedItem="{Binding LayoutMode, Mode=TwoWay}">
+          <platform:UiLayoutMode>Compact</platform:UiLayoutMode>
+          <platform:UiLayoutMode>Expanded</platform:UiLayoutMode>
+        </ComboBox>
+      </Grid>
+    </WrapPanel>
+  </GroupBox>
 </UserControl>

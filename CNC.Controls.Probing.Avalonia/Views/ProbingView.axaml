@@ -8,7 +8,7 @@
              xmlns:local="using:CNC.Controls.Probing"
              xmlns:loc="using:CNC.Localization.Avalonia"
              mc:Ignorable="d"
-             d:DesignHeight="600" d:DesignWidth="900"
+             d:DesignHeight="600" d:DesignWidth="800"
              x:Class="CNC.Controls.Probing.ProbingView">
 
   <UserControl.Resources>
@@ -252,7 +252,7 @@
             <Style Selector="TabItem">
               <Setter Property="Background" Value="{DynamicResource ThemeControlMidBrush}"/>
               <Setter Property="Foreground" Value="{DynamicResource ThemeForegroundBrush}"/>
-              <Setter Property="MinHeight" Value="36"/>
+              <Setter Property="MinHeight" Value="30"/>
               <Setter Property="Margin" Value="0"/>
               <Setter Property="Template">
                 <ControlTemplate>
@@ -264,7 +264,7 @@
                     CornerRadius="12,12,0,0" 
                     Padding="8,0">
                     <ContentPresenter Content="{TemplateBinding Header}"
-                      FontSize="{TemplateBinding FontSize}"
+                      FontSize="14"
                       VerticalAlignment="Center"/>
                   </Border>
                 </ControlTemplate>
@@ -332,7 +332,7 @@
               SelectedValue="{Binding Grbl.Probe, Mode=OneWay}"
               SelectedValueBinding="{Binding Id}"
               DisplayMemberBinding="{Binding Name}"
-              IsVisible="{Binding Grbl.MultiProbe, Converter={StaticResource IsVisibleConverter}}"
+              IsVisible="{Binding MultiProbe, Converter={StaticResource IsVisibleConverter}}"
               IsEnabled="{Binding Grbl.IsJobRunning, Converter={StaticResource IsNotRunningConverter}}"
               SelectionChanged="OnProbeSelectionChanged"
               Padding="8"

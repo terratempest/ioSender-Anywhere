@@ -7,6 +7,7 @@
         xmlns:cnc="using:CNC.Controls.Avalonia.Views"
         xmlns:probing="using:CNC.Controls.Probing"
         xmlns:config="using:CNC.Controls.Config"
+        xmlns:qa="using:ioSender.QuickAccess"
         xmlns:loc="using:CNC.Localization.Avalonia"
         mc:Ignorable="d" d:DesignWidth="1020" d:DesignHeight="685"
         x:Class="ioSender.MainWindow"
@@ -51,6 +52,15 @@
                   loc:Localize.Key="ioSender.mainwindow.mnu_saveLayout" loc:Localize.Fallback="_Save layout..."/>
         <MenuItem x:Name="MnuDeleteLayout" Header="_Delete layout..." Click="OnDeleteLayoutClick"
                   loc:Localize.Key="ioSender.mainwindow.mnu_deleteLayout" loc:Localize.Fallback="_Delete layout..."/>
+        <MenuItem x:Name="MnuSidebar" Header="_Sidebar"
+                  loc:Localize.Key="ioSender.mainwindow.mnu_sidebar" loc:Localize.Fallback="_Sidebar">
+          <MenuItem x:Name="MnuSidebarLeft" Header="_Left side" ToggleType="CheckBox"
+                    Click="OnSidebarLeftMenuClick"
+                    loc:Localize.Key="ioSender.mainwindow.mnu_sidebarLeft" loc:Localize.Fallback="_Left side"/>
+          <MenuItem x:Name="MnuSidebarRight" Header="_Right side" ToggleType="CheckBox"
+                    Click="OnSidebarRightMenuClick"
+                    loc:Localize.Key="ioSender.mainwindow.mnu_sidebarRight" loc:Localize.Fallback="_Right side"/>
+        </MenuItem>
         <Separator/>
         <MenuItem x:Name="MnuViewCamera" Header="_Camera..." Click="OnCameraClick"
                   loc:Localize.Key="ioSender.mainwindow.mnu_camera"/>
@@ -138,27 +148,49 @@
         </TabControl>
       </Grid>
 
-      <Grid Grid.Row="1">
-        <views:JobView x:Name="JobViewControl"
-                       DataContext="{Binding Grbl}"
-                       HorizontalAlignment="Stretch"
-                       VerticalAlignment="Stretch"/>
-        <ContentControl x:Name="ProbingPageHost"
-                        IsVisible="False"
-                        HorizontalAlignment="Stretch"
-                        VerticalAlignment="Stretch"/>
-        <ContentControl x:Name="OffsetsPageHost"
-                        IsVisible="False"
-                        HorizontalAlignment="Stretch"
-                        VerticalAlignment="Stretch"/>
-        <ContentControl x:Name="GrblConfigPageHost"
-                        IsVisible="False"
-                        HorizontalAlignment="Stretch"
-                        VerticalAlignment="Stretch"/>
-        <ContentControl x:Name="AppConfigPageHost"
-                        IsVisible="False"
-                        HorizontalAlignment="Stretch"
-                        VerticalAlignment="Stretch"/>
+      <Grid Grid.Row="1" ClipToBounds="False">
+        <DockPanel x:Name="ClientAreaDock" LastChildFill="True" ClipToBounds="False">
+          <qa:QuickAccessSidebarHost x:Name="LeftQuickAccess"
+                                     DockPanel.Dock="Left"
+                                     ZIndex="300"
+                                     Width="40"
+                                     IsVisible="False"/>
+          <qa:QuickAccessSidebarHost x:Name="RightQuickAccess"
+                                     DockPanel.Dock="Right"
+                                     ZIndex="300"
+                                     Width="40"
+                                     IsVisible="False"/>
+          <Grid x:Name="ClientAreaGrid" ClipToBounds="False">
+            <Grid HorizontalAlignment="Stretch" VerticalAlignment="Stretch">
+              <views:JobView x:Name="JobViewControl"
+                             DataContext="{Binding Grbl}"
+                             HorizontalAlignment="Stretch"
+                             VerticalAlignment="Stretch"/>
+              <ContentControl x:Name="ProbingPageHost"
+                              IsVisible="False"
+                              HorizontalAlignment="Stretch"
+                              VerticalAlignment="Stretch"/>
+              <ContentControl x:Name="OffsetsPageHost"
+                              IsVisible="False"
+                              HorizontalAlignment="Stretch"
+                              VerticalAlignment="Stretch"/>
+              <ContentControl x:Name="GrblConfigPageHost"
+                              IsVisible="False"
+                              HorizontalAlignment="Stretch"
+                              VerticalAlignment="Stretch"/>
+              <ContentControl x:Name="AppConfigPageHost"
+                              IsVisible="False"
+                              HorizontalAlignment="Stretch"
+                              VerticalAlignment="Stretch"/>
+            </Grid>
+            <Border x:Name="QuickAccessBackdrop"
+                    ZIndex="100"
+                    Background="#66000000"
+                    IsVisible="False"
+                    IsHitTestVisible="False"
+                    PointerPressed="OnQuickAccessBackdropPressed"/>
+          </Grid>
+        </DockPanel>
       </Grid>
     </Grid>
   </DockPanel>

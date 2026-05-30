@@ -2,8 +2,15 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:conv="using:CNC.Controls.Avalonia.Converters"
              xmlns:local="using:CNC.Controls.Probing"
-             x:Class="CNC.Controls.Probing.RotationControl">
+             x:Class="CNC.Controls.Probing.RotationControl"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             mc:Ignorable="d"
+             d:DesignHeight="600" d:DesignWidth="800"
+             >
+
   <UserControl.Resources>
+
     <conv:LogicalNotConverter x:Key="IsNotRunningConverter"/>
     <conv:EnumValueToBooleanConverter x:Key="EnumToEdgeConverter"/>
     <conv:BoolToVisibleConverter x:Key="ToVisibleConverter"/>
@@ -20,23 +27,24 @@
         <Setter Property="Opacity" Value="1"/>
       </Style>
     </ControlTheme>
+
   </UserControl.Resources>
+
   <Grid>
     <StackPanel Margin="5" Spacing="4">
       <StackPanel Orientation="Horizontal" Spacing="8">
-        <Border BorderBrush="{DynamicResource ThemeBorderLowBrush}" BorderThickness="1" Padding="6" CornerRadius="2" Width="280">
+        <GroupBox Header="Workpiece offset" BorderBrush="{DynamicResource ThemeBorderLowBrush}" >
           <StackPanel Spacing="4">
-            <TextBlock Text="Workpiece offset" FontWeight="SemiBold"/>
             <CheckBox Content="Determine X0,Y0 for right angled workpiece"
                       ToolTip.Tip="Adds a probe point on the left edge."
                       IsChecked="{Binding AddAction, Mode=TwoWay}"/>
             <local:CsSelectControl IsEnabled="{Binding AddAction}"/>
           </StackPanel>
-        </Border>
-        <Border BorderBrush="{DynamicResource ThemeBorderLowBrush}" BorderThickness="1" Padding="6" CornerRadius="2"
-                ToolTip.Tip="Click to select rotation center relative to job; if not selected X0,Y0 is used.">
+        </GroupBox>
+
+        <GroupBox Header="Rotation center" BorderBrush="{DynamicResource ThemeBorderLowBrush}"
+                  ToolTip.Tip="Click to select rotation center relative to job; if not selected X0,Y0 is used.">
           <StackPanel Spacing="4">
-            <TextBlock Text="Rotation center" FontWeight="SemiBold"/>
             <StackPanel Orientation="Horizontal" Spacing="8">
               <local:OriginPickerControl Value="{Binding Origin, Mode=TwoWay}"
                                          IsEnabled="{Binding Grbl.IsFileLoaded}"/>
@@ -48,52 +56,60 @@
               </StackPanel>
             </StackPanel>
           </StackPanel>
-        </Border>
+        </GroupBox>
       </StackPanel>
-      <CheckBox Content="Preview" Margin="15,0,0,0" IsChecked="{Binding PreviewEnable, Mode=TwoWay}"/>
-      <StackPanel Orientation="Horizontal" Spacing="30">
-        <Grid x:Name="ActionGrid" ToolTip.Tip="Click edge to select probing action."
-              Width="160" Height="160" Margin="5,10,0,0"
-              RowDefinitions="80,80" ColumnDefinitions="80,80">
-          <RadioButton Theme="{StaticResource RotFlagRadioTheme}" GroupName="rotEdge"
-                       IsChecked="{Binding ProbeEdge, Mode=TwoWay, Converter={StaticResource EnumToEdgeConverter}, ConverterParameter=AD}">
-            <Image Width="76" Height="76" Source="avares://CNC.Controls.Probing.Avalonia/Views/Resources/RotaterAD.png"/>
-          </RadioButton>
-          <RadioButton Grid.Column="1" Theme="{StaticResource RotFlagRadioTheme}" GroupName="rotEdge"
-                       IsChecked="{Binding ProbeEdge, Mode=TwoWay, Converter={StaticResource EnumToEdgeConverter}, ConverterParameter=CD}">
-            <Image Width="76" Height="76" Source="avares://CNC.Controls.Probing.Avalonia/Views/Resources/RotaterCD.png"/>
-          </RadioButton>
-          <RadioButton Grid.Row="1" Theme="{StaticResource RotFlagRadioTheme}" GroupName="rotEdge"
-                       IsChecked="{Binding ProbeEdge, Mode=TwoWay, Converter={StaticResource EnumToEdgeConverter}, ConverterParameter=AB}">
-            <Image Width="76" Height="76" Source="avares://CNC.Controls.Probing.Avalonia/Views/Resources/RotaterAB.png"/>
-          </RadioButton>
-          <RadioButton Grid.Row="1" Grid.Column="1" Theme="{StaticResource RotFlagRadioTheme}" GroupName="rotEdge"
-                       IsChecked="{Binding ProbeEdge, Mode=TwoWay, Converter={StaticResource EnumToEdgeConverter}, ConverterParameter=CB}">
-            <Image Width="76" Height="76" Source="avares://CNC.Controls.Probing.Avalonia/Views/Resources/RotaterCB.png"/>
-          </RadioButton>
+
+      <CheckBox Content="Preview" Margin="4,0" IsChecked="{Binding PreviewEnable, Mode=TwoWay}"/>
+
+      <Grid ColumnDefinitions="Auto,*" Margin="4,0">
+
+        <Grid Grid.Column="0" x:Name="ActionGrid" ToolTip.Tip="Click edge to select probing action."
+              Width="160" Height="160" Margin="0,10" 
+              RowDefinitions="75,75" ColumnDefinitions="75,75">
+          <local:ProbeEdgeButton Edge="AD" GroupName="rotEdge" Theme="{StaticResource RotFlagRadioTheme}"
+                                 SelectedEdge="{Binding ProbeEdge, Mode=TwoWay}"
+                                 ImageWidth="76" ImageHeight="76"
+                                 ImageUri="avares://CNC.Controls.Probing.Avalonia/Views/Resources/RotaterAD.png"/>
+
+          <local:ProbeEdgeButton Grid.Column="1" Edge="CD" GroupName="rotEdge" Theme="{StaticResource RotFlagRadioTheme}"
+                                 SelectedEdge="{Binding ProbeEdge, Mode=TwoWay}"
+                                 ImageWidth="76" ImageHeight="76"
+                                 ImageUri="avares://CNC.Controls.Probing.Avalonia/Views/Resources/RotaterCD.png"/>
+
+          <local:ProbeEdgeButton Grid.Row="1" Edge="AB" GroupName="rotEdge" Theme="{StaticResource RotFlagRadioTheme}"
+                                 SelectedEdge="{Binding ProbeEdge, Mode=TwoWay}"
+                                 ImageWidth="76" ImageHeight="76"
+                                 ImageUri="avares://CNC.Controls.Probing.Avalonia/Views/Resources/RotaterAB.png"/>
+
+          <local:ProbeEdgeButton Grid.Row="1" Grid.Column="1" Edge="CB" GroupName="rotEdge" Theme="{StaticResource RotFlagRadioTheme}"
+                                 SelectedEdge="{Binding ProbeEdge, Mode=TwoWay}"
+                                 ImageWidth="76" ImageHeight="76"
+                                 ImageUri="avares://CNC.Controls.Probing.Avalonia/Views/Resources/RotaterCB.png"/>
         </Grid>
-        <Border BorderBrush="{DynamicResource ThemeBorderLowBrush}" BorderThickness="1" Padding="6" CornerRadius="2"
-                IsVisible="{Binding PreviewEnable, Converter={StaticResource ToVisibleConverter}}" VerticalAlignment="Top">
-          <StackPanel Spacing="4">
-            <TextBlock Text="Preview" FontWeight="SemiBold"/>
-            <TextBox IsReadOnly="True" Text="{Binding PreviewText, Mode=OneWay}" TextWrapping="NoWrap"
-                     Width="245" Height="150" FontSize="10" FontFamily="Verdana"
-                     ScrollViewer.VerticalScrollBarVisibility="Auto"
-                     ScrollViewer.HorizontalScrollBarVisibility="Auto"/>
-          </StackPanel>
-        </Border>
-      </StackPanel>
+
+        <GroupBox Grid.Column="1" Header="Preview" BorderBrush="{DynamicResource ThemeBorderLowBrush}"
+                  IsVisible="{Binding PreviewEnable, Converter={StaticResource ToVisibleConverter}}">
+          <TextBox IsReadOnly="True" Text="{Binding PreviewText, Mode=OneWay}" TextWrapping="NoWrap"
+                   FontSize="10" FontFamily="Verdana"
+                   ScrollViewer.VerticalScrollBarVisibility="Auto"
+                   ScrollViewer.HorizontalScrollBarVisibility="Auto"/>
+        </GroupBox>
+
+      </Grid>
     </StackPanel>
+
     <StackPanel Margin="5,0,0,5" Orientation="Horizontal" HorizontalAlignment="Left" VerticalAlignment="Bottom" Spacing="4">
-      <Button Content="Start" Width="75"
+      <Button Content="Start" Width="75" HorizontalContentAlignment="Center"
               IsEnabled="{Binding Grbl.IsJobRunning, Converter={StaticResource IsNotRunningConverter}}"
               Click="OnStartClick"/>
-      <Button Content="Stop" Width="75"
+      <Button Content="Stop" Width="75" HorizontalContentAlignment="Center"
               IsEnabled="{Binding Grbl.IsJobRunning}"
               Click="OnStopClick"/>
-      <Button Content="Apply" Width="75"
+      <Button Content="Apply" Width="75" HorizontalContentAlignment="Center"
               IsEnabled="{Binding CanApplyTransform}"
               Click="OnApplyClick"/>
     </StackPanel>
+
   </Grid>
+
 </UserControl>

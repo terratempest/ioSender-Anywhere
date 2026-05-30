@@ -6,6 +6,7 @@ public static class WorkspaceEditorCatalog
 {
     static readonly WorkspaceEditorDescriptor[] All =
     [
+        Desc(WorkspaceEditorId.TabGroup, "ioSender.workspace.editor_tabgroup", "Tab Group", 200, 120, grbl: false, fillsWorkspace: true),
         Desc(WorkspaceEditorId.Program, "ioSender.workspace.editor_program", "Program", 200, 120, fillsWorkspace: true),
         Desc(WorkspaceEditorId.Viewer3D, "ioSender.workspace.editor_viewer3d", "3D View", 200, 160, fillsWorkspace: true),
         Desc(WorkspaceEditorId.Console, "ioSender.workspace.editor_console", "Console", 200, 100),
@@ -55,7 +56,17 @@ public static class WorkspaceEditorCatalog
 
     public static IReadOnlyList<WorkspaceEditorDescriptor> AllDescriptors => All;
 
-    /// <summary>Editors assignable in the Home workspace layout picker (excludes shell-level pages).</summary>
+    /// <summary>Editors assignable as content panels (excludes shell-level pages and layout containers).</summary>
+    public static IEnumerable<WorkspaceEditorDescriptor> PanelPickableDescriptors =>
+        All.Where(d => d.Id is not (
+            WorkspaceEditorId.TabGroup
+            or
+            WorkspaceEditorId.Probing
+            or WorkspaceEditorId.Offsets
+            or WorkspaceEditorId.GrblConfig
+            or WorkspaceEditorId.AppConfig));
+
+    /// <summary>Entries assignable in the Home workspace layout picker.</summary>
     public static IEnumerable<WorkspaceEditorDescriptor> LayoutPickableDescriptors =>
         All.Where(d => d.Id is not (
             WorkspaceEditorId.Probing

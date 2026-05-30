@@ -4,7 +4,12 @@
              xmlns:controls="using:CNC.Controls.Avalonia.Controls"
              xmlns:local="using:CNC.Controls.Probing"
              xmlns:views="using:CNC.Controls.Avalonia.Views"
-             x:Class="CNC.Controls.Probing.ToolLengthControl">
+             x:Class="CNC.Controls.Probing.ToolLengthControl"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             mc:Ignorable="d"
+             d:DesignHeight="600" d:DesignWidth="800"
+             >
   
   <UserControl.Resources>
     <conv:LogicalNotConverter x:Key="IsNotRunningConverter"/>
@@ -47,16 +52,14 @@
       />
 
 
-      <Border Margin="5,5,0,0" BorderBrush="{DynamicResource ThemeBorderLowBrush}" BorderThickness="1" Padding="6" CornerRadius="2"
+      <GroupBox Header="Workpiece offset" Margin="5,5,0,0" BorderBrush="{DynamicResource ThemeBorderLowBrush}"
               IsVisible="{Binding ProbeFixture, Converter={StaticResource IsNotVisibleConverter}}">
         <StackPanel Spacing="4">
-          <TextBlock Text="Workpiece offset" FontWeight="SemiBold"/>
           <CheckBox Content="Add offset" IsChecked="{Binding AddAction, Mode=TwoWay}" Margin="5,4,0,0"/>
           <StackPanel Orientation="Horizontal" Spacing="6">
             <local:CsSelectControl IsEnabled="{Binding AddAction}"/>
-            <Border BorderBrush="{DynamicResource ThemeBorderLowBrush}" BorderThickness="1" Padding="6" CornerRadius="2">
+            <GroupBox Header="Workpiece" BorderBrush="{DynamicResource ThemeBorderLowBrush}">
               <StackPanel Spacing="4">
-                <TextBlock Text="Workpiece" FontWeight="SemiBold"/>
                 <views:NumericField 
                   Label="Height:"
                   Value="{Binding WorkpieceHeight, Mode=TwoWay}"
@@ -67,10 +70,10 @@
                   HorizontalContentAlignment="Left"
                 />
               </StackPanel>
-            </Border>
+            </GroupBox>
           </StackPanel>
         </StackPanel>
-      </Border>
+      </GroupBox>
 
       <StackPanel Margin="10,5,0,0" Spacing="4"
         IsVisible="{Binding ProbeFixture, 
@@ -84,10 +87,10 @@
 
     <StackPanel Margin="5,0,0,5" Orientation="Horizontal"
       HorizontalAlignment="Left" VerticalAlignment="Bottom" Spacing="4">
-      <Button Content="Start" Width="75"
+      <Button Content="Start" Width="75" HorizontalContentAlignment="Center"
         IsEnabled="{Binding Grbl.IsJobRunning, Converter={StaticResource IsNotRunningConverter}}"
         Click="OnStartClick"/>
-      <Button Content="Stop" Width="75"
+      <Button Content="Stop" Width="75" HorizontalContentAlignment="Center"
         IsEnabled="{Binding Grbl.IsJobRunning}"
         Click="OnStopClick"/>
     </StackPanel>

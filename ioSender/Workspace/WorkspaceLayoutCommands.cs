@@ -4,31 +4,28 @@ namespace ioSender.Workspace;
 
 public static class WorkspaceLayoutCommands
 {
-    public static void SwapEditors(WorkspaceLeaf leafA, WorkspaceLeaf leafB) =>
-        (leafA.Editor, leafB.Editor) = (leafB.Editor, leafA.Editor);
-
-    public static bool TrySplitLeaf(
+    public static bool TryReplaceRegion(
         WorkspaceNode root,
-        WorkspaceLeaf target,
-        WorkspaceSplitOrientation orientation,
+        WorkspaceNode target,
+        WorkspaceNode replacement,
         out WorkspaceNode newRoot)
     {
-        if (root is WorkspaceLeaf leaf && ReferenceEquals(leaf, target))
+        if (ReferenceEquals(root, target))
         {
-            newRoot = CreateSplit(leaf, orientation);
+            newRoot = replacement;
             return true;
         }
 
         if (root is WorkspaceSplit split)
         {
-            if (TrySplitInBranch(split.First, target, orientation, out var newFirst))
+            if (TryReplaceRegion(split.First, target, replacement, out var newFirst))
             {
                 split.First = newFirst;
                 newRoot = root;
                 return true;
             }
 
-            if (TrySplitInBranch(split.Second, target, orientation, out var newSecond))
+            if (TryReplaceRegion(split.Second, target, replacement, out var newSecond))
             {
                 split.Second = newSecond;
                 newRoot = root;
@@ -40,49 +37,49 @@ public static class WorkspaceLayoutCommands
         return false;
     }
 
-    static bool TrySplitInBranch(
-        WorkspaceNode branch,
-        WorkspaceLeaf target,
+    public static bool TrySplitRegion(
+        WorkspaceNode root,
+        WorkspaceNode target,
         WorkspaceSplitOrientation orientation,
-        out WorkspaceNode newBranch)
+        out WorkspaceNode newRoot)
     {
-        if (branch is WorkspaceLeaf leaf && ReferenceEquals(leaf, target))
+        if (ReferenceEquals(root, target))
         {
-            newBranch = CreateSplit(leaf, orientation);
+            newRoot = CreateSplit(root, orientation);
             return true;
         }
 
-        if (branch is WorkspaceSplit childSplit)
+        if (root is WorkspaceSplit split)
         {
-            if (TrySplitInBranch(childSplit.First, target, orientation, out var nf))
+            if (TrySplitRegion(split.First, target, orientation, out var newFirst))
             {
-                childSplit.First = nf;
-                newBranch = childSplit;
+                split.First = newFirst;
+                newRoot = root;
                 return true;
             }
 
-            if (TrySplitInBranch(childSplit.Second, target, orientation, out var ns))
+            if (TrySplitRegion(split.Second, target, orientation, out var newSecond))
             {
-                childSplit.Second = ns;
-                newBranch = childSplit;
+                split.Second = newSecond;
+                newRoot = root;
                 return true;
             }
         }
 
-        newBranch = branch;
+        newRoot = root;
         return false;
     }
 
-    static WorkspaceSplit CreateSplit(WorkspaceLeaf existing, WorkspaceSplitOrientation orientation) =>
+    static WorkspaceSplit CreateSplit(WorkspaceNode existing, WorkspaceSplitOrientation orientation) =>
         new()
         {
             Orientation = orientation,
             Ratio = 0.5,
             First = existing,
-            Second = new WorkspaceLeaf { Editor = existing.Editor },
+            Second = existing.Clone(),
         };
 
-    public static bool TryJoinLeaf(WorkspaceNode root, WorkspaceLeaf target, out WorkspaceNode newRoot)
+    public static bool TryJoinRegion(WorkspaceNode root, WorkspaceNode target, out WorkspaceNode newRoot)
     {
         if (TryJoinRecursive(root, target, out var joined))
         {
@@ -94,17 +91,17 @@ public static class WorkspaceLayoutCommands
         return false;
     }
 
-    static bool TryJoinRecursive(WorkspaceNode node, WorkspaceLeaf target, out WorkspaceNode result)
+    static bool TryJoinRecursive(WorkspaceNode node, WorkspaceNode target, out WorkspaceNode result)
     {
         if (node is WorkspaceSplit split)
         {
-            if (split.First is WorkspaceLeaf first && ReferenceEquals(first, target))
+            if (ReferenceEquals(split.First, target))
             {
                 result = split.Second.Clone();
                 return true;
             }
 
-            if (split.Second is WorkspaceLeaf second && ReferenceEquals(second, target))
+            if (ReferenceEquals(split.Second, target))
             {
                 result = split.First.Clone();
                 return true;
@@ -127,5 +124,74 @@ public static class WorkspaceLayoutCommands
 
         result = node;
         return false;
+    }
+
+    public static bool TrySwapRegions(WorkspaceNode root, WorkspaceNode first, WorkspaceNode second, out WorkspaceNode newRoot)
+    {
+        if (ReferenceEquals(first, second))
+        {
+            newRoot = root;
+            return false;
+        }
+
+        var firstPath = FindPath(root, first);
+        var secondPath = FindPath(root, second);
+        if (firstPath is null || secondPath is null)
+        {
+            newRoot = root;
+            return false;
+        }
+
+        newRoot = root;
+        var firstClone = first.Clone();
+        var secondClone = second.Clone();
+        SetAtPath(ref newRoot, firstPath, secondClone);
+        SetAtPath(ref newRoot, secondPath, firstClone);
+        return true;
+    }
+
+    static List<bool>? FindPath(WorkspaceNode current, WorkspaceNode target)
+    {
+        if (ReferenceEquals(current, target))
+            return new List<bool>();
+
+        if (current is not WorkspaceSplit split)
+            return null;
+
+        if (FindPath(split.First, target) is { } left)
+        {
+            left.Insert(0, false);
+            return left;
+        }
+
+        if (FindPath(split.Second, target) is { } right)
+        {
+            right.Insert(0, true);
+            return right;
+        }
+
+        return null;
+    }
+
+    static void SetAtPath(ref WorkspaceNode root, IReadOnlyList<bool> path, WorkspaceNode replacement)
+    {
+        if (path.Count == 0)
+        {
+            root = replacement;
+            return;
+        }
+
+        var node = root;
+        for (var i = 0; i < path.Count - 1; i++)
+        {
+            var split = node.AsSplit();
+            node = path[i] ? split.Second : split.First;
+        }
+
+        var parent = node.AsSplit();
+        if (path[^1])
+            parent.Second = replacement;
+        else
+            parent.First = replacement;
     }
 }

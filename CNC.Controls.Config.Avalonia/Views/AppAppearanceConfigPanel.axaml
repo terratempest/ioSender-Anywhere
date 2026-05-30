@@ -1,52 +1,26 @@
 <UserControl xmlns="https://github.com/avaloniaui"
-
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-
              x:Class="CNC.Controls.Config.AppAppearanceConfigPanel"
-
              Width="310">
-
-  <Border BorderBrush="{DynamicResource ThemeBorderLowBrush}"
-
-          BorderThickness="1" Padding="8" CornerRadius="2">
-
-    <StackPanel Spacing="4">
-
-      <TextBlock Text="Appearance" FontWeight="SemiBold"/>
-
-      <Grid ColumnDefinitions="90,*">
-
-        <TextBlock Grid.Column="0" Text="Theme:" HorizontalAlignment="Right" VerticalAlignment="Center"/>
-
+  <GroupBox Header="Appearance" BorderBrush="{DynamicResource ThemeBorderLowBrush}">
+    <WrapPanel Orientation="Vertical" ItemWidth="290">
+      <Grid ColumnDefinitions="90,*" Margin="0,0,0,4">
+        <TextBlock Grid.Column="0" Text="Theme:" FontSize="12" HorizontalAlignment="Right" VerticalAlignment="Center"/>
         <ComboBox x:Name="ThemeCombo" Grid.Column="1" Margin="4,0,0,0" Width="120"
-
-                  HorizontalAlignment="Left"
-
+                  FontSize="12" HorizontalAlignment="Left"
                   SelectionChanged="OnThemeSelectionChanged"/>
-
       </Grid>
 
-      <Grid ColumnDefinitions="90,*">
-
-        <TextBlock Grid.Column="0" Text="Locale:" HorizontalAlignment="Right" VerticalAlignment="Center"/>
-
-        <TextBox Grid.Column="1" Margin="4,0,0,0" Width="120" HorizontalAlignment="Left"
-
+      <Grid ColumnDefinitions="90,*" Margin="0,0,0,4">
+        <TextBlock Grid.Column="0" Text="Locale:" FontSize="12" HorizontalAlignment="Right" VerticalAlignment="Center"/>
+        <TextBox Grid.Column="1" Margin="4,0,0,0" Width="120" FontSize="12" HorizontalAlignment="Left"
                  Text="{Binding Locale, Mode=TwoWay}"
-
-                 Watermark="empty = default"
-
+                 PlaceholderText="empty = default"
                  ToolTip.Tip="UI culture (e.g. de-DE). Restart may be required."/>
-
       </Grid>
 
       <TextBlock Text="Theme applies immediately."
-
                  FontSize="11" Opacity="0.75" TextWrapping="Wrap" Margin="0,4,0,0"/>
-
-    </StackPanel>
-
-  </Border>
-
+    </WrapPanel>
+  </GroupBox>
 </UserControl>
-

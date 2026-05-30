@@ -2,28 +2,26 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              x:Class="CNC.Controls.Config.AppGCodeStripConfigPanel"
              Width="310">
-  <Border BorderBrush="{DynamicResource ThemeBorderLowBrush}"
-          BorderThickness="1" Padding="8" CornerRadius="2">
-    <StackPanel Spacing="6">
-      <TextBlock Text="G-code command stripping" FontWeight="SemiBold"/>
-      <Grid ColumnDefinitions="60,*" RowDefinitions="Auto,Auto,Auto,Auto">
-        <TextBlock Grid.Row="0" Grid.Column="0" Text="M6:" HorizontalAlignment="Right" VerticalAlignment="Center"/>
-        <ComboBox Grid.Row="0" Grid.Column="1" Margin="4,0,0,0"
+  <GroupBox Header="Program strip" BorderBrush="{DynamicResource ThemeBorderLowBrush}">
+    <WrapPanel Orientation="Vertical" ItemWidth="290">
+      <Grid ColumnDefinitions="70,*" RowDefinitions="Auto,Auto,Auto,Auto">
+        <TextBlock Grid.Row="0" Grid.Column="0" Text="M6:" FontSize="12" HorizontalAlignment="Right" VerticalAlignment="Center"/>
+        <ComboBox Grid.Row="0" Grid.Column="1" Margin="4,0,0,0" FontSize="12"
                   ItemsSource="{Binding CommandIgnoreStates}"
                   SelectedItem="{Binding IgnoreM6, Mode=TwoWay}"/>
-        <TextBlock Grid.Row="1" Grid.Column="0" Text="M7:" HorizontalAlignment="Right" VerticalAlignment="Center"/>
-        <ComboBox Grid.Row="1" Grid.Column="1" Margin="4,4,0,0"
+        <TextBlock Grid.Row="1" Grid.Column="0" Text="M7:" FontSize="12" HorizontalAlignment="Right" VerticalAlignment="Center"/>
+        <ComboBox Grid.Row="1" Grid.Column="1" Margin="4,4,0,0" FontSize="12"
                   ItemsSource="{Binding CommandIgnoreStates}"
                   SelectedItem="{Binding IgnoreM7, Mode=TwoWay}"/>
-        <TextBlock Grid.Row="2" Grid.Column="0" Text="M8:" HorizontalAlignment="Right" VerticalAlignment="Center"/>
-        <ComboBox Grid.Row="2" Grid.Column="1" Margin="4,4,0,0"
+        <TextBlock Grid.Row="2" Grid.Column="0" Text="M8:" FontSize="12" HorizontalAlignment="Right" VerticalAlignment="Center"/>
+        <ComboBox Grid.Row="2" Grid.Column="1" Margin="4,4,0,0" FontSize="12"
                   ItemsSource="{Binding CommandIgnoreStates}"
                   SelectedItem="{Binding IgnoreM8, Mode=TwoWay}"/>
-        <TextBlock Grid.Row="3" Grid.Column="0" Text="G61/G64:" HorizontalAlignment="Right" VerticalAlignment="Center"/>
-        <ComboBox Grid.Row="3" Grid.Column="1" Margin="4,4,0,0"
+        <TextBlock Grid.Row="3" Grid.Column="0" Text="G61/G64:" FontSize="12" HorizontalAlignment="Right" VerticalAlignment="Center"/>
+        <ComboBox Grid.Row="3" Grid.Column="1" Margin="4,4,0,0" FontSize="12"
                   ItemsSource="{Binding CommandIgnoreStates}"
                   SelectedItem="{Binding IgnoreG61G64, Mode=TwoWay}"/>
       </Grid>
-    </StackPanel>
-  </Border>
+    </WrapPanel>
+  </GroupBox>
 </UserControl>

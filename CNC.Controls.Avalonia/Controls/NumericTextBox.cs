@@ -44,6 +44,15 @@ public class NumericTextBox : TextBox
         set => SetValue(FormatProperty, value);
     }
 
+    public static readonly StyledProperty<string?> PreviewTextProperty =
+        AvaloniaProperty.Register<NumericTextBox, string?>(nameof(PreviewText));
+
+    public string? PreviewText
+    {
+        get => GetValue(PreviewTextProperty);
+        set => SetValue(PreviewTextProperty, value);
+    }
+
     static NumericTextBox()
     {
         ValueProperty.Changed.AddClassHandler<NumericTextBox>((b, _) =>
@@ -57,6 +66,11 @@ public class NumericTextBox : TextBox
             NumericProperties.OnFormatChanged(b, b._np, (string)e.NewValue!);
             if (!b._isEditing)
                 b.SyncTextFromValue();
+        });
+
+        PreviewTextProperty.Changed.AddClassHandler<NumericTextBox>((b, e) =>
+        {
+            b.SetCurrentValue(PlaceholderTextProperty, e.NewValue as string);
         });
     }
 
@@ -75,7 +89,7 @@ public class NumericTextBox : TextBox
         }
     }
 
-    protected override void OnGotFocus(GotFocusEventArgs e)
+    protected override void OnGotFocus(FocusChangedEventArgs e)
     {
         base.OnGotFocus(e);
         if (!IsReadOnly)
@@ -104,7 +118,7 @@ public class NumericTextBox : TextBox
         base.OnTextInput(e);
     }
 
-    protected override void OnLostFocus(RoutedEventArgs e)
+    protected override void OnLostFocus(FocusChangedEventArgs e)
     {
         if (!IsReadOnly && _isEditing)
             CommitText();

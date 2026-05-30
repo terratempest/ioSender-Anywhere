@@ -8,10 +8,9 @@
     <conv:BoolToVisibleConverter x:Key="IsVisibleConverter"/>
   </UserControl.Resources>
 
-  <Border BorderBrush="{DynamicResource ThemeBorderLowBrush}" BorderThickness="1" Padding="6" CornerRadius="2">
+  <GroupBox Header="Action"  BorderBrush="{DynamicResource ThemeBorderLowBrush}" BorderThickness="1" Padding="6" CornerRadius="2">
     <StackPanel Spacing="4">
 
-      <TextBlock Text="Action" FontWeight="SemiBold"/>
 
       <Grid ColumnDefinitions="*,Auto">
         <RadioButton Content="Set coordinate system:"
@@ -46,5 +45,5 @@
       />
       
     </StackPanel>
-  </Border>
+  </GroupBox>
 </UserControl>

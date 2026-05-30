@@ -2,16 +2,14 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              x:Class="CNC.Controls.Probing.ProbingSettingsControl"
              Width="310">
-  <Border BorderBrush="{DynamicResource ThemeBorderLowBrush}"
-          BorderThickness="1" Padding="8" CornerRadius="2" Width="310">
-    <StackPanel Spacing="6">
-      <TextBlock Text="Probing" FontWeight="SemiBold"/>
-      <CheckBox Content="Manually validate probe is connected"
+  <GroupBox Header="Probing" BorderBrush="{DynamicResource ThemeBorderLowBrush}">
+    <WrapPanel Orientation="Vertical" ItemWidth="290">
+      <CheckBox Content="Manually validate probe is connected" FontSize="12"
                 IsChecked="{Binding Probing.ValidateProbeConnected, Mode=TwoWay}"
                 ToolTip.Tip="A dialog will be shown until the probe is asserted or cancelled."/>
-      <CheckBox Content="Check probe status before start (G59.3)"
+      <CheckBox Content="Check probe status before start (G59.3)" FontSize="12"
                 IsChecked="{Binding Probing.CheckProbeStatus, Mode=TwoWay}"
                 ToolTip.Tip="Controller alarm if probe is asserted when disabled."/>
-    </StackPanel>
-  </Border>
+    </WrapPanel>
+  </GroupBox>
 </UserControl>

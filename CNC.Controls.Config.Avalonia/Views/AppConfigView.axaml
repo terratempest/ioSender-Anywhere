@@ -11,54 +11,78 @@
 
   <DockPanel>
     <StackPanel DockPanel.Dock="Bottom" Orientation="Horizontal" Spacing="5" Margin="5">
-      <Button x:Name="btnSave" Content="Save settings" MinWidth="90" Height="22" Click="OnSaveClick"
+      <Button x:Name="btnSave" Content="Save settings" MinWidth="110" FontSize="12"
+              HorizontalContentAlignment="Center" Click="OnSaveClick"
               loc:Localize.Key="ioSender.appconfig.btn_save" loc:Localize.Fallback="Save settings"/>
     </StackPanel>
 
-    <TabControl DockPanel.Dock="Top" Margin="5">
-      <TabItem Header="Probing" loc:Localize.Key="ioSender.mainwindow.tab_probing" loc:Localize.Fallback="Probing">
-        <ScrollViewer>
-          <probing:ProbingSettingsControl DataContext="{Binding}" Margin="5"/>
-        </ScrollViewer>
-      </TabItem>
-      <TabItem Header="Jog" loc:Localize.Key="ioSender.appconfig.tab_jog" loc:Localize.Fallback="Jog">
-        <ScrollViewer>
-          <StackPanel Margin="5" Spacing="5">
-            <local:JogUiConfigControl x:Name="jogUiConfig" DataContext="{Binding}"/>
-            <local:JogConfigControl x:Name="jogConfig" DataContext="{Binding}"/>
-          </StackPanel>
-        </ScrollViewer>
-      </TabItem>
-      <TabItem Header="Appearance" loc:Localize.Key="ioSender.appconfig.tab_appearance" loc:Localize.Fallback="Appearance">
-        <ScrollViewer>
-          <local:AppAppearanceConfigPanel DataContext="{Binding}" Margin="5"/>
-        </ScrollViewer>
-      </TabItem>
-      <TabItem Header="Machine" loc:Localize.Key="ioSender.appconfig.tab_machine" loc:Localize.Fallback="Machine">
-        <ScrollViewer>
-          <local:AppMachineConfigPanel DataContext="{Binding}" Margin="5"/>
-        </ScrollViewer>
-      </TabItem>
-      <TabItem Header="Camera" loc:Localize.Key="ioSender.mainwindow.mnu_camera" loc:Localize.Fallback="Camera">
-        <ScrollViewer>
-          <local:AppCameraConfigPanel DataContext="{Binding}" Margin="5"/>
-        </ScrollViewer>
-      </TabItem>
-      <TabItem Header="G-code viewer" loc:Localize.Key="ioSender.appconfig.tab_viewer" loc:Localize.Fallback="G-code viewer">
-        <ScrollViewer>
-          <local:AppGCodeViewerConfigPanel DataContext="{Binding}" Margin="5"/>
-        </ScrollViewer>
-      </TabItem>
-      <TabItem Header="Program strip" loc:Localize.Key="ioSender.appconfig.tab_strip" loc:Localize.Fallback="Program strip">
-        <ScrollViewer>
-          <local:AppGCodeStripConfigPanel DataContext="{Binding}" Margin="5"/>
-        </ScrollViewer>
-      </TabItem>
-      <TabItem Header="Keyboard" loc:Localize.Key="ioSender.appconfig.tab_keyboard" loc:Localize.Fallback="Keyboard">
-        <ScrollViewer>
-          <local:AppKeyboardConfigPanel DataContext="{Binding}" Margin="5"/>
-        </ScrollViewer>
-      </TabItem>
-    </TabControl>
+    <Grid Margin="5" ColumnDefinitions="190,*">
+      <Border Grid.Column="0" Background="{DynamicResource ThemeControlLowBrush}"
+              BorderBrush="{DynamicResource ThemeBorderLowBrush}" BorderThickness="1"
+              Padding="4" Margin="0,0,8,0">
+        <ListBox x:Name="SettingsList" Background="Transparent" BorderThickness="0"
+                 FontSize="12" SelectionChanged="OnSettingsSelectionChanged">
+          <ListBoxItem Content="Probing"
+                       loc:Localize.Key="ioSender.mainwindow.tab_probing"
+                       loc:Localize.Fallback="Probing"/>
+          <ListBoxItem Content="Jog"
+                       loc:Localize.Key="ioSender.appconfig.tab_jog"
+                       loc:Localize.Fallback="Jog"/>
+          <ListBoxItem Content="Appearance"
+                       loc:Localize.Key="ioSender.appconfig.tab_appearance"
+                       loc:Localize.Fallback="Appearance"/>
+          <ListBoxItem Content="Machine"
+                       loc:Localize.Key="ioSender.appconfig.tab_machine"
+                       loc:Localize.Fallback="Machine"/>
+          <ListBoxItem Content="Camera"
+                       loc:Localize.Key="ioSender.mainwindow.mnu_camera"
+                       loc:Localize.Fallback="Camera"/>
+          <ListBoxItem Content="G-code viewer"
+                       loc:Localize.Key="ioSender.appconfig.tab_viewer"
+                       loc:Localize.Fallback="G-code viewer"/>
+          <ListBoxItem Content="Program strip"
+                       loc:Localize.Key="ioSender.appconfig.tab_strip"
+                       loc:Localize.Fallback="Program strip"/>
+          <ListBoxItem Content="Keyboard"
+                       loc:Localize.Key="ioSender.appconfig.tab_keyboard"
+                       loc:Localize.Fallback="Keyboard"/>
+        </ListBox>
+      </Border>
+
+      <Grid Grid.Column="1">
+        <WrapPanel x:Name="ProbingPage" Orientation="Vertical" ItemWidth="320">
+          <probing:ProbingSettingsControl x:Name="probingConfig" DataContext="{Binding}" Margin="0,0,8,8"/>
+        </WrapPanel>
+
+        <WrapPanel x:Name="JogPage" Orientation="Vertical" ItemWidth="320" IsVisible="False">
+          <local:JogUiConfigControl x:Name="jogUiConfig" DataContext="{Binding}" Margin="0,0,8,8"/>
+          <local:JogConfigControl x:Name="jogConfig" DataContext="{Binding}" Margin="0,0,8,8"/>
+        </WrapPanel>
+
+        <WrapPanel x:Name="AppearancePage" Orientation="Vertical" ItemWidth="320" IsVisible="False">
+          <local:AppAppearanceConfigPanel x:Name="appearanceConfig" DataContext="{Binding}" Margin="0,0,8,8"/>
+        </WrapPanel>
+
+        <WrapPanel x:Name="MachinePage" Orientation="Vertical" ItemWidth="320" IsVisible="False">
+          <local:AppMachineConfigPanel x:Name="machineConfig" DataContext="{Binding}" Margin="0,0,8,8"/>
+        </WrapPanel>
+
+        <WrapPanel x:Name="CameraPage" Orientation="Vertical" ItemWidth="320" IsVisible="False">
+          <local:AppCameraConfigPanel x:Name="cameraConfig" DataContext="{Binding}" Margin="0,0,8,8"/>
+        </WrapPanel>
+
+        <WrapPanel x:Name="ViewerPage" Orientation="Vertical" ItemWidth="320" IsVisible="False">
+          <local:AppGCodeViewerConfigPanel x:Name="viewerConfig" DataContext="{Binding}" Margin="0,0,8,8"/>
+        </WrapPanel>
+
+        <WrapPanel x:Name="StripPage" Orientation="Vertical" ItemWidth="320" IsVisible="False">
+          <local:AppGCodeStripConfigPanel x:Name="stripConfig" DataContext="{Binding}" Margin="0,0,8,8"/>
+        </WrapPanel>
+
+        <WrapPanel x:Name="KeyboardPage" Orientation="Vertical" ItemWidth="320" IsVisible="False">
+          <local:AppKeyboardConfigPanel x:Name="keyboardConfig" DataContext="{Binding}" Margin="0,0,8,8"/>
+        </WrapPanel>
+      </Grid>
+    </Grid>
   </DockPanel>
 </UserControl>

@@ -13,16 +13,33 @@ public static class WorkspaceLayoutService
         if (config.WorkspaceRoot is null || !WorkspaceLayoutDefaults.IsValid(config.WorkspaceRoot))
             config.WorkspaceRoot = ResolvePreset(config).Clone();
 
-        EnsureLeafIds(config.WorkspaceRoot);
+        EnsureRegionIds(config.WorkspaceRoot);
         return config.WorkspaceRoot;
     }
 
-    static void EnsureLeafIds(WorkspaceNode root)
+    static void EnsureRegionIds(WorkspaceNode root)
     {
-        foreach (var leaf in root.EnumerateLeaves())
+        switch (root)
         {
-            if (leaf.Id == Guid.Empty)
-                leaf.Id = Guid.NewGuid();
+            case WorkspaceLeaf leaf:
+                if (leaf.Id == Guid.Empty)
+                    leaf.Id = Guid.NewGuid();
+                break;
+            case WorkspaceSplit split:
+                EnsureRegionIds(split.First);
+                EnsureRegionIds(split.Second);
+                break;
+            case WorkspaceTabGroup tabGroup:
+                if (tabGroup.Id == Guid.Empty)
+                    tabGroup.Id = Guid.NewGuid();
+                foreach (var tab in tabGroup.Tabs)
+                {
+                    if (tab.Id == Guid.Empty)
+                        tab.Id = Guid.NewGuid();
+                }
+                if (!tabGroup.Tabs.Any(t => t.Id == tabGroup.ActiveTabId))
+                    tabGroup.ActiveTabId = tabGroup.Tabs.FirstOrDefault()?.Id ?? Guid.Empty;
+                break;
         }
     }
 

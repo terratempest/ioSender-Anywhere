@@ -1,4 +1,4 @@
-﻿ioSender.g.en-US.resources:mainwindow.baml,lbl_jogStep:System.Windows.FrameworkElement.ToolTip,ToolTip,True,True,,Distance for keyboard step jog (with &lt;CTRL&gt; modifier).
+ioSender.g.en-US.resources:mainwindow.baml,lbl_jogStep:System.Windows.FrameworkElement.ToolTip,ToolTip,True,True,,Distance for keyboard step jog (with &lt;CTRL&gt; modifier).
 ioSender.g.en-US.resources:mainwindow.baml,mnu_about:System.Windows.Controls.HeaderedItemsControl.Header,Menu,True,True,,_About
 ioSender.g.en-US.resources:mainwindow.baml,mnu_briefTour:System.Windows.Controls.HeaderedItemsControl.Header,Menu,True,True,,A _brief tour
 ioSender.g.en-US.resources:mainwindow.baml,mnu_camera:System.Windows.Controls.HeaderedItemsControl.Header,Menu,True,True,,_Camera
@@ -52,6 +52,11 @@ ioSender.g.en-US.resources:mainwindow.baml,tab_tools:System.Windows.Controls.Hea
 ioSender.g.en-US.resources:mainwindow.baml,tab_turning:System.Windows.Controls.HeaderedContentControl.Header,Label,True,True,,Turning
 ioSender.g.en-US.resources:mainwindow.baml,mnu_connect:System.Windows.Controls.HeaderedItemsControl.Header,Menu,True,True,,_Connect...
 ioSender.g.en-US.resources:mainwindow.baml,mnu_view:System.Windows.Controls.HeaderedItemsControl.Header,Menu,True,True,,_View
+ioSender.g.en-US.resources:mainwindow.baml,mnu_sidebar:System.Windows.Controls.HeaderedItemsControl.Header,Menu,True,True,,_Sidebar
+ioSender.g.en-US.resources:mainwindow.baml,mnu_sidebarLeft:System.Windows.Controls.HeaderedItemsControl.Header,Menu,True,True,,_Left
+ioSender.g.en-US.resources:mainwindow.baml,mnu_sidebarRight:System.Windows.Controls.HeaderedItemsControl.Header,Menu,True,True,,_Right
+ioSender.g.en-US.resources:mainwindow.baml,quickaccess_changePanel:System.String.$Content,None,True,True,,Change panel
+ioSender.g.en-US.resources:mainwindow.baml,quickaccess_removePanel:System.String.$Content,None,True,True,,Remove from sidebar
 ioSender.g.en-US.resources:mainwindow.baml,mnu_toggleLayout:System.Windows.Controls.HeaderedItemsControl.Header,Menu,True,True,,Toggle _large layout
 ioSender.g.en-US.resources:mainwindow.baml,mnu_refreshPorts:System.Windows.Controls.HeaderedItemsControl.Header,Menu,True,True,,_Refresh serial ports
 ioSender.g.en-US.resources:mainwindow.baml,btn_connect:System.Windows.Controls.ContentControl.Content,Button,True,True,,Connect

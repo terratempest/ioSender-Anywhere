@@ -82,6 +82,8 @@ public sealed class AppConfigService
             var migrated = MigrateLegacyTheme(Base);
             if (MigrateWorkspaceLayout(Base))
                 migrated = true;
+            if (MigrateQuickAccessSidebar(Base))
+                migrated = true;
             if (migrated)
                 Save();
             return true;
@@ -113,5 +115,21 @@ public sealed class AppConfigService
 
         config.WorkspacePreset = config.LayoutMode == UiLayoutMode.Expanded ? "Expanded" : "Compact";
         return false;
+    }
+
+    static bool MigrateQuickAccessSidebar(BaseConfig config)
+    {
+        if (config.QuickAccessSidebar is null)
+        {
+            config.QuickAccessSidebar = new QuickAccessSidebarConfig();
+            return true;
+        }
+
+        var before = (config.QuickAccessSidebar.ShowLeft, config.QuickAccessSidebar.ShowRight,
+            config.QuickAccessSidebar.LegacySidesMigrated);
+        config.QuickAccessSidebar.MigrateLegacyDockOnce();
+        var after = (config.QuickAccessSidebar.ShowLeft, config.QuickAccessSidebar.ShowRight,
+            config.QuickAccessSidebar.LegacySidesMigrated);
+        return before != after;
     }
 }

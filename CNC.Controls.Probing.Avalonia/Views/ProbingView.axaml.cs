@@ -368,9 +368,9 @@ public partial class ProbingView : UserControl, IKeyHandlerContext
         return grbl.Keyboard.ProcessKeypress(info, allowJog, this);
     }
 
-    void OnJogGotFocus(object? sender, GotFocusEventArgs e) => SetJogFocus(true);
+    void OnJogGotFocus(object? sender, FocusChangedEventArgs e) => SetJogFocus(true);
 
-    void OnJogLostFocus(object? sender, RoutedEventArgs e) => SetJogFocus(false);
+    void OnJogLostFocus(object? sender, FocusChangedEventArgs e) => SetJogFocus(false);
 
     void SetJogFocus(bool focused)
     {

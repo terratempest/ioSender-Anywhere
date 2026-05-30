@@ -40,6 +40,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 using System;
 using System.Linq;
 using System.Collections.ObjectModel;
+using System.Collections.Specialized;
 using System.Threading;
 using CNC.GCode;
 
@@ -52,7 +53,7 @@ namespace CNC.Core
         private string _tool, _probe, _message, _WPos, _MPos, _wco, _wcs, _a, _fs, _ov, _pn, _sc, _sd, _fans, _d, _gc, _h, _thcv, _thcs, _spindle;
         private string _mdiCommand, _mdiText, _fileName, _fsCwd;
         private string[] _rtState = new string[3];
-        private bool has_wco = false, _hasFans = false, _multiProbe = false;
+        private bool has_wco = false, _hasFans = false;
         private SDState _sdMounted = SDState.Unmounted;
         private bool _flood, _mist, _fan0, _toolChange, _reset, _isMPos, _isJobRunning, _isProbeSuccess, _pgmEnd, _isParserStateLive, _isTloRefSet;
         private bool _isCameraVisible = false, _responseLogVerbose = false, _isProbing = false, _autoReporting = false;
@@ -111,6 +112,13 @@ namespace CNC.Core
             ProbePosition.PropertyChanged += ProbePosition_PropertyChanged;
             ToolOffset.PropertyChanged += ToolOffset_PropertyChanged;
             GrblSpindles.Spindles.CollectionChanged += Spindles_CollectionChanged;
+            GrblInfo.Probes.CollectionChanged += Probes_CollectionChanged;
+        }
+
+        private void Probes_CollectionChanged(object? sender, NotifyCollectionChangedEventArgs e)
+        {
+            OnPropertyChanged(nameof(Probes));
+            OnPropertyChanged(nameof(MultiProbe));
         }
 
         private void Spindles_CollectionChanged(object sender, System.Collections.Specialized.NotifyCollectionChangedEventArgs e)
@@ -128,6 +136,7 @@ namespace CNC.Core
 
         ~GrblViewModel()
         {
+            GrblInfo.Probes.CollectionChanged -= Probes_CollectionChanged;
             // Thread.Abort() is not supported in .NET 5+; the poll thread exits on its own
             // since Poller.Run() returns immediately after creating the timer.
         }
@@ -239,7 +248,7 @@ namespace CNC.Core
         {
             has_wco = false;
             _MPos = _WPos = _wco = _h = string.Empty;
-            MachinePosition.Zero(); // clearing this stops updates of machine position flyout when > 3 axes, seemingly due to internal timing/sequencing issue.
+            MachinePosition.Zero(); // avoids stale machine-position readouts when clearing state with >3 axes.
             WorkPosition.Clear();
             WorkPositionOffset.Clear();
             Position.Clear();
@@ -408,7 +417,11 @@ namespace CNC.Core
         public ObservableCollection<Tool> Tools { get { return GrblWorkParameters.Tools; } }
         public ObservableCollection<Axis> Axes { get { return GrblInfo.Axes; } }
         public ObservableCollection<Probe> Probes { get { return GrblInfo.Probes; } }
-        public bool MultiProbe { get { return _multiProbe; } set { _multiProbe = value; OnPropertyChanged(); } }
+        public bool MultiProbe
+        {
+            get => Probes.Count > 1;
+            set => OnPropertyChanged();
+        }
         public ObservableCollection<string> SystemInfo { get { return GrblInfo.SystemInfo; } }
         public string Tool { get { return _tool; } set { _tool = GrblParserState.Tool = value; OnPropertyChanged(); } }
         public int Probe { get { return int.Parse(_probe); } set { _probe = (GrblParserState.Probe = value).ToString(); OnPropertyChanged(); } }

@@ -566,4 +566,5 @@ public class BaseConfig : ViewModelBase
     public CameraConfig Camera { get; set; } = new();
     public GCodeViewerConfig GCodeViewer { get; set; } = new();
     public ProbeConfig Probing { get; set; } = new();
+    public QuickAccessSidebarConfig QuickAccessSidebar { get; set; } = new();
 }

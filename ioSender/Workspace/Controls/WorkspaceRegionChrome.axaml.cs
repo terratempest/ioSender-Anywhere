@@ -101,6 +101,8 @@ public partial class WorkspaceRegionChrome : Border
     public void ClearEditorHost()
     {
         DetachHeaderStatusSource();
+        if (EditorHost.Content is WorkspaceTabGroupControl tabGroup)
+            tabGroup.ReleaseActiveEditor();
         if (EditorHost.Content is Control previous)
             DetachEditor(previous);
         EditorHost.Content = null;
@@ -109,7 +111,11 @@ public partial class WorkspaceRegionChrome : Border
     public void SetEditorContent(Control content)
     {
         if (EditorHost.Content is Control previous && !ReferenceEquals(previous, content))
+        {
+            if (previous is WorkspaceTabGroupControl tabGroup)
+                tabGroup.ReleaseActiveEditor();
             DetachEditor(previous);
+        }
         DetachEditor(content);
         EditorHost.Content = content;
         AttachHeaderStatusSource(content);
@@ -146,6 +152,11 @@ public partial class WorkspaceRegionChrome : Border
     {
         var desc = WorkspaceEditorCatalog.Get(EditorId);
         TitleText.Text = Localize.T(desc.TitleKey, desc.TitleFallback);
+    }
+
+    public void SetTitleText(string text)
+    {
+        TitleText.Text = text;
     }
 
     void UpdateEditChrome()

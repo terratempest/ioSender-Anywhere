@@ -6,7 +6,7 @@ namespace CNC.Controls.Avalonia.Utilities;
 
 public class NumericProperties
 {
-    public int Length;
+    public int MinimumIntegerDigits;
     public int Precision;
     public bool AllowDP;
     public bool AllowSign;
@@ -24,9 +24,10 @@ public class NumericProperties
     {
         AllowSign = format.StartsWith(NegativeSign, StringComparison.Ordinal);
         DisplayFormat = AllowSign ? format[1..] : format;
-        Length = format.Length - (AllowSign ? 1 : 0);
         AllowDP = DisplayFormat.Contains('.', StringComparison.Ordinal);
         Precision = AllowDP ? DisplayFormat.Length - DisplayFormat.LastIndexOf('.') - 1 : 0;
+        var integerFormat = AllowDP ? DisplayFormat[..DisplayFormat.LastIndexOf('.')] : DisplayFormat;
+        MinimumIntegerDigits = integerFormat.Count(c => c == '0');
         Styles = (AllowDP ? NumberStyles.AllowDecimalPoint : NumberStyles.None) |
                  (AllowSign ? NumberStyles.AllowLeadingSign : NumberStyles.None);
     }
@@ -64,7 +65,7 @@ public class NumericProperties
                 return false;
         }
 
-        return dp < 0 || len - dp - 1 <= np.Precision;
+        return true;
     }
 
     public static bool TryParseCommittedText(string value, NumericProperties np, out double result)

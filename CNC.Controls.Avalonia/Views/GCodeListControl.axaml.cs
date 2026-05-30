@@ -206,7 +206,7 @@ public partial class GCodeListControl : UserControl
 
     void OnDragOver(object? sender, DragEventArgs e)
     {
-        if (e.Data.Contains(DataFormats.Files))
+        if (e.DataTransfer.Contains(DataFormat.File))
             e.DragEffects = DragDropEffects.Copy;
         else
             e.DragEffects = DragDropEffects.None;
@@ -214,10 +214,10 @@ public partial class GCodeListControl : UserControl
 
     void OnDrop(object? sender, DragEventArgs e)
     {
-        if (!e.Data.Contains(DataFormats.Files))
+        if (!e.DataTransfer.Contains(DataFormat.File))
             return;
 
-        var path = e.Data.GetFiles()?.OfType<IStorageFile>().FirstOrDefault()?.TryGetLocalPath();
+        var path = e.DataTransfer.TryGetFiles()?.OfType<IStorageFile>().FirstOrDefault()?.TryGetLocalPath();
         if (path != null)
             _viewModel.LoadDroppedFile(path);
     }

@@ -6,15 +6,16 @@ namespace CNC.Platform.Tests;
 public sealed class NumericPropertiesTests
 {
     [Theory]
-    [InlineData("-###0.000", true, "###0.000", 8, true, 3)]
-    [InlineData("###0.000", false, "###0.000", 8, true, 3)]
-    [InlineData("-####", true, "####", 4, false, 0)]
-    [InlineData("####", false, "####", 4, false, 0)]
+    [InlineData("-###0.000", true, "###0.000", 1, true, 3)]
+    [InlineData("###0.000", false, "###0.000", 1, true, 3)]
+    [InlineData("-####", true, "####", 0, false, 0)]
+    [InlineData("####", false, "####", 0, false, 0)]
+    [InlineData("0", false, "0", 1, false, 0)]
     public void Parse_maps_signed_decimal_and_integer_format_properties(
         string format,
         bool allowSign,
         string displayFormat,
-        int length,
+        int minimumIntegerDigits,
         bool allowDecimalPoint,
         int precision)
     {
@@ -24,7 +25,7 @@ public sealed class NumericPropertiesTests
 
         Assert.Equal(allowSign, numeric.AllowSign);
         Assert.Equal(displayFormat, numeric.DisplayFormat);
-        Assert.Equal(length, numeric.Length);
+        Assert.Equal(minimumIntegerDigits, numeric.MinimumIntegerDigits);
         Assert.Equal(allowDecimalPoint, numeric.AllowDP);
         Assert.Equal(precision, numeric.Precision);
     }
@@ -63,18 +64,43 @@ public sealed class NumericPropertiesTests
     }
 
     [Theory]
+    [InlineData("0")]
+    [InlineData("#0")]
+    [InlineData("###0")]
+    public void IsStringNumeric_allows_more_integer_digits_than_display_format(string format)
+    {
+        var numeric = new NumericProperties();
+        numeric.Parse(format);
+
+        Assert.True(NumericProperties.IsStringNumeric("10", numeric));
+        Assert.True(NumericProperties.TryParseCommittedText("10", numeric, out var result));
+        Assert.Equal(10d, result);
+    }
+
+    [Theory]
     [InlineData("-12.34", true)]
     [InlineData("12.34", true)]
     [InlineData("12345.67", true)]
-    [InlineData("-12.345", false)]
+    [InlineData("-12.345", true)]
     [InlineData("12.", true)]
     [InlineData("12..", false)]
-    public void IsStringNumeric_enforces_decimal_fractional_precision(string value, bool expected)
+    public void IsStringNumeric_allows_decimal_input_beyond_display_precision(string value, bool expected)
     {
         var numeric = new NumericProperties();
         numeric.Parse("-##0.00");
 
         Assert.Equal(expected, NumericProperties.IsStringNumeric(value, numeric));
+    }
+
+    [Fact]
+    public void TryParseCommittedText_preserves_decimal_input_beyond_display_precision()
+    {
+        var numeric = new NumericProperties();
+        numeric.Parse("0.000");
+
+        Assert.True(NumericProperties.TryParseCommittedText("1.23456", numeric, out var result));
+        Assert.Equal(1.23456d, result);
+        Assert.Equal(3, numeric.Precision);
     }
 
     [Theory]

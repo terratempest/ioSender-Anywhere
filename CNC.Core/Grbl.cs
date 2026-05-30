@@ -1355,21 +1355,23 @@ namespace CNC.Core
                 DetectNumAxes(data);
         }
 
+        private static void SetProbeAvailable(int id, string nameKey, bool available)
+        {
+            var probe = Probes.FirstOrDefault(p => p.Id == id);
+            if (available)
+            {
+                if (probe == null)
+                    Probes.Add(new Probe(id, LibStrings.FindResource(nameKey)));
+            }
+            else if (probe != null)
+                Probes.Remove(probe);
+        }
+
         private static void UpdateProbes(Probes probes)
         {
-            if (probes.HasFlag(Core.Probes.Standard))
-            {
-                if (Probes.Where(p => p.Id == 0).FirstOrDefault() == null)
-                    Probes.Add(new Probe(0, LibStrings.FindResource("ProbePrimary")));
-            }
-            else if (Probes.Where(p => p.Id == 0).FirstOrDefault() != null)
-                Probes.Remove(Probes.Where(p => p.Id == 0).FirstOrDefault());
-
-            if (probes.HasFlag(Core.Probes.Toolsetter) && Probes.Where(p => p.Id == 1).FirstOrDefault() == null)
-                Probes.Add(new Probe(1, LibStrings.FindResource("ProbeToolSetter")));
-
-            if (probes.HasFlag(Core.Probes.Probe2) && Probes.Where(p => p.Id == 2).FirstOrDefault() == null)
-                Probes.Add(new Probe(2, LibStrings.FindResource("ProbeSecondary")));
+            SetProbeAvailable(0, "ProbePrimary", probes.HasFlag(Core.Probes.Standard));
+            SetProbeAvailable(1, "ProbeToolSetter", probes.HasFlag(Core.Probes.Toolsetter));
+            SetProbeAvailable(2, "ProbeSecondary", probes.HasFlag(Core.Probes.Probe2));
         }
 
         private static void Process(string data)

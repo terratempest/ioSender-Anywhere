@@ -44,6 +44,7 @@ public class ProbingPanelViewModel : ViewModelBase
         _grbl = grbl;
         _profiles.Load();
         OnPropertyChanged(nameof(Grbl));
+        OnPropertyChanged(nameof(MultiProbe));
         OnPropertyChanged(nameof(Profiles));
         Profile = Profiles.FirstOrDefault();
         _grbl.PropertyChanged += OnGrblPropertyChanged;
@@ -56,7 +57,10 @@ public class ProbingPanelViewModel : ViewModelBase
             _grbl.PropertyChanged -= OnGrblPropertyChanged;
         _grbl = null;
         OnPropertyChanged(nameof(Grbl));
+        OnPropertyChanged(nameof(MultiProbe));
     }
+
+    public bool MultiProbe => Grbl?.MultiProbe == true;
 
     public ProbingProfile? Profile
     {
@@ -192,6 +196,9 @@ public class ProbingPanelViewModel : ViewModelBase
     {
         if (e.PropertyName is nameof(GrblViewModel.Position) or nameof(GrblViewModel.Signals))
             UpdatePosition();
+
+        if (e.PropertyName is nameof(GrblViewModel.MultiProbe))
+            OnPropertyChanged(nameof(MultiProbe));
     }
 
     void UpdatePosition()

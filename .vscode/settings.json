@@ -1,3 +1,9 @@
 {
-    "dotnet.preferCSharpExtension": true
+    "dotnet.preferCSharpExtension": true,
+    "dotnet.defaultSolution": "ioSender.net.sln",
+    "avalonia.solutionPath": "ioSender.net.sln",
+    "avalonia.logLevel": "debug",
+    "avalonia.previewFeaturesEnabled": true,
+    "avalonia.preview.syncWithLaunchConfig": true,
+    "avalonia.telemetry.enabled": true
 }

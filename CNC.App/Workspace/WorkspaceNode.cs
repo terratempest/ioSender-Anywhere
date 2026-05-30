@@ -4,6 +4,7 @@ namespace CNC.App.Workspace;
 
 [XmlInclude(typeof(WorkspaceLeaf))]
 [XmlInclude(typeof(WorkspaceSplit))]
+[XmlInclude(typeof(WorkspaceTabGroup))]
 public abstract class WorkspaceNode
 {
     public WorkspaceLeaf AsLeaf() => this as WorkspaceLeaf
@@ -31,6 +32,13 @@ public abstract class WorkspaceNode
                 yield return id;
             foreach (var id in split.Second.EnumerateEditors())
                 yield return id;
+            yield break;
+        }
+
+        if (this is WorkspaceTabGroup tabGroup)
+        {
+            foreach (var tab in tabGroup.Tabs)
+                yield return tab.Editor;
         }
     }
 
@@ -61,6 +69,29 @@ public abstract class WorkspaceNode
             First = split.First.Clone(),
             Second = split.Second.Clone(),
         },
+        WorkspaceTabGroup tabGroup => CloneTabGroup(tabGroup),
         _ => throw new InvalidOperationException("Unknown node type."),
     };
+
+    static WorkspaceTabGroup CloneTabGroup(WorkspaceTabGroup tabGroup)
+    {
+        var clone = new WorkspaceTabGroup
+        {
+            Id = Guid.NewGuid(),
+            TabStripPlacement = tabGroup.TabStripPlacement,
+        };
+
+        foreach (var tab in tabGroup.Tabs)
+        {
+            var clonedTab = new WorkspaceTabEntry { Id = Guid.NewGuid(), Editor = tab.Editor };
+            clone.Tabs.Add(clonedTab);
+            if (tab.Id == tabGroup.ActiveTabId)
+                clone.ActiveTabId = clonedTab.Id;
+        }
+
+        if (clone.ActiveTabId == Guid.Empty)
+            clone.ActiveTabId = clone.Tabs.FirstOrDefault()?.Id ?? Guid.Empty;
+
+        return clone;
+    }
 }

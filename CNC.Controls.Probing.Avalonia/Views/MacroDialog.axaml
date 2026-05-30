@@ -6,7 +6,7 @@
         Width="475" Height="255"
         CanResize="False"
         WindowStartupLocation="CenterOwner">
-  <Grid RowDefinitions="32,*,30" ColumnDefinitions="*,*">
+  <Grid RowDefinitions="32,*,*" ColumnDefinitions="*,*">
     <StackPanel Grid.Row="0" Grid.ColumnSpan="2" Orientation="Horizontal" Margin="5,5,0,0" Spacing="8">
       <ComboBox x:Name="MacroCombo" Width="175" Height="22"
                 ItemsSource="{Binding Macros}"
@@ -29,6 +29,6 @@
                ToolTip.Tip="Commands to run after probing completes."/>
     </StackPanel>
     <Button Grid.Row="2" Grid.ColumnSpan="2" Content="Close" Width="100" HorizontalAlignment="Center"
-            Margin="0,0,0,5" Click="OnCloseClick"/>
+            Margin="0,0,0,5" Click="OnCloseClick" HorizontalContentAlignment="Center" VerticalAlignment="Bottom"/>
   </Grid>
 </Window>

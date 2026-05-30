@@ -8,20 +8,6 @@
   <conv:LogicalNotConverter x:Key="LogicalNotConverter"/>
   <conv:HomedStateToBooleanConverter x:Key="IsHomedConverter"/>
 
-  <Style x:Key="SidebarRailButton" Selector="Button.sidebar-rail">
-    <Setter Property="Width" Value="75"/>
-    <Setter Property="Height" Value="25"/>
-    <Setter Property="Focusable" Value="False"/>
-    <Setter Property="Background" Value="{DynamicResource ThemeControlLowBrush}"/>
-    <Setter Property="BorderBrush" Value="{DynamicResource ThemeBorderLowBrush}"/>
-    <Setter Property="BorderThickness" Value="1"/>
-    <Setter Property="CornerRadius" Value="3"/>
-    <Setter Property="Padding" Value="4,2"/>
-    <Setter Property="RenderTransform">
-      <RotateTransform Angle="90"/>
-    </Setter>
-  </Style>
-
   <Style x:Key="FlyoutCloseButton" Selector="Button.flyout-close">
     <Setter Property="Background" Value="Transparent"/>
     <Setter Property="BorderThickness" Value="0"/>
@@ -38,4 +24,5 @@
     <Setter Property="CornerRadius" Value="3"/>
     <Setter Property="Background" Value="{DynamicResource ThemeControlLowBrush}"/>
   </Style>
+
 </ResourceDictionary>
