@@ -23,14 +23,13 @@ public partial class OffsetView : UserControl
     public OffsetView()
     {
         InitializeComponent();
-        Offset = new CoordinateSystem();
         _parameters.WorkPositionOffset.PropertyChanged += Parameters_PropertyChanged;
         if (!GrblInfo.IsGrblHAL)
             _parameters.PropertyChanged += Parameters_PropertyChanged;
         AttachedToVisualTree += (_, _) => ApplyLatheColumnHeaders();
     }
 
-    public CoordinateSystem Offset { get; }
+    public CoordinateSystem Offset { get; } = new();
     public bool CanEdit { get => GetValue(CanEditProperty); set => SetValue(CanEditProperty, value); }
     public bool IsPredefined { get => GetValue(IsPredefinedProperty); set => SetValue(IsPredefinedProperty, value); }
 
@@ -65,7 +64,7 @@ public partial class OffsetView : UserControl
         if (!GrblInfo.LatheModeEnabled || dgrOffsets.Columns.Count < 2)
             return;
         var header = $"X offset ({(GrblWorkParameters.LatheMode == LatheMode.Radius ? "R" : "D")})";
-        // Column headers are templates in Avalonia; lathe label is applied via cvXOffset label binding at runtime if needed.
+        dgrOffsets.Columns[1].Header = header;
         cvXOffset.Label = header + ":";
     }
 
