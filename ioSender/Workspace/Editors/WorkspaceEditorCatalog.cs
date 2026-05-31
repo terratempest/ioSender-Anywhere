@@ -66,6 +66,8 @@ public static class WorkspaceEditorCatalog
             WorkspaceEditorId.TabGroup
             or
             WorkspaceEditorId.Probing
+            or WorkspaceEditorId.SdCard
+            or WorkspaceEditorId.Lathe
             or WorkspaceEditorId.Offsets
             or WorkspaceEditorId.GrblConfig
             or WorkspaceEditorId.AppConfig

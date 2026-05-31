@@ -14,6 +14,12 @@ public class WorkspaceEditorCatalogTests
         Assert.DoesNotContain(
             WorkspaceEditorCatalog.LayoutPickableDescriptors,
             d => d.Id == WorkspaceEditorId.Signals);
+        Assert.DoesNotContain(
+            WorkspaceEditorCatalog.LayoutPickableDescriptors,
+            d => d.Id == WorkspaceEditorId.SdCard);
+        Assert.DoesNotContain(
+            WorkspaceEditorCatalog.LayoutPickableDescriptors,
+            d => d.Id == WorkspaceEditorId.Lathe);
     }
 
     [Fact]
@@ -25,6 +31,12 @@ public class WorkspaceEditorCatalogTests
         Assert.DoesNotContain(
             WorkspaceEditorCatalog.PanelPickableDescriptors,
             d => d.Id == WorkspaceEditorId.Signals);
+        Assert.DoesNotContain(
+            WorkspaceEditorCatalog.PanelPickableDescriptors,
+            d => d.Id == WorkspaceEditorId.SdCard);
+        Assert.DoesNotContain(
+            WorkspaceEditorCatalog.PanelPickableDescriptors,
+            d => d.Id == WorkspaceEditorId.Lathe);
     }
 
     [Fact]
@@ -36,6 +48,12 @@ public class WorkspaceEditorCatalogTests
         Assert.Contains(
             WorkspaceEditorCatalog.AllDescriptors,
             d => d.Id == WorkspaceEditorId.Signals);
+        Assert.Contains(
+            WorkspaceEditorCatalog.AllDescriptors,
+            d => d.Id == WorkspaceEditorId.SdCard);
+        Assert.Contains(
+            WorkspaceEditorCatalog.AllDescriptors,
+            d => d.Id == WorkspaceEditorId.Lathe);
     }
 
     [Fact]
