@@ -8,7 +8,7 @@
              xmlns:local="using:CNC.Controls.Probing"
              xmlns:loc="using:CNC.Localization.Avalonia"
              mc:Ignorable="d"
-             d:DesignHeight="600" d:DesignWidth="800"
+             d:DesignHeight="580" d:DesignWidth="950"
              x:Class="CNC.Controls.Probing.ProbingView">
 
   <UserControl.Resources>
@@ -22,11 +22,11 @@
     <local:ProbingMacroActiveBrushConverter x:Key="MacroActiveBrushConverter"/>
   </UserControl.Resources>
 
-  <Grid>
+  <Grid TextElement.FontSize="12">
     <Grid x:Name="ProbingVmRoot"
           ColumnDefinitions="260,*"
           RowDefinitions="*"
-          Margin="4">
+          >
 
       <Border Grid.Column="0"
               BorderBrush="{DynamicResource ThemeBorderLowBrush}"
@@ -264,7 +264,7 @@
                     CornerRadius="12,12,0,0" 
                     Padding="8,0">
                     <ContentPresenter Content="{TemplateBinding Header}"
-                      FontSize="14"
+                      FontSize="12"
                       VerticalAlignment="Center"/>
                   </Border>
                 </ControlTemplate>

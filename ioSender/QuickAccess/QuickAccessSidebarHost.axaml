@@ -1,22 +1,29 @@
 <UserControl xmlns="https://github.com/avaloniaui"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              xmlns:qa="using:ioSender.QuickAccess"
              x:Class="ioSender.QuickAccess.QuickAccessSidebarHost"
-             Width="40"
-             MinWidth="40"
+             mc:Ignorable="d"
+             Width="36"
+             MinWidth="36"
              VerticalAlignment="Stretch"
+             d:DesignWidth="36"
+             d:DesignHeight="450"
              Focusable="False"
              ClipToBounds="False">
+
   <UserControl.Styles>
     <Style Selector="Button.quickaccess-tab">
-      <Setter Property="Width" Value="32"/>
+      <Setter Property="Width" Value="30"/>
       <Setter Property="Height" Value="65"/>
-      <Setter Property="Padding" Value="2"/>
+      <Setter Property="Padding" Value="-8"/>
       <Setter Property="Margin" Value="0"/>
       <Setter Property="ClipToBounds" Value="True"/>
       <Setter Property="Focusable" Value="False"/>
-      <Setter Property="FontSize" Value="11"/>
+      <Setter Property="FontSize" Value="12"/>
       <Setter Property="FontWeight" Value="SemiBold"/>
+      <Setter Property="HorizontalAlignment" Value="Center"/>
       <Setter Property="HorizontalContentAlignment" Value="Center"/>
       <Setter Property="VerticalContentAlignment" Value="Center"/>
       <Setter Property="Background" Value="{DynamicResource ThemeControlLowBrush}"/>
@@ -25,9 +32,8 @@
       <Setter Property="CornerRadius" Value="3"/>
     </Style>
     <Style Selector="Button.quickaccess-add">
-      <Setter Property="Width" Value="32"/>
-      <Setter Property="Height" Value="32"/>
-      <Setter Property="MinHeight" Value="32"/>
+      <Setter Property="Width" Value="30"/>
+      <Setter Property="Height" Value="30"/>
       <Setter Property="Padding" Value="0"/>
       <Setter Property="Margin" Value="0,2,0,0"/>
       <Setter Property="FontSize" Value="16"/>
@@ -37,26 +43,25 @@
       <Setter Property="VerticalContentAlignment" Value="Center"/>
     </Style>
   </UserControl.Styles>
+
   <Panel ClipToBounds="False">
     <Panel x:Name="FlyoutLayer" ClipToBounds="False" VerticalAlignment="Stretch">
-      <qa:QuickAccessPopupChrome x:Name="PanelChrome"
-                                 IsVisible="False"
-                                 VerticalAlignment="Top"/>
+      <qa:QuickAccessPopupChrome 
+        x:Name="PanelChrome"
+        IsVisible="False"
+        VerticalAlignment="Top"/>
     </Panel>
-    <Border Background="{DynamicResource ThemeControlMidBrush}"
-            BorderBrush="{DynamicResource ThemeBorderLowBrush}"
-            BorderThickness="1"
-            HorizontalAlignment="Stretch"
-            VerticalAlignment="Stretch"
-            Padding="2,4">
-      <ScrollViewer HorizontalScrollBarVisibility="Disabled"
-                    VerticalScrollBarVisibility="Auto"
-                    HorizontalAlignment="Stretch"
-                    VerticalAlignment="Stretch">
-        <StackPanel x:Name="TabStack"
-                    Width="32"
-                    Spacing="4"
-                    HorizontalAlignment="Center"/>
+    <Border 
+      Background="{DynamicResource ThemeControlMidBrush}"
+      BorderBrush="{DynamicResource ThemeBorderLowBrush}"
+      BorderThickness="1"
+      Padding="2,2">
+      <ScrollViewer 
+        HorizontalScrollBarVisibility="Disabled"
+        VerticalScrollBarVisibility="Auto"
+        HorizontalAlignment="Stretch"
+        VerticalAlignment="Stretch">
+        <StackPanel x:Name="TabStack" Spacing="2"/>
       </ScrollViewer>
     </Border>
   </Panel>

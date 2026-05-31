@@ -8,45 +8,84 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              mc:Ignorable="d"
-             d:DesignHeight="600" d:DesignWidth="800">
+             d:DesignHeight="420" d:DesignWidth="800">
   <UserControl.Resources>
     <conv:LogicalNotConverter x:Key="IsNotRunningConverter"/>
   </UserControl.Resources>
-  <Grid>
+  <Grid TextElement.FontSize="12">
     <StackPanel Margin="5" Width="250" HorizontalAlignment="Left" VerticalAlignment="Top" Spacing="4">
-      <GroupBox Header="Area to probe" BorderBrush="{DynamicResource ThemeBorderLowBrush}">
-        <StackPanel Spacing="4">
+      <GroupBox 
+        Header="Area to probe" 
+        BorderBrush="{DynamicResource ThemeBorderLowBrush}"
+        Padding="0"
+        >
+        
+        <StackPanel Spacing="4" Margin="4">
           <StackPanel Orientation="Horizontal" Spacing="4">
             <TextBlock Text="X:" VerticalAlignment="Center"/>
-            <controls:NumericTextBox Value="{Binding HeightMap.MinX, Mode=TwoWay}" Format="-###0.0##" Width="70"/>
+            <controls:NumericTextBox Value="{Binding HeightMap.MinX, Mode=TwoWay}" 
+              Format="-###0.0##" 
+              Width="70"
+              PreviewText="000.000"
+              Height="24" MinHeight="24" Padding="4,0" VerticalContentAlignment="Center"
+              />
             <TextBlock Text="W:" VerticalAlignment="Center"/>
-            <controls:NumericTextBox Value="{Binding HeightMap.Width, Mode=TwoWay}" Format="-###0.0##" Width="70"/>
+            <controls:NumericTextBox Value="{Binding HeightMap.Width, Mode=TwoWay}" 
+              Format="-###0.0##" 
+              Width="70"
+              PreviewText="000.000"
+              Height="24" MinHeight="24" Padding="4,0" VerticalContentAlignment="Center"/>
           </StackPanel>
+
           <StackPanel Orientation="Horizontal" Spacing="4">
             <TextBlock Text="Y:" VerticalAlignment="Center"/>
-            <controls:NumericTextBox Value="{Binding HeightMap.MinY, Mode=TwoWay}" Format="-###0.0##" Width="70"/>
+            <controls:NumericTextBox Value="{Binding HeightMap.MinY, Mode=TwoWay}" 
+              Format="-###0.0##" 
+              Width="70"
+              PreviewText="000.000"
+              Height="24" MinHeight="24" Padding="4,0" VerticalContentAlignment="Center"/>
             <TextBlock Text="H:" VerticalAlignment="Center"/>
-            <controls:NumericTextBox Value="{Binding HeightMap.Height, Mode=TwoWay}" Format="-###0.0##" Width="70"/>
+            <controls:NumericTextBox Value="{Binding HeightMap.Height, Mode=TwoWay}" 
+              Format="-###0.0##" 
+              Width="70"
+              PreviewText="000.000"
+              Height="24" MinHeight="24" Padding="4,0" VerticalContentAlignment="Center"/>
           </StackPanel>
-          <Button Content="Set from program limits" IsEnabled="{Binding Grbl.IsFileLoaded}" Click="OnLimitsClick"/>
+
+          <Button Content="Set from program limits" 
+            IsEnabled="{Binding Grbl.IsFileLoaded}" 
+            Click="OnLimitsClick"
+            HorizontalAlignment="Stretch" 
+            HorizontalContentAlignment="Center"/>
         </StackPanel>
       </GroupBox>
 
       <GroupBox Header="Gridsize" BorderBrush="{DynamicResource ThemeBorderLowBrush}">
         <StackPanel Spacing="4">
           <Grid ColumnDefinitions="Auto,*,Auto" RowDefinitions="Auto,Auto">
-            <TextBlock Grid.Row="0" Text="X:" VerticalAlignment="Center" Margin="0,0,6,4"/>
-            <controls:NumericTextBox Grid.Row="0" Grid.Column="1" Value="{Binding HeightMap.GridSizeX, Mode=TwoWay}" Format="0.###" Margin="0,0,0,4"/>
-            <CheckBox Grid.RowSpan="2" Grid.Column="2" Content="Lock" VerticalAlignment="Center" Margin="8,0,0,0"
-                      IsChecked="{Binding HeightMap.GridSizeLockXY, Mode=TwoWay}"/>
-            <TextBlock Grid.Row="1" Text="Y:" VerticalAlignment="Center" Margin="0,0,6,0"/>
-            <controls:NumericTextBox Grid.Row="1" Grid.Column="1" Value="{Binding HeightMap.GridSizeY, Mode=TwoWay}" Format="0.###"/>
+            <TextBlock Grid.Row="0" Text="X:" 
+              VerticalAlignment="Center" Margin="0,0,6,4"/>
+            <controls:NumericTextBox Grid.Row="0" Grid.Column="1" 
+              Value="{Binding HeightMap.GridSizeX, Mode=TwoWay}" 
+              Format="0.000" Margin="0,0,0,4"
+              PlaceholderText="5.000"
+              Height="24" MinHeight="24" Padding="4,0" VerticalContentAlignment="Center"/>
+            <CheckBox Grid.RowSpan="2" Grid.Column="2" 
+              Content="Lock" VerticalAlignment="Center" Margin="8,0,0,0"
+              IsChecked="{Binding HeightMap.GridSizeLockXY, Mode=TwoWay}"/>
+            <TextBlock Grid.Row="1" Text="Y:" 
+              VerticalAlignment="Center" Margin="0,0,6,0"/>
+            <controls:NumericTextBox Grid.Row="1" Grid.Column="1" 
+              Value="{Binding HeightMap.GridSizeY, Mode=TwoWay}" Format="0.###"
+              PlaceholderText="5.000"
+              Height="24" MinHeight="24" Padding="4,0" VerticalContentAlignment="Center"/>
           </Grid>
         </StackPanel>
       </GroupBox>
-
-      <CheckBox Content="Pause before probing" IsChecked="{Binding HeightMap.AddPause, Mode=TwoWay}"/>
-      <CheckBox Content="Set Z = 0 at X0Y0" IsChecked="{Binding HeightMap.SetToolOffset, Mode=TwoWay}"/>
+      <StackPanel Margin="4,0" Spacing="-6">
+        <CheckBox Content="Pause before probing" IsChecked="{Binding HeightMap.AddPause, Mode=TwoWay}"/>
+        <CheckBox Content="Set Z = 0 at X0Y0" IsChecked="{Binding HeightMap.SetToolOffset, Mode=TwoWay}"/>
+      </StackPanel>
       <local:CsSelectControl IsEnabled="{Binding HeightMap.SetToolOffset}"/>
     </StackPanel>
 

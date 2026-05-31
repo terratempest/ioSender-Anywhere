@@ -34,6 +34,9 @@ public partial class QuickAccessSidebarHost : UserControl
         PanelChrome.ResizeCompleted += (_, size) => PanelResizeCompleted?.Invoke(this, size);
         DockSideProperty.Changed.AddClassHandler<QuickAccessSidebarHost>((host, _) => host.UpdateFlyoutLayerSide());
         Loaded += (_, _) => UpdateFlyoutLayerSide();
+
+        if (Design.IsDesignMode)
+            BindTabs(CreateDesignTabs());
     }
 
     public QuickAccessSidebarDock DockSide
@@ -155,6 +158,15 @@ public partial class QuickAccessSidebarHost : UserControl
 
         return button;
     }
+
+    static IReadOnlyList<QuickAccessTabEntry> CreateDesignTabs() =>
+    [
+        new() { EditorId = WorkspaceEditorId.Jog },
+        new() { EditorId = WorkspaceEditorId.Macros },
+        new() { EditorId = WorkspaceEditorId.Goto },
+        new() { EditorId = WorkspaceEditorId.Outline },
+        new() { EditorId = WorkspaceEditorId.WorkParams },
+    ];
 
     void ShowTabContextMenu(Control anchor, QuickAccessTabEntry tab)
     {
