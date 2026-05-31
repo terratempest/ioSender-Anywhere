@@ -22,22 +22,29 @@
             CanUserResizeColumns="True"
             CanUserSortColumns="False"
             Padding="0"
+            RowHeight="22"
             IsReadOnly="True"
             SelectionMode="Extended"
             SelectionChanged="OnSelectionChanged"
             LoadingRow="OnLoadingRow"
             UnloadingRow="OnUnloadingRow">
     <DataGrid.Styles>
-        <!-- 1. Hide the sort icon space -->
         <Style Selector="DataGrid">
             <Style.Resources>
                 <x:Double x:Key="DataGridSortIconMinWidth">0.1</x:Double>
             </Style.Resources>
         </Style>
         
-        <!-- 2. Fix the right-side text clipping -->
         <Style Selector="DataGridColumnHeader">
             <Setter Property="UseLayoutRounding" Value="False" />
+        </Style>
+
+        <Style Selector="DataGridCell">
+            <Setter Property="FontSize" Value="12" />
+        </Style>
+
+        <Style Selector="DataGridCell TextBlock">
+            <Setter Property="FontSize" Value="12" />
         </Style>
     </DataGrid.Styles>
 
@@ -45,7 +52,7 @@
       <DataGridTextColumn Header="Block" Binding="{Binding Row}" Width="64"
                           loc:Localize.Key="CNC.Controls.Avalonia.gcodelistcontrol.hdr_block" loc:Localize.Fallback="Block"/>
       <DataGridTextColumn Header="Sts"  Binding="{Binding Sent}" Width="64"/>
-      <DataGridTextColumn Header="Data" Binding="{Binding DisplayData}" Width="*"
+      <DataGridTextColumn Header="Data" Binding="{Binding DisplayData}" Width="Auto"
                           loc:Localize.Key="CNC.Controls.Avalonia.gcodelistcontrol.hdr_data" loc:Localize.Fallback="Data"/>
     </DataGrid.Columns>
     <DataGrid.ContextMenu>

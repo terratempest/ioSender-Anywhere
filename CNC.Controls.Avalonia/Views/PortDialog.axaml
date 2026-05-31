@@ -1,90 +1,53 @@
 <Window xmlns="https://github.com/avaloniaui"
-
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
-
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-
         xmlns:platform="using:CNC.Platform.Abstractions"
-
         xmlns:vm="using:CNC.Controls.Avalonia.ViewModels"
         xmlns:loc="using:CNC.Localization.Avalonia"
-
         mc:Ignorable="d"
-
         x:Class="CNC.Controls.Avalonia.Views.PortDialog"
-
         x:DataType="vm:PortDialogViewModel"
-
         x:Name="PortDialogRoot"
         Title="Sender connection"
         loc:Localize.Key="CNC.Controls.Avalonia.portdialog.dlg_title"
-
         Width="400"
-
         SizeToContent="Height"
-
         CanResize="False"
-
         WindowStartupLocation="CenterOwner">
 
   <StackPanel Margin="12" Spacing="8">
-
     <TabControl SelectedIndex="{Binding SelectedTabIndex}">
-
       <TabItem x:Name="TabSerial" Header="Serial" loc:Localize.Key="CNC.Controls.Avalonia.portdialog.tab_serial">
-
         <Grid ColumnDefinitions="90,*" RowDefinitions="Auto,Auto,Auto" Margin="0,8,0,0">
-
           <TextBlock x:Name="LblSerialPort" Grid.Row="0" Grid.Column="0" Text="Port:" VerticalAlignment="Center"
                      loc:Localize.Key="CNC.Controls.Avalonia.portdialog.lbl_serialPort"/>
 
           <ComboBox x:Name="PortCombo" Grid.Row="0" Grid.Column="1"
-
                     ItemsSource="{Binding Ports}"
-
                     SelectedItem="{Binding SelectedPort}">
-
             <ComboBox.ItemTemplate>
-
               <DataTemplate x:DataType="platform:SerialPortInfo">
-
                 <TextBlock Text="{Binding DisplayName}"/>
-
               </DataTemplate>
-
             </ComboBox.ItemTemplate>
-
           </ComboBox>
-
-
 
           <TextBlock x:Name="LblSerialBaud" Grid.Row="1" Grid.Column="0" Text="Baud rate:" VerticalAlignment="Center" Margin="0,8,0,0"
                      loc:Localize.Key="CNC.Controls.Avalonia.portdialog.lbl_serialBaud"/>
 
           <ComboBox Grid.Row="1" Grid.Column="1" Margin="0,8,0,0"
-
                     ItemsSource="{Binding BaudRates}"
-
                     SelectedItem="{Binding SelectedBaud}"/>
-
         </Grid>
-
       </TabItem>
 
-
-
       <TabItem x:Name="TabTelnet" Header="Telnet" loc:Localize.Key="CNC.Controls.Avalonia.portdialog.tab_network">
-
         <Grid ColumnDefinitions="90,*" RowDefinitions="Auto,Auto" Margin="0,8,0,0">
-
           <TextBlock x:Name="LblTelnetHost" Grid.Row="0" Grid.Column="0" Text="Host:" VerticalAlignment="Center"
                      loc:Localize.Key="CNC.Controls.Avalonia.portdialog.lbl_ipAddress"/>
 
           <TextBox Grid.Row="0" Grid.Column="1" Text="{Binding TelnetHost}"/>
-
-
 
           <TextBlock x:Name="LblTelnetPort" Grid.Row="1" Grid.Column="0" Text="Port:" VerticalAlignment="Center" Margin="0,8,0,0"
                      loc:Localize.Key="CNC.Controls.Avalonia.portdialog.lbl_netPort"/>
@@ -92,50 +55,40 @@
           <TextBox Grid.Row="1" Grid.Column="1" Margin="0,8,0,0" Text="{Binding TelnetPort}"/>
 
         </Grid>
-
       </TabItem>
 
 
 
       <TabItem x:Name="TabWebsocket" Header="WebSocket" loc:Localize.Key="CNC.Controls.Avalonia.portdialog.lbl_websocket">
-
         <Grid ColumnDefinitions="90,*" RowDefinitions="Auto,Auto" Margin="0,8,0,0">
-
           <TextBlock Grid.Row="0" Grid.Column="0" Text="Host:" VerticalAlignment="Center"/>
 
           <TextBox Grid.Row="0" Grid.Column="1" Text="{Binding WebsocketHost}"/>
-
-
 
           <TextBlock Grid.Row="1" Grid.Column="0" Text="Port:" VerticalAlignment="Center" Margin="0,8,0,0"/>
 
           <TextBox Grid.Row="1" Grid.Column="1" Margin="0,8,0,0" Text="{Binding WebsocketPort}"/>
 
         </Grid>
-
       </TabItem>
-
     </TabControl>
 
-
-
     <TextBlock Text="{Binding ErrorMessage}"
-
                Foreground="IndianRed"
-
                IsVisible="{Binding HasError}"
-
                TextWrapping="Wrap"/>
-
-
 
     <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" Spacing="8" Margin="0,8,0,0">
 
-      <Button x:Name="BtnConnect" Content="Connect" Width="80" IsEnabled="{Binding CanConnect}" Click="OnConnectClick"
-              loc:Localize.Fallback="Connect"/>
+      <Button x:Name="BtnConnect" 
+        Content="Connect" Width="80" IsEnabled="{Binding CanConnect}" Click="OnConnectClick"
+        HorizontalContentAlignment="Center"
+        loc:Localize.Fallback="Connect"/>
 
-      <Button x:Name="BtnCancel" Content="Cancel" Width="80" Click="OnCancelClick"
-              loc:Localize.Key="CNC.Controls.Avalonia.portdialog.btn_cancel"/>
+      <Button x:Name="BtnCancel" 
+        Content="Cancel" Width="80" Click="OnCancelClick"
+        HorizontalContentAlignment="Center"
+        loc:Localize.Key="CNC.Controls.Avalonia.portdialog.btn_cancel"/>
 
     </StackPanel>
 

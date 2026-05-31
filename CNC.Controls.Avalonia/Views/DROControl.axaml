@@ -9,7 +9,7 @@
              x:DataType="core:GrblViewModel"
              HorizontalAlignment="Stretch"
              VerticalAlignment="Stretch"
-             MinWidth="160" MinHeight="120">
+             >
   <UserControl.Resources>
     <ResourceDictionary>
       <ResourceDictionary.MergedDictionaries>
@@ -22,173 +22,183 @@
       <conv:IsHomingEnabledConverter x:Key="HomingEnabledConverter"/>
     </ResourceDictionary>
   </UserControl.Resources>
-  <Border BorderThickness="0" Padding="4"
-          HorizontalAlignment="Stretch" VerticalAlignment="Stretch">
-    <Grid RowDefinitions="Auto,Auto,*,Auto">
-      <Button x:Name="btnHomeAll" Grid.Row="0" Content="Home All"
-              loc:Localize.Key="CNC.Controls.Avalonia.drocontrol.btn_homeAll"
-              loc:Localize.Fallback="Home All"
-              ToolTip.Tip="Ctrl+H"
-              Focusable="False" Margin="0,0,0,4" Height="32"
-              HorizontalAlignment="Stretch" VerticalAlignment="Top"
-              Background="{Binding HomedState, Converter={StaticResource HomedStateConverter}}">
-        <Button.IsEnabled>
-          <MultiBinding Converter="{StaticResource HomingEnabledConverter}">
-            <Binding Path="GrblState" Mode="OneWay"/>
-            <Binding Path="IsJobRunning" Mode="OneWay"/>
-            <Binding Path="IsSleepMode" Mode="OneWay"/>
+
+  <Grid RowDefinitions="Auto,Auto,*,Auto" Margin="4">
+    <Button x:Name="btnHomeAll" Grid.Row="0" Content="Home All"
+      loc:Localize.Key="CNC.Controls.Avalonia.drocontrol.btn_homeAll"
+      loc:Localize.Fallback="Home All"
+      ToolTip.Tip="Ctrl+H"
+      Margin="0,0,0,4" Height="32" Padding="0" VerticalContentAlignment="Center"
+      HorizontalAlignment="Stretch" HorizontalContentAlignment="Center"
+      Background="{Binding HomedState, Converter={StaticResource HomedStateConverter}}">
+      <Button.IsEnabled>
+        <MultiBinding Converter="{StaticResource HomingEnabledConverter}">
+          <Binding Path="GrblState" Mode="OneWay"/>
+          <Binding Path="IsJobRunning" Mode="OneWay"/>
+          <Binding Path="IsSleepMode" Mode="OneWay"/>
+        </MultiBinding>
+      </Button.IsEnabled>
+    </Button>
+    
+    <TextBlock x:Name="lblXMode" Grid.Row="1"
+      Text="{Binding LatheMode, Converter={StaticResource LatheModeConverter}}"
+      IsVisible="{Binding LatheModeEnabled, Converter={StaticResource IsVisibleConverter}}"
+      Height="22" TextAlignment="Right" Margin="0,0,40,2"/>
+      
+    <Grid x:Name="AxisGrid" Grid.Row="2" Margin="0,0,0,2">
+
+      <views:DROBaseControl x:Name="axisX" Label="X"
+        Value="{Binding Position.X, Mode=TwoWay}"
+        MachineValue="{Binding MachinePosition.X, Mode=OneWay}">
+        <views:DROBaseControl.IsScaled>
+          <MultiBinding Converter="{StaticResource EnumFlagsHasFlagConverter}">
+            <Binding Path="AxisScaled"/>
+            <Binding Source="{x:Static gcode:AxisFlags.X}"/>
           </MultiBinding>
-        </Button.IsEnabled>
-      </Button>
-      <TextBlock x:Name="lblXMode" Grid.Row="1"
-                 Text="{Binding LatheMode, Converter={StaticResource LatheModeConverter}}"
-                 IsVisible="{Binding LatheModeEnabled, Converter={StaticResource IsVisibleConverter}}"
-                 Height="22" TextAlignment="Right" Margin="0,0,40,2"/>
-      <Grid x:Name="AxisGrid" Grid.Row="2" Margin="0,0,0,2">
-        <views:DROBaseControl x:Name="axisX" Label="X"
-                              Value="{Binding Position.X, Mode=TwoWay}"
-                              MachineValue="{Binding MachinePosition.X, Mode=OneWay}">
-          <views:DROBaseControl.IsScaled>
-            <MultiBinding Converter="{StaticResource EnumFlagsHasFlagConverter}">
-              <Binding Path="AxisScaled"/>
-              <Binding Source="{x:Static gcode:AxisFlags.X}"/>
-            </MultiBinding>
-          </views:DROBaseControl.IsScaled>
-        </views:DROBaseControl>
-        <views:DROBaseControl x:Name="axisY" Label="Y"
-                              Value="{Binding Position.Y, Mode=TwoWay}"
-                              MachineValue="{Binding MachinePosition.Y, Mode=OneWay}">
-          <views:DROBaseControl.IsScaled>
-            <MultiBinding Converter="{StaticResource EnumFlagsHasFlagConverter}">
-              <Binding Path="AxisScaled"/>
-              <Binding Source="{x:Static gcode:AxisFlags.Y}"/>
-            </MultiBinding>
-          </views:DROBaseControl.IsScaled>
-          <views:DROBaseControl.IsVisible>
-            <MultiBinding Converter="{StaticResource IsAxisVisibleConverter}">
-              <Binding Path="AxisEnabledFlags"/>
-              <Binding Source="{x:Static gcode:AxisFlags.Y}"/>
-            </MultiBinding>
-          </views:DROBaseControl.IsVisible>
-        </views:DROBaseControl>
-        <views:DROBaseControl x:Name="axisZ" Label="Z"
-                              Value="{Binding Position.Z, Mode=TwoWay}"
-                              MachineValue="{Binding MachinePosition.Z, Mode=OneWay}">
-          <views:DROBaseControl.IsScaled>
-            <MultiBinding Converter="{StaticResource EnumFlagsHasFlagConverter}">
-              <Binding Path="AxisScaled"/>
-              <Binding Source="{x:Static gcode:AxisFlags.Z}"/>
-            </MultiBinding>
-          </views:DROBaseControl.IsScaled>
-          <views:DROBaseControl.IsVisible>
-            <MultiBinding Converter="{StaticResource IsAxisVisibleConverter}">
-              <Binding Path="AxisEnabledFlags"/>
-              <Binding Source="{x:Static gcode:AxisFlags.Z}"/>
-            </MultiBinding>
-          </views:DROBaseControl.IsVisible>
-        </views:DROBaseControl>
-        <views:DROBaseControl x:Name="axisA" Label="{Binding AxisLetter.A}"
-                              Value="{Binding Position.A, Mode=TwoWay}"
-                              MachineValue="{Binding MachinePosition.A, Mode=OneWay}">
-          <views:DROBaseControl.IsScaled>
-            <MultiBinding Converter="{StaticResource EnumFlagsHasFlagConverter}">
-              <Binding Path="AxisScaled"/>
-              <Binding Source="{x:Static gcode:AxisFlags.A}"/>
-            </MultiBinding>
-          </views:DROBaseControl.IsScaled>
-          <views:DROBaseControl.IsVisible>
-            <MultiBinding Converter="{StaticResource IsAxisVisibleConverter}">
-              <Binding Path="AxisEnabledFlags"/>
-              <Binding Source="{x:Static gcode:AxisFlags.A}"/>
-            </MultiBinding>
-          </views:DROBaseControl.IsVisible>
-        </views:DROBaseControl>
-        <views:DROBaseControl x:Name="axisB" Label="{Binding AxisLetter.B}"
-                              Value="{Binding Position.B, Mode=TwoWay}"
-                              MachineValue="{Binding MachinePosition.B, Mode=OneWay}">
-          <views:DROBaseControl.IsScaled>
-            <MultiBinding Converter="{StaticResource EnumFlagsHasFlagConverter}">
-              <Binding Path="AxisScaled"/>
-              <Binding Source="{x:Static gcode:AxisFlags.B}"/>
-            </MultiBinding>
-          </views:DROBaseControl.IsScaled>
-          <views:DROBaseControl.IsVisible>
-            <MultiBinding Converter="{StaticResource IsAxisVisibleConverter}">
-              <Binding Path="AxisEnabledFlags"/>
-              <Binding Source="{x:Static gcode:AxisFlags.B}"/>
-            </MultiBinding>
-          </views:DROBaseControl.IsVisible>
-        </views:DROBaseControl>
-        <views:DROBaseControl x:Name="axisC" Label="{Binding AxisLetter.C}"
-                              Value="{Binding Position.C, Mode=TwoWay}"
-                              MachineValue="{Binding MachinePosition.C, Mode=OneWay}">
-          <views:DROBaseControl.IsScaled>
-            <MultiBinding Converter="{StaticResource EnumFlagsHasFlagConverter}">
-              <Binding Path="AxisScaled"/>
-              <Binding Source="{x:Static gcode:AxisFlags.C}"/>
-            </MultiBinding>
-          </views:DROBaseControl.IsScaled>
-          <views:DROBaseControl.IsVisible>
-            <MultiBinding Converter="{StaticResource IsAxisVisibleConverter}">
-              <Binding Path="AxisEnabledFlags"/>
-              <Binding Source="{x:Static gcode:AxisFlags.C}"/>
-            </MultiBinding>
-          </views:DROBaseControl.IsVisible>
-        </views:DROBaseControl>
-        <views:DROBaseControl x:Name="axisU" Label="U"
-                              Value="{Binding Position.U, Mode=TwoWay}"
-                              MachineValue="{Binding MachinePosition.U, Mode=OneWay}">
-          <views:DROBaseControl.IsScaled>
-            <MultiBinding Converter="{StaticResource EnumFlagsHasFlagConverter}">
-              <Binding Path="AxisScaled"/>
-              <Binding Source="{x:Static gcode:AxisFlags.U}"/>
-            </MultiBinding>
-          </views:DROBaseControl.IsScaled>
-          <views:DROBaseControl.IsVisible>
-            <MultiBinding Converter="{StaticResource IsAxisVisibleConverter}">
-              <Binding Path="AxisEnabledFlags"/>
-              <Binding Source="{x:Static gcode:AxisFlags.U}"/>
-            </MultiBinding>
-          </views:DROBaseControl.IsVisible>
-        </views:DROBaseControl>
-        <views:DROBaseControl x:Name="axisV" Label="V"
-                              Value="{Binding Position.V, Mode=TwoWay}"
-                              MachineValue="{Binding MachinePosition.V, Mode=OneWay}">
-          <views:DROBaseControl.IsScaled>
-            <MultiBinding Converter="{StaticResource EnumFlagsHasFlagConverter}">
-              <Binding Path="AxisScaled"/>
-              <Binding Source="{x:Static gcode:AxisFlags.V}"/>
-            </MultiBinding>
-          </views:DROBaseControl.IsScaled>
-          <views:DROBaseControl.IsVisible>
-            <MultiBinding Converter="{StaticResource IsAxisVisibleConverter}">
-              <Binding Path="AxisEnabledFlags"/>
-              <Binding Source="{x:Static gcode:AxisFlags.V}"/>
-            </MultiBinding>
-          </views:DROBaseControl.IsVisible>
-        </views:DROBaseControl>
-        <views:DROBaseControl x:Name="axisW" Label="W"
-                              Value="{Binding Position.W, Mode=TwoWay}"
-                              MachineValue="{Binding MachinePosition.W, Mode=OneWay}">
-          <views:DROBaseControl.IsScaled>
-            <MultiBinding Converter="{StaticResource EnumFlagsHasFlagConverter}">
-              <Binding Path="AxisScaled"/>
-              <Binding Source="{x:Static gcode:AxisFlags.W}"/>
-            </MultiBinding>
-          </views:DROBaseControl.IsScaled>
-          <views:DROBaseControl.IsVisible>
-            <MultiBinding Converter="{StaticResource IsAxisVisibleConverter}">
-              <Binding Path="AxisEnabledFlags"/>
-              <Binding Source="{x:Static gcode:AxisFlags.W}"/>
-            </MultiBinding>
-          </views:DROBaseControl.IsVisible>
-        </views:DROBaseControl>
-      </Grid>
-      <Button x:Name="btnZeroAll" Grid.Row="3" Content="Zero all"
-              loc:Localize.Key="CNC.Controls.Avalonia.drocontrol.btn_zeroAll" loc:Localize.Fallback="Zero all"
-              IsEnabled="{Binding IsJobRunning, Converter={StaticResource BooleanConverter}}"
-              Focusable="False" Height="32" Margin="0,4,0,0"
-              HorizontalAlignment="Stretch" VerticalAlignment="Top"/>
+        </views:DROBaseControl.IsScaled>
+      </views:DROBaseControl>
+
+      <views:DROBaseControl x:Name="axisY" Label="Y"
+        Value="{Binding Position.Y, Mode=TwoWay}"
+        MachineValue="{Binding MachinePosition.Y, Mode=OneWay}">
+        <views:DROBaseControl.IsScaled>
+          <MultiBinding Converter="{StaticResource EnumFlagsHasFlagConverter}">
+            <Binding Path="AxisScaled"/>
+            <Binding Source="{x:Static gcode:AxisFlags.Y}"/>
+          </MultiBinding>
+        </views:DROBaseControl.IsScaled>
+        <views:DROBaseControl.IsVisible>
+          <MultiBinding Converter="{StaticResource IsAxisVisibleConverter}">
+            <Binding Path="AxisEnabledFlags"/>
+            <Binding Source="{x:Static gcode:AxisFlags.Y}"/>
+          </MultiBinding>
+        </views:DROBaseControl.IsVisible>
+      </views:DROBaseControl>
+
+      <views:DROBaseControl x:Name="axisZ" Label="Z"
+        Value="{Binding Position.Z, Mode=TwoWay}"
+        MachineValue="{Binding MachinePosition.Z, Mode=OneWay}">
+        <views:DROBaseControl.IsScaled>
+          <MultiBinding Converter="{StaticResource EnumFlagsHasFlagConverter}">
+            <Binding Path="AxisScaled"/>
+            <Binding Source="{x:Static gcode:AxisFlags.Z}"/>
+          </MultiBinding>
+        </views:DROBaseControl.IsScaled>
+        <views:DROBaseControl.IsVisible>
+          <MultiBinding Converter="{StaticResource IsAxisVisibleConverter}">
+            <Binding Path="AxisEnabledFlags"/>
+            <Binding Source="{x:Static gcode:AxisFlags.Z}"/>
+          </MultiBinding>
+        </views:DROBaseControl.IsVisible>
+      </views:DROBaseControl>
+
+      <views:DROBaseControl x:Name="axisA" Label="{Binding AxisLetter.A}"
+        Value="{Binding Position.A, Mode=TwoWay}"
+        MachineValue="{Binding MachinePosition.A, Mode=OneWay}">
+        <views:DROBaseControl.IsScaled>
+          <MultiBinding Converter="{StaticResource EnumFlagsHasFlagConverter}">
+            <Binding Path="AxisScaled"/>
+            <Binding Source="{x:Static gcode:AxisFlags.A}"/>
+          </MultiBinding>
+        </views:DROBaseControl.IsScaled>
+        <views:DROBaseControl.IsVisible>
+          <MultiBinding Converter="{StaticResource IsAxisVisibleConverter}">
+            <Binding Path="AxisEnabledFlags"/>
+            <Binding Source="{x:Static gcode:AxisFlags.A}"/>
+          </MultiBinding>
+        </views:DROBaseControl.IsVisible>
+      </views:DROBaseControl>
+
+      <views:DROBaseControl x:Name="axisB" Label="{Binding AxisLetter.B}"
+        Value="{Binding Position.B, Mode=TwoWay}"
+        MachineValue="{Binding MachinePosition.B, Mode=OneWay}">
+        <views:DROBaseControl.IsScaled>
+          <MultiBinding Converter="{StaticResource EnumFlagsHasFlagConverter}">
+            <Binding Path="AxisScaled"/>
+            <Binding Source="{x:Static gcode:AxisFlags.B}"/>
+          </MultiBinding>
+        </views:DROBaseControl.IsScaled>
+        <views:DROBaseControl.IsVisible>
+          <MultiBinding Converter="{StaticResource IsAxisVisibleConverter}">
+            <Binding Path="AxisEnabledFlags"/>
+            <Binding Source="{x:Static gcode:AxisFlags.B}"/>
+          </MultiBinding>
+        </views:DROBaseControl.IsVisible>
+      </views:DROBaseControl>
+
+      <views:DROBaseControl x:Name="axisC" Label="{Binding AxisLetter.C}"
+        Value="{Binding Position.C, Mode=TwoWay}"
+        MachineValue="{Binding MachinePosition.C, Mode=OneWay}">
+        <views:DROBaseControl.IsScaled>
+          <MultiBinding Converter="{StaticResource EnumFlagsHasFlagConverter}">
+            <Binding Path="AxisScaled"/>
+            <Binding Source="{x:Static gcode:AxisFlags.C}"/>
+          </MultiBinding>
+        </views:DROBaseControl.IsScaled>
+        <views:DROBaseControl.IsVisible>
+          <MultiBinding Converter="{StaticResource IsAxisVisibleConverter}">
+            <Binding Path="AxisEnabledFlags"/>
+            <Binding Source="{x:Static gcode:AxisFlags.C}"/>
+          </MultiBinding>
+        </views:DROBaseControl.IsVisible>
+      </views:DROBaseControl>
+
+      <views:DROBaseControl x:Name="axisU" Label="U"
+        Value="{Binding Position.U, Mode=TwoWay}"
+        MachineValue="{Binding MachinePosition.U, Mode=OneWay}">
+        <views:DROBaseControl.IsScaled>
+          <MultiBinding Converter="{StaticResource EnumFlagsHasFlagConverter}">
+            <Binding Path="AxisScaled"/>
+            <Binding Source="{x:Static gcode:AxisFlags.U}"/>
+          </MultiBinding>
+        </views:DROBaseControl.IsScaled>
+        <views:DROBaseControl.IsVisible>
+          <MultiBinding Converter="{StaticResource IsAxisVisibleConverter}">
+            <Binding Path="AxisEnabledFlags"/>
+            <Binding Source="{x:Static gcode:AxisFlags.U}"/>
+          </MultiBinding>
+        </views:DROBaseControl.IsVisible>
+      </views:DROBaseControl>
+
+      <views:DROBaseControl x:Name="axisV" Label="V"
+        Value="{Binding Position.V, Mode=TwoWay}"
+        MachineValue="{Binding MachinePosition.V, Mode=OneWay}">
+        <views:DROBaseControl.IsScaled>
+          <MultiBinding Converter="{StaticResource EnumFlagsHasFlagConverter}">
+            <Binding Path="AxisScaled"/>
+            <Binding Source="{x:Static gcode:AxisFlags.V}"/>
+          </MultiBinding>
+        </views:DROBaseControl.IsScaled>
+        <views:DROBaseControl.IsVisible>
+          <MultiBinding Converter="{StaticResource IsAxisVisibleConverter}">
+            <Binding Path="AxisEnabledFlags"/>
+            <Binding Source="{x:Static gcode:AxisFlags.V}"/>
+          </MultiBinding>
+        </views:DROBaseControl.IsVisible>
+      </views:DROBaseControl>
+
+      <views:DROBaseControl x:Name="axisW" Label="W"
+        Value="{Binding Position.W, Mode=TwoWay}"
+        MachineValue="{Binding MachinePosition.W, Mode=OneWay}">
+        <views:DROBaseControl.IsScaled>
+          <MultiBinding Converter="{StaticResource EnumFlagsHasFlagConverter}">
+            <Binding Path="AxisScaled"/>
+            <Binding Source="{x:Static gcode:AxisFlags.W}"/>
+          </MultiBinding>
+        </views:DROBaseControl.IsScaled>
+        <views:DROBaseControl.IsVisible>
+          <MultiBinding Converter="{StaticResource IsAxisVisibleConverter}">
+            <Binding Path="AxisEnabledFlags"/>
+            <Binding Source="{x:Static gcode:AxisFlags.W}"/>
+          </MultiBinding>
+        </views:DROBaseControl.IsVisible>
+      </views:DROBaseControl>
     </Grid>
-  </Border>
+
+    <Button x:Name="btnZeroAll" Grid.Row="3" Content="Zero all"
+            loc:Localize.Key="CNC.Controls.Avalonia.drocontrol.btn_zeroAll" loc:Localize.Fallback="Zero all"
+            IsEnabled="{Binding IsJobRunning, Converter={StaticResource BooleanConverter}}"
+            Height="32" Margin="0,4,0,0" Padding="0" HorizontalContentAlignment="Center" VerticalContentAlignment="Center"
+            HorizontalAlignment="Stretch" VerticalAlignment="Top"/>
+  </Grid>
 </UserControl>

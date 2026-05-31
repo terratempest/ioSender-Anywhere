@@ -15,15 +15,14 @@
       </ResourceDictionary.MergedDictionaries>
     </ResourceDictionary>
   </UserControl.Resources>
-  <Grid ColumnDefinitions="Auto,Auto">
+  <Grid ColumnDefinitions="Auto,Auto" TextElement.FontSize="12">
     <DataGrid x:Name="dgrTools" Grid.Column="0" IsReadOnly="True" SelectionMode="Single"
               AutoGenerateColumns="False" CanUserReorderColumns="False" CanUserResizeColumns="False"
-              CanUserSortColumns="False" Margin="10,10,0,0" HorizontalAlignment="Left"
-              VerticalAlignment="Top" SelectionChanged="dgrTools_SelectionChanged">
+              CanUserSortColumns="False" SelectionChanged="dgrTools_SelectionChanged">
       <DataGrid.Columns>
-        <DataGridTextColumn Header="Tool" Binding="{Binding Code}" Width="50"/>
-        <DataGridTextColumn Header="X" Binding="{Binding X}" Width="70"/>
-        <DataGridTextColumn Header="Y" Binding="{Binding Y}" Width="70">
+        <DataGridTextColumn Header="Tool" Binding="{Binding Code}"/>
+        <DataGridTextColumn Header="X" Binding="{Binding X}" />
+        <DataGridTextColumn Header="Y" Binding="{Binding Y}" >
           <DataGridTextColumn.IsVisible>
             <MultiBinding Converter="{StaticResource IsAxisVisibleConverter}">
               <Binding Path="DataContext.AxisEnabledFlags" ElementName="root"/>
@@ -31,19 +30,24 @@
             </MultiBinding>
           </DataGridTextColumn.IsVisible>
         </DataGridTextColumn>
-        <DataGridTextColumn Header="Z" Binding="{Binding Z}" Width="70"/>
-        <DataGridTextColumn Header="Name" Binding="{Binding Name}" Width="300"/>
+        <DataGridTextColumn Header="Z" Binding="{Binding Z}"/>
+        <DataGridTextColumn Header="Name" Binding="{Binding Name}"/>
       </DataGrid.Columns>
     </DataGrid>
-    <StackPanel Grid.Column="1" Margin="20,15,0,0" VerticalAlignment="Top">
-      <StackPanel Orientation="Horizontal">
-        <TextBlock Text="Tool:" VerticalAlignment="Center" Margin="37,0,4,0"/>
-        <TextBox x:Name="txtTool" Width="25" IsReadOnly="True" Height="23"/>
+    
+    <StackPanel Grid.Column="1" VerticalAlignment="Top">
+      <StackPanel Orientation="Horizontal" Margin="85,0,0,2">
+        <TextBlock Text="Tool:" VerticalAlignment="Center" Margin="4,0"/>
+        <TextBox x:Name="txtTool" IsReadOnly="True" />
       </StackPanel>
-      <views:CoordValueSetControl x:Name="cvXOffset" Label="X axis:" Tag="X" Click="cvOffset_Click"
-                                  Value="{Binding Offset.X, ElementName=root, Mode=TwoWay}"/>
-      <views:CoordValueSetControl x:Name="cvYOffset" Label="Y axis:" Tag="Y" Click="cvOffset_Click"
-                                  Value="{Binding Offset.Y, ElementName=root, Mode=TwoWay}">
+
+      <views:CoordValueSetControl x:Name="cvXOffset" 
+        Label="X axis:" Tag="X" Click="cvOffset_Click" Margin="2"
+        Value="{Binding Offset.X, ElementName=root, Mode=TwoWay}"/>
+                                  
+      <views:CoordValueSetControl x:Name="cvYOffset" Margin="2"
+        Label="Y axis:" Tag="Y" Click="cvOffset_Click"
+        Value="{Binding Offset.Y, ElementName=root, Mode=TwoWay}">
         <views:CoordValueSetControl.IsVisible>
           <MultiBinding Converter="{StaticResource IsAxisVisibleConverter}">
             <Binding Path="DataContext.AxisEnabledFlags" ElementName="root"/>
@@ -51,14 +55,20 @@
           </MultiBinding>
         </views:CoordValueSetControl.IsVisible>
       </views:CoordValueSetControl>
-      <views:CoordValueSetControl x:Name="cvZOffset" Label="Z axis:" Tag="Z" Click="cvOffset_Click"
-                                  Value="{Binding Offset.Z, ElementName=root, Mode=TwoWay}"/>
-      <views:CoordValueSetControl x:Name="cvTipRadius" Label="Tip radius:" Tag="R" IsEnabled="False" Click="cvOffset_Click"/>
-      <StackPanel Orientation="Horizontal" Margin="5,5">
-        <Button Content="Get current position" Margin="3,0" Click="btnCurrPos_Click"/>
+
+      <views:CoordValueSetControl x:Name="cvZOffset" Margin="2"
+        Label="Z axis:" Tag="Z" Click="cvOffset_Click"
+        Value="{Binding Offset.Z, ElementName=root, Mode=TwoWay}"/>
+
+      <views:CoordValueSetControl x:Name="cvTipRadius" Margin="2"
+        Label="Tip radius:" Tag="R" IsEnabled="False" Click="cvOffset_Click"/>
+
+      <StackPanel Orientation="Horizontal" Margin="0, 4" Spacing="4">
+        <Button Content="Get current position" Click="btnCurrPos_Click"/>
         <Button Content="Clear all" Click="btnClearAll_Click"/>
-        <Button Content="Set all" Margin="3,0" Click="btnSetAll_Click"/>
+        <Button Content="Set all"  Click="btnSetAll_Click"/>
       </StackPanel>
+
     </StackPanel>
   </Grid>
 </UserControl>

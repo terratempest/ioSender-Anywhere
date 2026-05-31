@@ -9,6 +9,7 @@
              x:Class="CNC.Controls.Avalonia.Views.OffsetView"
              x:Name="root"
              d:DesignHeight="515" d:DesignWidth="875">
+
   <UserControl.Resources>
     <ResourceDictionary>
       <ResourceDictionary.MergedDictionaries>
@@ -17,17 +18,17 @@
       <conv:LogicalNotConverter x:Key="IsNotPredefined"/>
     </ResourceDictionary>
   </UserControl.Resources>
-  <Grid Background="Transparent" ColumnDefinitions="Auto,Auto">
+
+  <Grid Background="Transparent" ColumnDefinitions="Auto,Auto" TextElement.FontSize="12">
     <DataGrid x:Name="dgrOffsets" Grid.Column="0" IsReadOnly="True"
               SelectionMode="Single" AutoGenerateColumns="False"
               CanUserReorderColumns="False" CanUserResizeColumns="False"
-              CanUserSortColumns="False" Margin="10,10,0,0"
-              HorizontalAlignment="Left" VerticalAlignment="Top"
-              SelectionChanged="dgrOffsets_SelectionChanged">
+              CanUserSortColumns="False" SelectionChanged="dgrOffsets_SelectionChanged">
+      
       <DataGrid.Columns>
-        <DataGridTextColumn Header="Offset" Binding="{Binding Code}" Width="50"/>
-        <DataGridTextColumn Header="X" Binding="{Binding X}" Width="70"/>
-        <DataGridTextColumn Header="Y" Binding="{Binding Y}" Width="70">
+        <DataGridTextColumn Header="Offset" Binding="{Binding Code}"/>
+        <DataGridTextColumn Header="X" Binding="{Binding X}"/>
+        <DataGridTextColumn Header="Y" Binding="{Binding Y}">
           <DataGridTextColumn.IsVisible>
             <MultiBinding Converter="{StaticResource IsAxisVisibleConverter}">
               <Binding Path="DataContext.AxisEnabledFlags" ElementName="root"/>
@@ -35,7 +36,7 @@
             </MultiBinding>
           </DataGridTextColumn.IsVisible>
         </DataGridTextColumn>
-        <DataGridTextColumn Header="Z" Binding="{Binding Z}" Width="70">
+        <DataGridTextColumn Header="Z" Binding="{Binding Z}">
           <DataGridTextColumn.IsVisible>
             <MultiBinding Converter="{StaticResource IsAxisVisibleConverter}">
               <Binding Path="DataContext.AxisEnabledFlags" ElementName="root"/>
@@ -43,7 +44,7 @@
             </MultiBinding>
           </DataGridTextColumn.IsVisible>
         </DataGridTextColumn>
-        <DataGridTextColumn Binding="{Binding A}" Width="70">
+        <DataGridTextColumn Binding="{Binding A}">
           <DataGridTextColumn.Header>
             <TextBlock Text="{Binding DataContext.AxisLetter.A, ElementName=root}"/>
           </DataGridTextColumn.Header>
@@ -54,7 +55,7 @@
             </MultiBinding>
           </DataGridTextColumn.IsVisible>
         </DataGridTextColumn>
-        <DataGridTextColumn Binding="{Binding B}" Width="70">
+        <DataGridTextColumn Binding="{Binding B}">
           <DataGridTextColumn.Header>
             <TextBlock Text="{Binding DataContext.AxisLetter.B, ElementName=root}"/>
           </DataGridTextColumn.Header>
@@ -65,7 +66,7 @@
             </MultiBinding>
           </DataGridTextColumn.IsVisible>
         </DataGridTextColumn>
-        <DataGridTextColumn Binding="{Binding C}" Width="70">
+        <DataGridTextColumn Binding="{Binding C}">
           <DataGridTextColumn.Header>
             <TextBlock Text="{Binding DataContext.AxisLetter.C, ElementName=root}"/>
           </DataGridTextColumn.Header>
@@ -76,7 +77,7 @@
             </MultiBinding>
           </DataGridTextColumn.IsVisible>
         </DataGridTextColumn>
-        <DataGridTextColumn Header="U" Binding="{Binding U}" Width="70">
+        <DataGridTextColumn Header="U" Binding="{Binding U}">
           <DataGridTextColumn.IsVisible>
             <MultiBinding Converter="{StaticResource IsAxisVisibleConverter}">
               <Binding Path="DataContext.AxisEnabledFlags" ElementName="root"/>
@@ -84,7 +85,7 @@
             </MultiBinding>
           </DataGridTextColumn.IsVisible>
         </DataGridTextColumn>
-        <DataGridTextColumn Header="V" Binding="{Binding V}" Width="70">
+        <DataGridTextColumn Header="V" Binding="{Binding V}">
           <DataGridTextColumn.IsVisible>
             <MultiBinding Converter="{StaticResource IsAxisVisibleConverter}">
               <Binding Path="DataContext.AxisEnabledFlags" ElementName="root"/>
@@ -92,7 +93,7 @@
             </MultiBinding>
           </DataGridTextColumn.IsVisible>
         </DataGridTextColumn>
-        <DataGridTextColumn Header="W" Binding="{Binding W}" Width="70">
+        <DataGridTextColumn Header="W" Binding="{Binding W}">
           <DataGridTextColumn.IsVisible>
             <MultiBinding Converter="{StaticResource IsAxisVisibleConverter}">
               <Binding Path="DataContext.AxisEnabledFlags" ElementName="root"/>
@@ -102,16 +103,17 @@
         </DataGridTextColumn>
       </DataGrid.Columns>
     </DataGrid>
-    <StackPanel Grid.Column="1" Margin="20,15,0,0" VerticalAlignment="Top">
-      <StackPanel Orientation="Horizontal">
-        <TextBlock Text="Offset:" VerticalAlignment="Center" Margin="29,0,4,0"/>
-        <TextBox Text="{Binding Offset.Code, ElementName=root}" Width="40" IsReadOnly="True" Height="23"/>
+
+    <StackPanel Grid.Column="1" VerticalAlignment="Top">
+      <StackPanel Orientation="Horizontal" Margin="73,0,0,2">
+        <TextBlock Text="Offset:" VerticalAlignment="Center" Margin="4,0"/>
+        <TextBox Text="{Binding Offset.Code, ElementName=root}" IsReadOnly="True"/>
       </StackPanel>
-      <views:CoordValueSetControl x:Name="cvXOffset" Tag="X" Click="cvOffset_Click"
+      <views:CoordValueSetControl x:Name="cvXOffset" Tag="X" Click="cvOffset_Click" Margin="2"
                                   Label="{Binding DataContext.AxisLetter.X, ElementName=root, StringFormat='{}{0} axis:'}"
                                   Value="{Binding Offset.X, ElementName=root, Mode=TwoWay}"
                                   IsEnabled="{Binding CanEdit, ElementName=root}"/>
-      <views:CoordValueSetControl x:Name="cvYOffset" Tag="Y" Click="cvOffset_Click"
+      <views:CoordValueSetControl x:Name="cvYOffset" Tag="Y" Click="cvOffset_Click" Margin="2"
                                   Label="{Binding DataContext.AxisLetter.Y, ElementName=root, StringFormat='{}{0} axis:'}"
                                   Value="{Binding Offset.Y, ElementName=root, Mode=TwoWay}"
                                   IsEnabled="{Binding CanEdit, ElementName=root}">
@@ -122,11 +124,11 @@
           </MultiBinding>
         </views:CoordValueSetControl.IsVisible>
       </views:CoordValueSetControl>
-      <views:CoordValueSetControl x:Name="cvZOffset" Tag="Z" Click="cvOffset_Click"
+      <views:CoordValueSetControl x:Name="cvZOffset" Tag="Z" Click="cvOffset_Click" Margin="2"
                                   Label="{Binding DataContext.AxisLetter.Z, ElementName=root, StringFormat='{}{0} axis:'}"
                                   Value="{Binding Offset.Z, ElementName=root, Mode=TwoWay}"
                                   IsEnabled="{Binding CanEdit, ElementName=root}"/>
-      <views:CoordValueSetControl x:Name="cvAOffset" Tag="{Binding DataContext.AxisLetter.A, ElementName=root}" Click="cvOffset_Click"
+      <views:CoordValueSetControl x:Name="cvAOffset" Tag="{Binding DataContext.AxisLetter.A, ElementName=root}" Click="cvOffset_Click" Margin="2"
                                   Label="{Binding DataContext.AxisLetter.A, ElementName=root, StringFormat='{}{0} axis:'}"
                                   Value="{Binding Offset.A, ElementName=root, Mode=TwoWay}"
                                   IsEnabled="{Binding CanEdit, ElementName=root}">
@@ -137,7 +139,7 @@
           </MultiBinding>
         </views:CoordValueSetControl.IsVisible>
       </views:CoordValueSetControl>
-      <views:CoordValueSetControl x:Name="cvBOffset" Tag="{Binding DataContext.AxisLetter.B, ElementName=root}" Click="cvOffset_Click"
+      <views:CoordValueSetControl x:Name="cvBOffset" Tag="{Binding DataContext.AxisLetter.B, ElementName=root}" Click="cvOffset_Click" Margin="2"
                                   Label="{Binding DataContext.AxisLetter.B, ElementName=root, StringFormat='{}{0} axis:'}"
                                   Value="{Binding Offset.B, ElementName=root, Mode=TwoWay}"
                                   IsEnabled="{Binding CanEdit, ElementName=root}">
@@ -148,7 +150,7 @@
           </MultiBinding>
         </views:CoordValueSetControl.IsVisible>
       </views:CoordValueSetControl>
-      <views:CoordValueSetControl x:Name="cvCOffset" Tag="{Binding DataContext.AxisLetter.C, ElementName=root}" Click="cvOffset_Click"
+      <views:CoordValueSetControl x:Name="cvCOffset" Tag="{Binding DataContext.AxisLetter.C, ElementName=root}" Click="cvOffset_Click" Margin="2"
                                   Label="{Binding DataContext.AxisLetter.C, ElementName=root, StringFormat='{}{0} axis:'}"
                                   Value="{Binding Offset.C, ElementName=root, Mode=TwoWay}"
                                   IsEnabled="{Binding CanEdit, ElementName=root}">
@@ -159,7 +161,7 @@
           </MultiBinding>
         </views:CoordValueSetControl.IsVisible>
       </views:CoordValueSetControl>
-      <views:CoordValueSetControl x:Name="cvUOffset" Tag="{Binding DataContext.AxisLetter.U, ElementName=root}" Click="cvOffset_Click"
+      <views:CoordValueSetControl x:Name="cvUOffset" Tag="{Binding DataContext.AxisLetter.U, ElementName=root}" Click="cvOffset_Click" Margin="2"
                                   Label="{Binding DataContext.AxisLetter.U, ElementName=root, StringFormat='{}{0} axis:'}"
                                   Value="{Binding Offset.U, ElementName=root, Mode=TwoWay}"
                                   IsEnabled="{Binding CanEdit, ElementName=root}">
@@ -170,7 +172,7 @@
           </MultiBinding>
         </views:CoordValueSetControl.IsVisible>
       </views:CoordValueSetControl>
-      <views:CoordValueSetControl x:Name="cvVOffset" Tag="{Binding DataContext.AxisLetter.V, ElementName=root}" Click="cvOffset_Click"
+      <views:CoordValueSetControl x:Name="cvVOffset" Tag="{Binding DataContext.AxisLetter.V, ElementName=root}" Click="cvOffset_Click" Margin="2"
                                   Label="{Binding DataContext.AxisLetter.V, ElementName=root, StringFormat='{}{0} axis:'}"
                                   Value="{Binding Offset.V, ElementName=root, Mode=TwoWay}"
                                   IsEnabled="{Binding CanEdit, ElementName=root}">
@@ -181,7 +183,7 @@
           </MultiBinding>
         </views:CoordValueSetControl.IsVisible>
       </views:CoordValueSetControl>
-      <views:CoordValueSetControl x:Name="cvWOffset" Tag="{Binding DataContext.AxisLetter.W, ElementName=root}" Click="cvOffset_Click"
+      <views:CoordValueSetControl x:Name="cvWOffset" Tag="{Binding DataContext.AxisLetter.W, ElementName=root}" Click="cvOffset_Click" Margin="2"
                                   Label="{Binding DataContext.AxisLetter.W, ElementName=root, StringFormat='{}{0} axis:'}"
                                   Value="{Binding Offset.W, ElementName=root, Mode=TwoWay}"
                                   IsEnabled="{Binding CanEdit, ElementName=root}">
@@ -192,14 +194,16 @@
           </MultiBinding>
         </views:CoordValueSetControl.IsVisible>
       </views:CoordValueSetControl>
-      <StackPanel Orientation="Horizontal" Margin="0,5">
-        <Button x:Name="btnCurrPos" Content="Get current position" Padding="8,0" Margin="3,0"
+
+      <StackPanel Orientation="Horizontal" Margin="0,4" Spacing="4">
+        <Button x:Name="btnCurrPos" Content="Get current position"
                 IsEnabled="{Binding IsPredefined, ElementName=root, Converter={StaticResource IsNotPredefined}}"
                 Click="btnCurrPos_Click"/>
-        <Button x:Name="btnClear" Content="Clear all" Padding="8,0"
+        <Button x:Name="btnClear" Content="Clear all" 
                 IsEnabled="{Binding CanEdit, ElementName=root}" Click="btnClearAll_Click"/>
-        <Button x:Name="btnSetAll" Content="Set all" Padding="8,0" Margin="3,0" Click="btnSetAll_Click"/>
+        <Button x:Name="btnSetAll" Content="Set all" Click="btnSetAll_Click"/>
       </StackPanel>
     </StackPanel>
+    
   </Grid>
 </UserControl>

@@ -19,66 +19,77 @@
         Background="{DynamicResource ThemeBackgroundBrush}">
 
   <DockPanel VerticalAlignment="Stretch" HorizontalAlignment="Stretch">
-    <Menu DockPanel.Dock="Top">
-      <MenuItem x:Name="MnuFile" Header="_File" loc:Localize.Key="ioSender.mainwindow.mnu_file">
-        <MenuItem x:Name="MnuFileOpen" Header="_Open G-code..." Click="OnOpenGCodeClick"
-                  loc:Localize.Key="ioSender.mainwindow.mnu_open"/>
-        <MenuItem x:Name="MnuTransform" Header="_Transform" IsEnabled="False"
-                  loc:Localize.Key="ioSender.mainwindow.mnu_transform" loc:Localize.Fallback="_Transform">
-          <MenuItem x:Name="MnuDragKnife" Header="Add drag knife moves" Click="OnDragKnifeTransformClick"
-                    loc:Localize.Key="ioSender.mainwindow.str_mnuDragKnife" loc:Localize.Fallback="Add drag knife moves"/>
+    <Grid DockPanel.Dock="Top" ColumnDefinitions="Auto,*,Auto"
+          Background="{DynamicResource ThemeControlLowBrush}">
+      <Menu Grid.Column="0">
+        <MenuItem x:Name="MnuFile" Header="_File" loc:Localize.Key="ioSender.mainwindow.mnu_file">
+          <MenuItem x:Name="MnuFileOpen" Header="_Open G-code..." Click="OnOpenGCodeClick"
+                    loc:Localize.Key="ioSender.mainwindow.mnu_open"/>
+          <MenuItem x:Name="MnuTransform" Header="_Transform" IsEnabled="False"
+                    loc:Localize.Key="ioSender.mainwindow.mnu_transform" loc:Localize.Fallback="_Transform">
+            <MenuItem x:Name="MnuDragKnife" Header="Add drag knife moves" Click="OnDragKnifeTransformClick"
+                      loc:Localize.Key="ioSender.mainwindow.str_mnuDragKnife" loc:Localize.Fallback="Add drag knife moves"/>
+          </MenuItem>
+          <Separator/>
+          <MenuItem x:Name="MnuFileConnect" Header="_Connect..." Click="OnConnectClick"
+                    loc:Localize.Key="ioSender.mainwindow.mnu_connect" loc:Localize.Fallback="_Connect..."/>
+          <MenuItem x:Name="MnuFileExit" Header="_Exit" Click="OnExitClick"
+                    loc:Localize.Key="ioSender.mainwindow.mnu_exit"/>
         </MenuItem>
-        <Separator/>
-        <MenuItem x:Name="MnuFileConnect" Header="_Connect..." Click="OnConnectClick"
-                  loc:Localize.Key="ioSender.mainwindow.mnu_connect" loc:Localize.Fallback="_Connect..."/>
-        <MenuItem x:Name="MnuFileExit" Header="_Exit" Click="OnExitClick"
-                  loc:Localize.Key="ioSender.mainwindow.mnu_exit"/>
-      </MenuItem>
-      <MenuItem x:Name="MnuView" Header="_View"
-                loc:Localize.Key="ioSender.mainwindow.mnu_view" loc:Localize.Fallback="_View">
-        <MenuItem x:Name="MnuLockLayout" Header="_Lock layout" ToggleType="CheckBox" IsChecked="True"
-                  Click="OnLockLayoutClick"
-                  loc:Localize.Key="ioSender.mainwindow.mnu_lockLayout" loc:Localize.Fallback="_Lock layout"/>
-        <MenuItem x:Name="MnuResetLayout" Header="_Reset layout" Click="OnResetLayoutClick"
-                  loc:Localize.Key="ioSender.mainwindow.mnu_resetLayout" loc:Localize.Fallback="_Reset layout"/>
-        <MenuItem x:Name="MnuLayouts" Header="_Layouts"
-                  loc:Localize.Key="ioSender.mainwindow.mnu_layouts" loc:Localize.Fallback="_Layouts">
-          <MenuItem x:Name="MnuPresetCompact" Header="_Compact" Click="OnPresetCompactClick"
-                    loc:Localize.Key="ioSender.mainwindow.mnu_presetCompact" loc:Localize.Fallback="_Compact"/>
-          <MenuItem x:Name="MnuPresetExpanded" Header="_Expanded" Click="OnPresetExpandedClick"
-                    loc:Localize.Key="ioSender.mainwindow.mnu_presetExpanded" loc:Localize.Fallback="_Expanded"/>
+
+        <MenuItem x:Name="MnuView" Header="_View"
+                  loc:Localize.Key="ioSender.mainwindow.mnu_view" loc:Localize.Fallback="_View">
+          <MenuItem x:Name="MnuLockLayout" Header="_Lock layout" ToggleType="CheckBox" IsChecked="True"
+                    Click="OnLockLayoutClick"
+                    loc:Localize.Key="ioSender.mainwindow.mnu_lockLayout" loc:Localize.Fallback="_Lock layout"/>
+          <MenuItem x:Name="MnuResetLayout" Header="_Reset layout" Click="OnResetLayoutClick"
+                    loc:Localize.Key="ioSender.mainwindow.mnu_resetLayout" loc:Localize.Fallback="_Reset layout"/>
+          <MenuItem x:Name="MnuLayouts" Header="_Layouts"
+                    loc:Localize.Key="ioSender.mainwindow.mnu_layouts" loc:Localize.Fallback="_Layouts">
+            <MenuItem x:Name="MnuPresetCompact" Header="_Compact" Click="OnPresetCompactClick"
+                      loc:Localize.Key="ioSender.mainwindow.mnu_presetCompact" loc:Localize.Fallback="_Compact"/>
+            <MenuItem x:Name="MnuPresetExpanded" Header="_Expanded" Click="OnPresetExpandedClick"
+                      loc:Localize.Key="ioSender.mainwindow.mnu_presetExpanded" loc:Localize.Fallback="_Expanded"/>
+          </MenuItem>
+          <MenuItem x:Name="MnuSaveLayout" Header="_Save layout..." Click="OnSaveLayoutClick"
+                    loc:Localize.Key="ioSender.mainwindow.mnu_saveLayout" loc:Localize.Fallback="_Save layout..."/>
+          <MenuItem x:Name="MnuDeleteLayout" Header="_Delete layout..." Click="OnDeleteLayoutClick"
+                    loc:Localize.Key="ioSender.mainwindow.mnu_deleteLayout" loc:Localize.Fallback="_Delete layout..."/>
+          <MenuItem x:Name="MnuSidebar" Header="_Sidebar"
+                    loc:Localize.Key="ioSender.mainwindow.mnu_sidebar" loc:Localize.Fallback="_Sidebar">
+            <MenuItem x:Name="MnuSidebarLeft" Header="_Left side" ToggleType="CheckBox"
+                      Click="OnSidebarLeftMenuClick"
+                      loc:Localize.Key="ioSender.mainwindow.mnu_sidebarLeft" loc:Localize.Fallback="_Left side"/>
+            <MenuItem x:Name="MnuSidebarRight" Header="_Right side" ToggleType="CheckBox"
+                      Click="OnSidebarRightMenuClick"
+                      loc:Localize.Key="ioSender.mainwindow.mnu_sidebarRight" loc:Localize.Fallback="_Right side"/>
+          </MenuItem>
+          <Separator/>
+          <MenuItem x:Name="MnuViewCamera" Header="_Camera..." Click="OnCameraClick"
+                    loc:Localize.Key="ioSender.mainwindow.mnu_camera"/>
+          <MenuItem x:Name="MnuRefreshPorts" Header="_Refresh serial ports" Click="OnRefreshPortsClick"
+                    loc:Localize.Key="ioSender.mainwindow.mnu_refreshPorts" loc:Localize.Fallback="_Refresh serial ports"/>
         </MenuItem>
-        <MenuItem x:Name="MnuSaveLayout" Header="_Save layout..." Click="OnSaveLayoutClick"
-                  loc:Localize.Key="ioSender.mainwindow.mnu_saveLayout" loc:Localize.Fallback="_Save layout..."/>
-        <MenuItem x:Name="MnuDeleteLayout" Header="_Delete layout..." Click="OnDeleteLayoutClick"
-                  loc:Localize.Key="ioSender.mainwindow.mnu_deleteLayout" loc:Localize.Fallback="_Delete layout..."/>
-        <MenuItem x:Name="MnuSidebar" Header="_Sidebar"
-                  loc:Localize.Key="ioSender.mainwindow.mnu_sidebar" loc:Localize.Fallback="_Sidebar">
-          <MenuItem x:Name="MnuSidebarLeft" Header="_Left side" ToggleType="CheckBox"
-                    Click="OnSidebarLeftMenuClick"
-                    loc:Localize.Key="ioSender.mainwindow.mnu_sidebarLeft" loc:Localize.Fallback="_Left side"/>
-          <MenuItem x:Name="MnuSidebarRight" Header="_Right side" ToggleType="CheckBox"
-                    Click="OnSidebarRightMenuClick"
-                    loc:Localize.Key="ioSender.mainwindow.mnu_sidebarRight" loc:Localize.Fallback="_Right side"/>
+
+        <MenuItem x:Name="MnuSettings" Header="_Settings"
+                  loc:Localize.Key="ioSender.mainwindow.mnu_settings" loc:Localize.Fallback="_Settings">
+          <MenuItem x:Name="MnuGrblSettings" Header="Settings: _Grbl" Click="OnGrblSettingsClick"
+                    loc:Localize.Key="ioSender.mainwindow.mnu_grblSettings" loc:Localize.Fallback="Settings: _Grbl"/>
+          <MenuItem x:Name="MnuAppSettings" Header="Settings: _App" Click="OnAppSettingsClick"
+                    loc:Localize.Key="ioSender.mainwindow.mnu_appSettings" loc:Localize.Fallback="Settings: _App"/>
+          <MenuItem x:Name="MnuCheckMode" Header="Check _mode"
+                    ToggleType="CheckBox"
+                    Click="OnCheckModeMenuClick"
+                    loc:Localize.Key="ioSender.mainwindow.mnu_checkMode" loc:Localize.Fallback="Check mode"/>
         </MenuItem>
-        <Separator/>
-        <MenuItem x:Name="MnuViewCamera" Header="_Camera..." Click="OnCameraClick"
-                  loc:Localize.Key="ioSender.mainwindow.mnu_camera"/>
-        <MenuItem x:Name="MnuRefreshPorts" Header="_Refresh serial ports" Click="OnRefreshPortsClick"
-                  loc:Localize.Key="ioSender.mainwindow.mnu_refreshPorts" loc:Localize.Fallback="_Refresh serial ports"/>
-      </MenuItem>
-      <MenuItem x:Name="MnuSettings" Header="_Settings"
-                loc:Localize.Key="ioSender.mainwindow.mnu_settings" loc:Localize.Fallback="_Settings">
-        <MenuItem x:Name="MnuGrblSettings" Header="Settings: _Grbl" Click="OnGrblSettingsClick"
-                  loc:Localize.Key="ioSender.mainwindow.mnu_grblSettings" loc:Localize.Fallback="Settings: _Grbl"/>
-        <MenuItem x:Name="MnuAppSettings" Header="Settings: _App" Click="OnAppSettingsClick"
-                  loc:Localize.Key="ioSender.mainwindow.mnu_appSettings" loc:Localize.Fallback="Settings: _App"/>
-        <MenuItem x:Name="MnuCheckMode" Header="Check _mode"
-                  ToggleType="CheckBox"
-                  Click="OnCheckModeMenuClick"
-                  loc:Localize.Key="ioSender.mainwindow.mnu_checkMode" loc:Localize.Fallback="Check mode"/>
-      </MenuItem>
-    </Menu>
+      </Menu>
+
+      <cnc:SignalsControl Grid.Column="2"
+                          DataContext="{Binding Grbl}"
+                          HorizontalAlignment="Right"
+                          VerticalAlignment="Center"
+                          Margin="4,0,6,0"/>
+    </Grid>
 
     <Border DockPanel.Dock="Bottom" Padding="6,4"
             Background="{DynamicResource ThemeControlLowBrush}"

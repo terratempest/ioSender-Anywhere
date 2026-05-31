@@ -6,29 +6,31 @@
              xmlns:core="using:CNC.Core"
              x:Class="CNC.Controls.Avalonia.Views.WorkParametersControl"
              x:DataType="core:GrblViewModel"
-             MinWidth="200"
-             MinHeight="72"
-             HorizontalAlignment="Stretch"
-             VerticalAlignment="Stretch">
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             mc:Ignorable="d" d:DesignWidth="250" d:DesignHeight="80"
+             >
 
   <UserControl.Resources>
     <conv:LogicalNotConverter x:Key="BooleanConverter"/>
     <conv:BoolToVisibleConverter x:Key="IsVisibleConverter"/>
   </UserControl.Resources>
 
-  <Grid Margin="4" ColumnDefinitions="Auto,*,Auto,*" RowDefinitions="28,28"
+  <Grid Margin="4" ColumnDefinitions="Auto,*,Auto,*" RowDefinitions="28,28" TextElement.FontSize="12"
         HorizontalAlignment="Stretch" VerticalAlignment="Stretch">
 
-    <TextBlock x:Name="LblOffset" Grid.Row="0" Grid.Column="0" Text="Offset:" Height="24"
-               VerticalAlignment="Center" Foreground="{DynamicResource ThemeForegroundBrush}"
-               loc:Localize.Key="CNC.Controls.Avalonia.workparameterscontrol.lbl_offset" loc:Localize.Fallback="Offset:"/>
-    <ComboBox x:Name="cbxOffset" Grid.Row="0" Grid.Column="1" Height="24"
-              HorizontalAlignment="Stretch" VerticalAlignment="Center"
-              ItemsSource="{Binding CoordinateSystems}"
-              SelectedValue="{Binding WorkCoordinateSystem, Mode=OneWay}"
-              SelectedValueBinding="{Binding Code}"
-              IsEnabled="{Binding IsJobRunning, Converter={StaticResource BooleanConverter}}"
-              SelectionChanged="cbxOffset_SelectionChanged">
+    <TextBlock x:Name="LblOffset" Grid.Row="0" Grid.Column="0" Text="Offset:" 
+      VerticalAlignment="Center" Foreground="{DynamicResource ThemeForegroundBrush}"
+      loc:Localize.Key="CNC.Controls.Avalonia.workparameterscontrol.lbl_offset" loc:Localize.Fallback="Offset:"/>
+    
+      <ComboBox x:Name="cbxOffset" Grid.Row="0" Grid.Column="1" 
+        Margin="4, 0"
+        ItemsSource="{Binding CoordinateSystems}"
+        SelectedValue="{Binding WorkCoordinateSystem, Mode=OneWay}"
+        SelectedValueBinding="{Binding Code}"
+        IsEnabled="{Binding IsJobRunning, Converter={StaticResource BooleanConverter}}"
+        SelectionChanged="cbxOffset_SelectionChanged"
+        PlaceholderText="G59.3">
       <ComboBox.ItemTemplate>
         <DataTemplate>
           <TextBlock Text="{Binding Code}"/>
@@ -36,16 +38,16 @@
       </ComboBox.ItemTemplate>
     </ComboBox>
 
-    <TextBlock x:Name="LblTool" Grid.Row="0" Grid.Column="2" Text="Tool:" Height="24"
-               VerticalAlignment="Center" Foreground="{DynamicResource ThemeForegroundBrush}"
-               loc:Localize.Key="CNC.Controls.Avalonia.workparameterscontrol.lbl_tool" loc:Localize.Fallback="Tool:"/>
-    <ComboBox x:Name="cbxTool" Grid.Row="0" Grid.Column="3" Height="24"
-              HorizontalAlignment="Stretch" VerticalAlignment="Center"
-              ItemsSource="{Binding Tools}"
-              SelectedValue="{Binding Tool, Mode=OneWay}"
-              SelectedValueBinding="{Binding Code}"
-              IsEnabled="{Binding IsJobRunning, Converter={StaticResource BooleanConverter}}"
-              SelectionChanged="cbxTool_SelectionChanged">
+    <TextBlock x:Name="LblTool" Grid.Row="0" Grid.Column="2" Text="Tool:" 
+      VerticalAlignment="Center" Foreground="{DynamicResource ThemeForegroundBrush}"
+      loc:Localize.Key="CNC.Controls.Avalonia.workparameterscontrol.lbl_tool" loc:Localize.Fallback="Tool:"/>
+    <ComboBox x:Name="cbxTool" Grid.Row="0" Grid.Column="3" Margin="4, 0, 0, 0"
+      ItemsSource="{Binding Tools}"
+      SelectedValue="{Binding Tool, Mode=OneWay}"
+      SelectedValueBinding="{Binding Code}"
+      IsEnabled="{Binding IsJobRunning, Converter={StaticResource BooleanConverter}}"
+      SelectionChanged="cbxTool_SelectionChanged"
+      PlaceholderText="1000">
       <ComboBox.ItemTemplate>
         <DataTemplate>
           <TextBlock Text="{Binding Code}"/>
@@ -54,13 +56,14 @@
     </ComboBox>
 
     <StackPanel Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="4"
-                Orientation="Horizontal" Spacing="12"
-                HorizontalAlignment="Right" VerticalAlignment="Center" Height="28">
-      <views:LEDControl x:Name="LedTlo" Label="TLO" Height="28"
-                        IsSet="{Binding IsToolOffsetActive, Mode=OneWay}"
-                        IsVisible="{Binding IsParserStateLive, Converter={StaticResource IsVisibleConverter}}"/>
-      <views:LEDControl x:Name="LedTloRef" Label="TLO ref'd" Height="28"
-                        IsSet="{Binding IsTloReferenceSet, Mode=OneWay}"/>
+      Orientation="Horizontal" Spacing="12"
+      HorizontalAlignment="Right" VerticalAlignment="Center">
+      <views:LEDControl x:Name="LedTlo" Label="TLO" 
+        IsSet="{Binding IsToolOffsetActive, Mode=OneWay}"
+        IsVisible="{Binding IsParserStateLive, Converter={StaticResource IsVisibleConverter}}"/>
+      <views:LEDControl x:Name="LedTloRef" Label="TLO ref'd" 
+        IsSet="{Binding IsTloReferenceSet, Mode=OneWay}"/>
     </StackPanel>
+
   </Grid>
 </UserControl>

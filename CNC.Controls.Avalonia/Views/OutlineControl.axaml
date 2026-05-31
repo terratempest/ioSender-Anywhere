@@ -1,12 +1,40 @@
 <UserControl xmlns="https://github.com/avaloniaui"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:conv="using:CNC.Controls.Avalonia.Converters"
              xmlns:views="using:CNC.Controls.Avalonia.Views"
              x:Class="CNC.Controls.Avalonia.Views.OutlineControl"
-             Height="125" Width="250">
-  <Border Classes="panel-chrome" BorderThickness="1" Padding="4" Width="250" Height="125">
-    <StackPanel>
-      <TextBlock Text="Outline" FontWeight="Bold" Margin="0,0,0,4"/>
-      <views:OutlineBaseControl x:Name="OutlineBase"/>
-    </StackPanel>
-  </Border>
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             mc:Ignorable="d" d:DesignWidth="230" d:DesignHeight="210"
+             HorizontalAlignment="Stretch" VerticalAlignment="Stretch"
+             >
+  <UserControl.Resources>
+    <conv:LogicalNotConverter x:Key="LogicalNotConverter"/>
+  </UserControl.Resources>
+
+  <Grid RowDefinitions="Auto, Auto"
+        Margin="4"
+        HorizontalAlignment="Stretch"
+        VerticalAlignment="Stretch"
+        IsEnabled="{Binding IsJobRunning, Converter={StaticResource LogicalNotConverter}}">
+    
+    <TextBlock Grid.Row="0" TextWrapping="Wrap" VerticalAlignment="Top">
+      <Run Text="Execute moves to outline X and Y program limits."/>
+      <LineBreak/>
+      <Run Text="Ensure tool tip is clear of any obstructions!" Foreground="Red" FontWeight="Bold"/>
+    </TextBlock>
+
+    <Grid Grid.Row="1" ColumnDefinitions="Auto, *" Margin="0,16,0,0" HorizontalAlignment="Stretch">
+      <views:NumericField Label="Feed rate:" 
+                          Grid.Column="0"
+                          Value="{Binding FeedRate, RelativeSource={RelativeSource AncestorType=UserControl}, Mode=TwoWay}"
+                          Unit="{Binding FeedrateUnit}"
+                          Format="###0" 
+                          VerticalAlignment="Top"/>
+
+      <Button Grid.Column="1" Content="Go" IsEnabled="{Binding IsFileLoaded}"
+              HorizontalAlignment="Right" Width="48" HorizontalContentAlignment="Center"
+              VerticalAlignment="Top" Click="button_Go"/>
+    </Grid>
+  </Grid>
 </UserControl>

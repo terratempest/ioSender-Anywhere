@@ -1,13 +1,66 @@
 <UserControl xmlns="https://github.com/avaloniaui"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-             xmlns:views="using:CNC.Controls.Avalonia.Views"
+             xmlns:conv="using:CNC.Controls.Avalonia.Converters"
              x:Class="CNC.Controls.Avalonia.Views.GotoControl"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             mc:Ignorable="d"
              Focusable="False"
-             Width="250" Height="122">
-  <Border Classes="panel-chrome" BorderThickness="1" Padding="4" Width="250">
-    <StackPanel>
-      <TextBlock Text="Goto" FontWeight="Bold" Margin="0,0,0,4"/>
-      <views:GotoBaseControl Margin="36,0,0,0"/>
+             d:DesignHeight="150"
+             d:DesignWidth="200"
+             HorizontalAlignment="Stretch"
+             VerticalAlignment="Stretch">
+  <UserControl.Resources>
+    <conv:LogicalNotConverter x:Key="LogicalNotConverter"/>
+    <conv:HomedStateToBooleanConverter x:Key="IsHomed"/>
+  </UserControl.Resources>
+
+  <Grid RowDefinitions="Auto,Auto,Auto"
+        IsEnabled="{Binding IsJobRunning, Converter={StaticResource LogicalNotConverter}}"
+        Margin="4"
+        RowSpacing="4"
+        HorizontalAlignment="Stretch"
+        VerticalAlignment="Top">
+    <Button Grid.Row="0"
+            Tag="G28"
+            Content="Goto position 1 (G28)"
+            Height="36"
+            VerticalContentAlignment="Center"
+            HorizontalContentAlignment="Center"
+            Padding="0"
+            IsEnabled="{Binding HomedState, Mode=OneWay, Converter={StaticResource IsHomed}}"
+            Focusable="False"
+            HorizontalAlignment="Stretch"
+            Click="OnGotoClick"/>
+
+    <Button Grid.Row="1"
+            Tag="G30"
+            Content="Goto position 2 (G30)"
+            Height="36"
+            VerticalContentAlignment="Center"
+            HorizontalContentAlignment="Center"
+            Padding="0"
+            IsEnabled="{Binding HomedState, Mode=OneWay, Converter={StaticResource IsHomed}}"
+            Focusable="False"
+            HorizontalAlignment="Stretch" 
+            Click="OnGotoClick"/>
+
+    <StackPanel Grid.Row="2" Orientation="Horizontal" HorizontalAlignment="Center" Spacing="4">
+      <ComboBox x:Name="cbxCoordinateSystem" Width="80" Height="36"
+                ItemsSource="{Binding CoordinateSystems, RelativeSource={RelativeSource AncestorType=UserControl}}"
+                SelectionChanged="OnCoordinateSystemSelectionChanged"
+                PlaceholderText="G99.9">
+        <ComboBox.ItemTemplate>
+          <DataTemplate>
+            <TextBlock Text="{Binding Code}"/>
+          </DataTemplate>
+        </ComboBox.ItemTemplate>
+      </ComboBox>
+
+      <Button Tag="G5x" Content="Go" Height="38" Width="38" Padding="0"
+              VerticalContentAlignment="Center" HorizontalContentAlignment="Center"
+              IsEnabled="{Binding HomedState, Mode=OneWay, Converter={StaticResource IsHomed}}"
+              Focusable="False" Click="OnGotoClick"/>
     </StackPanel>
-  </Border>
+  </Grid>
 </UserControl>

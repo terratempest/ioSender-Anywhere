@@ -7,7 +7,7 @@
              x:Name="numericField"
              mc:Ignorable="d"
              d:DesignWidth="240"
-             d:DesignHeight="24"
+             d:DesignHeight="36"
              >
 
   <Grid x:Name="grid" ColumnDefinitions="*,Auto,Auto">

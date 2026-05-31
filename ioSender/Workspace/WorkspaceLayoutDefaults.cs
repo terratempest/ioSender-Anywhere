@@ -18,13 +18,7 @@ public static class WorkspaceLayoutDefaults
         {
             Orientation = WorkspaceSplitOrientation.Horizontal,
             Ratio = 0.22,
-            First = new WorkspaceSplit
-            {
-                Orientation = WorkspaceSplitOrientation.Vertical,
-                Ratio = 0.42,
-                First = Leaf(WorkspaceEditorId.Dro),
-                Second = Leaf(WorkspaceEditorId.Signals),
-            },
+            First = Leaf(WorkspaceEditorId.Dro),
             Second = new WorkspaceSplit
             {
                 Orientation = WorkspaceSplitOrientation.Horizontal,
@@ -50,13 +44,7 @@ public static class WorkspaceLayoutDefaults
         {
             Orientation = WorkspaceSplitOrientation.Horizontal,
             Ratio = 0.18,
-            First = new WorkspaceSplit
-            {
-                Orientation = WorkspaceSplitOrientation.Vertical,
-                Ratio = 0.38,
-                First = Leaf(WorkspaceEditorId.Dro),
-                Second = Leaf(WorkspaceEditorId.Signals),
-            },
+            First = Leaf(WorkspaceEditorId.Dro),
             Second = new WorkspaceSplit
             {
                 Orientation = WorkspaceSplitOrientation.Horizontal,

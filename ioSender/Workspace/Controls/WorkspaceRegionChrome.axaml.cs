@@ -12,8 +12,6 @@ namespace ioSender.Workspace.Controls;
 
 public partial class WorkspaceRegionChrome : Border
 {
-    const double SignalsCompactHeaderHeight = 70d;
-
     public static readonly StyledProperty<WorkspaceEditorId> EditorIdProperty =
         AvaloniaProperty.Register<WorkspaceRegionChrome, WorkspaceEditorId>(nameof(EditorId));
 
@@ -43,7 +41,6 @@ public partial class WorkspaceRegionChrome : Border
         TitleBar.PointerReleased += OnTitleBarPointerReleased;
         PointerEntered += OnPointerEntered;
         PointerExited += OnPointerExited;
-        SizeChanged += OnSizeChanged;
     }
 
     public WorkspaceEditorId EditorId
@@ -211,13 +208,9 @@ public partial class WorkspaceRegionChrome : Border
         HeaderStatusText.IsVisible = visible;
     }
 
-    void OnSizeChanged(object? sender, SizeChangedEventArgs e) => UpdateTitleBarVisibility();
-
     void UpdateTitleBarVisibility()
     {
-        TitleBar.IsVisible = EditorId != WorkspaceEditorId.Signals
-            || IsEditMode
-            || Bounds.Height >= SignalsCompactHeaderHeight;
+        TitleBar.IsVisible = true;
     }
 
     void OnTitleBarPointerPressed(object? sender, PointerPressedEventArgs e)

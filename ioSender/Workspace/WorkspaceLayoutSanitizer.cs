@@ -7,7 +7,7 @@ public static class WorkspaceLayoutSanitizer
     public static WorkspaceNode? Sanitize(WorkspaceNode? root) => root switch
     {
         null => null,
-        WorkspaceLeaf leaf => leaf.Editor == WorkspaceEditorId.Status ? null : leaf,
+        WorkspaceLeaf leaf => IsShellLevelPanel(leaf.Editor) ? null : leaf,
         WorkspaceSplit split => CollapseSplit(split),
         WorkspaceTabGroup tabGroup => SanitizeTabGroup(tabGroup),
         _ => null,
@@ -38,7 +38,7 @@ public static class WorkspaceLayoutSanitizer
     static WorkspaceNode? SanitizeTabGroup(WorkspaceTabGroup tabGroup)
     {
         var tabs = tabGroup.Tabs
-            .Where(t => t.Editor != WorkspaceEditorId.Status)
+            .Where(t => !IsShellLevelPanel(t.Editor))
             .ToList();
 
         if (tabs.Count == 0)
@@ -62,4 +62,7 @@ public static class WorkspaceLayoutSanitizer
 
         return clone;
     }
+
+    static bool IsShellLevelPanel(WorkspaceEditorId id) =>
+        id is WorkspaceEditorId.Status or WorkspaceEditorId.Signals;
 }

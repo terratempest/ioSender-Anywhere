@@ -17,8 +17,8 @@ public static class WorkspaceEditorCatalog
         Desc(WorkspaceEditorId.Signals, "ioSender.workspace.editor_signals", "Signals", 216, 60, fillsWorkspace: true),
         Desc(WorkspaceEditorId.Status, "ioSender.workspace.editor_status", "Status", 216, 66, fillsWorkspace: true),
         Desc(WorkspaceEditorId.Jog, "ioSender.workspace.editor_jog", "Jog", 280, 200, fillsWorkspace: true),
-        Desc(WorkspaceEditorId.Outline, "ioSender.workspace.editor_outline", "Outline", 250, 125),
-        Desc(WorkspaceEditorId.Goto, "ioSender.workspace.editor_goto", "Goto", 250, 100),
+        Desc(WorkspaceEditorId.Outline, "ioSender.workspace.editor_outline", "Outline", 250, 125, fillsWorkspace: true),
+        Desc(WorkspaceEditorId.Goto, "ioSender.workspace.editor_goto", "Goto", 250, 100, fillsWorkspace: true),
         Desc(WorkspaceEditorId.WorkParams, "ioSender.workspace.editor_workparams", "Work Parameters", 200, 72, fillsWorkspace: true),
         Desc(WorkspaceEditorId.Spindle, "ioSender.workspace.editor_spindle", "Spindle", 250, 90, fillsWorkspace: true),
         Desc(WorkspaceEditorId.SpindleTouch, "ioSender.workspace.editor_spindleTouch", "Spindle (Touch)", 220, 250, fillsWorkspace: true),
@@ -68,6 +68,7 @@ public static class WorkspaceEditorCatalog
             or WorkspaceEditorId.Offsets
             or WorkspaceEditorId.GrblConfig
             or WorkspaceEditorId.AppConfig
+            or WorkspaceEditorId.Signals
             or WorkspaceEditorId.Status));
 
     /// <summary>Entries assignable in the Home workspace layout picker.</summary>
@@ -77,6 +78,7 @@ public static class WorkspaceEditorCatalog
             or WorkspaceEditorId.Offsets
             or WorkspaceEditorId.GrblConfig
             or WorkspaceEditorId.AppConfig
+            or WorkspaceEditorId.Signals
             or WorkspaceEditorId.Status));
 
     public static WorkspaceEditorDescriptor Get(WorkspaceEditorId id) =>

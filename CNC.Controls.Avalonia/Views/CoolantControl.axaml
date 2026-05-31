@@ -11,8 +11,6 @@
              mc:Ignorable="d"
              d:DesignWidth="220"
              d:DesignHeight="48"
-             MinWidth="80"
-             MinHeight="32"
              HorizontalAlignment="Stretch"
              VerticalAlignment="Stretch"
              HorizontalContentAlignment="Stretch"

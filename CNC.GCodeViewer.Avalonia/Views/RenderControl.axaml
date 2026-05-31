@@ -10,45 +10,57 @@
              HorizontalAlignment="Stretch"
              VerticalAlignment="Stretch">
   <DockPanel>
-    <StackPanel DockPanel.Dock="Bottom" Orientation="Horizontal" HorizontalAlignment="Right" Spacing="4" Margin="0,4,0,0">
-      <Button Content="Reset view" Click="OnResetViewClick" Padding="8,4"/>
-    </StackPanel>
+
     <Grid x:Name="ViewportHost" Background="#101010">
       <views:ToolpathGlControl x:Name="GlViewport"
-                               HorizontalAlignment="Stretch"
-                               VerticalAlignment="Stretch"/>
+        HorizontalAlignment="Stretch"
+        VerticalAlignment="Stretch"/>
+
       <Panel x:Name="ViewportInput"
-             Background="Transparent"
-             HorizontalAlignment="Stretch"
-             VerticalAlignment="Stretch"
-             Cursor="Hand"/>
+        Background="Transparent"
+        HorizontalAlignment="Stretch"
+        VerticalAlignment="Stretch"
+        Cursor="Hand"/>
+
       <views:ViewCubeOverlay x:Name="ViewCube"
-                             Width="110"
-                             Height="110"
-                             HorizontalAlignment="Right"
-                             VerticalAlignment="Bottom"
-                             Margin="8"
-                             IsHitTestVisible="True"/>
-      <Border x:Name="StatusPanel" HorizontalAlignment="Left" VerticalAlignment="Bottom" Margin="8"
-                             IsHitTestVisible="False"
-              Background="#AA000000" Padding="8,4" CornerRadius="4">
+        Width="110"
+        Height="110"
+        HorizontalAlignment="Right"
+        VerticalAlignment="Bottom"
+        Margin="8"
+        IsHitTestVisible="True"/>
+
+      <Border x:Name="StatusPanel" 
+        HorizontalAlignment="Left" VerticalAlignment="Bottom" Margin="8"
+        IsHitTestVisible="False"
+        Background="#AA000000" Padding="8,4" CornerRadius="4">
         <TextBlock x:Name="StatusText"
-                   Foreground="#CCCCCC"
-                   FontSize="10"
-                   TextWrapping="Wrap"
-                   MaxWidth="280"
-                   Text="3D view — starting"/>
+          Foreground="#CCCCCC"
+          FontSize="10"
+          TextWrapping="Wrap"
+          MaxWidth="280"
+          Text="3D view — starting"/>
       </Border>
-      <Border x:Name="OverlayPanel" HorizontalAlignment="Right" VerticalAlignment="Top" Margin="8"
-              Background="#AA000000" Padding="8,4" CornerRadius="4" IsVisible="False"
-              IsHitTestVisible="False">
+
+      <Border x:Name="OverlayPanel" 
+        HorizontalAlignment="Right" VerticalAlignment="Top" Margin="8"
+        Background="#AA000000" Padding="8,4" CornerRadius="4" IsVisible="False"
+        IsHitTestVisible="False">
         <TextBlock x:Name="OverlayText"
-                   Foreground="White"
-                   FontSize="11"
-                   TextWrapping="Wrap"
-                   MaxWidth="220"
-                   Text=""/>
+          Foreground="White"
+          FontSize="11"
+          TextWrapping="Wrap"
+          MaxWidth="220"
+          Text=""/>
       </Border>
+      
+      <Button Content="🗘" Click="OnResetViewClick" Padding="0"
+        Height="36" Width="36" FontSize="18" FontWeight="Bold"
+        VerticalAlignment="Top" HorizontalAlignment="Right"
+        Margin="8"
+        HorizontalContentAlignment="Center" VerticalContentAlignment="Center"
+      />
+
     </Grid>
   </DockPanel>
 </UserControl>

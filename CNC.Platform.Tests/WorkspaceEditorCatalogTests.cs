@@ -6,26 +6,35 @@ namespace CNC.Platform.Tests;
 public class WorkspaceEditorCatalogTests
 {
     [Fact]
-    public void LayoutPickableDescriptors_excludes_status()
+    public void LayoutPickableDescriptors_excludes_shell_level_panels()
     {
         Assert.DoesNotContain(
             WorkspaceEditorCatalog.LayoutPickableDescriptors,
             d => d.Id == WorkspaceEditorId.Status);
+        Assert.DoesNotContain(
+            WorkspaceEditorCatalog.LayoutPickableDescriptors,
+            d => d.Id == WorkspaceEditorId.Signals);
     }
 
     [Fact]
-    public void PanelPickableDescriptors_excludes_status()
+    public void PanelPickableDescriptors_excludes_shell_level_panels()
     {
         Assert.DoesNotContain(
             WorkspaceEditorCatalog.PanelPickableDescriptors,
             d => d.Id == WorkspaceEditorId.Status);
+        Assert.DoesNotContain(
+            WorkspaceEditorCatalog.PanelPickableDescriptors,
+            d => d.Id == WorkspaceEditorId.Signals);
     }
 
     [Fact]
-    public void AllDescriptors_includes_status_for_backward_compatibility()
+    public void AllDescriptors_includes_shell_level_panels_for_backward_compatibility()
     {
         Assert.Contains(
             WorkspaceEditorCatalog.AllDescriptors,
             d => d.Id == WorkspaceEditorId.Status);
+        Assert.Contains(
+            WorkspaceEditorCatalog.AllDescriptors,
+            d => d.Id == WorkspaceEditorId.Signals);
     }
 }
