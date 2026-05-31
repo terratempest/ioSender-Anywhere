@@ -1,0 +1,25 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             mc:Ignorable="d"
+             x:Class="CNC.Controls.Avalonia.Views.GrblErrorList"
+             d:DesignWidth="510"
+             d:DesignHeight="310">
+  <DataGrid x:Name="DgrErrors"
+            IsReadOnly="True"
+            SelectionMode="Single"
+            AutoGenerateColumns="False"
+            CanUserReorderColumns="False"
+            CanUserResizeColumns="False"
+            CanUserSortColumns="False">
+    <DataGrid.Columns>
+      <DataGridTextColumn Header="Code"
+                          Binding="{Binding Key}"
+                          Width="40"/>
+      <DataGridTextColumn Header="Message"
+                          Binding="{Binding Value}"
+                          Width="*"/>
+    </DataGrid.Columns>
+  </DataGrid>
+</UserControl>

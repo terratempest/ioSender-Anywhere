@@ -115,6 +115,11 @@ public sealed class WorkspaceEditorControlFactory
             VerticalAlignment = Avalonia.Layout.VerticalAlignment.Stretch,
         },
         WorkspaceEditorId.JobBar => new JobBarEditorControl(_session.AppConfig.Base, _session.MachineCommands),
+        WorkspaceEditorId.Macros => new MacroExecuteControl(_session.AppConfig)
+        {
+            HorizontalAlignment = Avalonia.Layout.HorizontalAlignment.Stretch,
+            VerticalAlignment = Avalonia.Layout.VerticalAlignment.Stretch,
+        },
         WorkspaceEditorId.Probing => new ProbingView(_session.AppConfig.Base),
         WorkspaceEditorId.SdCard => new SDCardView(),
         WorkspaceEditorId.Lathe => new LatheWizardsView(),

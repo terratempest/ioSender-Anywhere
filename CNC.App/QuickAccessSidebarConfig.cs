@@ -23,6 +23,16 @@ public sealed class QuickAccessSidebarConfig
 
     public List<QuickAccessTabEntry> Tabs { get; set; } = new();
 
+    public QuickAccessSidebarConfig Clone() => new()
+    {
+        Enabled = Enabled,
+        ShowLeft = ShowLeft,
+        ShowRight = ShowRight,
+        Dock = Dock,
+        LegacySidesMigrated = LegacySidesMigrated,
+        Tabs = Tabs.Select(t => t.Clone()).ToList(),
+    };
+
     /// <summary>One-time migration from <see cref="Dock"/>; never re-runs after <see cref="LegacySidesMigrated"/>.</summary>
     public void MigrateLegacyDockOnce()
     {
@@ -46,6 +56,14 @@ public sealed class QuickAccessTabEntry
     public WorkspaceEditorId EditorId { get; set; }
     public double PopupWidth { get; set; }
     public double PopupHeight { get; set; }
+
+    public QuickAccessTabEntry Clone() => new()
+    {
+        Id = Id,
+        EditorId = EditorId,
+        PopupWidth = PopupWidth,
+        PopupHeight = PopupHeight,
+    };
 }
 
 public static class QuickAccessSidebarDefaults

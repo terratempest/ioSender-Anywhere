@@ -1,0 +1,32 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:views="using:CNC.Controls.Avalonia.Views"
+        xmlns:loc="using:CNC.Localization.Avalonia"
+        mc:Ignorable="d"
+        x:Class="CNC.Controls.Avalonia.Views.ErrorsAndAlarms"
+        x:Name="ErrorsAndAlarmsRoot"
+        Title="Controller error and alarm codes"
+        loc:Localize.Key="CNC.Controls.Avalonia.errorsandalarms.wnd_errorsAndAlarms"
+        Width="750"
+        Height="500"
+        MinWidth="150"
+        MinHeight="100"
+        WindowStartupLocation="CenterOwner">
+
+  <TabControl>
+    <TabItem x:Name="TabErrors"
+             Header="Error codes"
+             loc:Localize.Key="CNC.Controls.Avalonia.errorsandalarms.tab_errors"
+             loc:Localize.Fallback="Error codes">
+      <views:GrblErrorList/>
+    </TabItem>
+    <TabItem x:Name="TabAlarms"
+             Header="Alarm codes"
+             loc:Localize.Key="CNC.Controls.Avalonia.errorsandalarms.tab_alarms"
+             loc:Localize.Fallback="Alarm codes">
+      <views:GrblAlarmList/>
+    </TabItem>
+  </TabControl>
+</Window>

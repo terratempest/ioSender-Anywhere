@@ -37,4 +37,18 @@ public class WorkspaceEditorCatalogTests
             WorkspaceEditorCatalog.AllDescriptors,
             d => d.Id == WorkspaceEditorId.Signals);
     }
+
+    [Fact]
+    public void Macros_is_pickable_and_requires_grbl_context()
+    {
+        var descriptor = WorkspaceEditorCatalog.Get(WorkspaceEditorId.Macros);
+
+        Assert.Contains(
+            WorkspaceEditorCatalog.LayoutPickableDescriptors,
+            d => d.Id == WorkspaceEditorId.Macros);
+        Assert.Contains(
+            WorkspaceEditorCatalog.PanelPickableDescriptors,
+            d => d.Id == WorkspaceEditorId.Macros);
+        Assert.True(descriptor.RequiresGrblDataContext);
+    }
 }

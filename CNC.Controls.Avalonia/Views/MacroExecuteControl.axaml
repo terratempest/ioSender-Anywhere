@@ -1,0 +1,48 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:conv="using:CNC.Controls.Avalonia.Converters"
+             x:Class="CNC.Controls.Avalonia.Views.MacroExecuteControl"
+             HorizontalAlignment="Stretch"
+             VerticalAlignment="Stretch">
+  <UserControl.Resources>
+    <conv:LogicalNotConverter x:Key="LogicalNotConverter"/>
+  </UserControl.Resources>
+  <Grid RowDefinitions="*,Auto" Margin="4">
+    <ScrollViewer Grid.Row="0"
+                  HorizontalScrollBarVisibility="Disabled"
+                  IsEnabled="{Binding IsJobRunning, Converter={StaticResource LogicalNotConverter}}">
+      <Grid>
+        <ItemsControl ItemsSource="{Binding Macros, RelativeSource={RelativeSource AncestorType=UserControl}}">
+          <ItemsControl.ItemsPanel>
+            <ItemsPanelTemplate>
+              <WrapPanel Orientation="Horizontal"/>
+            </ItemsPanelTemplate>
+          </ItemsControl.ItemsPanel>
+          <ItemsControl.ItemTemplate>
+            <DataTemplate>
+              <Button Width="140"
+                      Height="28"
+                      Margin="3"
+                      Tag="{Binding}"
+                      Loaded="OnMacroButtonLoaded"
+                      Click="OnMacroClick"/>
+            </DataTemplate>
+          </ItemsControl.ItemTemplate>
+        </ItemsControl>
+        <TextBlock Text="No macros defined, use Edit button to add."
+                   TextWrapping="Wrap"
+                   HorizontalAlignment="Center"
+                   VerticalAlignment="Center"
+                   Margin="12"
+                   IsVisible="{Binding IsMessageVisible, RelativeSource={RelativeSource AncestorType=UserControl}}"/>
+      </Grid>
+    </ScrollViewer>
+
+    <Button Grid.Row="1"
+            Content="Edit"
+            Width="72"
+            HorizontalAlignment="Right"
+            Margin="0,8,0,0"
+            Click="OnEditClick"/>
+  </Grid>
+</UserControl>

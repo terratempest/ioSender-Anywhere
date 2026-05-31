@@ -1,0 +1,56 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        x:Class="CNC.Controls.Avalonia.Views.MacroEditor"
+        Title="Macro Editor"
+        Width="420"
+        Height="360"
+        MinWidth="360"
+        MinHeight="320"
+        CanResize="True"
+        WindowStartupLocation="CenterOwner"
+        Background="{DynamicResource ThemeBackgroundBrush}">
+  <Grid RowDefinitions="*,Auto" Margin="10" RowSpacing="10">
+    <Grid ColumnDefinitions="150,*" ColumnSpacing="10">
+      <DockPanel Grid.Column="0">
+        <Button DockPanel.Dock="Top"
+                Content="Add"
+                HorizontalAlignment="Stretch"
+                Margin="0,0,0,6"
+                IsEnabled="{Binding CanAdd}"
+                Click="OnAddClick"/>
+        <Button DockPanel.Dock="Bottom"
+                Content="Delete"
+                HorizontalAlignment="Stretch"
+                Margin="0,6,0,0"
+                IsEnabled="{Binding CanDelete}"
+                Click="OnDeleteClick"/>
+        <ListBox ItemsSource="{Binding Macros}"
+                 SelectedItem="{Binding SelectedMacro, Mode=TwoWay}">
+          <ListBox.ItemTemplate>
+            <DataTemplate>
+              <TextBlock Text="{Binding Name}" TextTrimming="CharacterEllipsis"/>
+            </DataTemplate>
+          </ListBox.ItemTemplate>
+        </ListBox>
+      </DockPanel>
+
+      <Grid Grid.Column="1" RowDefinitions="Auto,Auto,*" RowSpacing="8"
+            IsEnabled="{Binding HasSelection}">
+        <TextBox PlaceholderText="Name"
+                 Text="{Binding EditorName, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
+        <CheckBox Grid.Row="1"
+                  Content="Confirm before executing"
+                  IsChecked="{Binding EditorConfirmOnExecute, Mode=TwoWay}"/>
+        <TextBox Grid.Row="2"
+                 AcceptsReturn="True"
+                 TextWrapping="Wrap"
+                 Text="{Binding EditorCode, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
+      </Grid>
+    </Grid>
+
+    <StackPanel Grid.Row="1" Orientation="Horizontal" HorizontalAlignment="Right" Spacing="8">
+      <Button Content="Ok" Width="75" Click="OnOkClick"/>
+      <Button Content="Cancel" Width="75" Click="OnCancelClick"/>
+    </StackPanel>
+  </Grid>
+</Window>

@@ -1,6 +1,7 @@
 using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Controls.ApplicationLifetimes;
+using Avalonia.Input.Platform;
 using CNC.Core;
 
 namespace CNC.Controls.Avalonia.Services;
@@ -19,6 +20,14 @@ public static class AvaloniaGrblUi
             return result;
         };
 
+        GrblUi.SetClipboardText = text =>
+        {
+            UiThread.Invoke(() =>
+            {
+                if (GetMainWindow()?.Clipboard is { } clipboard)
+                    _ = clipboard.SetTextAsync(text);
+            });
+        };
     }
 
     private static Window? GetMainWindow()

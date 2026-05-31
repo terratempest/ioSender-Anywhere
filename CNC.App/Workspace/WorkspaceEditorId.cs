@@ -23,6 +23,7 @@ public enum WorkspaceEditorId
     Feed,
     FeedTouch,
     JobBar,
+    Macros,
     Probing,
     SdCard,
     Lathe,

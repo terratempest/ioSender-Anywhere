@@ -1,0 +1,64 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:loc="using:CNC.Localization.Avalonia"
+        mc:Ignorable="d"
+        x:Class="CNC.Controls.Avalonia.Views.About"
+        x:Name="AboutRoot"
+        Title="About"
+        loc:Localize.Key="CNC.Controls.Avalonia.about.dlg_about"
+        Width="450"
+        Height="350"
+        CanResize="False"
+        ShowInTaskbar="False"
+        WindowStartupLocation="CenterOwner">
+
+  <Grid RowDefinitions="Auto,*,Auto" Margin="10" RowSpacing="8">
+    <TextBlock x:Name="CopyrightText"
+               Text="(C)2015-2026 Io Engineering (Terje Io)"
+               VerticalAlignment="Center"/>
+
+    <GroupBox x:Name="GrpGrbl"
+              Grid.Row="1"
+              Header="grbl"
+              HorizontalAlignment="Stretch"
+              VerticalAlignment="Stretch">
+      <StackPanel Spacing="4">
+        <TextBlock x:Name="TxtGrblVersion" Text="-"/>
+        <TextBlock x:Name="TxtGrblOptions" Text="-"/>
+        <TextBlock x:Name="TxtGrblNewOptions" Text="-"/>
+        <TextBlock x:Name="TxtGrblConnection" Text="-"/>
+        <TextBox x:Name="TxtSystemInfo"
+                 Height="145"
+                 IsReadOnly="True"
+                 AcceptsReturn="True"
+                 TextWrapping="Wrap"
+                 FontSize="10"
+                 FontFamily="Verdana"
+                 ScrollViewer.VerticalScrollBarVisibility="Auto"/>
+      </StackPanel>
+    </GroupBox>
+
+    <StackPanel Grid.Row="2"
+                Orientation="Horizontal"
+                HorizontalAlignment="Center"
+                Spacing="8">
+      <Button x:Name="BtnOk"
+              Content="Ok"
+              Width="85"
+              HorizontalContentAlignment="Center"
+              Click="OnOkClick"
+              loc:Localize.Key="CNC.Controls.Avalonia.about.btn_ok"
+              loc:Localize.Fallback="Ok"/>
+      <Button x:Name="BtnToClipboard"
+              Content="To Clipboard"
+              Width="105"
+              HorizontalContentAlignment="Center"
+              ToolTip.Tip="Copy grbl version information and settings to clipboard"
+              Click="OnToClipboardClick"
+              loc:Localize.Key="CNC.Controls.Avalonia.about.btn_toClipboard"
+              loc:Localize.Fallback="To Clipboard"/>
+    </StackPanel>
+  </Grid>
+</Window>

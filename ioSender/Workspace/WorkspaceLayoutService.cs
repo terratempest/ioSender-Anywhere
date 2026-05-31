@@ -86,6 +86,13 @@ public static class WorkspaceLayoutService
             {
                 AppHostContext.AppConfig.Base.WorkspacePreset = saved.Name;
                 AppHostContext.AppConfig.Base.WorkspaceRoot = root;
+                if (saved.QuickAccessSidebar is { } quickAccessSidebar)
+                {
+                    var sidebar = quickAccessSidebar.Clone();
+                    sidebar.LegacySidesMigrated = true;
+                    AppHostContext.AppConfig.Base.QuickAccessSidebar = sidebar;
+                }
+
                 return true;
             }
         }

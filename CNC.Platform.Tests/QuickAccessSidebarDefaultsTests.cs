@@ -82,4 +82,57 @@ public class QuickAccessSidebarDefaultsTests
         Assert.Equal(200, w);
         Assert.Equal(100, h);
     }
+
+    [Fact]
+    public void Clone_preserves_sidebar_state_without_sharing_tabs()
+    {
+        var firstTabId = Guid.NewGuid();
+        var secondTabId = Guid.NewGuid();
+        var config = new QuickAccessSidebarConfig
+        {
+            Enabled = true,
+            ShowLeft = true,
+            ShowRight = false,
+            Dock = QuickAccessSidebarDock.Left,
+            LegacySidesMigrated = true,
+            Tabs =
+            [
+                new QuickAccessTabEntry
+                {
+                    Id = firstTabId,
+                    EditorId = WorkspaceEditorId.Jog,
+                    PopupWidth = 320,
+                    PopupHeight = 240,
+                },
+                new QuickAccessTabEntry
+                {
+                    Id = secondTabId,
+                    EditorId = WorkspaceEditorId.Console,
+                    PopupWidth = 480,
+                    PopupHeight = 360,
+                },
+            ],
+        };
+
+        var clone = config.Clone();
+
+        Assert.NotSame(config, clone);
+        Assert.Equal(config.Enabled, clone.Enabled);
+        Assert.Equal(config.ShowLeft, clone.ShowLeft);
+        Assert.Equal(config.ShowRight, clone.ShowRight);
+        Assert.Equal(config.Dock, clone.Dock);
+        Assert.Equal(config.LegacySidesMigrated, clone.LegacySidesMigrated);
+        Assert.Equal([WorkspaceEditorId.Jog, WorkspaceEditorId.Console], clone.Tabs.Select(t => t.EditorId).ToArray());
+        Assert.Equal([firstTabId, secondTabId], clone.Tabs.Select(t => t.Id).ToArray());
+        Assert.Equal([320, 480], clone.Tabs.Select(t => t.PopupWidth).ToArray());
+        Assert.Equal([240, 360], clone.Tabs.Select(t => t.PopupHeight).ToArray());
+        Assert.NotSame(config.Tabs, clone.Tabs);
+        Assert.NotSame(config.Tabs[0], clone.Tabs[0]);
+
+        clone.Tabs[0].EditorId = WorkspaceEditorId.Goto;
+        clone.Tabs.Add(new QuickAccessTabEntry { EditorId = WorkspaceEditorId.Outline });
+
+        Assert.Equal(WorkspaceEditorId.Jog, config.Tabs[0].EditorId);
+        Assert.Equal(2, config.Tabs.Count);
+    }
 }

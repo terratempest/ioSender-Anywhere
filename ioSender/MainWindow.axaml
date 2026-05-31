@@ -65,6 +65,11 @@
                       loc:Localize.Key="ioSender.mainwindow.mnu_sidebarRight" loc:Localize.Fallback="_Right side"/>
           </MenuItem>
           <Separator/>
+          <MenuItem x:Name="MnuViewSdCard" Header="_SD Card..." Click="OnSdCardClick"
+                    loc:Localize.Key="ioSender.mainwindow.mnu_sdCard" loc:Localize.Fallback="_SD Card..."/>
+          <MenuItem x:Name="MnuViewLatheWizards" Header="_Lathe Wizards..." Click="OnLatheWizardsClick"
+                    loc:Localize.Key="ioSender.mainwindow.mnu_latheWizards" loc:Localize.Fallback="_Lathe Wizards..."/>
+          <Separator/>
           <MenuItem x:Name="MnuViewCamera" Header="_Camera..." Click="OnCameraClick"
                     loc:Localize.Key="ioSender.mainwindow.mnu_camera"/>
           <MenuItem x:Name="MnuRefreshPorts" Header="_Refresh serial ports" Click="OnRefreshPortsClick"
@@ -81,6 +86,22 @@
                     ToggleType="CheckBox"
                     Click="OnCheckModeMenuClick"
                     loc:Localize.Key="ioSender.mainwindow.mnu_checkMode" loc:Localize.Fallback="Check mode"/>
+        </MenuItem>
+
+        <MenuItem x:Name="MnuHelp" Header="_Help"
+                  loc:Localize.Key="ioSender.mainwindow.mnu_help" loc:Localize.Fallback="_Help">
+          <MenuItem x:Name="MnuHelpWiki" Header="_Wiki" Click="OnHelpWikiClick"
+                    loc:Localize.Key="ioSender.mainwindow.mnu_wiki" loc:Localize.Fallback="_Wiki"/>
+          <MenuItem x:Name="MnuHelpUsageTips" Header="Usage _tips" Click="OnHelpUsageTipsClick"
+                    loc:Localize.Key="ioSender.mainwindow.mnu_usageTips" loc:Localize.Fallback="Usage _tips"/>
+          <MenuItem x:Name="MnuHelpBriefTour" Header="A _brief tour" Click="OnHelpBriefTourClick"
+                    loc:Localize.Key="ioSender.mainwindow.mnu_briefTour" loc:Localize.Fallback="A _brief tour"/>
+          <MenuItem x:Name="MnuHelpVideoTutorials" Header="_Video tutorials" Click="OnHelpVideoTutorialsClick"
+                    loc:Localize.Key="ioSender.mainwindow.mnu_videoTutorials" loc:Localize.Fallback="_Video tutorials"/>
+          <MenuItem x:Name="MnuHelpErrorsAndAlarms" Header="_Error and alarm codes" Click="OnHelpErrorsAndAlarmsClick"
+                    loc:Localize.Key="ioSender.mainwindow.mnu_errorsAndAlarms" loc:Localize.Fallback="_Error and alarm codes"/>
+          <MenuItem x:Name="MnuHelpAbout" Header="_About" Click="OnHelpAboutClick"
+                    loc:Localize.Key="ioSender.mainwindow.mnu_about" loc:Localize.Fallback="_About"/>
         </MenuItem>
       </Menu>
 
@@ -158,6 +179,9 @@
           </TabItem>
           <TabItem x:Name="TabOffsets" Header="Offsets"
                    loc:Localize.Key="ioSender.mainwindow.tab_offsets" loc:Localize.Fallback="Offsets">
+            <Grid/>
+          </TabItem>
+          <TabItem x:Name="TabSettings" IsVisible="False">
             <Grid/>
           </TabItem>
         </TabControl>

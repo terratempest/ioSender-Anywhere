@@ -1,3 +1,4 @@
+using CNC.App;
 using CNC.App.Workspace;
 
 namespace ioSender.Workspace;
@@ -8,4 +9,6 @@ public sealed class WorkspaceSavedLayout
     public string Name { get; set; } = string.Empty;
 
     public WorkspaceNode Root { get; set; } = new WorkspaceLeaf();
+
+    public QuickAccessSidebarConfig? QuickAccessSidebar { get; set; }
 }

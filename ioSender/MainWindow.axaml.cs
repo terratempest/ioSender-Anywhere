@@ -4,12 +4,14 @@ using Avalonia.Interactivity;
 using Avalonia.Media;
 using Avalonia.Platform.Storage;
 using Avalonia.Threading;
+using System.Diagnostics;
 using CNC.App;
 using CNC.Converters;
 using CNC.Controls.Avalonia.Services;
 using CNC.Controls.Avalonia.Views;
 using CNC.Controls.Config;
 using CNC.Controls.DragKnife;
+using CNC.Controls.Lathe;
 using CNC.Controls.Probing;
 using CNC.Core;
 using CNC.Localization.Avalonia;
@@ -31,6 +33,10 @@ public partial class MainWindow : Window
     private readonly MachineConnectionInitializer _connectionInitializer;
     private readonly ProgramService _programService;
     private CameraWindow? _cameraWindow;
+    private Window? _sdCardWindow;
+    private Window? _latheWizardsWindow;
+    private SDCardView? _sdCardView;
+    private LatheWizardsView? _latheWizardsView;
     private bool _shellReady;
     private bool _suppressShellEvents;
     private ShellPage _activePage = ShellPage.Home;
@@ -64,9 +70,14 @@ public partial class MainWindow : Window
         UpdateProgramFileButtons();
         UpdateCheckModeMenu();
         UpdateLayoutMenuEnabled();
+        UpdateFloatingPanelMenuEnabled();
         InitializeQuickAccessSidebar();
         WireShellTabHeaders();
-        MnuView.SubmenuOpened += (_, _) => UpdateLayoutMenuEnabled();
+        MnuView.SubmenuOpened += (_, _) =>
+        {
+            UpdateLayoutMenuEnabled();
+            UpdateFloatingPanelMenuEnabled();
+        };
         MnuLayouts.SubmenuOpened += (_, _) => RebuildLayoutsMenu();
         Opened += OnMainWindowOpened;
         Closing += OnMainWindowClosing;
@@ -200,12 +211,14 @@ public partial class MainWindow : Window
 
         _viewModel.NotifyConnectionChanged();
         UpdateConnectionUi();
+        UpdateFloatingPanelMenuEnabled();
         return true;
     }
 
     void OnMainWindowClosing(object? sender, WindowClosingEventArgs e)
     {
         SaveWindowPlacement();
+        CloseFloatingPanelWindows();
         DisconnectMachine();
     }
 
@@ -337,18 +350,31 @@ public partial class MainWindow : Window
         Localize.Apply(MnuPresetExpanded);
         Localize.Apply(MnuSaveLayout);
         Localize.Apply(MnuDeleteLayout);
+        Localize.Apply(MnuViewSdCard);
+        Localize.Apply(MnuViewLatheWizards);
         Localize.Apply(MnuViewCamera);
         Localize.Apply(MnuRefreshPorts);
         Localize.Apply(MnuSettings);
         Localize.Apply(MnuGrblSettings);
         Localize.Apply(MnuAppSettings);
         Localize.Apply(MnuCheckMode);
+        Localize.Apply(MnuHelp);
+        Localize.Apply(MnuHelpWiki);
+        Localize.Apply(MnuHelpUsageTips);
+        Localize.Apply(MnuHelpBriefTour);
+        Localize.Apply(MnuHelpVideoTutorials);
+        Localize.Apply(MnuHelpErrorsAndAlarms);
+        Localize.Apply(MnuHelpAbout);
         Localize.Apply(TabHome);
         Localize.Apply(TabProbing);
         Localize.Apply(TabOffsets);
     }
 
-    private void OnConnectionChanged() => UpdateConnectionUi();
+    private void OnConnectionChanged()
+    {
+        UpdateConnectionUi();
+        UpdateFloatingPanelMenuEnabled();
+    }
 
     void OnGrblPropertyChanged(object? sender, System.ComponentModel.PropertyChangedEventArgs e)
     {
@@ -361,6 +387,10 @@ public partial class MainWindow : Window
             or nameof(GrblViewModel.IsJobRunning)
             or nameof(GrblViewModel.IsSleepMode))
             UpdateCheckModeMenu();
+
+        if (e.PropertyName is nameof(GrblViewModel.IsReady)
+            or nameof(GrblViewModel.LatheModeEnabled))
+            UpdateFloatingPanelMenuEnabled();
     }
 
     void UpdateCheckModeMenu()
@@ -418,7 +448,11 @@ public partial class MainWindow : Window
         if (_suppressShellEvents || !_shellReady)
             return;
 
-        NavigateTo(PageFromTab(ShellTabs.SelectedItem as TabItem), fromTabControl: true);
+        if (ShellTabs.SelectedItem is not TabItem selectedTab
+            || ReferenceEquals(selectedTab, TabSettings))
+            return;
+
+        NavigateTo(PageFromTab(selectedTab), fromTabControl: true);
     }
 
     void OnGrblSettingsClick(object? sender, RoutedEventArgs e) => NavigateTo(ShellPage.GrblSettings);
@@ -441,18 +475,21 @@ public partial class MainWindow : Window
         GrblConfigPageHost.IsVisible = page == ShellPage.GrblSettings;
         AppConfigPageHost.IsVisible = page == ShellPage.AppSettings;
 
-        if (page is ShellPage.Home or ShellPage.Probing or ShellPage.Offsets)
+        if (!fromTabControl)
         {
-            if (!fromTabControl)
+            _suppressShellEvents = true;
+            try
             {
-                _suppressShellEvents = true;
                 ShellTabs.SelectedItem = page switch
                 {
                     ShellPage.Home => TabHome,
                     ShellPage.Probing => TabProbing,
                     ShellPage.Offsets => TabOffsets,
-                    _ => TabHome,
+                    _ => TabSettings,
                 };
+            }
+            finally
+            {
                 _suppressShellEvents = false;
             }
         }
@@ -579,6 +616,13 @@ public partial class MainWindow : Window
         MnuDeleteLayout.IsEnabled = homeActive && CanDeleteActiveLayout();
     }
 
+    void UpdateFloatingPanelMenuEnabled()
+    {
+        var initialized = _connectionService.IsConnected && _viewModel.Grbl.IsReady;
+        MnuViewSdCard.IsEnabled = initialized && GrblInfo.HasFS;
+        MnuViewLatheWizards.IsEnabled = initialized && GrblInfo.LatheModeEnabled;
+    }
+
     private async void OnOpenGCodeClick(object? sender, RoutedEventArgs e)
     {
         if (StorageProvider is not { } storage)
@@ -638,6 +682,101 @@ public partial class MainWindow : Window
         _cameraWindow.Show(this);
     }
 
+    private void OnSdCardClick(object? sender, RoutedEventArgs e)
+    {
+        if (_sdCardWindow is { IsVisible: true })
+        {
+            _sdCardWindow.Activate();
+            return;
+        }
+
+        _sdCardView = new SDCardView
+        {
+            DataContext = _viewModel.Grbl,
+            HorizontalAlignment = Avalonia.Layout.HorizontalAlignment.Stretch,
+            VerticalAlignment = Avalonia.Layout.VerticalAlignment.Stretch,
+        };
+        _sdCardView.FileSelected += OnSdCardFileSelected;
+
+        _sdCardWindow = CreateFloatingPanelWindow(
+            Localize.T("ioSender.mainwindow.tab_sdCard", "SD Card"),
+            _sdCardView,
+            540,
+            540);
+        _sdCardWindow.Closed += (_, _) =>
+        {
+            if (_sdCardView is { } view)
+            {
+                view.FileSelected -= OnSdCardFileSelected;
+                view.Activate(false);
+            }
+
+            _sdCardView = null;
+            _sdCardWindow = null;
+        };
+        _sdCardWindow.Show(this);
+        _sdCardView.Activate(true);
+    }
+
+    private void OnLatheWizardsClick(object? sender, RoutedEventArgs e)
+    {
+        if (_latheWizardsWindow is { IsVisible: true })
+        {
+            _latheWizardsWindow.Activate();
+            return;
+        }
+
+        _latheWizardsView = new LatheWizardsView
+        {
+            DataContext = _viewModel.Grbl,
+            HorizontalAlignment = Avalonia.Layout.HorizontalAlignment.Stretch,
+            VerticalAlignment = Avalonia.Layout.VerticalAlignment.Stretch,
+        };
+
+        _latheWizardsWindow = CreateFloatingPanelWindow(
+            Localize.T("ioSender.mainwindow.tab_latheWizards", "Lathe Wizards"),
+            _latheWizardsView,
+            900,
+            540);
+        _latheWizardsWindow.Closed += (_, _) =>
+        {
+            _latheWizardsView?.Activate(false);
+            _latheWizardsView = null;
+            _latheWizardsWindow = null;
+        };
+        _latheWizardsWindow.Show(this);
+        _latheWizardsView.Activate(true);
+    }
+
+    Window CreateFloatingPanelWindow(string title, Control content, double width, double height) =>
+        new()
+        {
+            Title = title,
+            Content = content,
+            Width = width,
+            Height = height,
+            MinWidth = Math.Min(width, 360),
+            MinHeight = Math.Min(height, 300),
+            WindowStartupLocation = WindowStartupLocation.CenterOwner,
+        };
+
+    void OnSdCardFileSelected(string filename, bool rewind)
+    {
+        var separator = filename.IndexOf(':');
+        var selectedName = separator >= 0 ? filename[(separator + 1)..] : filename;
+        var currentName = _viewModel.Grbl.FileName;
+        if (currentName.StartsWith("SDCard:", StringComparison.OrdinalIgnoreCase))
+            currentName = currentName["SDCard:".Length..];
+
+        if (!string.Equals(currentName, selectedName, StringComparison.OrdinalIgnoreCase))
+            _programService.Close();
+
+        _viewModel.Grbl.FileName = filename;
+        _viewModel.Grbl.SDRewind = rewind;
+        NavigateTo(ShellPage.Home);
+        Activate();
+    }
+
     private async void OnConnectClick(object? sender, RoutedEventArgs e) => await ShowPortDialogAsync();
 
     private async void OnServerStatusClick(object? sender, RoutedEventArgs e)
@@ -653,6 +792,13 @@ public partial class MainWindow : Window
         DisconnectMachine();
         _viewModel.NotifyConnectionChanged();
         UpdateConnectionUi();
+        UpdateFloatingPanelMenuEnabled();
+    }
+
+    void CloseFloatingPanelWindows()
+    {
+        _sdCardWindow?.Close();
+        _latheWizardsWindow?.Close();
     }
 
     private async Task ShowPortDialogAsync()
@@ -682,6 +828,7 @@ public partial class MainWindow : Window
 
         _viewModel.NotifyConnectionChanged();
         UpdateConnectionUi();
+        UpdateFloatingPanelMenuEnabled();
     }
 
     bool FinishConnectionAfterPortDialog(bool showErrors = true)
@@ -739,6 +886,7 @@ public partial class MainWindow : Window
     void ApplyLayout(string layoutName)
     {
         JobViewControl.WorkspaceHost.ApplyLayout(layoutName);
+        SyncQuickAccessFromConfig();
         UpdateLayoutMenuEnabled();
     }
 
@@ -776,7 +924,7 @@ public partial class MainWindow : Window
             return;
 
         var root = JobViewControl.WorkspaceHost.CurrentRoot;
-        WorkspaceLayoutFileService.Save(name, root);
+        WorkspaceLayoutFileService.Save(name, root, QuickAccessSidebarService.Config);
         WorkspaceLayoutService.SaveRoot(root, name);
         WorkspaceLayoutService.Persist();
         RebuildLayoutsMenu();
@@ -811,6 +959,38 @@ public partial class MainWindow : Window
     }
 
     private void OnRefreshPortsClick(object? sender, RoutedEventArgs e) => _viewModel.RefreshPorts();
+
+    private void OnHelpWikiClick(object? sender, RoutedEventArgs e) =>
+        OpenHelpLink("https://github.com/terjeio/ioSender/wiki");
+
+    private void OnHelpUsageTipsClick(object? sender, RoutedEventArgs e) =>
+        OpenHelpLink("https://github.com/terjeio/ioSender/wiki/Usage-tips");
+
+    private void OnHelpBriefTourClick(object? sender, RoutedEventArgs e) =>
+        OpenHelpLink("https://www.grbl.org/single-post/one-sender-to-rule-them-all");
+
+    private void OnHelpVideoTutorialsClick(object? sender, RoutedEventArgs e) =>
+        OpenHelpLink("https://youtube.com/playlist?list=PLnSV6o2cRxM5mQQe4ec5cS2J8jBsEciY3");
+
+    private void OnHelpErrorsAndAlarmsClick(object? sender, RoutedEventArgs e) =>
+        new ErrorsAndAlarms(Title ?? "ioSender").Show(this);
+
+    private async void OnHelpAboutClick(object? sender, RoutedEventArgs e)
+    {
+        var about = new About(Title ?? "ioSender", AppHostContext.AppConfig.Base.PortParams)
+        {
+            DataContext = _viewModel.Grbl
+        };
+        await about.ShowDialog(this);
+    }
+
+    private static void OpenHelpLink(string url)
+    {
+        Process.Start(new ProcessStartInfo(url)
+        {
+            UseShellExecute = true
+        });
+    }
 
     private void OnExitClick(object? sender, RoutedEventArgs e) => Close();
 }

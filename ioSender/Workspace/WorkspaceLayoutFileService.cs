@@ -1,4 +1,5 @@
 using System.Xml.Serialization;
+using CNC.App;
 using CNC.App.Workspace;
 using CNC.Core;
 
@@ -47,7 +48,7 @@ public static class WorkspaceLayoutFileService
         return false;
     }
 
-    public static void Save(string name, WorkspaceNode root)
+    public static void Save(string name, WorkspaceNode root, QuickAccessSidebarConfig? quickAccessSidebar = null)
     {
         Directory.CreateDirectory(LayoutsDirectory);
 
@@ -58,6 +59,7 @@ public static class WorkspaceLayoutFileService
         {
             Name = name,
             Root = root.Clone(),
+            QuickAccessSidebar = quickAccessSidebar?.Clone(),
         };
 
         using var stream = new FileStream(path, FileMode.Create, FileAccess.Write, FileShare.None);
