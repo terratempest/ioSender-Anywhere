@@ -26,8 +26,6 @@
       <ComboBox x:Name="cbxOffset" Grid.Row="0" Grid.Column="1" 
         Margin="4, 0"
         ItemsSource="{Binding CoordinateSystems}"
-        SelectedValue="{Binding WorkCoordinateSystem, Mode=OneWay}"
-        SelectedValueBinding="{Binding Code}"
         IsEnabled="{Binding IsJobRunning, Converter={StaticResource BooleanConverter}}"
         SelectionChanged="cbxOffset_SelectionChanged"
         PlaceholderText="G59.3">

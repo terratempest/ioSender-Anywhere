@@ -1313,7 +1313,12 @@ namespace CNC.Core
                     {
                         _h = value;
                         var hs = _h.Split(',');
-                        HomedState = hs[0] == "1" ? HomedState.Homed : (GrblState.State == GrblStates.Alarm && GrblState.Substate == 11 ? HomedState.NotHomed : HomedState.Unknown);
+                        HomedState = hs[0] switch
+                        {
+                            "1" => HomedState.Homed,
+                            "0" => HomedState.NotHomed,
+                            _ => HomedState.Unknown
+                        };
                     }
                     break;
 

@@ -55,6 +55,18 @@ public sealed class GrblViewModelReadoutTests
     }
 
     [Fact]
+    public void DataReceived_parser_state_updates_work_coordinate_system()
+    {
+        var vm = new GrblViewModel();
+
+        vm.DataReceived("[GC:G0 G54 G17 G21 G90 G94 M5 M9 T0 F0 S0]");
+        Assert.Equal("G54", vm.WorkCoordinateSystem);
+
+        vm.DataReceived("[GC:G0 G59.2 G17 G21 G90 G94 M5 M9 T0 F0 S0]");
+        Assert.Equal("G59.2", vm.WorkCoordinateSystem);
+    }
+
+    [Fact]
     public void DataReceived_grbl_banner_then_status_restores_idle_display()
     {
         var vm = new GrblViewModel { IsReady = true };
@@ -213,6 +225,36 @@ public sealed class GrblViewModelReadoutTests
 
         Assert.True(vm.AxisScaled.Value.HasFlag(AxisFlags.X));
         Assert.False(vm.AxisScaled.Value.HasFlag(AxisFlags.Y));
+    }
+
+    [Fact]
+    public void DataReceived_homed_field_sets_homed_state()
+    {
+        var vm = new GrblViewModel();
+
+        vm.DataReceived("<Idle|MPos:0,0,0|H:1|Bf:15,128>");
+
+        Assert.Equal(HomedState.Homed, vm.HomedState);
+    }
+
+    [Fact]
+    public void DataReceived_not_homed_field_sets_not_homed_state()
+    {
+        var vm = new GrblViewModel();
+
+        vm.DataReceived("<Idle|MPos:0,0,0|H:0|Bf:15,128>");
+
+        Assert.Equal(HomedState.NotHomed, vm.HomedState);
+    }
+
+    [Fact]
+    public void DataReceived_alarm_11_sets_not_homed_state()
+    {
+        var vm = new GrblViewModel();
+
+        vm.DataReceived("<Alarm:11|MPos:0,0,0|Bf:15,128>");
+
+        Assert.Equal(HomedState.NotHomed, vm.HomedState);
     }
 
     [Fact]
