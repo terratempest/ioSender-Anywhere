@@ -25,6 +25,8 @@
         <MenuItem x:Name="MnuFile" Header="_File" loc:Localize.Key="ioSender.mainwindow.mnu_file">
           <MenuItem x:Name="MnuFileOpen" Header="_Open G-code..." Click="OnOpenGCodeClick"
                     loc:Localize.Key="ioSender.mainwindow.mnu_open"/>
+          <MenuItem x:Name="MnuFileSave" Header="_Save" IsEnabled="False" Click="OnSaveProgramClick"
+                    loc:Localize.Key="ioSender.mainwindow.mnu_save" loc:Localize.Fallback="_Save"/>
           <MenuItem x:Name="MnuTransform" Header="_Transform" IsEnabled="False"
                     loc:Localize.Key="ioSender.mainwindow.mnu_transform" loc:Localize.Fallback="_Transform">
             <MenuItem x:Name="MnuDragKnife" Header="Add drag knife moves" Click="OnDragKnifeTransformClick"
@@ -46,10 +48,12 @@
                     loc:Localize.Key="ioSender.mainwindow.mnu_resetLayout" loc:Localize.Fallback="_Reset layout"/>
           <MenuItem x:Name="MnuLayouts" Header="_Layouts"
                     loc:Localize.Key="ioSender.mainwindow.mnu_layouts" loc:Localize.Fallback="_Layouts">
-            <MenuItem x:Name="MnuPresetCompact" Header="_Compact" Click="OnPresetCompactClick"
-                      loc:Localize.Key="ioSender.mainwindow.mnu_presetCompact" loc:Localize.Fallback="_Compact"/>
-            <MenuItem x:Name="MnuPresetExpanded" Header="_Expanded" Click="OnPresetExpandedClick"
-                      loc:Localize.Key="ioSender.mainwindow.mnu_presetExpanded" loc:Localize.Fallback="_Expanded"/>
+            <MenuItem x:Name="MnuPresetClassic" Header="_Classic" Click="OnPresetClassicClick"
+                      loc:Localize.Key="ioSender.mainwindow.mnu_presetClassic" loc:Localize.Fallback="_Classic"/>
+            <MenuItem x:Name="MnuPresetTouch" Header="_Touch" Click="OnPresetTouchClick"
+                      loc:Localize.Key="ioSender.mainwindow.mnu_presetTouch" loc:Localize.Fallback="_Touch"/>
+            <MenuItem x:Name="MnuPresetXL" Header="_XL" Click="OnPresetXLClick"
+                      loc:Localize.Key="ioSender.mainwindow.mnu_presetXL" loc:Localize.Fallback="_XL"/>
           </MenuItem>
           <MenuItem x:Name="MnuSaveLayout" Header="_Save layout..." Click="OnSaveLayoutClick"
                     loc:Localize.Key="ioSender.mainwindow.mnu_saveLayout" loc:Localize.Fallback="_Save layout..."/>

@@ -28,7 +28,7 @@ public static class WorkspaceLayoutFileService
         }
 
         return layouts
-            .Where(l => !WorkspaceLayoutDefaults.IsBuiltIn(l.Name))
+            .Where(l => !WorkspaceLayoutDefaults.IsPackagedLayoutName(l.Name))
             .GroupBy(l => l.Name, StringComparer.OrdinalIgnoreCase)
             .Select(g => g.First())
             .OrderBy(l => l.Name, StringComparer.CurrentCultureIgnoreCase)

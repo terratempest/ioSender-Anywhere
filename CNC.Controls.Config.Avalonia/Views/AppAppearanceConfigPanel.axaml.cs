@@ -16,13 +16,13 @@ public partial class AppAppearanceConfigPanel : UserControl
 
     [
 
-        ("Standard", "Dark"),
+        (AppTheme.Light, "Light"),
 
-        ("Black", "Darker"),
+        (AppTheme.LightHighContrast, "Light (High Contrast)"),
 
-        ("Light", "Light"),
+        (AppTheme.Dark, "Dark"),
 
-        ("White", "Light (bright)"),
+        (AppTheme.DarkHighContrast, "Dark (High Contrast)"),
 
     ];
 

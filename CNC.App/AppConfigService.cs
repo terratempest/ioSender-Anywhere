@@ -96,15 +96,12 @@ public sealed class AppConfigService
     static bool MigrateLegacyTheme(BaseConfig config)
     {
         var theme = config.Theme;
-        if (string.IsNullOrWhiteSpace(theme)
-            || theme.Equals("default", StringComparison.OrdinalIgnoreCase)
-            || theme.Equals("Dark", StringComparison.OrdinalIgnoreCase))
-        {
-            config.Theme = "Standard";
-            return true;
-        }
+        var normalized = AppThemeKeys.Normalize(theme);
+        if (string.Equals(theme, normalized, StringComparison.Ordinal))
+            return false;
 
-        return false;
+        config.Theme = normalized;
+        return true;
     }
 
     /// <summary>Ensure workspace root exists; map legacy LayoutMode when root is missing.</summary>
@@ -113,7 +110,7 @@ public sealed class AppConfigService
         if (config.WorkspaceRoot is not null)
             return false;
 
-        config.WorkspacePreset = config.LayoutMode == UiLayoutMode.Expanded ? "Expanded" : "Compact";
+        config.WorkspacePreset = config.LayoutMode == UiLayoutMode.Expanded ? "XL" : "Classic";
         return false;
     }
 

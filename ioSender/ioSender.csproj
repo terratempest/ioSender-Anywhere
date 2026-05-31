@@ -60,6 +60,11 @@
   </ItemGroup>
 
   <ItemGroup>
+    <EmbeddedResource Include="DefaultLayouts\*.xml" />
+    <Content Include="DefaultLayouts\*.xml" CopyToOutputDirectory="PreserveNewest" />
+  </ItemGroup>
+
+  <ItemGroup>
     <Content Include="..\Locale\**\*" Link="Locale\%(RecursiveDir)%(Filename)%(Extension)" CopyToOutputDirectory="PreserveNewest" />
   </ItemGroup>
 </Project>

@@ -2,16 +2,21 @@ using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Markup.Xaml;
 using Avalonia.Styling;
+using CNC.App;
 
 namespace CNC.Controls.Config;
 
 /// <summary>Maps persisted theme keys to Avalonia theme variants and ioSender palette overlays.</summary>
 public static class AppTheme
 {
-    const string StandardPaletteUri = "avares://CNC.Controls.Config.Avalonia/Themes/IoSenderPalette.axaml";
-    const string BlackPaletteUri = "avares://CNC.Controls.Config.Avalonia/Themes/IoSenderBlackPalette.axaml";
+    public const string Light = AppThemeKeys.Light;
+    public const string LightHighContrast = AppThemeKeys.LightHighContrast;
+    public const string Dark = AppThemeKeys.Dark;
+    public const string DarkHighContrast = AppThemeKeys.DarkHighContrast;
 
-    static ResourceDictionary? _blackOverlay;
+    const string HighContrastPaletteUri = "avares://CNC.Controls.Config.Avalonia/Themes/IoSenderHighContrastPalette.axaml";
+
+    static ResourceDictionary? _highContrastOverlay;
 
     public static void Apply(string? themeKey)
     {
@@ -20,39 +25,33 @@ public static class AppTheme
 
         var key = NormalizeThemeKey(themeKey);
         app.RequestedThemeVariant = IsLightKey(key) ? ThemeVariant.Light : ThemeVariant.Dark;
-        SyncBlackOverlay(app, key == "Black");
+        SyncHighContrastOverlay(app, IsHighContrastKey(key));
+        AppThemeKeys.NotifyThemeApplied();
     }
 
-    public static string NormalizeThemeKey(string? theme)
-    {
-        if (string.IsNullOrWhiteSpace(theme)
-            || theme.Equals("default", StringComparison.OrdinalIgnoreCase))
-            return "Standard";
-
-        return theme switch
-        {
-            "Dark" => "Standard",
-            _ => theme,
-        };
-    }
+    public static string NormalizeThemeKey(string? theme) => AppThemeKeys.Normalize(theme);
 
     static bool IsLightKey(string key) =>
-        key.Equals("Light", StringComparison.OrdinalIgnoreCase)
-        || key.Equals("White", StringComparison.OrdinalIgnoreCase);
+        key.Equals(Light, StringComparison.OrdinalIgnoreCase)
+        || key.Equals(LightHighContrast, StringComparison.OrdinalIgnoreCase);
 
-    static void SyncBlackOverlay(Application app, bool useBlack)
+    static bool IsHighContrastKey(string key) =>
+        key.Equals(LightHighContrast, StringComparison.OrdinalIgnoreCase)
+        || key.Equals(DarkHighContrast, StringComparison.OrdinalIgnoreCase);
+
+    static void SyncHighContrastOverlay(Application app, bool useHighContrast)
     {
-        _blackOverlay ??= (ResourceDictionary)AvaloniaXamlLoader.Load(new Uri(BlackPaletteUri));
+        _highContrastOverlay ??= (ResourceDictionary)AvaloniaXamlLoader.Load(new Uri(HighContrastPaletteUri));
 
         var merged = app.Resources.MergedDictionaries;
-        if (useBlack)
+        if (useHighContrast)
         {
-            if (!merged.Contains(_blackOverlay))
-                merged.Add(_blackOverlay);
+            if (!merged.Contains(_highContrastOverlay))
+                merged.Add(_highContrastOverlay);
         }
-        else if (merged.Contains(_blackOverlay))
+        else if (merged.Contains(_highContrastOverlay))
         {
-            merged.Remove(_blackOverlay);
+            merged.Remove(_highContrastOverlay);
         }
     }
 }

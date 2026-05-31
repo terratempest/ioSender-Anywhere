@@ -1,120 +1,114 @@
+using System.Xml.Serialization;
+using CNC.App;
 using CNC.App.Workspace;
+using CNC.Platform.Abstractions;
 
 namespace ioSender.Workspace;
 
 public static class WorkspaceLayoutDefaults
 {
-    public const string PresetCompact = "Compact";
-    public const string PresetExpanded = "Expanded";
+    public const string PresetClassic = "Classic";
+    public const string PresetTouch = "Touch";
+    public const string PresetXL = "XL";
     public const string PresetDefault = "Default";
 
-    public static WorkspaceNode Default => Compact;
+    const string LegacyPresetCompact = "Compact";
+    const string LegacyPresetExpanded = "Expanded";
+    const string ResourcePrefix = "ioSender.DefaultLayouts.";
 
-    public static WorkspaceNode Compact => new WorkspaceSplit
+    static readonly XmlSerializer Serializer = new(typeof(WorkspaceSavedLayout));
+
+    public static WorkspaceNode Default => GetPreset(PresetClassic) ?? new WorkspaceLeaf { Editor = WorkspaceEditorId.Program };
+
+    public static WorkspaceNode? GetPreset(string? name) =>
+        TryGetPresetLayout(name, out var layout) ? layout.Root.Clone() : null;
+
+    public static bool TryGetPresetLayout(string? name, out WorkspaceSavedLayout layout)
     {
-        Orientation = WorkspaceSplitOrientation.Vertical,
-        Ratio = 0.94,
-        First = new WorkspaceSplit
+        var presetName = NormalizePresetName(name);
+        if (presetName is null || !IsBundledPreset(presetName))
         {
-            Orientation = WorkspaceSplitOrientation.Horizontal,
-            Ratio = 0.22,
-            First = Leaf(WorkspaceEditorId.Dro),
-            Second = new WorkspaceSplit
-            {
-                Orientation = WorkspaceSplitOrientation.Horizontal,
-                Ratio = 0.72,
-                First = new WorkspaceSplit
-                {
-                    Orientation = WorkspaceSplitOrientation.Vertical,
-                    Ratio = 0.42,
-                    First = Leaf(WorkspaceEditorId.Program),
-                    Second = Leaf(WorkspaceEditorId.Viewer3D),
-                },
-                Second = RightMachineStack(),
-            },
-        },
-        Second = Leaf(WorkspaceEditorId.JobBar),
-    };
+            layout = new WorkspaceSavedLayout();
+            return false;
+        }
 
-    public static WorkspaceNode Expanded => new WorkspaceSplit
-    {
-        Orientation = WorkspaceSplitOrientation.Vertical,
-        Ratio = 0.94,
-        First = new WorkspaceSplit
+        if (TryLoadBundledLayout(presetName, out layout))
         {
-            Orientation = WorkspaceSplitOrientation.Horizontal,
-            Ratio = 0.18,
-            First = Leaf(WorkspaceEditorId.Dro),
-            Second = new WorkspaceSplit
-            {
-                Orientation = WorkspaceSplitOrientation.Horizontal,
-                Ratio = 0.82,
-                First = Leaf(WorkspaceEditorId.Program),
-                Second = new WorkspaceSplit
-                {
-                    Orientation = WorkspaceSplitOrientation.Vertical,
-                    Ratio = 0.22,
-                    First = Leaf(WorkspaceEditorId.Jog),
-                    Second = new WorkspaceSplit
-                    {
-                        Orientation = WorkspaceSplitOrientation.Horizontal,
-                        Ratio = 0.5,
-                        First = new WorkspaceSplit
-                        {
-                            Orientation = WorkspaceSplitOrientation.Vertical,
-                            Ratio = 0.5,
-                            First = Leaf(WorkspaceEditorId.Outline),
-                            Second = Leaf(WorkspaceEditorId.Spindle),
-                        },
-                        Second = new WorkspaceSplit
-                        {
-                            Orientation = WorkspaceSplitOrientation.Vertical,
-                            Ratio = 0.5,
-                            First = Leaf(WorkspaceEditorId.Feed),
-                            Second = Leaf(WorkspaceEditorId.Goto),
-                        },
-                    },
-                },
-            },
-        },
-        Second = Leaf(WorkspaceEditorId.JobBar),
-    };
+            layout.Name = presetName;
+            return true;
+        }
 
-    static WorkspaceNode RightMachineStack() => new WorkspaceSplit
-    {
-        Orientation = WorkspaceSplitOrientation.Vertical,
-        Ratio = 0.26,
-        First = Leaf(WorkspaceEditorId.WorkParams),
-        Second = new WorkspaceSplit
-        {
-            Orientation = WorkspaceSplitOrientation.Vertical,
-            Ratio = 0.33,
-            First = Leaf(WorkspaceEditorId.Coolant),
-            Second = new WorkspaceSplit
-            {
-                Orientation = WorkspaceSplitOrientation.Vertical,
-                Ratio = 0.5,
-                First = Leaf(WorkspaceEditorId.Spindle),
-                Second = Leaf(WorkspaceEditorId.Feed),
-            },
-        },
-    };
+        layout = new WorkspaceSavedLayout();
+        return false;
+    }
 
-    static WorkspaceLeaf Leaf(WorkspaceEditorId id) => new() { Editor = id };
-
-    public static WorkspaceNode? GetPreset(string? name) => name switch
-    {
-        PresetCompact => Compact.Clone(),
-        PresetExpanded => Expanded.Clone(),
-        PresetDefault or null or "" => Compact.Clone(),
-        _ => null,
-    };
+    public static string GetPresetForLayoutMode(UiLayoutMode mode) =>
+        mode == UiLayoutMode.Expanded ? PresetXL : PresetClassic;
 
     public static bool IsBuiltIn(string? name) =>
-        string.Equals(name, PresetCompact, StringComparison.OrdinalIgnoreCase)
-        || string.Equals(name, PresetExpanded, StringComparison.OrdinalIgnoreCase);
+        string.Equals(name, PresetClassic, StringComparison.OrdinalIgnoreCase)
+        || string.Equals(name, PresetTouch, StringComparison.OrdinalIgnoreCase)
+        || string.Equals(name, PresetXL, StringComparison.OrdinalIgnoreCase);
+
+    public static bool IsPackagedLayoutName(string? name) =>
+        IsBuiltIn(name)
+        || string.Equals(name, "ioSender (classic)", StringComparison.OrdinalIgnoreCase)
+        || string.Equals(name, "ioSender (Touch)", StringComparison.OrdinalIgnoreCase)
+        || string.Equals(name, "ioSender (XL)", StringComparison.OrdinalIgnoreCase);
 
     public static bool IsValid(WorkspaceNode? root) => root is not null && HasRegion(root);
+
+    static string? NormalizePresetName(string? name)
+    {
+        if (string.IsNullOrWhiteSpace(name) || string.Equals(name, PresetDefault, StringComparison.OrdinalIgnoreCase))
+            return PresetClassic;
+        if (string.Equals(name, LegacyPresetCompact, StringComparison.OrdinalIgnoreCase))
+            return PresetClassic;
+        if (string.Equals(name, LegacyPresetExpanded, StringComparison.OrdinalIgnoreCase))
+            return PresetXL;
+        if (string.Equals(name, PresetClassic, StringComparison.OrdinalIgnoreCase))
+            return PresetClassic;
+        if (string.Equals(name, PresetTouch, StringComparison.OrdinalIgnoreCase))
+            return PresetTouch;
+        if (string.Equals(name, PresetXL, StringComparison.OrdinalIgnoreCase))
+            return PresetXL;
+        return null;
+    }
+
+    static bool IsBundledPreset(string name) =>
+        name is PresetClassic or PresetTouch or PresetXL;
+
+    static bool TryLoadBundledLayout(string presetName, out WorkspaceSavedLayout layout)
+    {
+        try
+        {
+            using var stream = OpenBundledLayout(presetName);
+            if (stream is not null)
+            {
+                layout = (WorkspaceSavedLayout)Serializer.Deserialize(stream)!;
+                if (IsValid(layout.Root))
+                    return true;
+            }
+        }
+        catch
+        {
+        }
+
+        layout = new WorkspaceSavedLayout();
+        return false;
+    }
+
+    static Stream? OpenBundledLayout(string presetName)
+    {
+        var resourceName = ResourcePrefix + presetName + ".xml";
+        var assembly = typeof(WorkspaceLayoutDefaults).Assembly;
+        var stream = assembly.GetManifestResourceStream(resourceName);
+        if (stream is not null)
+            return stream;
+
+        var path = Path.Combine(AppContext.BaseDirectory, "DefaultLayouts", presetName + ".xml");
+        return File.Exists(path) ? File.OpenRead(path) : null;
+    }
 
     static bool HasRegion(WorkspaceNode node) => node switch
     {

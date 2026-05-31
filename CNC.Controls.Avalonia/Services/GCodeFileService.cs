@@ -46,6 +46,9 @@ public sealed class GCodeFileService
 
     public void Load(string filename)
     {
+        if (!CanMutateProgram())
+            return;
+
         BeginProgramMutation();
         try
         {
@@ -70,6 +73,8 @@ public sealed class GCodeFileService
     public void LoadFromLines(IEnumerable<string> lines, string displayName)
     {
         ArgumentNullException.ThrowIfNull(lines);
+        if (!CanMutateProgram())
+            return;
 
         BeginProgramMutation();
         RunWithLoadDialect(() =>
@@ -94,8 +99,31 @@ public sealed class GCodeFileService
         ProgramChanged?.Invoke();
     }
 
+    public void Save()
+    {
+        if (!CanMutateProgram())
+            return;
+
+        if (Model == null || !Model.IsPhysicalFileLoaded || Model.IsSDCardJob)
+            return;
+
+        try
+        {
+            using var stream = new StreamWriter(Model.FileName);
+            foreach (var line in _program.Blocks)
+                stream.WriteLine(line.Data);
+        }
+        catch (Exception ex) when (ex is IOException or UnauthorizedAccessException)
+        {
+            GrblUi.ShowError(ex.Message, "ioSender");
+        }
+    }
+
     public void Close()
     {
+        if (!CanMutateProgram())
+            return;
+
         BeginProgramMutation();
         _program.CloseFile();
         if (Model != null)
@@ -110,6 +138,9 @@ public sealed class GCodeFileService
 
     public void AddBlock(string block, CNC.Core.Action action)
     {
+        if (!CanMutateProgram())
+            return;
+
         if (action == CNC.Core.Action.New)
             BeginLoadDialect();
 
@@ -131,6 +162,9 @@ public sealed class GCodeFileService
 
     public void ReplaceFromTokens(IReadOnlyList<GCodeToken> tokens, string headerComment, bool compress)
     {
+        if (!CanMutateProgram())
+            return;
+
         BeginProgramMutation();
         var gc = GCodeParser.TokensToGCode(tokens.ToList(), compress);
         var fileName = Model?.FileName ?? string.Empty;
@@ -159,6 +193,15 @@ public sealed class GCodeFileService
     }
 
     void BeginProgramMutation() => ProgramLoading?.Invoke();
+
+    bool CanMutateProgram()
+    {
+        if (Model is not { IsJobRunning: true } and not { IsToolChanging: true })
+            return true;
+
+        Model.Message = "Stop the active job or tool change before changing the program.";
+        return false;
+    }
 
     private bool RunWithLoadDialect(Func<bool> load)
     {

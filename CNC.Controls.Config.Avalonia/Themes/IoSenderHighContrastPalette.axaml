@@ -1,0 +1,84 @@
+<ResourceDictionary xmlns="https://github.com/avaloniaui"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+  <ResourceDictionary.ThemeDictionaries>
+  <ResourceDictionary x:Key="Dark">
+    <SolidColorBrush x:Key="ThemeBackgroundBrush" Color="#0B0B0B"/>
+    <SolidColorBrush x:Key="ThemeForegroundBrush" Color="#F2F2F2"/>
+    <SolidColorBrush x:Key="ThemeControlLowBrush" Color="#111111"/>
+    <SolidColorBrush x:Key="ThemeControlMidBrush" Color="#1B1B1B"/>
+    <SolidColorBrush x:Key="ThemeControlHighBrush" Color="#282828"/>
+    <SolidColorBrush x:Key="ThemeControlHighlightLowBrush" Color="#303030"/>
+    <SolidColorBrush x:Key="ThemeControlHighlightMidBrush" Color="#3D3D3D"/>
+    <SolidColorBrush x:Key="ThemeControlHighlightHighBrush" Color="#4A4A4A"/>
+    <SolidColorBrush x:Key="ThemeBorderLowBrush" Color="#777777"/>
+    <SolidColorBrush x:Key="ThemeBorderMidBrush" Color="#A0A0A0"/>
+    <SolidColorBrush x:Key="ThemeBorderHighBrush" Color="#D6D6D6"/>
+    <SolidColorBrush x:Key="ThemeAccentBrush" Color="#66B8FF"/>
+    <SolidColorBrush x:Key="ThemeAccentBrushLow" Color="#0B5794"/>
+    <SolidColorBrush x:Key="ThemeAccentBrushHigh" Color="#A7D8FF"/>
+    <Color x:Key="ThemeAccentColor">#66B8FF</Color>
+    <Color x:Key="ThemeAccentColor1">#66B8FF</Color>
+    <Color x:Key="ThemeAccentColor2">#0B5794</Color>
+    <Color x:Key="ThemeAccentColor3">#A7D8FF</Color>
+    <SolidColorBrush x:Key="IoSenderReadOnlyBrush" Color="#202020"/>
+    <SolidColorBrush x:Key="IoSenderOverlayBrush" Color="#CC000000"/>
+    <SolidColorBrush x:Key="IoSenderDangerBrush" Color="#FF4D4D"/>
+    <SolidColorBrush x:Key="IoSenderDangerForegroundBrush" Color="#000000"/>
+    <SolidColorBrush x:Key="IoSenderHomedBrush" Color="#7CFF8A"/>
+    <SolidColorBrush x:Key="IoSenderNotHomedBrush" Color="#FF6E6E"/>
+    <SolidColorBrush x:Key="IoSenderDroReadoutBrush" Color="#FFFFFF"/>
+    <SolidColorBrush x:Key="IoSenderDroReadoutForegroundBrush" Color="#000000"/>
+    <SolidColorBrush x:Key="IoSenderJogSelectedBrush" Color="#7CFF8A"/>
+    <Color x:Key="IoSenderViewerBackgroundColor">#000000</Color>
+    <Color x:Key="IoSenderViewerCutColor">#FF5252</Color>
+    <Color x:Key="IoSenderViewerRapidColor">#FFB3C1</Color>
+    <Color x:Key="IoSenderViewerRetractColor">#77FF88</Color>
+    <Color x:Key="IoSenderViewerGridColor">#B8B8B8</Color>
+    <Color x:Key="IoSenderViewerGridMinorColor">#5C5C5C</Color>
+    <Color x:Key="IoSenderViewerGridMajorColor">#B8B8B8</Color>
+    <Color x:Key="IoSenderViewerHighlightColor">#FFD54F</Color>
+    <Color x:Key="IoSenderViewerToolColor">#00E676</Color>
+    <Color x:Key="IoSenderViewerWorkEnvelopeColor">#64B5FF</Color>
+  </ResourceDictionary>
+
+  <ResourceDictionary x:Key="Light">
+    <SolidColorBrush x:Key="ThemeBackgroundBrush" Color="#E4E6E8"/>
+    <SolidColorBrush x:Key="ThemeForegroundBrush" Color="#000000"/>
+    <SolidColorBrush x:Key="ThemeControlLowBrush" Color="#FFFFFF"/>
+    <SolidColorBrush x:Key="ThemeControlMidBrush" Color="#D5D8DC"/>
+    <SolidColorBrush x:Key="ThemeControlHighBrush" Color="#BCC2C8"/>
+    <SolidColorBrush x:Key="ThemeControlHighlightLowBrush" Color="#A9B1BA"/>
+    <SolidColorBrush x:Key="ThemeControlHighlightMidBrush" Color="#919BA6"/>
+    <SolidColorBrush x:Key="ThemeControlHighlightHighBrush" Color="#77838F"/>
+    <SolidColorBrush x:Key="ThemeBorderLowBrush" Color="#4D5862"/>
+    <SolidColorBrush x:Key="ThemeBorderMidBrush" Color="#26313B"/>
+    <SolidColorBrush x:Key="ThemeBorderHighBrush" Color="#000000"/>
+    <SolidColorBrush x:Key="ThemeAccentBrush" Color="#003C70"/>
+    <SolidColorBrush x:Key="ThemeAccentBrushLow" Color="#75B8EA"/>
+    <SolidColorBrush x:Key="ThemeAccentBrushHigh" Color="#001E3D"/>
+    <Color x:Key="ThemeAccentColor">#003C70</Color>
+    <Color x:Key="ThemeAccentColor1">#003C70</Color>
+    <Color x:Key="ThemeAccentColor2">#75B8EA</Color>
+    <Color x:Key="ThemeAccentColor3">#001E3D</Color>
+    <SolidColorBrush x:Key="IoSenderReadOnlyBrush" Color="#BEC4CA"/>
+    <SolidColorBrush x:Key="IoSenderOverlayBrush" Color="#88000000"/>
+    <SolidColorBrush x:Key="IoSenderDangerBrush" Color="#8C1D18"/>
+    <SolidColorBrush x:Key="IoSenderDangerForegroundBrush" Color="#FFFFFF"/>
+    <SolidColorBrush x:Key="IoSenderHomedBrush" Color="#3E8F42"/>
+    <SolidColorBrush x:Key="IoSenderNotHomedBrush" Color="#C64349"/>
+    <SolidColorBrush x:Key="IoSenderDroReadoutBrush" Color="#FFFFFF"/>
+    <SolidColorBrush x:Key="IoSenderDroReadoutForegroundBrush" Color="#000000"/>
+    <SolidColorBrush x:Key="IoSenderJogSelectedBrush" Color="#0B6F22"/>
+    <Color x:Key="IoSenderViewerBackgroundColor">#FFFFFF</Color>
+    <Color x:Key="IoSenderViewerCutColor">#8F0000</Color>
+    <Color x:Key="IoSenderViewerRapidColor">#771232</Color>
+    <Color x:Key="IoSenderViewerRetractColor">#004F12</Color>
+    <Color x:Key="IoSenderViewerGridColor">#000000</Color>
+    <Color x:Key="IoSenderViewerGridMinorColor">#9FA8B1</Color>
+    <Color x:Key="IoSenderViewerGridMajorColor">#000000</Color>
+    <Color x:Key="IoSenderViewerHighlightColor">#000000</Color>
+    <Color x:Key="IoSenderViewerToolColor">#004F12</Color>
+    <Color x:Key="IoSenderViewerWorkEnvelopeColor">#002B55</Color>
+  </ResourceDictionary>
+  </ResourceDictionary.ThemeDictionaries>
+</ResourceDictionary>

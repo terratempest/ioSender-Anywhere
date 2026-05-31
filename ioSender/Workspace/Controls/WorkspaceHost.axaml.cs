@@ -98,7 +98,7 @@ public partial class WorkspaceHost : UserControl
         WorkspaceLayoutService.Persist();
     }
 
-    public void ResetToDefault() => ApplyPreset(WorkspaceLayoutDefaults.PresetCompact);
+    public void ResetToDefault() => ApplyPreset(WorkspaceLayoutDefaults.PresetClassic);
 
     public void Rebuild()
     {

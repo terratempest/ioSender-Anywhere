@@ -1,7 +1,6 @@
 <UserControl xmlns="https://github.com/avaloniaui"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:cnc="using:CNC.Controls.Avalonia.Views"
-             xmlns:platform="using:CNC.Platform.Abstractions"
              x:Class="CNC.Controls.Config.AppMachineConfigPanel"
              Width="310">
   <GroupBox Header="Machine" BorderBrush="{DynamicResource ThemeBorderLowBrush}">
@@ -20,15 +19,6 @@
       <CheckBox Content="Restore last window size and position on startup" FontSize="12" IsChecked="{Binding KeepWindowSize, Mode=TwoWay}"/>
       <CheckBox Content="Send comments" FontSize="12" IsChecked="{Binding SendComments, Mode=TwoWay}"/>
       <CheckBox Content="Add line numbers" FontSize="12" IsChecked="{Binding AddLineNumbers, Mode=TwoWay}"/>
-
-      <Grid ColumnDefinitions="90,*" Margin="0,8,0,0">
-        <TextBlock Grid.Column="0" Text="Layout:" FontSize="12" HorizontalAlignment="Right" VerticalAlignment="Center"/>
-        <ComboBox Grid.Column="1" Margin="4,0,0,0" Width="120" FontSize="12"
-                  HorizontalAlignment="Left" SelectedItem="{Binding LayoutMode, Mode=TwoWay}">
-          <platform:UiLayoutMode>Compact</platform:UiLayoutMode>
-          <platform:UiLayoutMode>Expanded</platform:UiLayoutMode>
-        </ComboBox>
-      </Grid>
     </WrapPanel>
   </GroupBox>
 </UserControl>

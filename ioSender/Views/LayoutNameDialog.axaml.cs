@@ -41,7 +41,7 @@ public partial class LayoutNameDialog : Window
 
         if (WorkspaceLayoutDefaults.IsBuiltIn(LayoutName))
         {
-            ShowError("Compact and Expanded are built-in layouts. Choose another name.");
+            ShowError("Classic, Touch, and XL are built-in layouts. Choose another name.");
             return;
         }
 

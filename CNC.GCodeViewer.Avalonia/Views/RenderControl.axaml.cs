@@ -33,6 +33,7 @@ public partial class RenderControl : UserControl
     int _renderWaitTicks;
     Point3D? _renderStartOverride;
     Point3D? _programStart;
+    ViewerThemeColors _themeColors = ViewerThemeColors.Current();
 
     public GCodeViewerSession? Session { get; set; }
 
@@ -110,6 +111,8 @@ public partial class RenderControl : UserControl
         base.OnAttachedToVisualTree(e);
         SubscribeConfig();
         SubscribeGrbl();
+        AppThemeKeys.ThemeApplied += OnAppThemeApplied;
+        RefreshThemeColors(rebuild: false);
         GlViewport.ViewerConfig = ViewerSession.Settings;
         GlViewport.SetAnimationActive(true);
         SetStatus(_glInitFailed ? "3D view unavailable — OpenGL" : "3D view — ready");
@@ -122,6 +125,7 @@ public partial class RenderControl : UserControl
         GlViewport.SetAnimationActive(false);
         StopRenderWaitTimer();
         CancelPathBuild();
+        AppThemeKeys.ThemeApplied -= OnAppThemeApplied;
         UnsubscribeConfig();
         UnsubscribeGrbl();
         base.OnDetachedFromVisualTree(e);
@@ -167,6 +171,7 @@ public partial class RenderControl : UserControl
         var cts = _buildCts;
         var ct = cts.Token;
         var buildVersion = ++_buildVersion;
+        var theme = _themeColors;
         SetStatus($"3D view — building toolpath ({tokenCount:N0} tokens)…");
 
         var buildTask = Task.Run(() =>
@@ -176,7 +181,7 @@ public partial class RenderControl : UserControl
                 var cfg = ViewerSession.Settings;
                 var built = GCodePathBuilder.Build(tokens, start, cfg.ArcResolution, cfg.MinDistance, ct);
                 var bounds = PathBounds.FromSegments(built.Segments);
-                var scene = ToolpathSceneBuilder.Build(built.Segments, bounds, cfg, ViewerSession.Grbl, ct);
+                var scene = ToolpathSceneBuilder.Build(built.Segments, bounds, cfg, theme, ViewerSession.Grbl, ct);
                 Dispatcher.UIThread.Post(() =>
                 {
                     if (ReferenceEquals(_buildCts, cts))
@@ -279,7 +284,7 @@ public partial class RenderControl : UserControl
         scene.Executed = BuildExecutedLayer(cfg);
         ViewCube.IsVisible = cfg.ShowViewCube;
         scene.ToolMarker = BuildToolMarker(cfg);
-        GlViewport.SetBackground(cfg.BlackBackground);
+        GlViewport.SetBackground(_themeColors.Background);
         OverlayPanel.IsVisible = cfg.ShowTextOverlay;
     }
 
@@ -302,8 +307,8 @@ public partial class RenderControl : UserControl
         if (_segments == null || _tokens == null || !cfg.RenderExecuted)
             return null;
 
-        var highlight = cfg.HighlightColor.ToColor();
-        var cut = cfg.CutMotionColor.ToColor();
+        var highlight = ViewerColors.ResolveHighlightColor(cfg, _themeColors);
+        var cut = ViewerColors.ResolveCutColor(cfg, _themeColors);
         if (highlight.R == cut.R && highlight.G == cut.G && highlight.B == cut.B)
             return null;
 
@@ -339,7 +344,7 @@ public partial class RenderControl : UserControl
         if (points.Count < 2)
             return null;
 
-        var color = cfg.ToolOriginColor.ToColor();
+        var color = ViewerColors.ResolveToolColor(cfg, _themeColors);
         return mode == ToolVisualizerMode.Cone
             ? ViewerLineLayerBuilder.FromTriangles(points, color, tag: "tool-marker")
             : ViewerLineLayerBuilder.FromPoints(points, color, ToolThickness, tag: "tool-marker");
@@ -385,7 +390,7 @@ public partial class RenderControl : UserControl
             return;
 
         var cfg = ViewerSession.Settings;
-        var scene = ToolpathSceneBuilder.Build(_segments, _bounds, cfg, ViewerSession.Grbl);
+        var scene = ToolpathSceneBuilder.Build(_segments, _bounds, cfg, _themeColors, ViewerSession.Grbl);
         EnrichScene(scene);
         PushSceneToViewport(scene, _bounds, resetView: false);
     }
@@ -479,7 +484,7 @@ public partial class RenderControl : UserControl
     void OnViewerConfigChanged(object? sender, PropertyChangedEventArgs e)
     {
         var cfg = ViewerSession.Settings;
-        GlViewport.SetBackground(cfg.BlackBackground);
+        GlViewport.SetBackground(_themeColors.Background);
         OverlayPanel.IsVisible = cfg.ShowTextOverlay;
         ViewCube.IsVisible = cfg.ShowViewCube;
 
@@ -524,6 +529,19 @@ public partial class RenderControl : UserControl
         {
             RebuildStaticLayers();
         }
+    }
+
+    void OnAppThemeApplied(object? sender, EventArgs e) =>
+        Dispatcher.UIThread.Post(() => RefreshThemeColors(rebuild: true), DispatcherPriority.Background);
+
+    void RefreshThemeColors(bool rebuild)
+    {
+        _themeColors = ViewerThemeColors.Current();
+        GlViewport.SetBackground(_themeColors.Background);
+        if (rebuild)
+            RebuildStaticLayers();
+        else
+            UpdateDynamicLayers();
     }
 
     void OnGrblPropertyChanged(object? sender, PropertyChangedEventArgs e)

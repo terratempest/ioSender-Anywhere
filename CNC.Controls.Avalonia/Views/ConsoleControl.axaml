@@ -22,12 +22,24 @@
       <Button x:Name="BtnClear" Grid.Column="6" Content="Clear" Click="OnClearClick" HorizontalAlignment="Right"
               loc:Localize.Key="CNC.Controls.Avalonia.consolecontrol.btn_clear" loc:Localize.Fallback="Clear"/>
     </Grid>
-    <ListBox Grid.Row="1" ItemsSource="{Binding ResponseLog}" FontFamily="Consolas,Courier New,monospace" FontSize="10">
+    <ListBox Grid.Row="1" ItemsSource="{Binding ResponseLog}" FontFamily="Consolas,Courier New,monospace" FontSize="10"
+             Background="{DynamicResource ThemeControlLowBrush}"
+             Foreground="{DynamicResource ThemeForegroundBrush}"
+             BorderBrush="{DynamicResource ThemeBorderLowBrush}">
       <ListBox.Styles>
         <Style Selector="ListBoxItem">
           <Setter Property="Height" Value="24"/>
           <Setter Property="Padding" Value="4, 0"/>
           <Setter Property="VerticalContentAlignment" Value="Center"/>
+          <Setter Property="Background" Value="Transparent"/>
+          <Setter Property="Foreground" Value="{DynamicResource ThemeForegroundBrush}"/>
+        </Style>
+        <Style Selector="ListBoxItem:pointerover /template/ ContentPresenter">
+          <Setter Property="Background" Value="{DynamicResource ThemeControlHighlightLowBrush}"/>
+        </Style>
+        <Style Selector="ListBoxItem:selected /template/ ContentPresenter">
+          <Setter Property="Background" Value="{DynamicResource ThemeAccentBrushLow}"/>
+          <Setter Property="Foreground" Value="{DynamicResource ThemeForegroundBrush}"/>
         </Style>
       </ListBox.Styles>
     </ListBox>

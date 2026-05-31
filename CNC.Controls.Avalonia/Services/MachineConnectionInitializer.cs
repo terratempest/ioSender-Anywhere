@@ -84,7 +84,9 @@ public sealed class MachineConnectionInitializer
             ResumePolling();
             var gotStatus = RequestInitialStatusSnapshot(model);
             model.IsReady = true;
-            if (!model.IsDroPositionKnown)
+            if (model.IsCheckMode)
+                model.Message = "Check mode active - cycle start will validate only.";
+            else if (!model.IsDroPositionKnown)
             {
                 model.Message = gotStatus
                     ? "Connected — no position in status report (check $10 / poll interval)."

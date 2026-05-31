@@ -1,6 +1,7 @@
 using Avalonia;
 using Avalonia.Input;
 using Avalonia.Interactivity;
+using Avalonia.Media;
 using Avalonia.OpenGL;
 using Avalonia.OpenGL.Controls;
 using Avalonia.Threading;
@@ -22,7 +23,7 @@ public class ToolpathGlControl : OpenGlControlBase
     readonly ViewerCamera _camera = new();
     ViewerScene? _scene;
     bool _sceneGpuDirty = true;
-    bool _blackBackground = true;
+    Color _backgroundColor = Color.FromRgb(16, 16, 16);
     bool _initFailed;
     string? _initFailureMessage;
     string? _renderFailureMessage;
@@ -65,9 +66,9 @@ public class ToolpathGlControl : OpenGlControlBase
     public void HandlePointerWheelChanged(PointerWheelEventArgs e, Visual? inputElement = null) =>
         OnPointerWheelChanged(inputElement ?? this, e);
 
-    public void SetBackground(bool blackBackground)
+    public void SetBackground(Color backgroundColor)
     {
-        _blackBackground = blackBackground;
+        _backgroundColor = backgroundColor;
         RequestNextFrameRendering();
     }
 
@@ -150,7 +151,7 @@ public class ToolpathGlControl : OpenGlControlBase
             _renderFailureMessage = null;
             _renderer.Initialize(gl, GlVersion);
             _sceneGpuDirty = true;
-            gl.ClearColor(0.06f, 0.06f, 0.06f, 1f);
+            gl.ClearColor(ToGl(_backgroundColor.R), ToGl(_backgroundColor.G), ToGl(_backgroundColor.B), ToGl(_backgroundColor.A));
             gl.Disable(GlConsts.GL_DEPTH_TEST);
             gl.Disable(GlConsts.GL_CULL_FACE);
             gl.Disable(GlConsts.GL_SCISSOR_TEST);
@@ -187,7 +188,7 @@ public class ToolpathGlControl : OpenGlControlBase
         gl.Viewport(0, 0, w, h);
 
         ResetFrameState(gl);
-        gl.ClearColor(_blackBackground ? 0.06f : 1f, _blackBackground ? 0.06f : 1f, _blackBackground ? 0.06f : 1f, 1f);
+        gl.ClearColor(ToGl(_backgroundColor.R), ToGl(_backgroundColor.G), ToGl(_backgroundColor.B), ToGl(_backgroundColor.A));
         gl.Clear(GlConsts.GL_COLOR_BUFFER_BIT);
 
         if (_scene == null)
@@ -230,6 +231,8 @@ public class ToolpathGlControl : OpenGlControlBase
         gl.Disable(GlSampleAlphaToCoverage);
         gl.Disable(GlSampleCoverage);
     }
+
+    static float ToGl(byte channel) => channel / 255f;
 
     void MarkRenderFailure(string message)
     {

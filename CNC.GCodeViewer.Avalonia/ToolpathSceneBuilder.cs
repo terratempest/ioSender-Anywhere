@@ -12,23 +12,24 @@ internal static class ToolpathSceneBuilder
         GCodePathSegments segments,
         PathBounds bounds,
         GCodeViewerConfig cfg,
+        ViewerThemeColors theme,
         GrblViewModel? grbl = null,
         CancellationToken cancellationToken = default)
     {
         cancellationToken.ThrowIfCancellationRequested();
 
         var cut = segments.Cut.Count > 1
-            ? ViewerLineLayerBuilder.FromPoints(segments.Cut, ViewerColors.ResolveCutColor(cfg), 1.5f)
+            ? ViewerLineLayerBuilder.FromPoints(segments.Cut, ViewerColors.ResolveCutColor(cfg, theme), 1.5f)
             : null;
         cancellationToken.ThrowIfCancellationRequested();
 
         var rapid = segments.Rapid.Count > 1
-            ? ViewerLineLayerBuilder.FromPoints(segments.Rapid, ViewerColors.ResolveRapidColor(cfg), 0.75f)
+            ? ViewerLineLayerBuilder.FromPoints(segments.Rapid, ViewerColors.ResolveRapidColor(cfg, theme), 0.75f)
             : null;
         cancellationToken.ThrowIfCancellationRequested();
 
         var retract = segments.Retract.Count > 1
-            ? ViewerLineLayerBuilder.FromPoints(segments.Retract, ViewerColors.ResolveRetractColor(cfg), 0.75f)
+            ? ViewerLineLayerBuilder.FromPoints(segments.Retract, ViewerColors.ResolveRetractColor(cfg, theme), 0.75f)
             : null;
         cancellationToken.ThrowIfCancellationRequested();
 
@@ -42,25 +43,25 @@ internal static class ToolpathSceneBuilder
             if (cfg.ShowGrid)
             {
                 var gridLines = ViewerGridBuilder.Build(bounds);
-                var color = ViewerColors.ResolveGridColor(cfg);
+                var color = ViewerColors.ResolveGridColor(cfg, theme);
                 if (gridLines.Minor.Count > 1)
-                    grid = ViewerLineLayerBuilder.FromPoints(gridLines.Minor, HalfBrightness(color), 0.5f);
+                    grid = ViewerLineLayerBuilder.FromPoints(gridLines.Minor, IsDefaultGridColor(cfg) ? theme.GridMinor : HalfBrightness(color), 0.5f);
                 if (gridLines.Major.Count > 1)
-                    gridMajor = ViewerLineLayerBuilder.FromPoints(gridLines.Major, color, 1.25f);
+                    gridMajor = ViewerLineLayerBuilder.FromPoints(gridLines.Major, IsDefaultGridColor(cfg) ? theme.GridMajor : color, 1.25f);
             }
 
             if (cfg.ShowBoundingBox)
             {
                 var job = ViewerEnvelopeBuilder.JobBox(bounds);
                 if (job.Count > 1)
-                    jobBox = ViewerLineLayerBuilder.FromPoints(job, cfg.HighlightColor.ToColor(), 1f);
+                    jobBox = ViewerLineLayerBuilder.FromPoints(job, ViewerColors.ResolveHighlightColor(cfg, theme), 1f);
             }
 
             if (cfg.ShowWorkEnvelope)
             {
                 var work = ViewerEnvelopeBuilder.WorkAreaBox(grbl);
                 if (work.Count > 1)
-                    workBox = ViewerLineLayerBuilder.FromPoints(work, Colors.DarkBlue, 1f);
+                    workBox = ViewerLineLayerBuilder.FromPoints(work, theme.WorkEnvelope, 1f);
             }
         }
 
@@ -78,4 +79,10 @@ internal static class ToolpathSceneBuilder
 
     static Color HalfBrightness(Color color) =>
         Color.FromArgb(color.A, (byte)(color.R / 2), (byte)(color.G / 2), (byte)(color.B / 2));
+
+    static bool IsDefaultGridColor(GCodeViewerConfig cfg) =>
+        cfg.GridColor.R == UiColor.Gray.R
+        && cfg.GridColor.G == UiColor.Gray.G
+        && cfg.GridColor.B == UiColor.Gray.B
+        && cfg.GridColor.A == UiColor.Gray.A;
 }

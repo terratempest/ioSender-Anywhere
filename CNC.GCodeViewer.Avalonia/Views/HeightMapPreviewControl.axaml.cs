@@ -16,7 +16,7 @@ public partial class HeightMapPreviewControl : UserControl
     public HeightMapPreviewControl()
     {
         InitializeComponent();
-        GlViewport.SetBackground(blackBackground: true);
+        GlViewport.SetBackground(ViewerThemeColors.Current().Background);
         ViewportInput.PointerPressed += (_, e) => GlViewport.HandlePointerPressed(e, ViewportInput);
         ViewportInput.PointerMoved += (_, e) => GlViewport.HandlePointerMoved(e, ViewportInput);
         ViewportInput.PointerReleased += (_, e) => GlViewport.HandlePointerReleased(e, ViewportInput);

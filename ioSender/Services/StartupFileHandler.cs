@@ -24,7 +24,7 @@ public static class StartupFileHandler
 
         var program = AppHostContext.Session.Program;
         var model = program.Model;
-        if (!allowWhileJobRunning && model?.IsJobRunning == true)
+        if (!allowWhileJobRunning && model is { IsJobRunning: true } or { IsToolChanging: true })
             return false;
 
         program.Load(path);

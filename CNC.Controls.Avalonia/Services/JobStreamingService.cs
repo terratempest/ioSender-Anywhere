@@ -10,6 +10,10 @@ namespace CNC.Controls.Avalonia.Services;
 /// <summary>File streaming state machine for the Avalonia job controls.</summary>
 public sealed class JobStreamingService
 {
+    private const string CheckModeActiveMessage = "Check mode active - cycle start will validate only.";
+    private const string CheckModeRunningMessage = "Checking - validating only, no machine motion.";
+    private const string CheckModeCompleteMessage = "Check complete - check mode remains active.";
+
     private enum StreamingHandler
     {
         Idle = 0,
@@ -205,7 +209,10 @@ public sealed class JobStreamingService
                 JobTimer.Start();
                 _streamingHandler.Call(StreamingState.Send, false);
                 if ((_job.IsChecking = _model.GrblState.State == GrblStates.Check))
-                    _model.Message = "Checking";
+                {
+                    _model.Message = CheckModeRunningMessage;
+                    SetButtons(cycleStart: false, feedHold: false, stop: true, rewind: false, cycleStartLabel: "Checking");
+                }
 
                 bool? res = null;
                 var token = new CancellationToken();
@@ -256,6 +263,7 @@ public sealed class JobStreamingService
         _job.Started = false;
         _job.Transferred = false;
         _job.Complete = false;
+        _job.IsChecking = false;
         _job.SerialUsed = 0;
         _job.AckPending = 0;
         _job.CurrentRow = null;
@@ -481,6 +489,20 @@ public sealed class JobStreamingService
                 _streamingHandler.Call(StreamingState.Idle, true);
                 break;
 
+            case GrblStates.Check:
+                _stopRequested = false;
+                if (JobTimer.IsRunning || _job.IsChecking)
+                {
+                    _job.IsChecking = true;
+                    _model.Message = CheckModeRunningMessage;
+                    if (_model.StreamingState != StreamingState.Error)
+                        _streamingHandler.Call(StreamingState.Send, false);
+                    SetButtons(cycleStart: false, feedHold: false, stop: true, rewind: false, cycleStartLabel: "Checking", stopLabel: "Stop");
+                }
+                else
+                    ApplyCheckModeIdleState(CheckModeActiveMessage);
+                break;
+
             case GrblStates.Jog:
                 if (_stopRequested)
                 {
@@ -568,6 +590,8 @@ public sealed class JobStreamingService
     {
         if (_streamingHandler.Count)
         {
+            var wasChecking = _job.IsChecking;
+
             if (_job.AckPending > 0)
                 _job.AckPending--;
 
@@ -609,7 +633,7 @@ public sealed class JobStreamingService
             {
                 _job.Transferred = false;
                 _model!.BlockExecuting = 0;
-                _model.Message = "Transfer complete";
+                _model.Message = wasChecking ? CheckModeCompleteMessage : "Transfer complete";
             }
             else if (_job.PendingLine != _job.PgmEndLine)
             {
@@ -1012,10 +1036,16 @@ public sealed class JobStreamingService
             switch (newState)
             {
                 case StreamingState.Idle:
+                    var wasChecking = _job.IsChecking;
                     if (_model != null)
                         _model.RunTime = JobTimer.RunTime;
                     JobTimer.Stop();
+                    _job.IsChecking = false;
+                    if (_model != null)
+                        _model.IsJobRunning = false;
                     RewindFile();
+                    if (wasChecking && _grblState.State == GrblStates.Check)
+                        ApplyCheckModeIdleState(CheckModeCompleteMessage);
                     SetStreamingHandler(StreamingHandler.Idle);
                     break;
 
@@ -1068,15 +1098,20 @@ public sealed class JobStreamingService
                     if (model == null)
                         break;
 
-                    SetButtons(
-                        controlEnabled: !_grblState.MPG,
-                        cycleStart: GCode.IsLoaded || (model.IsSDCardJob && model.SDRewind),
-                        stop: false,
-                        feedHold: false,
-                        rewind: false,
-                        cycleStartLabel: "Cycle Start");
-                    _feedHoldEnable = !_grblState.MPG;
-                    model.IsJobRunning = JobTimer.IsRunning;
+                    if (_grblState.State == GrblStates.Check)
+                        ApplyCheckModeIdleState(model.Message == CheckModeCompleteMessage ? model.Message : CheckModeActiveMessage);
+                    else
+                    {
+                        SetButtons(
+                            controlEnabled: !_grblState.MPG,
+                            cycleStart: GCode.IsLoaded || (model.IsSDCardJob && model.SDRewind),
+                            stop: false,
+                            feedHold: false,
+                            rewind: false,
+                            cycleStartLabel: "Cycle Start");
+                        _feedHoldEnable = !_grblState.MPG;
+                        model.IsJobRunning = JobTimer.IsRunning;
+                    }
                     break;
 
                 case StreamingState.Send:
@@ -1182,6 +1217,24 @@ public sealed class JobStreamingService
             CycleStartLabel = cycleStartLabel,
             StopLabel = stopLabel
         });
+    }
+
+    private void ApplyCheckModeIdleState(string message)
+    {
+        if (_model == null)
+            return;
+
+        SetButtons(
+            controlEnabled: !_grblState.MPG,
+            cycleStart: !_grblState.MPG && (GCode.IsLoaded || (_model.IsSDCardJob && _model.SDRewind)),
+            feedHold: false,
+            stop: false,
+            rewind: false,
+            cycleStartLabel: "Check Program",
+            stopLabel: "Stop");
+        _feedHoldEnable = !_grblState.MPG;
+        _model.IsJobRunning = false;
+        _model.Message = message;
     }
 }
 

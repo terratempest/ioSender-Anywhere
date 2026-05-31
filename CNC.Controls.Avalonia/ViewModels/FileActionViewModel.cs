@@ -23,21 +23,27 @@ public sealed class FileActionViewModel
 
     public void Open(string path)
     {
-        if (!string.IsNullOrEmpty(path))
+        if (CanMutateProgram() && !string.IsNullOrEmpty(path))
             _program.Load(path);
     }
 
     public void Reload()
     {
-        if (!string.IsNullOrEmpty(Model?.FileName))
+        if (CanMutateProgram() && !string.IsNullOrEmpty(Model?.FileName))
             _program.Load(Model.FileName);
     }
 
-    public void Close() => _program.Close();
+    public void Close()
+    {
+        if (CanMutateProgram())
+            _program.Close();
+    }
 
     public async Task EditAsync()
     {
-        if (!string.IsNullOrEmpty(Model?.FileName) && _externalEditor != null)
+        if (CanMutateProgram() && !string.IsNullOrEmpty(Model?.FileName) && _externalEditor != null)
             await _externalEditor.OpenFileAsync(Model.FileName);
     }
+
+    bool CanMutateProgram() => Model is not { IsJobRunning: true } and not { IsToolChanging: true };
 }

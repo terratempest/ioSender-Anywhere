@@ -68,6 +68,8 @@ public sealed class ProgramService
 
     public void Close() => Files.Close();
 
+    public void Save() => Files.Save();
+
     public void AddBlock(string block) => Files.AddBlock(block);
 
     public void AddBlock(string block, CNC.Core.Action action) => Files.AddBlock(block, action);

@@ -12,7 +12,11 @@ public static class WorkspaceLayoutService
         var config = AppHostContext.AppConfig.Base;
         var root = WorkspaceLayoutSanitizer.Sanitize(config.WorkspaceRoot);
         if (root is null || !WorkspaceLayoutDefaults.IsValid(root))
-            root = ResolvePreset(config).Clone();
+        {
+            var preset = ResolvePreset(config);
+            root = preset.Root.Clone();
+            ApplyQuickAccessSidebar(preset);
+        }
 
         config.WorkspaceRoot = root;
         EnsureRegionIds(config.WorkspaceRoot);
@@ -45,11 +49,17 @@ public static class WorkspaceLayoutService
         }
     }
 
-    static WorkspaceNode ResolvePreset(BaseConfig config) =>
-        WorkspaceLayoutDefaults.GetPreset(config.WorkspacePreset)
-        ?? (config.LayoutMode == UiLayoutMode.Expanded
-            ? WorkspaceLayoutDefaults.Expanded
-            : WorkspaceLayoutDefaults.Compact);
+    static WorkspaceSavedLayout ResolvePreset(BaseConfig config)
+    {
+        if (WorkspaceLayoutDefaults.TryGetPresetLayout(config.WorkspacePreset, out var preset))
+            return preset;
+
+        return WorkspaceLayoutDefaults.TryGetPresetLayout(
+            WorkspaceLayoutDefaults.GetPresetForLayoutMode(config.LayoutMode),
+            out preset)
+            ? preset
+            : new WorkspaceSavedLayout { Name = WorkspaceLayoutDefaults.PresetClassic, Root = WorkspaceLayoutDefaults.Default };
+    }
 
     public static void SaveRoot(WorkspaceNode root)
     {
@@ -65,17 +75,20 @@ public static class WorkspaceLayoutService
 
     public static void ApplyPreset(string presetName)
     {
-        var root = WorkspaceLayoutDefaults.GetPreset(presetName) ?? WorkspaceLayoutDefaults.Default.Clone();
-        AppHostContext.AppConfig.Base.WorkspacePreset = presetName;
-        AppHostContext.AppConfig.Base.WorkspaceRoot = root.Clone();
+        if (!TryApplyLayout(presetName))
+        {
+            AppHostContext.AppConfig.Base.WorkspacePreset = WorkspaceLayoutDefaults.PresetClassic;
+            AppHostContext.AppConfig.Base.WorkspaceRoot = WorkspaceLayoutDefaults.Default.Clone();
+        }
     }
 
     public static bool TryApplyLayout(string layoutName)
     {
-        if (WorkspaceLayoutDefaults.GetPreset(layoutName) is { } preset)
+        if (WorkspaceLayoutDefaults.TryGetPresetLayout(layoutName, out var preset))
         {
-            AppHostContext.AppConfig.Base.WorkspacePreset = layoutName;
-            AppHostContext.AppConfig.Base.WorkspaceRoot = preset.Clone();
+            AppHostContext.AppConfig.Base.WorkspacePreset = preset.Name;
+            AppHostContext.AppConfig.Base.WorkspaceRoot = preset.Root.Clone();
+            ApplyQuickAccessSidebar(preset);
             return true;
         }
 
@@ -98,6 +111,16 @@ public static class WorkspaceLayoutService
         }
 
         return false;
+    }
+
+    static void ApplyQuickAccessSidebar(WorkspaceSavedLayout layout)
+    {
+        if (layout.QuickAccessSidebar is not { } quickAccessSidebar)
+            return;
+
+        var sidebar = quickAccessSidebar.Clone();
+        sidebar.LegacySidesMigrated = true;
+        AppHostContext.AppConfig.Base.QuickAccessSidebar = sidebar;
     }
 
     public static string ActiveLayoutName => AppHostContext.AppConfig.Base.WorkspacePreset;

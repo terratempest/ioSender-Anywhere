@@ -217,6 +217,13 @@ public partial class MainWindow : Window
 
     void OnMainWindowClosing(object? sender, WindowClosingEventArgs e)
     {
+        if (!CanDisconnectOrExit())
+        {
+            e.Cancel = true;
+            ShowBusyMessage();
+            return;
+        }
+
         SaveWindowPlacement();
         CloseFloatingPanelWindows();
         DisconnectMachine();
@@ -251,6 +258,7 @@ public partial class MainWindow : Window
         GCodeConverterRegistry.RegisterDefaults();
         DragKnifeOptions.AutoCompress = AppHostContext.AppConfig.Base.AutoCompress;
         MnuTransform.IsEnabled = true;
+        UpdateProgramFileButtons();
     }
 
     public void HandleIpcMessage(string message) => StartupFileHandler.TryLoadFromIpcMessage(message);
@@ -338,6 +346,7 @@ public partial class MainWindow : Window
     {
         Localize.Apply(MnuFile);
         Localize.Apply(MnuFileOpen);
+        Localize.Apply(MnuFileSave);
         Localize.Apply(MnuFileExit);
         Localize.Apply(MnuTransform);
         Localize.Apply(MnuDragKnife);
@@ -346,8 +355,9 @@ public partial class MainWindow : Window
         Localize.Apply(MnuLockLayout);
         Localize.Apply(MnuResetLayout);
         Localize.Apply(MnuLayouts);
-        Localize.Apply(MnuPresetCompact);
-        Localize.Apply(MnuPresetExpanded);
+        Localize.Apply(MnuPresetClassic);
+        Localize.Apply(MnuPresetTouch);
+        Localize.Apply(MnuPresetXL);
         Localize.Apply(MnuSaveLayout);
         Localize.Apply(MnuDeleteLayout);
         Localize.Apply(MnuViewSdCard);
@@ -380,11 +390,17 @@ public partial class MainWindow : Window
     {
         if (e.PropertyName is nameof(GrblViewModel.FileName)
             or nameof(GrblViewModel.IsFileLoaded)
-            or nameof(GrblViewModel.IsPhysicalFileLoaded))
+            or nameof(GrblViewModel.IsPhysicalFileLoaded)
+            or nameof(GrblViewModel.IsJobRunning)
+            or nameof(GrblViewModel.IsToolChanging))
+        {
             UpdateProgramFileButtons();
+            UpdateConnectionUi();
+        }
 
         if (e.PropertyName is nameof(GrblViewModel.IsCheckMode)
             or nameof(GrblViewModel.IsJobRunning)
+            or nameof(GrblViewModel.IsToolChanging)
             or nameof(GrblViewModel.IsSleepMode))
             UpdateCheckModeMenu();
 
@@ -429,6 +445,10 @@ public partial class MainWindow : Window
     private void UpdateConnectionUi()
     {
         var connected = _connectionService.IsConnected;
+        var busy = IsMachineBusy();
+        BtnServerStatus.IsEnabled = !busy;
+        MnuFileConnect.IsEnabled = !busy;
+        MnuFileExit.IsEnabled = !busy;
         BtnServerStatus.Background = new SolidColorBrush(connected ? Color.Parse("#4CAF50") : Color.Parse("#FFB74D"));
         ToolTip.SetTip(BtnServerStatus, connected
             ? string.Format(
@@ -439,9 +459,24 @@ public partial class MainWindow : Window
 
     void UpdateProgramFileButtons()
     {
-        BtnReloadProgram.IsEnabled = _viewModel.Grbl.IsPhysicalFileLoaded;
-        BtnCloseProgram.IsEnabled = _viewModel.Grbl.IsFileLoaded;
+        var grbl = _viewModel.Grbl;
+        var canMutate = CanMutateProgram();
+        BtnOpenProgram.IsEnabled = canMutate;
+        MnuFileOpen.IsEnabled = canMutate;
+        MnuFileSave.IsEnabled = canMutate && grbl.IsPhysicalFileLoaded && !grbl.IsSDCardJob;
+        MnuTransform.IsEnabled = canMutate && grbl.IsFileLoaded && !grbl.IsSDCardJob;
+        BtnReloadProgram.IsEnabled = canMutate && grbl.IsPhysicalFileLoaded;
+        BtnCloseProgram.IsEnabled = canMutate && grbl.IsFileLoaded;
     }
+
+    bool IsMachineBusy() => _viewModel.Grbl.IsJobRunning || _viewModel.Grbl.IsToolChanging;
+
+    bool CanMutateProgram() => !IsMachineBusy();
+
+    bool CanDisconnectOrExit() => !IsMachineBusy();
+
+    void ShowBusyMessage() =>
+        MessageDialogs.ShowError("Stop the active job or tool change before changing the program, disconnecting, or exiting.", "ioSender");
 
     void OnShellTabsSelectionChanged(object? sender, SelectionChangedEventArgs e)
     {
@@ -625,6 +660,12 @@ public partial class MainWindow : Window
 
     private async void OnOpenGCodeClick(object? sender, RoutedEventArgs e)
     {
+        if (!CanMutateProgram())
+        {
+            ShowBusyMessage();
+            return;
+        }
+
         if (StorageProvider is not { } storage)
             return;
 
@@ -634,6 +675,17 @@ public partial class MainWindow : Window
 
         if (!GCodeConverterRegistry.TryLoad(path, GCodeFileTarget.Current, this))
             _programService.Load(path);
+    }
+
+    void OnSaveProgramClick(object? sender, RoutedEventArgs e)
+    {
+        if (!CanMutateProgram())
+        {
+            ShowBusyMessage();
+            return;
+        }
+
+        _programService.Save();
     }
 
     static async Task<string?> PickGCodeOrConvertedPathAsync(IStorageProvider storage)
@@ -658,16 +710,39 @@ public partial class MainWindow : Window
     }
 
     void OnDragKnifeTransformClick(object? sender, RoutedEventArgs e)
-        => new DragKnifeViewModel().Apply(this);
+    {
+        if (!CanMutateProgram())
+        {
+            ShowBusyMessage();
+            return;
+        }
+
+        new DragKnifeViewModel().Apply(this);
+    }
 
     void OnReloadProgramClick(object? sender, RoutedEventArgs e)
     {
+        if (!CanMutateProgram())
+        {
+            ShowBusyMessage();
+            return;
+        }
+
         var filename = _viewModel.Grbl.FileName;
         if (!string.IsNullOrWhiteSpace(filename) && _viewModel.Grbl.IsPhysicalFileLoaded)
             _programService.Load(filename);
     }
 
-    void OnCloseProgramClick(object? sender, RoutedEventArgs e) => _programService.Close();
+    void OnCloseProgramClick(object? sender, RoutedEventArgs e)
+    {
+        if (!CanMutateProgram())
+        {
+            ShowBusyMessage();
+            return;
+        }
+
+        _programService.Close();
+    }
 
     private void OnCameraClick(object? sender, RoutedEventArgs e)
     {
@@ -789,6 +864,12 @@ public partial class MainWindow : Window
 
     private void OnDisconnectClick(object? sender, RoutedEventArgs e)
     {
+        if (!CanDisconnectOrExit())
+        {
+            ShowBusyMessage();
+            return;
+        }
+
         DisconnectMachine();
         _viewModel.NotifyConnectionChanged();
         UpdateConnectionUi();
@@ -867,20 +948,28 @@ public partial class MainWindow : Window
         UpdateLayoutMenuEnabled();
     }
 
-    private void OnPresetCompactClick(object? sender, RoutedEventArgs e)
+    private void OnPresetClassicClick(object? sender, RoutedEventArgs e)
     {
         if (!_shellReady || _activePage != ShellPage.Home)
             return;
 
-        ApplyLayout(WorkspaceLayoutDefaults.PresetCompact);
+        ApplyLayout(WorkspaceLayoutDefaults.PresetClassic);
     }
 
-    private void OnPresetExpandedClick(object? sender, RoutedEventArgs e)
+    private void OnPresetTouchClick(object? sender, RoutedEventArgs e)
     {
         if (!_shellReady || _activePage != ShellPage.Home)
             return;
 
-        ApplyLayout(WorkspaceLayoutDefaults.PresetExpanded);
+        ApplyLayout(WorkspaceLayoutDefaults.PresetTouch);
+    }
+
+    private void OnPresetXLClick(object? sender, RoutedEventArgs e)
+    {
+        if (!_shellReady || _activePage != ShellPage.Home)
+            return;
+
+        ApplyLayout(WorkspaceLayoutDefaults.PresetXL);
     }
 
     void ApplyLayout(string layoutName)
@@ -893,8 +982,9 @@ public partial class MainWindow : Window
     void RebuildLayoutsMenu()
     {
         MnuLayouts.Items.Clear();
-        MnuLayouts.Items.Add(MnuPresetCompact);
-        MnuLayouts.Items.Add(MnuPresetExpanded);
+        MnuLayouts.Items.Add(MnuPresetClassic);
+        MnuLayouts.Items.Add(MnuPresetTouch);
+        MnuLayouts.Items.Add(MnuPresetXL);
 
         var layouts = WorkspaceLayoutFileService.LoadLayouts();
         if (layouts.Count > 0)
@@ -943,7 +1033,7 @@ public partial class MainWindow : Window
             return;
 
         if (WorkspaceLayoutFileService.Delete(name))
-            ApplyLayout(WorkspaceLayoutDefaults.PresetCompact);
+            ApplyLayout(WorkspaceLayoutDefaults.PresetClassic);
 
         RebuildLayoutsMenu();
         UpdateLayoutMenuEnabled();
