@@ -29,12 +29,14 @@
               PreviewText="000.000"
               Height="24" MinHeight="24" Padding="4,0" VerticalContentAlignment="Center"
               />
+            <TextBlock Text="{Binding Grbl.Unit}" VerticalAlignment="Center"/>
             <TextBlock Text="W:" VerticalAlignment="Center"/>
             <controls:NumericTextBox Value="{Binding HeightMap.Width, Mode=TwoWay}" 
               Format="-###0.0##" 
               Width="70"
               PreviewText="000.000"
               Height="24" MinHeight="24" Padding="4,0" VerticalContentAlignment="Center"/>
+            <TextBlock Text="{Binding Grbl.Unit}" VerticalAlignment="Center"/>
           </StackPanel>
 
           <StackPanel Orientation="Horizontal" Spacing="4">
@@ -44,12 +46,14 @@
               Width="70"
               PreviewText="000.000"
               Height="24" MinHeight="24" Padding="4,0" VerticalContentAlignment="Center"/>
+            <TextBlock Text="{Binding Grbl.Unit}" VerticalAlignment="Center"/>
             <TextBlock Text="H:" VerticalAlignment="Center"/>
             <controls:NumericTextBox Value="{Binding HeightMap.Height, Mode=TwoWay}" 
               Format="-###0.0##" 
               Width="70"
               PreviewText="000.000"
               Height="24" MinHeight="24" Padding="4,0" VerticalContentAlignment="Center"/>
+            <TextBlock Text="{Binding Grbl.Unit}" VerticalAlignment="Center"/>
           </StackPanel>
 
           <Button Content="Set from program limits" 
@@ -62,7 +66,7 @@
 
       <GroupBox Header="Gridsize" BorderBrush="{DynamicResource ThemeBorderLowBrush}">
         <StackPanel Spacing="4">
-          <Grid ColumnDefinitions="Auto,*,Auto" RowDefinitions="Auto,Auto">
+          <Grid ColumnDefinitions="Auto,*,Auto,Auto" RowDefinitions="Auto,Auto">
             <TextBlock Grid.Row="0" Text="X:" 
               VerticalAlignment="Center" Margin="0,0,6,4"/>
             <controls:NumericTextBox Grid.Row="0" Grid.Column="1" 
@@ -70,15 +74,19 @@
               Format="0.000" Margin="0,0,0,4"
               PlaceholderText="5.000"
               Height="24" MinHeight="24" Padding="4,0" VerticalContentAlignment="Center"/>
-            <CheckBox Grid.RowSpan="2" Grid.Column="2" 
+            <TextBlock Grid.Row="0" Grid.Column="2" Text="{Binding Grbl.Unit}"
+              VerticalAlignment="Center" Margin="4,0,0,4"/>
+            <CheckBox Grid.RowSpan="2" Grid.Column="3" 
               Content="Lock" VerticalAlignment="Center" Margin="8,0,0,0"
               IsChecked="{Binding HeightMap.GridSizeLockXY, Mode=TwoWay}"/>
             <TextBlock Grid.Row="1" Text="Y:" 
               VerticalAlignment="Center" Margin="0,0,6,0"/>
             <controls:NumericTextBox Grid.Row="1" Grid.Column="1" 
-              Value="{Binding HeightMap.GridSizeY, Mode=TwoWay}" Format="0.###"
+              Value="{Binding HeightMap.GridSizeY, Mode=TwoWay}" Format="0.000"
               PlaceholderText="5.000"
               Height="24" MinHeight="24" Padding="4,0" VerticalContentAlignment="Center"/>
+            <TextBlock Grid.Row="1" Grid.Column="2" Text="{Binding Grbl.Unit}"
+              VerticalAlignment="Center" Margin="4,0,0,0"/>
           </Grid>
         </StackPanel>
       </GroupBox>

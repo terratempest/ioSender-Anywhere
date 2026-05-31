@@ -43,6 +43,7 @@
               <controls:NumericTextBox Value="{Binding WorkpieceHeight, Mode=TwoWay}"
                                        IsEnabled="{Binding ProbeZ}" Format="0.000"
                                        PreviewText="10.000"/>
+              <TextBlock Text="{Binding Grbl.Unit}" VerticalAlignment="Center"/>
             </StackPanel>
 
             <StackPanel Orientation="Horizontal" Spacing="4" HorizontalAlignment="Right">
@@ -57,6 +58,7 @@
                   </MultiBinding>
                 </controls:NumericTextBox.IsEnabled>
               </controls:NumericTextBox>
+              <TextBlock Text="{Binding Grbl.Unit}" VerticalAlignment="Center"/>
             </StackPanel>
 
           </StackPanel>

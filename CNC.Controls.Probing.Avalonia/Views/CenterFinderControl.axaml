@@ -43,14 +43,16 @@
 
         <GroupBox Header="Workpiece dimensions" BorderBrush="{DynamicResource ThemeBorderLowBrush}">
           <StackPanel Spacing="4">
-            <Grid ColumnDefinitions="Auto,*,Auto" RowDefinitions="Auto,Auto">
+            <Grid ColumnDefinitions="Auto,*,Auto,Auto" RowDefinitions="Auto,Auto">
               <TextBlock Grid.Row="0" Text="X size:" VerticalAlignment="Center" Margin="0,0,6,4"/>
               <controls:NumericTextBox Grid.Row="0" Grid.Column="1" Value="{Binding WorkpieceSizeX, Mode=TwoWay}" Format="0.000" Margin="0,0,0,4"/>
-              <CheckBox Grid.RowSpan="2" Grid.Column="2" Content="Lock" VerticalAlignment="Center" Margin="8,0,0,0"
+              <TextBlock Grid.Row="0" Grid.Column="2" Text="{Binding Grbl.Unit}" VerticalAlignment="Center" Margin="4,0,0,4"/>
+              <CheckBox Grid.RowSpan="2" Grid.Column="3" Content="Lock" VerticalAlignment="Center" Margin="8,0,0,0"
                 IsChecked="{Binding WorkpieceLockXY, Mode=TwoWay}"
                 ToolTip.Tip="Unlock and set X or Y size to 0 to probe in one direction only."/>
               <TextBlock Grid.Row="1" Text="Y size:" VerticalAlignment="Center" Margin="0,0,6,0"/>
               <controls:NumericTextBox Grid.Row="1" Grid.Column="1" Value="{Binding WorkpieceSizeY, Mode=TwoWay}" Format="0.000"/>
+              <TextBlock Grid.Row="1" Grid.Column="2" Text="{Binding Grbl.Unit}" VerticalAlignment="Center" Margin="4,0,0,0"/>
             </Grid>
           </StackPanel>
         </GroupBox>

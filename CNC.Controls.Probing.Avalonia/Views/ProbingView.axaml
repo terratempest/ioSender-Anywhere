@@ -88,7 +88,7 @@
                                     Value="{Binding ProbeDiameter, Mode=TwoWay}"
                                     IsEnabled="{Binding ProbeDiameterEnable}"
                                     Format="0.###"
-                                    Unit="mm"
+                                    Unit="{Binding Grbl.Unit}"
                                     Width="220"
                                     HorizontalAlignment="Stretch"/>
               </StackPanel>
@@ -104,7 +104,7 @@
                                     IsEnabled="{Binding TouchPlateHeightEnable}"
                                     IsVisible="{Binding TouchPlateHeightEnable, Converter={StaticResource IsVisibleConverter}}"
                                     Format="0.###"
-                                    Unit="mm"
+                                    Unit="{Binding Grbl.Unit}"
                                     Width="220"
                                     HorizontalAlignment="Stretch"/>
                 <views:NumericField Label="Fixture:"
@@ -112,7 +112,7 @@
                                     IsEnabled="{Binding FixtureHeightEnable}"
                                     IsVisible="{Binding FixtureHeightEnable, Converter={StaticResource IsVisibleConverter}}"
                                     Format="0.###"
-                                    Unit="mm"
+                                    Unit="{Binding Grbl.Unit}"
                                     Width="220"
                                     HorizontalAlignment="Stretch"/>
               </StackPanel>
@@ -142,13 +142,13 @@
                 <views:NumericField Label="Probing distance:"
                                     Value="{Binding ProbeDistance, Mode=TwoWay}"
                                     Format="0.000"
-                                    Unit="mm"
+                                    Unit="{Binding Grbl.Unit}"
                                     Width="220"
                                     HorizontalAlignment="Stretch"/>
                 <views:NumericField Label="Latch distance:"
                                     Value="{Binding LatchDistance, Mode=TwoWay}"
                                     Format="0.000"
-                                    Unit="mm"
+                                    Unit="{Binding Grbl.Unit}"
                                     Width="220"
                                     HorizontalAlignment="Stretch"/>
               </StackPanel>
@@ -164,7 +164,7 @@
                                     IsEnabled="{Binding XYOffsetEnable}"
                                     IsVisible="{Binding XYOffsetEnable, Converter={StaticResource IsVisibleConverter}}"
                                     Format="0.000"
-                                    Unit="mm"
+                                    Unit="{Binding Grbl.Unit}"
                                     Width="220"
                                     HorizontalAlignment="Stretch"/>
                 <views:NumericField Label="Offset:"
@@ -172,7 +172,7 @@
                                     IsEnabled="{Binding OffsetEnable}"
                                     IsVisible="{Binding OffsetEnable, Converter={StaticResource IsVisibleConverter}}"
                                     Format="0.000"
-                                    Unit="mm"
+                                    Unit="{Binding Grbl.Unit}"
                                     Width="220"
                                     HorizontalAlignment="Stretch"/>
                 <views:NumericField Label="Depth:"
@@ -180,7 +180,7 @@
                                     IsEnabled="{Binding XYOffsetEnable}"
                                     IsVisible="{Binding XYOffsetEnable, Converter={StaticResource IsVisibleConverter}}"
                                     Format="0.000"
-                                    Unit="mm"
+                                    Unit="{Binding Grbl.Unit}"
                                     Width="220"
                                     HorizontalAlignment="Stretch"/>
               </StackPanel>
@@ -191,11 +191,13 @@
                     IsEnabled="{Binding XYOffsetEnable}">
               <StackPanel Spacing="4">
                 <TextBlock Text="Probe/touchplate XY offsets" FontWeight="SemiBold"/>
-                <Grid ColumnDefinitions="Auto,*,Auto,*">
+                <Grid ColumnDefinitions="Auto,*,Auto,Auto,*,Auto">
                   <TextBlock Text="X:" VerticalAlignment="Center" Margin="0,0,4,0"/>
                   <controls:NumericTextBox Grid.Column="1" Value="{Binding ProbeOffsetX, Mode=TwoWay}" Format="0.###"/>
-                  <TextBlock Grid.Column="2" Text="Y:" VerticalAlignment="Center" Margin="8,0,4,0"/>
-                  <controls:NumericTextBox Grid.Column="3" Value="{Binding ProbeOffsetY, Mode=TwoWay}" Format="0.###"/>
+                  <TextBlock Grid.Column="2" Text="{Binding Grbl.Unit}" VerticalAlignment="Center" Margin="4,0,0,0"/>
+                  <TextBlock Grid.Column="3" Text="Y:" VerticalAlignment="Center" Margin="8,0,4,0"/>
+                  <controls:NumericTextBox Grid.Column="4" Value="{Binding ProbeOffsetY, Mode=TwoWay}" Format="0.###"/>
+                  <TextBlock Grid.Column="5" Text="{Binding Grbl.Unit}" VerticalAlignment="Center" Margin="4,0,0,0"/>
                 </Grid>
                 <CheckBox Content="Is touch plate"
                           IsChecked="{Binding TouchPlateIsXY, Mode=TwoWay}"
