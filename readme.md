@@ -6,7 +6,7 @@
 
 Cross-platform build: `ioSender.net.sln` at the repository root.
 
-**Prerequisites:** [.NET 8 SDK](https://dotnet.microsoft.com/download/dotnet/8.0)
+**Prerequisites:** [.NET 8 SDK](https://dotnet.microsoft.com/download/dotnet/8.0). Windows installer packaging also requires [Inno Setup](https://jrsoftware.org/isinfo.php).
 
 ```bash
 # Restore and build
@@ -23,6 +23,7 @@ dotnet run --project GrblConfigApp/GrblConfigApp.csproj
 ./scripts/publish-linux.sh          # self-contained linux-x64 → artifacts/publish/linux-x64
 ./scripts/package-deb.sh            # build artifacts/iosender_*_amd64.deb (Linux)
 pwsh ./scripts/publish-windows.ps1  # win-x64   → artifacts/publish/win-x64
+pwsh ./scripts/package-windows-installer.ps1  # build artifacts/ioSender-Setup-*-win-x64.exe (Windows)
 ```
 
 On Windows, `ioSender` and `GrblConfigApp` use `CNC.Platform.Windows`; on Linux, `CNC.Platform.Linux`.

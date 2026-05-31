@@ -1,4 +1,4 @@
-# Build Windows publish + Linux .deb (via WSL) in parallel.
+# Build Windows publish + Windows installer + Linux .deb (via WSL) in parallel.
 param(
     [switch]$Launch,
     [switch]$NoPause,
@@ -14,8 +14,10 @@ $WinPublish = Join-Path $Artifacts "publish\win-x64"
 $WinExe = Join-Path $WinPublish "ioSender.exe"
 $WslScriptWin = Join-Path $Scripts "wsl-build-deb.sh"
 $WinLog = Join-Path $Artifacts "build-win.log"
+$WinInstallerLog = Join-Path $Artifacts "build-win-installer.log"
 $WslLog = Join-Path $Artifacts "build-wsl.log"
 $WinErr = Join-Path $Artifacts "build-win.err"
+$WinInstallerErr = Join-Path $Artifacts "build-win-installer.err"
 $WslErr = Join-Path $Artifacts "build-wsl.err"
 $ExportDir = Join-Path $env:TEMP "iosender-export"
 
@@ -154,6 +156,7 @@ Write-Host "Repo: $Root"
 New-Item -ItemType Directory -Force -Path $Artifacts | Out-Null
 New-Item -ItemType Directory -Force -Path $ExportDir | Out-Null
 Get-ChildItem $ExportDir -Filter "iosender_*.deb" -ErrorAction SilentlyContinue | Remove-Item -Force
+Get-ChildItem $Artifacts -Filter "ioSender-Setup-*-win-x64.exe" -ErrorAction SilentlyContinue | Remove-Item -Force
 
 Ensure-WslInstalled
 $distro = Get-WslDistroName -Preferred $WslDistro
@@ -165,10 +168,12 @@ Sync-SourceToWsl -Distro $distro -SourceRoot $Root
 $wslExport = Convert-ToWslPath $ExportDir
 $wslSh = New-WslBuildScriptPath $WslScriptWin
 $publishScript = Join-Path $Scripts "publish-windows.ps1"
+$installerScript = Join-Path $Scripts "package-windows-installer.ps1"
 
-Write-Step "Starting parallel builds (Windows + WSL: $distro)"
+Write-Step "Starting parallel builds (Windows folder + WSL: $distro)"
 
 $winArgs = "-NoProfile -ExecutionPolicy Bypass -File `"$publishScript`""
+$winInstallerArgs = "-NoProfile -ExecutionPolicy Bypass -File `"$installerScript`""
 $wslArgs = "-d $distro --cd ~ -e /bin/bash `"$wslSh`" `"$wslExport`""
 
 $winPs = Start-Process -FilePath "powershell.exe" -WorkingDirectory $env:TEMP `
@@ -179,27 +184,60 @@ $wslPs = Start-Process -FilePath "wsl.exe" -WorkingDirectory $env:TEMP `
     -ArgumentList $wslArgs -PassThru -NoNewWindow `
     -RedirectStandardOutput $WslLog -RedirectStandardError $WslErr
 
-Write-Host "Windows PID $($winPs.Id)  |  WSL PID $($wslPs.Id)"
-Write-Host "Waiting for builds (logs: artifacts\build-win.log, artifacts\build-wsl.log)..."
+Write-Host "Windows folder PID $($winPs.Id)  |  WSL PID $($wslPs.Id)"
+Write-Host "Waiting for Windows folder publish before starting installer (logs: artifacts\build-win*.log, artifacts\build-wsl.log)..."
 
 $sw = [System.Diagnostics.Stopwatch]::StartNew()
-while (-not $winPs.HasExited -or -not $wslPs.HasExited) {
+while (-not $winPs.HasExited) {
     $pending = @()
-    if (-not $winPs.HasExited) { $pending += "Windows" }
+    $pending += "Windows folder"
+    if (-not $wslPs.HasExited) { $pending += "WSL" }
+    Write-Host ("  [{0}] waiting on: {1}" -f $sw.Elapsed.ToString('mm\:ss'), ($pending -join ', '))
+    Start-Sleep -Seconds 3
+}
+
+$winPs.WaitForExit()
+$winPs.Refresh()
+
+$winInstallerPs = $null
+if ($winPs.ExitCode -eq 0 -and (Test-Path $WinExe)) {
+    Write-Step "Starting Windows installer build"
+    $winInstallerPs = Start-Process -FilePath "powershell.exe" -WorkingDirectory $env:TEMP `
+        -ArgumentList $winInstallerArgs -PassThru -NoNewWindow `
+        -RedirectStandardOutput $WinInstallerLog -RedirectStandardError $WinInstallerErr
+    Write-Host "Windows installer PID $($winInstallerPs.Id)"
+} else {
+    Write-Host "Skipping Windows installer because the folder publish failed." -ForegroundColor Yellow
+}
+
+while ((($null -ne $winInstallerPs) -and -not $winInstallerPs.HasExited) -or -not $wslPs.HasExited) {
+    $pending = @()
+    if (($null -ne $winInstallerPs) -and -not $winInstallerPs.HasExited) { $pending += "Windows installer" }
     if (-not $wslPs.HasExited) { $pending += "WSL" }
     Write-Host ("  [{0}] waiting on: {1}" -f $sw.Elapsed.ToString('mm\:ss'), ($pending -join ', '))
     Start-Sleep -Seconds 3
 }
 $sw.Stop()
 
-$winPs.WaitForExit()
+if ($null -ne $winInstallerPs) {
+    $winInstallerPs.WaitForExit()
+    $winInstallerPs.Refresh()
+}
 $wslPs.WaitForExit()
-$winPs.Refresh()
 $wslPs.Refresh()
+
+$winInstallerExit = "skipped"
+if ($null -ne $winInstallerPs) {
+    $winInstallerExit = $winInstallerPs.ExitCode
+}
 
 Write-Step "Windows publish finished (exit $($winPs.ExitCode))"
 if (Test-Path $WinLog) { Get-Content $WinLog | Write-Host }
 if (Test-Path $WinErr) { Get-Content $WinErr | Write-Host }
+
+Write-Step "Windows installer finished (exit $winInstallerExit)"
+if (Test-Path $WinInstallerLog) { Get-Content $WinInstallerLog | Write-Host }
+if (Test-Path $WinInstallerErr) { Get-Content $WinInstallerErr | Write-Host }
 
 Write-Step "WSL .deb build finished (exit $($wslPs.ExitCode))"
 if (Test-Path $WslLog) { Get-Content $WslLog | Write-Host }
@@ -218,13 +256,24 @@ $deb = Get-ChildItem (Join-Path $Artifacts "iosender_*.deb") -ErrorAction Silent
     Sort-Object LastWriteTime -Descending |
     Select-Object -First 1
 
+$winInstaller = Get-ChildItem (Join-Path $Artifacts "ioSender-Setup-*-win-x64.exe") -ErrorAction SilentlyContinue |
+    Sort-Object LastWriteTime -Descending |
+    Select-Object -First 1
+
 $winOk = (Test-Path $WinExe)
+$winInstallerOk = ($null -ne $winInstaller)
 $wslOk = ($null -ne $deb)
 
 $buildFailed = $false
 if (-not $winOk) {
     Write-Host "Windows build failed (ioSender.exe missing)." -ForegroundColor Red
     if ($winPs.ExitCode -ne 0) { Write-Host "  exit code: $($winPs.ExitCode)" -ForegroundColor DarkRed }
+    $buildFailed = $true
+}
+
+if (-not $winInstallerOk) {
+    Write-Host "Windows installer build failed (setup .exe missing)." -ForegroundColor Red
+    if (($null -ne $winInstallerPs) -and $winInstallerPs.ExitCode -ne 0) { Write-Host "  exit code: $($winInstallerPs.ExitCode)" -ForegroundColor DarkRed }
     $buildFailed = $true
 }
 
@@ -242,8 +291,9 @@ Write-Host ""
 Write-Host "========================================" -ForegroundColor Green
 Write-Host " Build complete" -ForegroundColor Green
 Write-Host "========================================" -ForegroundColor Green
-Write-Host " Windows: $WinExe"
-Write-Host " Linux:   $($deb.FullName)"
+Write-Host " Windows folder:    $WinExe"
+Write-Host " Windows installer: $($winInstaller.FullName)"
+Write-Host " Linux installer:   $($deb.FullName)"
 
 if ($Launch) {
     Write-Step "Launching Windows build"
