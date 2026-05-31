@@ -24,7 +24,7 @@ function Write-Step([string]$Message) {
     Write-Host "==> $Message" -ForegroundColor Cyan
 }
 
-function Ensure-Wsl {
+function Ensure-WslInstalled {
     if (-not (Get-Command wsl -ErrorAction SilentlyContinue)) {
         throw "WSL not found. Install WSL + Ubuntu, then re-run."
     }
@@ -58,6 +58,19 @@ function Get-WslDistroName {
     }
 
     return $distros[0]
+}
+
+function Ensure-WslDistroReady {
+    param([string]$Distro)
+
+    $output = & wsl.exe -d $Distro --cd ~ -e /bin/bash -lc "printf WSL_READY" 2>&1
+    if ($LASTEXITCODE -ne 0 -or (($output -join "`n") -notmatch "WSL_READY")) {
+        $message = (($output -join "`n") -replace "`0", "").Trim()
+        if ([string]::IsNullOrWhiteSpace($message)) {
+            $message = "No output from WSL."
+        }
+        throw "WSL distro '$Distro' could not start (exit $LASTEXITCODE). Try 'wsl --shutdown' or reboot Windows, then re-run. Details: $message"
+    }
 }
 
 function Convert-ToWslPath([string]$WindowsPath) {
@@ -142,8 +155,9 @@ New-Item -ItemType Directory -Force -Path $Artifacts | Out-Null
 New-Item -ItemType Directory -Force -Path $ExportDir | Out-Null
 Get-ChildItem $ExportDir -Filter "iosender_*.deb" -ErrorAction SilentlyContinue | Remove-Item -Force
 
-Ensure-Wsl
+Ensure-WslInstalled
 $distro = Get-WslDistroName -Preferred $WslDistro
+Ensure-WslDistroReady -Distro $distro
 
 Write-Step "Syncing source to ~/ioSender-build (rsync)"
 Sync-SourceToWsl -Distro $distro -SourceRoot $Root
@@ -180,6 +194,8 @@ $sw.Stop()
 
 $winPs.WaitForExit()
 $wslPs.WaitForExit()
+$winPs.Refresh()
+$wslPs.Refresh()
 
 Write-Step "Windows publish finished (exit $($winPs.ExitCode))"
 if (Test-Path $WinLog) { Get-Content $WinLog | Write-Host }

@@ -12,9 +12,10 @@ set EXITCODE=%ERRORLEVEL%
 
 if %EXITCODE% neq 0 (
     echo.
-    echo  BUILD FAILED (exit %EXITCODE%)
+    echo  BUILD FAILED ^(exit %EXITCODE%^)
     echo.
-    pause
+    echo %* | findstr /i /c:"-NoPause" >nul
+    if errorlevel 1 pause
     exit /b %EXITCODE%
 )
 

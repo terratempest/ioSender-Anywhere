@@ -12,10 +12,17 @@ resolve_version() {
     echo "$VERSION"
     return
   fi
-  dotnet msbuild "$ROOT/ioSender/ioSender.csproj" -getProperty:Version -nologo -v:q 2>/dev/null | tr -d '\r' || true
+
+  if command -v dotnet >/dev/null 2>&1; then
+    dotnet msbuild "$ROOT/ioSender/ioSender.csproj" -getProperty:Version -nologo -v:q 2>/dev/null | tr -d '\r' || true
+  fi
 }
 
 VERSION="$(resolve_version)"
+if [[ -z "$VERSION" ]]; then
+  VERSION="$(sed -n 's:.*<Version>\(.*\)</Version>.*:\1:p' "$ROOT/Directory.Build.props" | head -1 | tr -d '\r' || true)"
+fi
+
 if [[ -z "$VERSION" ]]; then
   if command -v git >/dev/null 2>&1 && git -C "$ROOT" describe --tags --abbrev=0 >/dev/null 2>&1; then
     VERSION="$(git -C "$ROOT" describe --tags --abbrev=0 | sed 's/^v//')"

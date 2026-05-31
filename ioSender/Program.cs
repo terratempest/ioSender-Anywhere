@@ -28,7 +28,7 @@ class Program
         try
         {
             EarlyStartupBanner.Show();
-            EarlyStartupBanner.ReportProgress("Starting Avalonia...", 10);
+            EarlyStartupBanner.ReportProgress("Starting Application...", 10);
             BuildAvaloniaApp().StartWithClassicDesktopLifetime(args);
         }
         catch (Exception ex)
