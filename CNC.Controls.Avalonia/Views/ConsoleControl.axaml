@@ -1,23 +1,35 @@
 <UserControl xmlns="https://github.com/avaloniaui"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
-             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              xmlns:core="using:CNC.Core"
              xmlns:loc="using:CNC.Localization.Avalonia"
-             mc:Ignorable="d" d:DesignWidth="400" d:DesignHeight="331"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             mc:Ignorable="d" d:DesignWidth="600" d:DesignHeight="600"
              x:Class="CNC.Controls.Avalonia.Views.ConsoleControl"
              x:DataType="core:GrblViewModel">
-  <DockPanel>
-    <StackPanel DockPanel.Dock="Top" Orientation="Horizontal" Spacing="10" Margin="0,0,0,5">
-      <CheckBox x:Name="ChkVerbose" Content="Verbose" IsChecked="{Binding ResponseLogVerbose}"
-                loc:Localize.Key="CNC.Controls.Avalonia.consolecontrol.lbl_verbose" loc:Localize.Fallback="Verbose"/>
-      <CheckBox x:Name="ChkFilterRt" Content="Filter out realtime responses" IsChecked="{Binding ResponseLogFilterRT}" IsEnabled="{Binding ResponseLogVerbose}"
-                loc:Localize.Key="CNC.Controls.Avalonia.consolecontrol.lbl_filterRT" loc:Localize.Fallback="Filter out realtime responses"/>
-      <CheckBox x:Name="ChkShowAllRt" Content="Show all realtime responses" IsChecked="{Binding ResponseLogShowRTAll}" IsEnabled="{Binding ResponseLogVerbose}"
-                loc:Localize.Key="CNC.Controls.Avalonia.consolecontrol.lbl_showAll" loc:Localize.Fallback="Show all realtime responses"/>
-      <Button x:Name="BtnClear" Content="Clear" Click="OnClearClick"
+  <Grid RowDefinitions="Auto, *">
+    <Grid Grid.Row="0" ColumnDefinitions="Auto,*" Margin="4, 0" TextElement.FontSize="12">
+      <Menu>
+        <MenuItem Header="Settings">
+          <CheckBox x:Name="ChkVerbose" Content="Verbose" IsChecked="{Binding ResponseLogVerbose}"
+                    loc:Localize.Key="CNC.Controls.Avalonia.consolecontrol.lbl_verbose" loc:Localize.Fallback="Verbose"/>
+          <CheckBox x:Name="ChkFilterRt" Content="Filter out realtime responses" IsChecked="{Binding ResponseLogFilterRT}" IsEnabled="{Binding ResponseLogVerbose}"
+                    loc:Localize.Key="CNC.Controls.Avalonia.consolecontrol.lbl_filterRT" loc:Localize.Fallback="Filter out realtime responses"/>
+          <CheckBox x:Name="ChkShowAllRt" Content="Show all realtime responses" IsChecked="{Binding ResponseLogShowRTAll}" IsEnabled="{Binding ResponseLogVerbose}"
+                    loc:Localize.Key="CNC.Controls.Avalonia.consolecontrol.lbl_showAll" loc:Localize.Fallback="Show all realtime responses"/>
+        </MenuItem>
+      </Menu>
+      <Button x:Name="BtnClear" Grid.Column="6" Content="Clear" Click="OnClearClick" HorizontalAlignment="Right"
               loc:Localize.Key="CNC.Controls.Avalonia.consolecontrol.btn_clear" loc:Localize.Fallback="Clear"/>
-    </StackPanel>
-    <ListBox ItemsSource="{Binding ResponseLog}" FontFamily="Consolas,Courier New,monospace" FontSize="10"/>
-  </DockPanel>
+    </Grid>
+    <ListBox Grid.Row="1" ItemsSource="{Binding ResponseLog}" FontFamily="Consolas,Courier New,monospace" FontSize="10">
+      <ListBox.Styles>
+        <Style Selector="ListBoxItem">
+          <Setter Property="Height" Value="24"/>
+          <Setter Property="Padding" Value="4, 0"/>
+          <Setter Property="VerticalContentAlignment" Value="Center"/>
+        </Style>
+      </ListBox.Styles>
+    </ListBox>
+  </Grid>
 </UserControl>

@@ -13,6 +13,7 @@ public static class WorkspaceEditorCatalog
         Desc(WorkspaceEditorId.Mdi, "CNC.Controls.Avalonia.mdicontrol.grp_mdi", "MDI", 200, 100, fillsWorkspace: true),
         Desc(WorkspaceEditorId.MdiTouch, "ioSender.workspace.editor_mdiTouch", "MDI (Touch)", 360, 250, fillsWorkspace: true),
         Desc(WorkspaceEditorId.Dro, "CNC.Controls.Avalonia.drocontrol.grp_dro", "DRO", 160, 120, fillsWorkspace: true),
+        Desc(WorkspaceEditorId.ProgramLimits, "ioSender.workspace.editor_programLimits", "Program limits", 216, 120, fillsWorkspace: true),
         Desc(WorkspaceEditorId.Signals, "ioSender.workspace.editor_signals", "Signals", 216, 60, fillsWorkspace: true),
         Desc(WorkspaceEditorId.Status, "ioSender.workspace.editor_status", "Status", 216, 66, fillsWorkspace: true),
         Desc(WorkspaceEditorId.Jog, "ioSender.workspace.editor_jog", "Jog", 280, 200, fillsWorkspace: true),
@@ -66,7 +67,8 @@ public static class WorkspaceEditorCatalog
             WorkspaceEditorId.Probing
             or WorkspaceEditorId.Offsets
             or WorkspaceEditorId.GrblConfig
-            or WorkspaceEditorId.AppConfig));
+            or WorkspaceEditorId.AppConfig
+            or WorkspaceEditorId.Status));
 
     /// <summary>Entries assignable in the Home workspace layout picker.</summary>
     public static IEnumerable<WorkspaceEditorDescriptor> LayoutPickableDescriptors =>
@@ -74,7 +76,8 @@ public static class WorkspaceEditorCatalog
             WorkspaceEditorId.Probing
             or WorkspaceEditorId.Offsets
             or WorkspaceEditorId.GrblConfig
-            or WorkspaceEditorId.AppConfig));
+            or WorkspaceEditorId.AppConfig
+            or WorkspaceEditorId.Status));
 
     public static WorkspaceEditorDescriptor Get(WorkspaceEditorId id) =>
         All.First(d => d.Id == id);

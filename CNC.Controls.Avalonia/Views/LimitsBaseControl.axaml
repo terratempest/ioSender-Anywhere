@@ -1,0 +1,34 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:controls="using:CNC.Controls.Avalonia.Controls"
+             x:Class="CNC.Controls.Avalonia.Views.LimitsBaseControl"
+             x:Name="Root"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             mc:Ignorable="d" d:DesignWidth="200" 
+             >
+  <Grid ColumnDefinitions="24, *, 16, *, 48" VerticalAlignment="Center" HorizontalAlignment="Stretch" TextElement.FontSize="12">
+    <TextBlock Grid.Column="0" x:Name="axisLabel"
+      Text="{Binding Label, ElementName=Root}"
+      TextAlignment="Right"
+      VerticalAlignment="Center"
+      Margin="4, 0"
+    />
+    <controls:NumericTextBox x:Name="cvMin" Grid.Column="1"
+      Format="{Binding DataContext.Format, RelativeSource={RelativeSource AncestorType=UserControl}}"
+      Value="{Binding MinValue, ElementName=Root, Mode=OneWay}"
+      IsReadOnly="True" VerticalContentAlignment="Center" HorizontalContentAlignment="Center"
+      Height="24" MinHeight="24" Padding="4, 0" MinWidth="48"
+      Focusable="False"/>
+    <TextBlock Text="-" VerticalAlignment="Center" HorizontalAlignment="Center" Grid.Column="2"/>
+    <controls:NumericTextBox x:Name="cvMax" Grid.Column="3"
+      Format="{Binding DataContext.Format, RelativeSource={RelativeSource AncestorType=UserControl}}"
+      Value="{Binding MaxValue, ElementName=Root, Mode=OneWay}"
+      IsReadOnly="True" VerticalContentAlignment="Center" HorizontalContentAlignment="Center"
+      Height="24" MinHeight="24" Padding="4, 0" MinWidth="48"
+      Focusable="False"/>
+    <TextBlock Grid.Column="4" x:Name="unitLabel"
+      Text="{Binding DataContext.Unit, RelativeSource={RelativeSource AncestorType=UserControl}}"
+      VerticalAlignment="Center" HorizontalAlignment="Left" Margin="4, 0"/>
+  </Grid>
+</UserControl>

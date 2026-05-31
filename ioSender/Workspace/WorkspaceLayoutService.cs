@@ -10,9 +10,11 @@ public static class WorkspaceLayoutService
     public static WorkspaceNode EnsureRoot()
     {
         var config = AppHostContext.AppConfig.Base;
-        if (config.WorkspaceRoot is null || !WorkspaceLayoutDefaults.IsValid(config.WorkspaceRoot))
-            config.WorkspaceRoot = ResolvePreset(config).Clone();
+        var root = WorkspaceLayoutSanitizer.Sanitize(config.WorkspaceRoot);
+        if (root is null || !WorkspaceLayoutDefaults.IsValid(root))
+            root = ResolvePreset(config).Clone();
 
+        config.WorkspaceRoot = root;
         EnsureRegionIds(config.WorkspaceRoot);
         return config.WorkspaceRoot;
     }
@@ -77,12 +79,15 @@ public static class WorkspaceLayoutService
             return true;
         }
 
-        if (WorkspaceLayoutFileService.TryLoadByName(layoutName, out var saved)
-            && WorkspaceLayoutDefaults.IsValid(saved.Root))
+        if (WorkspaceLayoutFileService.TryLoadByName(layoutName, out var saved))
         {
-            AppHostContext.AppConfig.Base.WorkspacePreset = saved.Name;
-            AppHostContext.AppConfig.Base.WorkspaceRoot = saved.Root.Clone();
-            return true;
+            var root = WorkspaceLayoutSanitizer.Sanitize(saved.Root.Clone());
+            if (root is not null && WorkspaceLayoutDefaults.IsValid(root))
+            {
+                AppHostContext.AppConfig.Base.WorkspacePreset = saved.Name;
+                AppHostContext.AppConfig.Base.WorkspaceRoot = root;
+                return true;
+            }
         }
 
         return false;

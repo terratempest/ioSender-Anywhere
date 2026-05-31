@@ -71,6 +71,11 @@ public sealed class WorkspaceEditorControlFactory
             VerticalAlignment = Avalonia.Layout.VerticalAlignment.Stretch,
         },
         WorkspaceEditorId.Dro => new DROControl(),
+        WorkspaceEditorId.ProgramLimits => new LimitsControl
+        {
+            HorizontalAlignment = Avalonia.Layout.HorizontalAlignment.Stretch,
+            VerticalAlignment = Avalonia.Layout.VerticalAlignment.Stretch,
+        },
         WorkspaceEditorId.Signals => new SignalsControl(),
         WorkspaceEditorId.Status => new StatusControl
         {

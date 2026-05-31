@@ -9,9 +9,10 @@
              x:DataType="core:GrblViewModel"
              mc:Ignorable="d"
              d:DesignWidth="350"
-             d:DesignHeight="100"
+             d:DesignHeight="28"
              MinWidth="216"
              MinHeight="24"
+             MaxHeight="28"
              HorizontalAlignment="Stretch"
              VerticalAlignment="Stretch">
 
@@ -19,7 +20,7 @@
     <conv:GrblStateToColorConverter x:Key="ToColorConverter"/>
   </UserControl.Resources>
 
-  <Grid Margin="4" ColumnDefinitions="Auto,*,Auto" MaxHeight="48" MinHeight="24"
+  <Grid Margin="4" ColumnDefinitions="Auto,*,Auto,Auto" MaxHeight="28" MinHeight="24"
         HorizontalAlignment="Stretch" VerticalAlignment="Stretch">
     <TextBlock x:Name="LblState" Grid.Column="0" Text="State:" VerticalAlignment="Center"
                Margin="0,0,4,0"
@@ -36,13 +37,23 @@
              Text="{Binding GrblStateDisplay, Mode=OneWay}"
              Background="{Binding GrblState, Converter={StaticResource ToColorConverter}}"/>
 
-    <Button x:Name="btnReset" Grid.Column="2"
-            Content="Reset" ToolTip.Tip="Ctrl+Shift+R"
+    <Button x:Name="btnUnlock" Grid.Column="2"
+            Content="Unlock" ToolTip.Tip="Ctrl+U"
             Width="72" Margin="4,0,0,0" Padding="0"
-            HorizontalContentAlignment="Center" 
+            HorizontalContentAlignment="Center"
             VerticalContentAlignment="Center"
             HorizontalAlignment="Right"
-            VerticalAlignment= "Stretch"
+            VerticalAlignment="Stretch"
+            Focusable="False"
+            loc:Localize.Key="CNC.Controls.Avalonia.statuscontrol.btn_unlock"/>
+
+    <Button x:Name="btnReset" Grid.Column="3"
+            Content="Reset" ToolTip.Tip="Ctrl+Shift+R"
+            Width="72" Margin="4,0,0,0" Padding="0"
+            HorizontalContentAlignment="Center"
+            VerticalContentAlignment="Center"
+            HorizontalAlignment="Right"
+            VerticalAlignment="Stretch"
             Focusable="False" Classes="danger"
             loc:Localize.Key="CNC.Controls.Avalonia.statuscontrol.btn_reset"/>
   </Grid>

@@ -86,6 +86,7 @@ ioSender.g.en-US.resources:mainwindow.baml,mnu_presetExpanded:System.Windows.Con
 ioSender.g.en-US.resources:workspace.baml,editor_program:System.String.$Content,None,True,True,,Program
 ioSender.g.en-US.resources:workspace.baml,editor_viewer3d:System.String.$Content,None,True,True,,3D View
 ioSender.g.en-US.resources:workspace.baml,editor_console:System.String.$Content,None,True,True,,Console
+ioSender.g.en-US.resources:workspace.baml,editor_programLimits:System.String.$Content,None,True,True,,Program limits
 ioSender.g.en-US.resources:workspace.baml,editor_signals:System.String.$Content,None,True,True,,Signals
 ioSender.g.en-US.resources:workspace.baml,editor_status:System.String.$Content,None,True,True,,Status
 ioSender.g.en-US.resources:workspace.baml,editor_jog:System.String.$Content,None,True,True,,Jog

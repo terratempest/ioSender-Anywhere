@@ -73,6 +73,10 @@
                   loc:Localize.Key="ioSender.mainwindow.mnu_grblSettings" loc:Localize.Fallback="Settings: _Grbl"/>
         <MenuItem x:Name="MnuAppSettings" Header="Settings: _App" Click="OnAppSettingsClick"
                   loc:Localize.Key="ioSender.mainwindow.mnu_appSettings" loc:Localize.Fallback="Settings: _App"/>
+        <MenuItem x:Name="MnuCheckMode" Header="Check _mode"
+                  ToggleType="CheckBox"
+                  Click="OnCheckModeMenuClick"
+                  loc:Localize.Key="ioSender.mainwindow.mnu_checkMode" loc:Localize.Fallback="Check mode"/>
       </MenuItem>
     </Menu>
 
@@ -89,7 +93,7 @@
     </Border>
 
     <Grid RowDefinitions="Auto,*">
-      <Grid Grid.Row="0" ColumnDefinitions="Auto,*"
+      <Grid Grid.Row="0" ColumnDefinitions="Auto,*,Auto"
             Background="{DynamicResource ThemeControlLowBrush}">
         <StackPanel Grid.Column="0" Orientation="Horizontal" Spacing="4" Margin="4,3,6,3"
                     VerticalAlignment="Center">
@@ -146,6 +150,12 @@
             <Grid/>
           </TabItem>
         </TabControl>
+
+        <cnc:StatusControl Grid.Column="2"
+                           DataContext="{Binding Grbl}"
+                           HorizontalAlignment="Right"
+                           VerticalAlignment="Center"
+                           Margin="4,3,6,3"/>
       </Grid>
 
       <Grid Grid.Row="1" ClipToBounds="False">

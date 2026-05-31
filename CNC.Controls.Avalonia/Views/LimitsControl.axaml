@@ -1,0 +1,77 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:views="using:CNC.Controls.Avalonia.Views"
+             xmlns:loc="using:CNC.Localization.Avalonia"
+             xmlns:core="using:CNC.Core"
+             xmlns:gcode="using:CNC.GCode"
+             x:Class="CNC.Controls.Avalonia.Views.LimitsControl"
+             x:DataType="core:GrblViewModel"
+             mc:Ignorable="d"
+             d:DesignWidth="250">
+
+  <UserControl.Resources>
+    <ResourceDictionary>
+      <ResourceDictionary.MergedDictionaries>
+        <ResourceInclude Source="avares://CNC.Controls.Avalonia/Themes/Controls.axaml"/>
+      </ResourceDictionary.MergedDictionaries>
+    </ResourceDictionary>
+  </UserControl.Resources>
+  <StackPanel Spacing="4" Margin="4">
+    <views:LimitsBaseControl x:Name="axisX" Label="X"
+                              MinValue="{Binding ProgramLimits.MinX, Mode=OneWay}"
+                              MaxValue="{Binding ProgramLimits.MaxX, Mode=OneWay}"/>
+    <views:LimitsBaseControl x:Name="axisY" Label="Y"
+                              MinValue="{Binding ProgramLimits.MinY, Mode=OneWay}"
+                              MaxValue="{Binding ProgramLimits.MaxY, Mode=OneWay}">
+      <views:LimitsBaseControl.IsVisible>
+        <MultiBinding Converter="{StaticResource IsAxisVisibleConverter}">
+          <Binding Path="AxisEnabledFlags"/>
+          <Binding Source="{x:Static gcode:AxisFlags.Y}"/>
+        </MultiBinding>
+      </views:LimitsBaseControl.IsVisible>
+    </views:LimitsBaseControl>
+    <views:LimitsBaseControl x:Name="axisZ" Label="Z"
+                              MinValue="{Binding ProgramLimits.MinZ, Mode=OneWay}"
+                              MaxValue="{Binding ProgramLimits.MaxZ, Mode=OneWay}">
+      <views:LimitsBaseControl.IsVisible>
+        <MultiBinding Converter="{StaticResource IsAxisVisibleConverter}">
+          <Binding Path="AxisEnabledFlags"/>
+          <Binding Source="{x:Static gcode:AxisFlags.Z}"/>
+        </MultiBinding>
+      </views:LimitsBaseControl.IsVisible>
+    </views:LimitsBaseControl>
+    <views:LimitsBaseControl x:Name="axisA" Label="{Binding AxisLetter.A}"
+                              MinValue="{Binding ProgramLimits.MinA, Mode=OneWay}"
+                              MaxValue="{Binding ProgramLimits.MaxA, Mode=OneWay}">
+      <views:LimitsBaseControl.IsVisible>
+        <MultiBinding Converter="{StaticResource IsAxisVisibleConverter}">
+          <Binding Path="AxisEnabledFlags"/>
+          <Binding Source="{x:Static gcode:AxisFlags.A}"/>
+        </MultiBinding>
+      </views:LimitsBaseControl.IsVisible>
+    </views:LimitsBaseControl>
+    <views:LimitsBaseControl x:Name="axisB" Label="{Binding AxisLetter.B}"
+                              MinValue="{Binding ProgramLimits.MinB, Mode=OneWay}"
+                              MaxValue="{Binding ProgramLimits.MaxB, Mode=OneWay}">
+      <views:LimitsBaseControl.IsVisible>
+        <MultiBinding Converter="{StaticResource IsAxisVisibleConverter}">
+          <Binding Path="AxisEnabledFlags"/>
+          <Binding Source="{x:Static gcode:AxisFlags.B}"/>
+        </MultiBinding>
+      </views:LimitsBaseControl.IsVisible>
+    </views:LimitsBaseControl>
+    <views:LimitsBaseControl x:Name="axisC" Label="{Binding AxisLetter.C}"
+                              MinValue="{Binding ProgramLimits.MinC, Mode=OneWay}"
+                              MaxValue="{Binding ProgramLimits.MaxC, Mode=OneWay}">
+      <views:LimitsBaseControl.IsVisible>
+        <MultiBinding Converter="{StaticResource IsAxisVisibleConverter}">
+          <Binding Path="AxisEnabledFlags"/>
+          <Binding Source="{x:Static gcode:AxisFlags.C}"/>
+        </MultiBinding>
+      </views:LimitsBaseControl.IsVisible>
+    </views:LimitsBaseControl>
+  </StackPanel>
+
+</UserControl>

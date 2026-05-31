@@ -41,6 +41,7 @@ public partial class MainWindow : Window
     private bool _restoringPlacement;
     private QuickAccessSidebarController? _quickAccess;
     private bool _suppressSidebarMenuSync;
+    private bool _suppressCheckModeMenuSync;
 
     public MainWindow()
     {
@@ -61,6 +62,7 @@ public partial class MainWindow : Window
 
         UpdateConnectionUi();
         UpdateProgramFileButtons();
+        UpdateCheckModeMenu();
         UpdateLayoutMenuEnabled();
         InitializeQuickAccessSidebar();
         WireShellTabHeaders();
@@ -340,6 +342,7 @@ public partial class MainWindow : Window
         Localize.Apply(MnuSettings);
         Localize.Apply(MnuGrblSettings);
         Localize.Apply(MnuAppSettings);
+        Localize.Apply(MnuCheckMode);
         Localize.Apply(TabHome);
         Localize.Apply(TabProbing);
         Localize.Apply(TabOffsets);
@@ -353,6 +356,44 @@ public partial class MainWindow : Window
             or nameof(GrblViewModel.IsFileLoaded)
             or nameof(GrblViewModel.IsPhysicalFileLoaded))
             UpdateProgramFileButtons();
+
+        if (e.PropertyName is nameof(GrblViewModel.IsCheckMode)
+            or nameof(GrblViewModel.IsJobRunning)
+            or nameof(GrblViewModel.IsSleepMode))
+            UpdateCheckModeMenu();
+    }
+
+    void UpdateCheckModeMenu()
+    {
+        if (_suppressCheckModeMenuSync)
+            return;
+
+        var grbl = _viewModel.Grbl;
+        _suppressCheckModeMenuSync = true;
+        try
+        {
+            MnuCheckMode.IsChecked = grbl.IsCheckMode;
+            MnuCheckMode.IsEnabled = !grbl.IsJobRunning && !grbl.IsSleepMode;
+        }
+        finally
+        {
+            _suppressCheckModeMenuSync = false;
+        }
+    }
+
+    void OnCheckModeMenuClick(object? sender, RoutedEventArgs e)
+    {
+        if (_suppressCheckModeMenuSync)
+            return;
+
+        var grbl = _viewModel.Grbl;
+        if (grbl.IsJobRunning || grbl.IsSleepMode)
+            return;
+
+        if (MnuCheckMode.IsChecked == true)
+            grbl.ExecuteCommand(GrblConstants.CMD_CHECK);
+        else if (grbl.IsCheckMode)
+            Grbl.Reset();
     }
 
     private void UpdateConnectionUi()

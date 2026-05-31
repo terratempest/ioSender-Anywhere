@@ -11,13 +11,23 @@ public partial class StatusControl : UserControl
     {
         InitializeComponent();
         ApplyLocalization();
+        btnUnlock.Click += Unlock_Click;
         btnReset.Click += Reset_Click;
     }
 
     void ApplyLocalization()
     {
         Localize.Apply(LblState);
+        Localize.Apply(btnUnlock);
         Localize.Apply(btnReset);
+    }
+
+    void Unlock_Click(object? sender, RoutedEventArgs e)
+    {
+        if (DataContext is not GrblViewModel model)
+            return;
+
+        model.ExecuteCommand(GrblConstants.CMD_UNLOCK);
     }
 
     void Reset_Click(object? sender, RoutedEventArgs e)
