@@ -3,8 +3,12 @@ setlocal
 cd /d "%~dp0"
 
 echo.
-echo  ioSender - Windows + Linux (.deb) release build
-echo  =================================================
+echo  ioSender - release artifact build
+echo  =================================
+echo  Produces:
+echo    - Windows portable .zip
+echo    - Windows installer .exe
+echo    - Linux installer .deb
 echo.
 
 powershell.exe -NoProfile -ExecutionPolicy Bypass -File "%~dp0scripts\build-all.ps1" %*

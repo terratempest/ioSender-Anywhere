@@ -12,6 +12,7 @@ $Scripts = Join-Path $Root "scripts"
 $Artifacts = Join-Path $Root "artifacts"
 $WinPublish = Join-Path $Artifacts "publish\win-x64"
 $WinExe = Join-Path $WinPublish "ioSender.exe"
+$Project = Join-Path $Root "ioSender\ioSender.csproj"
 $WslScriptWin = Join-Path $Scripts "wsl-build-deb.sh"
 $WinLog = Join-Path $Artifacts "build-win.log"
 $WinInstallerLog = Join-Path $Artifacts "build-win-installer.log"
@@ -150,6 +151,40 @@ function New-WslBuildScriptPath([string]$SourcePath) {
     return (Convert-ToWslPath $tempWin)
 }
 
+function Get-ProjectVersion {
+    $version = (& dotnet msbuild $Project -getProperty:Version -nologo -v:q 2>$null | Select-Object -First 1).Trim()
+    if ([string]::IsNullOrWhiteSpace($version)) {
+        return "0.0.0"
+    }
+    return $version
+}
+
+function New-WindowsPortableZip {
+    param(
+        [string]$SourceDirectory,
+        [string]$Version
+    )
+
+    if (-not (Test-Path (Join-Path $SourceDirectory "ioSender.exe"))) {
+        throw "Windows publish output missing: $SourceDirectory\ioSender.exe"
+    }
+
+    $portableName = "ioSender-$Version-win-x64-portable"
+    $zipPath = Join-Path $Artifacts "$portableName.zip"
+    $stagingRoot = Join-Path $env:TEMP "iosender-portable-$PID"
+    $portableRoot = Join-Path $stagingRoot $portableName
+
+    if (Test-Path $stagingRoot) { Remove-Item $stagingRoot -Recurse -Force }
+    if (Test-Path $zipPath) { Remove-Item $zipPath -Force }
+
+    New-Item -ItemType Directory -Force -Path $portableRoot | Out-Null
+    Copy-Item (Join-Path $SourceDirectory "*") $portableRoot -Recurse -Force
+    Compress-Archive -Path $portableRoot -DestinationPath $zipPath -CompressionLevel Optimal -Force
+    Remove-Item $stagingRoot -Recurse -Force
+
+    return $zipPath
+}
+
 Write-Host "ioSender release build" -ForegroundColor Yellow
 Write-Host "Repo: $Root"
 
@@ -157,6 +192,7 @@ New-Item -ItemType Directory -Force -Path $Artifacts | Out-Null
 New-Item -ItemType Directory -Force -Path $ExportDir | Out-Null
 Get-ChildItem $ExportDir -Filter "iosender_*.deb" -ErrorAction SilentlyContinue | Remove-Item -Force
 Get-ChildItem $Artifacts -Filter "ioSender-Setup-*-win-x64.exe" -ErrorAction SilentlyContinue | Remove-Item -Force
+Get-ChildItem $Artifacts -Filter "ioSender-*-win-x64-portable.zip" -ErrorAction SilentlyContinue | Remove-Item -Force
 
 Ensure-WslInstalled
 $distro = Get-WslDistroName -Preferred $WslDistro
@@ -199,8 +235,13 @@ while (-not $winPs.HasExited) {
 $winPs.WaitForExit()
 $winPs.Refresh()
 
+$winExit = $winPs.ExitCode
+if ($null -eq $winExit -and (Test-Path $WinExe)) {
+    $winExit = 0
+}
+
 $winInstallerPs = $null
-if ($winPs.ExitCode -eq 0 -and (Test-Path $WinExe)) {
+if (Test-Path $WinExe) {
     Write-Step "Starting Windows installer build"
     $winInstallerPs = Start-Process -FilePath "powershell.exe" -WorkingDirectory $env:TEMP `
         -ArgumentList $winInstallerArgs -PassThru -NoNewWindow `
@@ -226,20 +267,29 @@ if ($null -ne $winInstallerPs) {
 $wslPs.WaitForExit()
 $wslPs.Refresh()
 
+$wslExit = $wslPs.ExitCode
 $winInstallerExit = "skipped"
 if ($null -ne $winInstallerPs) {
     $winInstallerExit = $winInstallerPs.ExitCode
 }
 
-Write-Step "Windows publish finished (exit $($winPs.ExitCode))"
+Write-Step "Windows publish finished (exit $winExit)"
 if (Test-Path $WinLog) { Get-Content $WinLog | Write-Host }
 if (Test-Path $WinErr) { Get-Content $WinErr | Write-Host }
+
+$version = Get-ProjectVersion
+$winZip = $null
+if (Test-Path $WinExe) {
+    Write-Step "Packaging Windows portable zip"
+    $winZip = New-WindowsPortableZip -SourceDirectory $WinPublish -Version $version
+    Write-Host "Built $winZip"
+}
 
 Write-Step "Windows installer finished (exit $winInstallerExit)"
 if (Test-Path $WinInstallerLog) { Get-Content $WinInstallerLog | Write-Host }
 if (Test-Path $WinInstallerErr) { Get-Content $WinInstallerErr | Write-Host }
 
-Write-Step "WSL .deb build finished (exit $($wslPs.ExitCode))"
+Write-Step "WSL .deb build finished (exit $wslExit)"
 if (Test-Path $WslLog) { Get-Content $WslLog | Write-Host }
 if (Test-Path $WslErr) { Get-Content $WslErr | Write-Host }
 
@@ -261,13 +311,19 @@ $winInstaller = Get-ChildItem (Join-Path $Artifacts "ioSender-Setup-*-win-x64.ex
     Select-Object -First 1
 
 $winOk = (Test-Path $WinExe)
+$winZipOk = ($null -ne $winZip -and (Test-Path $winZip))
 $winInstallerOk = ($null -ne $winInstaller)
 $wslOk = ($null -ne $deb)
 
 $buildFailed = $false
 if (-not $winOk) {
     Write-Host "Windows build failed (ioSender.exe missing)." -ForegroundColor Red
-    if ($winPs.ExitCode -ne 0) { Write-Host "  exit code: $($winPs.ExitCode)" -ForegroundColor DarkRed }
+    if ($null -ne $winExit -and $winExit -ne 0) { Write-Host "  exit code: $winExit" -ForegroundColor DarkRed }
+    $buildFailed = $true
+}
+
+if (-not $winZipOk) {
+    Write-Host "Windows portable zip build failed (.zip missing)." -ForegroundColor Red
     $buildFailed = $true
 }
 
@@ -279,7 +335,7 @@ if (-not $winInstallerOk) {
 
 if (-not $wslOk) {
     Write-Host "WSL build failed (.deb missing)." -ForegroundColor Red
-    if ($wslPs.ExitCode -ne 0) { Write-Host "  exit code: $($wslPs.ExitCode)" -ForegroundColor DarkRed }
+    if ($null -ne $wslExit -and $wslExit -ne 0) { Write-Host "  exit code: $wslExit" -ForegroundColor DarkRed }
     $buildFailed = $true
 }
 
@@ -291,7 +347,7 @@ Write-Host ""
 Write-Host "========================================" -ForegroundColor Green
 Write-Host " Build complete" -ForegroundColor Green
 Write-Host "========================================" -ForegroundColor Green
-Write-Host " Windows folder:    $WinExe"
+Write-Host " Windows portable:  $winZip"
 Write-Host " Windows installer: $($winInstaller.FullName)"
 Write-Host " Linux installer:   $($deb.FullName)"
 

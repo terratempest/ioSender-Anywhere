@@ -59,3 +59,59 @@ Name: "{autodesktop}\ioSender"; Filename: "{app}\ioSender.exe"; WorkingDir: "{ap
 
 [Run]
 Filename: "{app}\ioSender.exe"; Description: "{cm:LaunchProgram,{#StringChange(AppName, '&', '&&')}}"; Flags: nowait postinstall skipifsilent
+
+[Code]
+const
+  AppUninstallKey = 'Software\Microsoft\Windows\CurrentVersion\Uninstall\{8F52F15F-65D8-4D4E-B8D8-A2EE6C631C8E}_is1';
+
+function Unquote(Value: string): string;
+begin
+  Result := Value;
+  if (Length(Result) >= 2) and (Result[1] = '"') and (Result[Length(Result)] = '"') then
+    Result := Copy(Result, 2, Length(Result) - 2);
+end;
+
+function TryGetExistingUninstaller(RootKey: Integer; var Uninstaller: string): Boolean;
+begin
+  Result := RegQueryStringValue(RootKey, AppUninstallKey, 'UninstallString', Uninstaller);
+  if Result then
+    Uninstaller := Unquote(Uninstaller);
+end;
+
+function UninstallExistingInstall(RootKey: Integer): Boolean;
+var
+  ResultCode: Integer;
+  Uninstaller: string;
+begin
+  Result := True;
+  if not TryGetExistingUninstaller(RootKey, Uninstaller) then
+    exit;
+
+  Log('Existing ioSender install found. Running uninstaller: ' + Uninstaller);
+  Result := Exec(
+    Uninstaller,
+    '/VERYSILENT /SUPPRESSMSGBOXES /NORESTART',
+    '',
+    SW_HIDE,
+    ewWaitUntilTerminated,
+    ResultCode);
+
+  if not Result then
+  begin
+    MsgBox('An existing ioSender installation was found, but its uninstaller could not be started. Uninstall ioSender manually, then run this installer again.', mbError, MB_OK);
+    exit;
+  end;
+
+  if ResultCode <> 0 then
+  begin
+    MsgBox('An existing ioSender installation was found, but uninstalling it failed with exit code ' + IntToStr(ResultCode) + '. Uninstall ioSender manually, then run this installer again.', mbError, MB_OK);
+    Result := False;
+  end;
+end;
+
+function InitializeSetup(): Boolean;
+begin
+  Result := UninstallExistingInstall(HKCU);
+  if Result then
+    Result := UninstallExistingInstall(HKLM);
+end;

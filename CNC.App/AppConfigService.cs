@@ -8,6 +8,7 @@ public sealed class AppConfigService
 {
     private readonly IPathService? _pathService;
     private string? _configFilePath;
+    private string? _legacyConfigFilePath;
 
     public AppConfigService(IPathService? pathService = null) => _pathService = pathService;
 
@@ -25,6 +26,10 @@ public sealed class AppConfigService
             path += Path.DirectorySeparatorChar;
 
         Resources.Path = Resources.ConfigPath = path;
+
+        var legacyPath = Path.Combine(baseDirectory, Resources.IniName);
+        if (!string.Equals(legacyPath, Resources.IniFile, StringComparison.OrdinalIgnoreCase))
+            _legacyConfigFilePath = legacyPath;
     }
 
     public bool Load(string? filename = null)
@@ -58,6 +63,10 @@ public sealed class AppConfigService
 
         try
         {
+            var directory = Path.GetDirectoryName(path);
+            if (!string.IsNullOrWhiteSpace(directory))
+                Directory.CreateDirectory(directory);
+
             using var stream = new FileStream(path, FileMode.Create, FileAccess.Write, FileShare.None);
             serializer.Serialize(stream, Base);
             _configFilePath = path;
@@ -87,6 +96,14 @@ public sealed class AppConfigService
             if (migrated)
                 Save();
             return true;
+        }
+
+        var targetConfigFilePath = Resources.IniFile;
+        if (!string.IsNullOrWhiteSpace(_legacyConfigFilePath)
+            && File.Exists(_legacyConfigFilePath)
+            && Load(_legacyConfigFilePath))
+        {
+            return Save(targetConfigFilePath);
         }
 
         Base = new BaseConfig();
