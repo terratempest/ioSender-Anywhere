@@ -30,3 +30,4 @@ obj/
 /ioSender (original)
 
 .fake
+*.af~lock~
