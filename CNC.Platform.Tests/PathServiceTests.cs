@@ -1,13 +1,17 @@
 using CNC.Core;
 using CNC.App;
+using CNC.App.Workspace;
 using CNC.Platform.Abstractions;
 using CNC.Platform.Linux;
 using CNC.Platform.Windows;
+using ioSender.Workspace;
 
 namespace CNC.Platform.Tests;
 
 public class PathServiceTests
 {
+    static readonly object EnvironmentLock = new();
+
     [Fact]
     public void NormalizeConfigPath_ensures_trailing_separator()
     {
@@ -49,6 +53,54 @@ public class PathServiceTests
     }
 
     [Fact]
+    public void LinuxPathService_uses_xdg_config_home_for_config()
+    {
+        lock (EnvironmentLock)
+        {
+            var original = Environment.GetEnvironmentVariable("XDG_CONFIG_HOME");
+            var configHome = Path.Combine(Path.GetTempPath(), "iosender-xdg-" + Guid.NewGuid().ToString("N"));
+
+            try
+            {
+                Environment.SetEnvironmentVariable("XDG_CONFIG_HOME", configHome);
+
+                var paths = new LinuxPathService();
+                var result = paths.NormalizeConfigPath("/usr/lib/iosender");
+
+                Assert.Equal(EnsureTrailingSeparator(Path.Combine(configHome, "ioSender")), result);
+            }
+            finally
+            {
+                Environment.SetEnvironmentVariable("XDG_CONFIG_HOME", original);
+            }
+        }
+    }
+
+    [Fact]
+    public void LinuxPathService_falls_back_to_home_config_directory()
+    {
+        lock (EnvironmentLock)
+        {
+            var original = Environment.GetEnvironmentVariable("XDG_CONFIG_HOME");
+
+            try
+            {
+                Environment.SetEnvironmentVariable("XDG_CONFIG_HOME", null);
+
+                var paths = new LinuxPathService();
+                var result = paths.NormalizeConfigPath("/usr/lib/iosender");
+                var home = Environment.GetFolderPath(Environment.SpecialFolder.UserProfile);
+
+                Assert.Equal(EnsureTrailingSeparator(Path.Combine(home, ".config", "ioSender")), result);
+            }
+            finally
+            {
+                Environment.SetEnvironmentVariable("XDG_CONFIG_HOME", original);
+            }
+        }
+    }
+
+    [Fact]
     public void GrblViewModel_uses_injected_path_service_for_physical_file_detection()
     {
         var vm = new GrblViewModel { PathService = new LinuxPathService() };
@@ -86,6 +138,71 @@ public class PathServiceTests
                 Directory.Delete(tempRoot, recursive: true);
         }
     }
+
+    [Fact]
+    public void AppConfigService_saves_config_to_linux_user_config_directory()
+    {
+        lock (EnvironmentLock)
+        {
+            var original = Environment.GetEnvironmentVariable("XDG_CONFIG_HOME");
+            var tempRoot = Path.Combine(Path.GetTempPath(), "iosender-linux-config-test-" + Guid.NewGuid().ToString("N"));
+            var installDir = Path.Combine(tempRoot, "install");
+            var configHome = Path.Combine(tempRoot, "xdg");
+            var expectedConfigDir = Path.Combine(configHome, "ioSender");
+
+            try
+            {
+                Directory.CreateDirectory(installDir);
+                Environment.SetEnvironmentVariable("XDG_CONFIG_HOME", configHome);
+
+                var appConfig = new AppConfigService(new LinuxPathService());
+                appConfig.InitializePaths(installDir);
+                appConfig.Base.Theme = "Light";
+
+                Assert.True(appConfig.Save());
+                Assert.True(File.Exists(Path.Combine(expectedConfigDir, "App.config")));
+                Assert.Equal(Path.Combine(expectedConfigDir, "App.config"), appConfig.ConfigFilePath);
+            }
+            finally
+            {
+                Environment.SetEnvironmentVariable("XDG_CONFIG_HOME", original);
+                if (Directory.Exists(tempRoot))
+                    Directory.Delete(tempRoot, recursive: true);
+            }
+        }
+    }
+
+    [Fact]
+    public void WorkspaceLayoutFileService_saves_layouts_under_config_path()
+    {
+        var tempRoot = Path.Combine(Path.GetTempPath(), "iosender-layout-test-" + Guid.NewGuid().ToString("N"));
+        var originalConfigPath = Resources.ConfigPath;
+        var originalPath = Resources.Path;
+
+        try
+        {
+            Resources.Path = Resources.ConfigPath = EnsureTrailingSeparator(tempRoot);
+
+            WorkspaceLayoutFileService.Save(
+                "Shop",
+                new WorkspaceLeaf { Editor = WorkspaceEditorId.Program });
+
+            var expectedPath = Path.Combine(tempRoot, "layouts", "Shop.xml");
+            Assert.True(File.Exists(expectedPath));
+        }
+        finally
+        {
+            Resources.ConfigPath = originalConfigPath;
+            Resources.Path = originalPath;
+            if (Directory.Exists(tempRoot))
+                Directory.Delete(tempRoot, recursive: true);
+        }
+    }
+
+    static string EnsureTrailingSeparator(string path) =>
+        path.EndsWith(Path.DirectorySeparatorChar)
+            ? path
+            : path + Path.DirectorySeparatorChar;
 
     sealed class FixedConfigPathService : IPathService
     {
