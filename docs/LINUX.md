@@ -27,11 +27,9 @@ Optional (camera preview): `libv4l-0`, `v4l-utils`.
 
 ### USB serial access
 
-Add your user to the `dialout` group, then log out and back in:
+The `.deb` package installs udev rules that grant the active local desktop user access to common USB serial devices via systemd-logind. No `sudo` command should be needed for normal Debian/Ubuntu desktop installs.
 
-```bash
-sudo usermod -aG dialout $USER
-```
+If a controller was already plugged in while installing, disconnect and reconnect the USB device after installation.
 
 ## Build from source
 
@@ -73,5 +71,6 @@ Locale CSV files are installed under `/usr/lib/iosender/Locale/`. Override with 
 |-------|-------------|
 | App does not start | Install deps: `sudo apt install libx11-6 libgtk-3-0 libgl1 libfontconfig1` |
 | 3D view blank | Ensure Mesa/OpenGL works (`glxinfo`); viewer may degrade gracefully |
-| No serial ports | `dialout` group; device appears as `/dev/ttyUSB0` or `/dev/ttyACM0` |
+| No serial ports | Reconnect the USB device; verify it appears as `/dev/ttyUSB0`, `/dev/ttyACM0`, or `/dev/serial/by-id/*`; reinstall the `.deb` if udev rules were missing |
+| Permission denied opening serial port | Reconnect the USB device or reload udev rules; `dialout` group setup is only a fallback for nonstandard, headless, or non-systemd systems |
 | Camera unavailable | Install `libv4l-0`; check `/dev/video*` permissions |

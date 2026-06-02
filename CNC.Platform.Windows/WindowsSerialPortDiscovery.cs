@@ -22,6 +22,15 @@ public sealed class WindowsSerialPortDiscovery : ISerialPortDiscovery
             .ToList();
     }
 
+    public bool IsPortAvailable(string portName)
+    {
+        if (string.IsNullOrWhiteSpace(portName))
+            return false;
+
+        return SerialPort.GetPortNames()
+            .Any(name => string.Equals(name, portName.Trim(), StringComparison.OrdinalIgnoreCase));
+    }
+
     private static Dictionary<string, string> TryGetFriendlyNames()
     {
         var result = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);

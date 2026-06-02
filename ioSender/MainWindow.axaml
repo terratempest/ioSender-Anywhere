@@ -16,9 +16,79 @@
         Icon="/Assets/iosendericon.ico"
         MinWidth="800" MinHeight="600"
         Width="1020" Height="685"
-        Background="{DynamicResource ThemeBackgroundBrush}">
+        Background="{DynamicResource ThemeBackgroundBrush}"
+        WindowDecorations="None">
 
   <DockPanel VerticalAlignment="Stretch" HorizontalAlignment="Stretch">
+    <Border x:Name="TitleBar"
+            DockPanel.Dock="Top"
+            Height="34"
+            Padding="10,0,4,0"
+            Background="{DynamicResource ThemeControlLowBrush}"
+            BorderBrush="{DynamicResource ThemeBorderLowBrush}"
+            BorderThickness="0,0,0,1"
+            PointerPressed="OnTitleBarPointerPressed">
+      <Grid ColumnDefinitions="Auto,*,Auto">
+        <StackPanel Grid.Column="0" Orientation="Horizontal" Spacing="8"
+                    VerticalAlignment="Center">
+          <Image Source="/Assets/iosendericon.ico" Width="16" Height="16"/>
+          <TextBlock Text="ioSender"
+                     VerticalAlignment="Center"
+                     FontWeight="SemiBold"
+                     Foreground="{DynamicResource ThemeForegroundBrush}"/>
+        </StackPanel>
+
+        <StackPanel Grid.Column="2" Orientation="Horizontal" Spacing="2">
+          <Button x:Name="BtnWindowMinimize"
+                  Width="36" Height="30" Padding="10"
+                  ToolTip.Tip="Minimize"
+                  Click="OnWindowMinimizeClick">
+            <Viewbox Width="12" Height="12">
+              <Canvas Width="24" Height="24">
+                <Path Fill="{DynamicResource ThemeForegroundBrush}"
+                      Data="M5,12 L19,12 L19,14 L5,14 Z"/>
+              </Canvas>
+            </Viewbox>
+          </Button>
+          <Button x:Name="BtnWindowMaximize"
+                  Width="36" Height="30" Padding="9"
+                  ToolTip.Tip="Maximize"
+                  Click="OnWindowMaximizeClick">
+            <Viewbox Width="12" Height="12">
+              <Canvas Width="24" Height="24">
+                <Path x:Name="IconWindowMaximize"
+                      Fill="{DynamicResource ThemeForegroundBrush}"
+                      Data="M5,5 L19,5 L19,19 L5,19 Z M7,7 L7,17 L17,17 L17,7 Z"/>
+              </Canvas>
+            </Viewbox>
+          </Button>
+          <Button x:Name="BtnWindowFullscreen"
+                  Width="36" Height="30" Padding="8"
+                  ToolTip.Tip="Fullscreen"
+                  Click="OnWindowFullscreenClick">
+            <Viewbox Width="13" Height="13">
+              <Canvas Width="24" Height="24">
+                <Path x:Name="IconWindowFullscreen"
+                      Fill="{DynamicResource ThemeForegroundBrush}"
+                      Data="M4,4 L10,4 L10,6 L7,6 L7,9 L5,9 L5,5 L4,5 Z M14,4 L20,4 L20,10 L18,10 L18,7 L15,7 L15,5 L19,5 L19,4 Z M5,14 L7,14 L7,17 L10,17 L10,19 L4,19 L4,18 L5,18 Z M18,14 L20,14 L20,20 L14,20 L14,18 L17,18 L17,15 L18,15 Z"/>
+              </Canvas>
+            </Viewbox>
+          </Button>
+          <Button x:Name="BtnWindowClose"
+                  Width="36" Height="30" Padding="9"
+                  ToolTip.Tip="Close"
+                  Click="OnWindowCloseClick">
+            <Viewbox Width="12" Height="12">
+              <Canvas Width="24" Height="24">
+                <Path Fill="{DynamicResource ThemeForegroundBrush}"
+                      Data="M5.6,4.2 L12,10.6 L18.4,4.2 L19.8,5.6 L13.4,12 L19.8,18.4 L18.4,19.8 L12,13.4 L5.6,19.8 L4.2,18.4 L10.6,12 L4.2,5.6 Z"/>
+              </Canvas>
+            </Viewbox>
+          </Button>
+        </StackPanel>
+      </Grid>
+    </Border>
+
     <Grid DockPanel.Dock="Top" ColumnDefinitions="Auto,*,Auto"
           Background="{DynamicResource ThemeControlLowBrush}">
       <Menu Grid.Column="0">

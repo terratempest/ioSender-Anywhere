@@ -1,5 +1,6 @@
 using Avalonia;
 using Avalonia.Controls;
+using Avalonia.Input;
 using Avalonia.Interactivity;
 using Avalonia.Media;
 using Avalonia.Platform.Storage;
@@ -48,12 +49,14 @@ public partial class MainWindow : Window
     private QuickAccessSidebarController? _quickAccess;
     private bool _suppressSidebarMenuSync;
     private bool _suppressCheckModeMenuSync;
+    private WindowState _preFullscreenWindowState = WindowState.Normal;
 
     public MainWindow()
     {
         using var _ = StartupTrace.Measure("MainWindow constructor");
         InitializeComponent();
         RestoreWindowPlacement();
+        UpdateWindowChromeState();
         using (StartupTrace.Measure("MainWindow localization"))
             ApplyLocalization();
         _session = AppHostContext.Session;
@@ -82,6 +85,85 @@ public partial class MainWindow : Window
         Opened += OnMainWindowOpened;
         Closing += OnMainWindowClosing;
         PositionChanged += (_, _) => SaveWindowPlacement();
+    }
+
+    protected override void OnPropertyChanged(AvaloniaPropertyChangedEventArgs change)
+    {
+        base.OnPropertyChanged(change);
+        if (change.Property == WindowStateProperty)
+        {
+            UpdateWindowChromeState();
+        }
+    }
+
+    void OnTitleBarPointerPressed(object? sender, PointerPressedEventArgs e)
+    {
+        if (WindowState == WindowState.FullScreen)
+            return;
+
+        if (!e.GetCurrentPoint(this).Properties.IsLeftButtonPressed)
+            return;
+
+        if (e.ClickCount == 2)
+        {
+            ToggleMaximized();
+            e.Handled = true;
+            return;
+        }
+
+        BeginMoveDrag(e);
+        e.Handled = true;
+    }
+
+    void OnWindowMinimizeClick(object? sender, RoutedEventArgs e) => WindowState = WindowState.Minimized;
+
+    void OnWindowMaximizeClick(object? sender, RoutedEventArgs e) => ToggleMaximized();
+
+    void OnWindowFullscreenClick(object? sender, RoutedEventArgs e) => ToggleFullscreen();
+
+    void OnWindowCloseClick(object? sender, RoutedEventArgs e) => Close();
+
+    void ToggleMaximized()
+    {
+        if (WindowState == WindowState.FullScreen)
+            return;
+
+        WindowState = WindowState == WindowState.Maximized
+            ? WindowState.Normal
+            : WindowState.Maximized;
+    }
+
+    void ToggleFullscreen()
+    {
+        if (WindowState == WindowState.FullScreen)
+        {
+            WindowState = _preFullscreenWindowState == WindowState.Maximized
+                ? WindowState.Maximized
+                : WindowState.Normal;
+            return;
+        }
+
+        _preFullscreenWindowState = WindowState == WindowState.Maximized
+            ? WindowState.Maximized
+            : WindowState.Normal;
+        WindowState = WindowState.FullScreen;
+    }
+
+    void UpdateWindowChromeState()
+    {
+        var isFullscreen = WindowState == WindowState.FullScreen;
+        var isMaximized = WindowState == WindowState.Maximized;
+
+        BtnWindowMaximize.IsEnabled = !isFullscreen;
+        IconWindowMaximize.Data = Geometry.Parse(isMaximized
+            ? "M8,5 L19,5 L19,16 L16,16 L16,19 L5,19 L5,8 L8,8 Z M10,7 L10,8 L16,8 L16,14 L17,14 L17,7 Z M7,10 L7,17 L14,17 L14,10 Z"
+            : "M5,5 L19,5 L19,19 L5,19 Z M7,7 L7,17 L17,17 L17,7 Z");
+        ToolTip.SetTip(BtnWindowMaximize, isMaximized ? "Restore" : "Maximize");
+
+        IconWindowFullscreen.Data = Geometry.Parse(isFullscreen
+            ? "M8,4 L10,4 L10,10 L4,10 L4,8 L7,8 L7,5 L8,5 Z M14,4 L16,4 L16,7 L19,7 L19,8 L20,8 L20,10 L14,10 Z M4,14 L10,14 L10,20 L8,20 L8,17 L5,17 L5,16 L4,16 Z M14,14 L20,14 L20,16 L17,16 L17,19 L16,19 L16,20 L14,20 Z"
+            : "M4,4 L10,4 L10,6 L7,6 L7,9 L5,9 L5,5 L4,5 Z M14,4 L20,4 L20,10 L18,10 L18,7 L15,7 L15,5 L19,5 L19,4 Z M5,14 L7,14 L7,17 L10,17 L10,19 L4,19 L4,18 L5,18 Z M18,14 L20,14 L20,20 L14,20 L14,18 L17,18 L17,15 L18,15 Z");
+        ToolTip.SetTip(BtnWindowFullscreen, isFullscreen ? "Exit fullscreen" : "Fullscreen");
     }
 
     void InitializeQuickAccessSidebar()
@@ -311,6 +393,9 @@ public partial class MainWindow : Window
 
         var config = AppHostContext.AppConfig.Base;
         if (!config.KeepWindowSize)
+            return;
+
+        if (WindowState == WindowState.FullScreen)
             return;
 
         config.WindowMaximized = WindowState == WindowState.Maximized;

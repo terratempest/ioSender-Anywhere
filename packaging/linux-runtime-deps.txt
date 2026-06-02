@@ -12,3 +12,5 @@ libegl1
 libopengl0
 libgtk-3-0
 libstdc++6
+udev
+libpam-systemd

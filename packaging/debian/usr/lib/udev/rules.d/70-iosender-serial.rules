@@ -1,0 +1,7 @@
+# Grant active local desktop users access to common CNC USB serial devices.
+ACTION=="remove", GOTO="iosender_serial_end"
+SUBSYSTEM!="tty", GOTO="iosender_serial_end"
+
+KERNEL=="ttyUSB[0-9]*|ttyACM[0-9]*|ttyAMA[0-9]*|ttyTHS[0-9]*|ttymxc[0-9]*|ttyGS[0-9]*", MODE="0660", TAG+="uaccess"
+
+LABEL="iosender_serial_end"

@@ -90,7 +90,7 @@ public class SerialStream : StreamComms
         catch (Exception ex)
         {
             throw new SerialPortConfigurationException(
-                $"Unable to open serial port '{settings.PortName}'.", ex);
+                CreateOpenErrorMessage(settings.PortName, ex), ex);
         }
 
         if (!serialPort.IsOpen)
@@ -255,15 +255,31 @@ public class SerialStream : StreamComms
 
     private static void EnsurePortAvailable(string portName, ISerialPortDiscovery portDiscovery)
     {
-        var known = portDiscovery.GetPorts();
-        if (known.Count == 0)
+        if (portDiscovery.IsPortAvailable(portName))
             return;
 
-        if (!known.Any(p => string.Equals(p.Name, portName, StringComparison.OrdinalIgnoreCase)))
+        var known = portDiscovery.GetPorts();
+        throw new SerialPortConfigurationException(
+            known.Count == 0
+                ? $"Serial port '{portName}' was not found."
+                : $"Serial port '{portName}' was not found. Available: {string.Join(", ", known.Select(p => p.Name))}.");
+    }
+
+    internal static string CreateOpenErrorMessage(string portName, Exception ex) =>
+        CreateOpenErrorMessage(portName, ex, OperatingSystem.IsLinux());
+
+    internal static string CreateOpenErrorMessage(string portName, Exception ex, bool isLinux)
+    {
+        var message = $"Unable to open serial port '{portName}'. {ex.Message}";
+
+        if (isLinux
+            && portName.StartsWith("/dev/", StringComparison.Ordinal)
+            && ex is UnauthorizedAccessException)
         {
-            throw new SerialPortConfigurationException(
-                $"Serial port '{portName}' was not found. Available: {string.Join(", ", known.Select(p => p.Name))}.");
+            message += " The ioSender Debian package normally grants local desktop USB serial access through udev. Reconnect the USB device, reinstall the .deb, or reload udev rules. On nonstandard, headless, or non-systemd systems, serial access may require fallback group configuration such as dialout.";
         }
+
+        return message;
     }
 
     private int gp()

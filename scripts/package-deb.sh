@@ -41,7 +41,7 @@ if [[ ! -f "$PUBLISH_DIR/ioSender" ]]; then
   exit 1
 fi
 
-mapfile -t DEP_LINES < <(grep -v '^[[:space:]]*#' "$ROOT/packaging/linux-runtime-deps.txt" | grep -v '^[[:space:]]*$')
+mapfile -t DEP_LINES < <(sed 's/\r$//' "$ROOT/packaging/linux-runtime-deps.txt" | grep -v '^[[:space:]]*#' | grep -v '^[[:space:]]*$')
 DEPENDS="$(IFS=', '; echo "${DEP_LINES[*]}")"
 
 rm -rf "$STAGING"
@@ -50,6 +50,7 @@ mkdir -p "$STAGING/usr/lib/iosender"
 mkdir -p "$STAGING/usr/bin"
 mkdir -p "$STAGING/usr/share/applications"
 mkdir -p "$STAGING/usr/share/icons/hicolor/256x256/apps"
+mkdir -p "$STAGING/usr/lib/udev/rules.d"
 
 cp -a "$PUBLISH_DIR/." "$STAGING/usr/lib/iosender/"
 
@@ -66,6 +67,7 @@ fi
 chmod 755 "$STAGING/usr/bin/iosender"
 cp "$TEMPLATE_DEBIAN/usr/share/applications/iosender.desktop" "$STAGING/usr/share/applications/"
 cp "$ROOT/Icon/iosendericon.png" "$STAGING/usr/share/icons/hicolor/256x256/apps/iosender.png"
+cp "$TEMPLATE_DEBIAN/usr/lib/udev/rules.d/70-iosender-serial.rules" "$STAGING/usr/lib/udev/rules.d/"
 
 sed -e "s/@VERSION@/$VERSION/g" -e "s/@DEPENDS@/$DEPENDS/g" \
   "$TEMPLATE_DEBIAN/DEBIAN/control.in" > "$STAGING/DEBIAN/control"

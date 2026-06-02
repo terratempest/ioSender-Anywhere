@@ -3,6 +3,16 @@ namespace CNC.Platform.Linux;
 /// <summary>Filters /dev/tty* entries to CNC-relevant serial devices.</summary>
 public static class LinuxSerialPortFilter
 {
+    private static readonly string[] RelevantPrefixes =
+    [
+        "ttyUSB",
+        "ttyACM",
+        "ttyAMA",
+        "ttyTHS",
+        "ttymxc",
+        "ttyGS"
+    ];
+
     public static bool IsRelevantDevice(string deviceFileName)
     {
         if (string.IsNullOrWhiteSpace(deviceFileName))
@@ -10,8 +20,7 @@ public static class LinuxSerialPortFilter
 
         var name = Path.GetFileName(deviceFileName.Trim());
 
-        if (name.StartsWith("ttyUSB", StringComparison.Ordinal)
-            || name.StartsWith("ttyACM", StringComparison.Ordinal))
+        if (RelevantPrefixes.Any(prefix => name.StartsWith(prefix, StringComparison.Ordinal)))
         {
             return true;
         }
@@ -31,6 +40,16 @@ public static class LinuxSerialPortFilter
         }
 
         return false;
+    }
+
+    public static bool IsPersistentSerialPath(string path)
+    {
+        if (string.IsNullOrWhiteSpace(path))
+            return false;
+
+        var trimmed = path.Trim();
+        return trimmed.StartsWith("/dev/serial/by-id/", StringComparison.Ordinal)
+            || trimmed.StartsWith("/dev/serial/by-path/", StringComparison.Ordinal);
     }
 
     public static string NormalizeDevicePath(string portName)
