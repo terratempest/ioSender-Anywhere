@@ -5,6 +5,27 @@
              Width="310">
   <GroupBox Header="Keyboard mappings" BorderBrush="{DynamicResource ThemeBorderLowBrush}">
     <WrapPanel Orientation="Vertical" ItemWidth="290">
+      <StackPanel Orientation="Horizontal" Spacing="4">
+        <TextBlock Text="Popup keyboard:" FontSize="12" VerticalAlignment="Center"/>
+        <Border Width="12" Height="12"
+                CornerRadius="6"
+                Background="{DynamicResource ThemeControlMidBrush}"
+                BorderBrush="{DynamicResource ThemeBorderMidBrush}"
+                BorderThickness="1"
+                ToolTip.Tip="Controls whether clicking editable input fields opens the on-screen keyboard, and how many clicks are required."
+                VerticalAlignment="Center">
+          <TextBlock Text="i"
+                     FontSize="8"
+                     FontWeight="Bold"
+                     HorizontalAlignment="Center"
+                     VerticalAlignment="Center"/>
+        </Border>
+      </StackPanel>
+
+      <ComboBox x:Name="PopupKeyboardTriggerCombo" FontSize="12" HorizontalAlignment="Stretch"
+                SelectionChanged="OnPopupKeyboardTriggerChanged"
+                Margin="0,0,0,8"/>
+
       <TextBlock Text="Jog mode:" FontSize="12"/>
 
       <ComboBox x:Name="JogModeCombo" FontSize="12" HorizontalAlignment="Stretch"

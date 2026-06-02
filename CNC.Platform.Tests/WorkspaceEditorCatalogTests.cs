@@ -69,4 +69,20 @@ public class WorkspaceEditorCatalogTests
             d => d.Id == WorkspaceEditorId.Macros);
         Assert.True(descriptor.RequiresGrblDataContext);
     }
+
+    [Theory]
+    [InlineData(WorkspaceEditorId.Keyboard)]
+    [InlineData(WorkspaceEditorId.NumberPad)]
+    public void Popup_keyboard_panels_are_pickable_and_do_not_require_grbl_context(WorkspaceEditorId id)
+    {
+        var descriptor = WorkspaceEditorCatalog.Get(id);
+
+        Assert.Contains(
+            WorkspaceEditorCatalog.LayoutPickableDescriptors,
+            d => d.Id == id);
+        Assert.Contains(
+            WorkspaceEditorCatalog.PanelPickableDescriptors,
+            d => d.Id == id);
+        Assert.False(descriptor.RequiresGrblDataContext);
+    }
 }

@@ -1,5 +1,6 @@
 using Avalonia.Controls;
 using Avalonia.Interactivity;
+using CNC.Controls.Avalonia.Controls;
 using CNC.Localization.Avalonia;
 using CNC.Controls.Avalonia.Services;
 using CNC.Controls.Avalonia.ViewModels;
@@ -13,6 +14,7 @@ public partial class PortDialog : Window
     public PortDialog()
     {
         InitializeComponent();
+        PopupKeyboardService.Attach(this);
         ApplyLocalization();
     }
 

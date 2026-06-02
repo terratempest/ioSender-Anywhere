@@ -1,5 +1,6 @@
 using Avalonia.Controls;
 using Avalonia.Interactivity;
+using CNC.Controls.Avalonia.Controls;
 
 namespace CNC.Controls.DragKnife;
 
@@ -8,6 +9,7 @@ public partial class DragKnifeDialog : Window
     public DragKnifeDialog()
     {
         InitializeComponent();
+        PopupKeyboardService.Attach(this);
     }
 
     public DragKnifeDialog(DragKnifeViewModel model) : this()

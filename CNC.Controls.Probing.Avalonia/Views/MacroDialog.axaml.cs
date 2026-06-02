@@ -1,5 +1,6 @@
 using Avalonia.Controls;
 using Avalonia.Interactivity;
+using CNC.Controls.Avalonia.Controls;
 using CNC.Controls.Avalonia.Services;
 using CNC.Core;
 
@@ -13,6 +14,7 @@ public partial class MacroDialog : Window
     public MacroDialog()
     {
         InitializeComponent();
+        PopupKeyboardService.Attach(this);
     }
 
     public MacroDialog(ProbeMacroViewModel viewModel)

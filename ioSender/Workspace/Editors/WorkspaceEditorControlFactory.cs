@@ -120,6 +120,18 @@ public sealed class WorkspaceEditorControlFactory
             HorizontalAlignment = Avalonia.Layout.HorizontalAlignment.Stretch,
             VerticalAlignment = Avalonia.Layout.VerticalAlignment.Stretch,
         },
+        WorkspaceEditorId.Keyboard => new CNC.Controls.Avalonia.Controls.PopupKeyboardControl
+        {
+            Layout = CNC.Controls.Avalonia.Controls.PopupKeyboardLayout.Regular,
+            HorizontalAlignment = Avalonia.Layout.HorizontalAlignment.Stretch,
+            VerticalAlignment = Avalonia.Layout.VerticalAlignment.Stretch,
+        },
+        WorkspaceEditorId.NumberPad => new CNC.Controls.Avalonia.Controls.PopupKeyboardControl
+        {
+            Layout = CNC.Controls.Avalonia.Controls.PopupKeyboardLayout.Numeric,
+            HorizontalAlignment = Avalonia.Layout.HorizontalAlignment.Stretch,
+            VerticalAlignment = Avalonia.Layout.VerticalAlignment.Stretch,
+        },
         WorkspaceEditorId.Probing => new ProbingView(_session.AppConfig.Base),
         WorkspaceEditorId.SdCard => new SDCardView(),
         WorkspaceEditorId.Lathe => new LatheWizardsView(),

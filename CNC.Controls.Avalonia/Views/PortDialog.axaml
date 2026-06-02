@@ -4,6 +4,7 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:platform="using:CNC.Platform.Abstractions"
         xmlns:vm="using:CNC.Controls.Avalonia.ViewModels"
+        xmlns:controls="using:CNC.Controls.Avalonia.Controls"
         xmlns:loc="using:CNC.Localization.Avalonia"
         mc:Ignorable="d"
         x:Class="CNC.Controls.Avalonia.Views.PortDialog"
@@ -52,7 +53,9 @@
           <TextBlock x:Name="LblTelnetPort" Grid.Row="1" Grid.Column="0" Text="Port:" VerticalAlignment="Center" Margin="0,8,0,0"
                      loc:Localize.Key="CNC.Controls.Avalonia.portdialog.lbl_netPort"/>
 
-          <TextBox Grid.Row="1" Grid.Column="1" Margin="0,8,0,0" Text="{Binding TelnetPort}"/>
+          <TextBox Grid.Row="1" Grid.Column="1" Margin="0,8,0,0"
+                   Text="{Binding TelnetPort}"
+                   controls:PopupKeyboard.Layout="Numeric"/>
 
         </Grid>
       </TabItem>
@@ -67,7 +70,9 @@
 
           <TextBlock Grid.Row="1" Grid.Column="0" Text="Port:" VerticalAlignment="Center" Margin="0,8,0,0"/>
 
-          <TextBox Grid.Row="1" Grid.Column="1" Margin="0,8,0,0" Text="{Binding WebsocketPort}"/>
+          <TextBox Grid.Row="1" Grid.Column="1" Margin="0,8,0,0"
+                   Text="{Binding WebsocketPort}"
+                   controls:PopupKeyboard.Layout="Numeric"/>
 
         </Grid>
       </TabItem>

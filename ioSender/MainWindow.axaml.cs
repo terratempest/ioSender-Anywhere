@@ -7,6 +7,7 @@ using Avalonia.Threading;
 using System.Diagnostics;
 using CNC.App;
 using CNC.Converters;
+using CNC.Controls.Avalonia.Controls;
 using CNC.Controls.Avalonia.Services;
 using CNC.Controls.Avalonia.Views;
 using CNC.Controls.Config;
@@ -73,6 +74,7 @@ public partial class MainWindow : Window
         UpdateCheckModeMenu();
         UpdateLayoutMenuEnabled();
         UpdateFloatingPanelMenuEnabled();
+        PopupKeyboardService.Attach(this);
         InitializeQuickAccessSidebar();
         WireShellTabHeaders();
         MnuView.SubmenuOpened += (_, _) =>
@@ -900,8 +902,9 @@ public partial class MainWindow : Window
         _latheWizardsView.Activate(true);
     }
 
-    Window CreateFloatingPanelWindow(string title, Control content, double width, double height) =>
-        new()
+    Window CreateFloatingPanelWindow(string title, Control content, double width, double height)
+    {
+        var window = new Window
         {
             Title = title,
             Content = content,
@@ -911,6 +914,9 @@ public partial class MainWindow : Window
             MinHeight = Math.Min(height, 300),
             WindowStartupLocation = WindowStartupLocation.CenterOwner,
         };
+        PopupKeyboardService.Attach(window);
+        return window;
+    }
 
     void OnSdCardFileSelected(string filename, bool rewind)
     {

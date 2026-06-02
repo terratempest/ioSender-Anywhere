@@ -3,6 +3,7 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              xmlns:core="using:CNC.Core"
+             xmlns:controls="using:CNC.Controls.Avalonia.Controls"
              xmlns:views="using:CNC.Controls.Avalonia.Views"
              mc:Ignorable="d"
              d:DesignHeight="480" d:DesignWidth="980"
@@ -70,6 +71,7 @@
         <TextBlock x:Name="txtSettingTitle" Grid.Row="0" FontWeight="SemiBold" FontSize="12"/>
         <TextBox x:Name="txtValue" Grid.Row="1" Width="200" HorizontalAlignment="Left" VerticalAlignment="Top"
                  FontSize="12"
+                 controls:PopupKeyboard.Layout="Numeric"
                  LostFocus="OnValueLostFocus"/>
         <WrapPanel x:Name="valueEditorPanel" Grid.Row="1" Orientation="Vertical"
                    ItemWidth="180" MinHeight="40" IsVisible="False"/>

@@ -5,6 +5,7 @@ using Avalonia.Controls;
 using Avalonia.Interactivity;
 using Avalonia.Layout;
 using Avalonia.Media;
+using CNC.Controls.Avalonia.Controls;
 using CNC.Core;
 
 namespace CNC.Converters;
@@ -16,6 +17,7 @@ public partial class JobParametersDialog : Window
     public JobParametersDialog()
     {
         InitializeComponent();
+        PopupKeyboardService.Attach(this);
     }
 
     public JobParametersDialog(JobParametersViewModel model) : this()

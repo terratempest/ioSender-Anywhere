@@ -27,6 +27,8 @@ public static class WorkspaceEditorCatalog
         Desc(WorkspaceEditorId.FeedTouch, "ioSender.workspace.editor_feedTouch", "Feed (Touch)", 220, 200, fillsWorkspace: true),
         Desc(WorkspaceEditorId.JobBar, "ioSender.workspace.editor_jobbar", "Job", 400, 40, minHeight: 36, fillsWorkspace: true),
         Desc(WorkspaceEditorId.Macros, "ioSender.workspace.editor_macros", "Macros", 300, 160, fillsWorkspace: true),
+        Desc(WorkspaceEditorId.Keyboard, "ioSender.workspace.editor_keyboard", "Keyboard", 360, 220, grbl: false, fillsWorkspace: true),
+        Desc(WorkspaceEditorId.NumberPad, "ioSender.workspace.editor_numberPad", "Number Pad", 220, 190, grbl: false, fillsWorkspace: true),
         Desc(WorkspaceEditorId.Probing, "ioSender.mainwindow.tab_probing", "Probing", 400, 300, activation: true),
         Desc(WorkspaceEditorId.SdCard, "ioSender.mainwindow.tab_sdCard", "SD Card", 300, 200, activation: true),
         Desc(WorkspaceEditorId.Lathe, "ioSender.mainwindow.tab_latheWizards", "Lathe Wizards", 400, 300, activation: true, grbl: false),

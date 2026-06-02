@@ -410,11 +410,20 @@ public class JogConfig : ViewModelBase
 }
 
 [Serializable]
+public enum PopupKeyboardTrigger
+{
+    Off = 0,
+    OneClick = 1,
+    TwoClick = 2,
+}
+
+[Serializable]
 public class BaseConfig : ViewModelBase
 {
     private int _pollInterval = 200;
     private int _maxBufferSize = 300;
     private bool _useBuffering, _keepMdiFocus = true, _filterOkResponse, _saveWindowSize = true, _autoCompress, _sendComments, _addLineNumbers;
+    private PopupKeyboardTrigger _popupKeyboardTrigger = PopupKeyboardTrigger.TwoClick;
     private CommandIgnoreState _ignoreM6 = CommandIgnoreState.No, _ignoreM7 = CommandIgnoreState.No, _ignoreM8 = CommandIgnoreState.No;
     private CommandIgnoreState _ignoreG61G64 = CommandIgnoreState.Strip;
     private string _theme = "Dark";
@@ -530,6 +539,12 @@ public class BaseConfig : ViewModelBase
     {
         get => _addLineNumbers;
         set { _addLineNumbers = value; OnPropertyChanged(); }
+    }
+
+    public PopupKeyboardTrigger PopupKeyboardTrigger
+    {
+        get => _popupKeyboardTrigger;
+        set { _popupKeyboardTrigger = value; OnPropertyChanged(); }
     }
 
     [XmlIgnore]

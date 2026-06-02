@@ -121,7 +121,8 @@
                 Foreground="{DynamicResource ThemeForegroundBrush}"
                 IsEnabled="{Binding IsJobRunning, Converter={StaticResource LogicalNotConverter}}"
                 TextAlignment="Center"
-                Text="12000"/>
+                Text="12000"
+                controls:PopupKeyboard.Layout="Numeric"/>
       </Border>
 
       <Button x:Name="BtnSetRpm"

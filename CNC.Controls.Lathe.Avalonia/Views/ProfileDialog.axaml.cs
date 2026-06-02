@@ -5,6 +5,7 @@ using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Controls.ApplicationLifetimes;
 using Avalonia.Interactivity;
+using CNC.Controls.Avalonia.Controls;
 using CNC.GCode;
 
 namespace CNC.Controls.Lathe;
@@ -45,6 +46,7 @@ public partial class ProfileDialog : Window
     public ProfileDialog()
     {
         InitializeComponent();
+        PopupKeyboardService.Attach(this);
     }
 
     public ProfileDialog(WizardConfig options) : this()

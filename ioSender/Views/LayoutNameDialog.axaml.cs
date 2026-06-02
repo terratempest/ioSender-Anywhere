@@ -1,5 +1,6 @@
 using Avalonia.Controls;
 using Avalonia.Input;
+using CNC.Controls.Avalonia.Controls;
 using ioSender.Workspace;
 
 namespace ioSender.Views;
@@ -9,6 +10,7 @@ public partial class LayoutNameDialog : Window
     public LayoutNameDialog()
     {
         InitializeComponent();
+        PopupKeyboardService.Attach(this);
         SaveButton.Click += (_, _) => TrySave();
         CancelButton.Click += (_, _) => Close(null);
         NameBox.KeyDown += OnNameBoxKeyDown;

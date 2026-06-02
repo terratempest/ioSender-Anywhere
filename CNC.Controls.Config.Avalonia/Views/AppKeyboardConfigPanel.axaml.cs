@@ -23,9 +23,30 @@ public partial class AppKeyboardConfigPanel : UserControl
     public AppKeyboardConfigPanel()
     {
         InitializeComponent();
+        PopupKeyboardTriggerCombo.ItemsSource = PopupKeyboardTriggerEntries;
         JogModeCombo.ItemsSource = Enum.GetValues<JogConfig.JogMode>();
         DataContextChanged += (_, _) => BindJogMode();
     }
+
+    sealed class PopupKeyboardTriggerEntry
+    {
+        public PopupKeyboardTriggerEntry(PopupKeyboardTrigger value, string label)
+        {
+            Value = value;
+            Label = label;
+        }
+
+        public PopupKeyboardTrigger Value { get; }
+        public string Label { get; }
+        public override string ToString() => Label;
+    }
+
+    static readonly PopupKeyboardTriggerEntry[] PopupKeyboardTriggerEntries =
+    [
+        new(PopupKeyboardTrigger.Off, "Off"),
+        new(PopupKeyboardTrigger.OneClick, "1 Click"),
+        new(PopupKeyboardTrigger.TwoClick, "2 Click"),
+    ];
 
 
 
@@ -41,10 +62,21 @@ public partial class AppKeyboardConfigPanel : UserControl
 
 
 
+        PopupKeyboardTriggerCombo.SelectedItem = PopupKeyboardTriggerEntries
+            .First(entry => entry.Value == _config.PopupKeyboardTrigger);
+
         JogModeCombo.SelectedItem = _config.Jog.Mode;
 
         RefreshKeyMapPath();
 
+    }
+
+    void OnPopupKeyboardTriggerChanged(object? sender, SelectionChangedEventArgs e)
+    {
+        if (_config == null || PopupKeyboardTriggerCombo.SelectedItem is not PopupKeyboardTriggerEntry entry)
+            return;
+
+        _config.PopupKeyboardTrigger = entry.Value;
     }
 
 

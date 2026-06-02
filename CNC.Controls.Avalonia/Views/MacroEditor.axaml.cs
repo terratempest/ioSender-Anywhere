@@ -1,6 +1,7 @@
 using System.Collections.ObjectModel;
 using Avalonia.Controls;
 using Avalonia.Interactivity;
+using CNC.Controls.Avalonia.Controls;
 using CNC.Controls.Avalonia.ViewModels;
 using CNC.GCode;
 
@@ -11,6 +12,7 @@ public partial class MacroEditor : Window
     public MacroEditor()
     {
         InitializeComponent();
+        PopupKeyboardService.Attach(this);
     }
 
     public MacroEditor(ObservableCollection<Macro> macros) : this()

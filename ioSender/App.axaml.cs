@@ -80,6 +80,8 @@ public partial class App : Application
         var startupArgs = desktop.Args ?? [];
 
         AppHostContext.Initialize(platform, appConfig, startupArgs);
+        CNC.Controls.Avalonia.Controls.PopupKeyboardService.TriggerClickCount =
+            () => (int)AppHostContext.AppConfig.Base.PopupKeyboardTrigger;
 
         EarlyStartupBanner.ReportProgress("Applying theme...", 52);
         using (StartupTrace.Measure("Theme apply"))
