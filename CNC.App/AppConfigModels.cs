@@ -491,6 +491,7 @@ public class BaseConfig : ViewModelBase
     public double WindowLeft { get; set; } = -1;
     public double WindowTop { get; set; } = -1;
     public bool WindowMaximized { get; set; }
+    public bool WindowFullscreen { get; set; }
     public int OutlineFeedRate { get; set; } = 500;
 
     public int MaxBufferSize

@@ -146,6 +146,7 @@ public partial class MainWindow : Window
         _preFullscreenWindowState = WindowState == WindowState.Maximized
             ? WindowState.Maximized
             : WindowState.Normal;
+        SaveWindowPlacement();
         WindowState = WindowState.FullScreen;
     }
 
@@ -356,7 +357,10 @@ public partial class MainWindow : Window
         {
             if (config.WindowWidth == -1 || config.WindowMaximized)
             {
+                _preFullscreenWindowState = WindowState.Maximized;
                 WindowState = WindowState.Maximized;
+                if (config.WindowFullscreen)
+                    WindowState = WindowState.FullScreen;
                 return;
             }
 
@@ -379,6 +383,10 @@ public partial class MainWindow : Window
                 Position = new PixelPoint(left, top);
                 WindowStartupLocation = WindowStartupLocation.Manual;
             }
+
+            _preFullscreenWindowState = WindowState.Normal;
+            if (config.WindowFullscreen)
+                WindowState = WindowState.FullScreen;
         }
         finally
         {
@@ -396,8 +404,12 @@ public partial class MainWindow : Window
             return;
 
         if (WindowState == WindowState.FullScreen)
+        {
+            config.WindowFullscreen = true;
             return;
+        }
 
+        config.WindowFullscreen = false;
         config.WindowMaximized = WindowState == WindowState.Maximized;
 
         if (WindowState != WindowState.Maximized && WindowState != WindowState.Minimized)
