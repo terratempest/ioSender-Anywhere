@@ -15,9 +15,20 @@
         WindowStartupLocation="CenterOwner">
 
   <Grid RowDefinitions="Auto,*,Auto" Margin="10" RowSpacing="8">
-    <TextBlock x:Name="CopyrightText"
-               Text="(C)2015-2026 Io Engineering (Terje Io)"
-               VerticalAlignment="Center"/>
+    <StackPanel Spacing="4">
+      <TextBlock x:Name="CopyrightText"
+                 Text="(C)2015-2026 Io Engineering (Terje Io)"
+                 VerticalAlignment="Center"/>
+      <TextBlock x:Name="TxtAppVersion" Text="Version -"/>
+      <Button x:Name="BtnGitHub"
+              Content="GitHub: terratempest/ioSender-crossplatform"
+              Padding="0"
+              HorizontalAlignment="Left"
+              Background="Transparent"
+              BorderBrush="Transparent"
+              Foreground="{DynamicResource ThemeAccentBrush}"
+              Click="OnGitHubClick"/>
+    </StackPanel>
 
     <GroupBox x:Name="GrpGrbl"
               Grid.Row="1"

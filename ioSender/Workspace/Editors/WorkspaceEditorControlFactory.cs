@@ -81,7 +81,7 @@ public sealed class WorkspaceEditorControlFactory
         {
             HorizontalAlignment = Avalonia.Layout.HorizontalAlignment.Stretch,
         },
-        WorkspaceEditorId.Jog => new JogControl { HorizontalAlignment = Avalonia.Layout.HorizontalAlignment.Stretch },
+        WorkspaceEditorId.Jog => new JogControl(_session.AppConfig) { HorizontalAlignment = Avalonia.Layout.HorizontalAlignment.Stretch },
         WorkspaceEditorId.Outline => new OutlineControl(_session.AppConfig),
         WorkspaceEditorId.Goto => new GotoControl(),
         WorkspaceEditorId.WorkParams => new WorkParametersControl

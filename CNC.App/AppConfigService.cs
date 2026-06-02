@@ -14,6 +14,8 @@ public sealed class AppConfigService
 
     public BaseConfig Base { get; private set; } = new();
 
+    public event EventHandler? Saved;
+
     public string? FileName { get; private set; }
 
     public string ConfigFilePath =>
@@ -70,6 +72,7 @@ public sealed class AppConfigService
             using var stream = new FileStream(path, FileMode.Create, FileAccess.Write, FileShare.None);
             serializer.Serialize(stream, Base);
             _configFilePath = path;
+            Saved?.Invoke(this, EventArgs.Empty);
             return true;
         }
         catch

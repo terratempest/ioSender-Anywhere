@@ -8,6 +8,8 @@
         xmlns:probing="using:CNC.Controls.Probing"
         xmlns:config="using:CNC.Controls.Config"
         xmlns:qa="using:ioSender.QuickAccess"
+        xmlns:chrome="using:Avalonia.Controls.Chrome"
+        xmlns:local="using:ioSender"
         xmlns:loc="using:CNC.Localization.Avalonia"
         mc:Ignorable="d" d:DesignWidth="1020" d:DesignHeight="685"
         x:Class="ioSender.MainWindow"
@@ -17,7 +19,20 @@
         MinWidth="800" MinHeight="600"
         Width="1020" Height="685"
         Background="{DynamicResource ThemeBackgroundBrush}"
-        WindowDecorations="None">
+        WindowDecorations="Full"
+        ExtendClientAreaToDecorationsHint="True"
+        ExtendClientAreaTitleBarHeightHint="34">
+
+  <Window.WindowDecorationsTheme>
+    <ControlTheme TargetType="chrome:WindowDrawnDecorations">
+      <Setter Property="DefaultTitleBarHeight" Value="34"/>
+      <Setter Property="DefaultFrameThickness" Value="0"/>
+      <Setter Property="DefaultShadowThickness" Value="0"/>
+      <Setter Property="Template">
+        <local:EmptyWindowDrawnDecorationsTemplate/>
+      </Setter>
+    </ControlTheme>
+  </Window.WindowDecorationsTheme>
 
   <DockPanel VerticalAlignment="Stretch" HorizontalAlignment="Stretch">
     <Border x:Name="TitleBar"
@@ -26,12 +41,12 @@
             Padding="10,0,4,0"
             Background="{DynamicResource ThemeControlLowBrush}"
             BorderBrush="{DynamicResource ThemeBorderLowBrush}"
-            BorderThickness="0,0,0,1">
+            BorderThickness="0,0,0,1"
+            chrome:WindowDecorationProperties.ElementRole="TitleBar">
       <Grid ColumnDefinitions="Auto,Auto,*,Auto,Auto">
         <StackPanel Grid.Column="0" Orientation="Horizontal" Spacing="8"
                     Margin="0,0,10,0"
-                    VerticalAlignment="Center"
-                    PointerPressed="OnTitleBarPointerPressed">
+                    VerticalAlignment="Center">
           <Image Source="/Assets/iosendericon.ico" Width="16" Height="16"/>
           <TextBlock Text="ioSender"
                      VerticalAlignment="Center"
@@ -39,7 +54,10 @@
                      Foreground="{DynamicResource ThemeForegroundBrush}"/>
         </StackPanel>
 
-        <Menu Grid.Column="1" Background="Transparent" VerticalAlignment="Center">
+        <Menu Grid.Column="1"
+              Background="Transparent"
+              VerticalAlignment="Center"
+              chrome:WindowDecorationProperties.ElementRole="User">
         <MenuItem x:Name="MnuFile" Header="_File" loc:Localize.Key="ioSender.mainwindow.mnu_file">
           <MenuItem x:Name="MnuFileOpen" Header="_Open G-code..." Click="OnOpenGCodeClick"
                     loc:Localize.Key="ioSender.mainwindow.mnu_open"/>
@@ -127,21 +145,19 @@
         </MenuItem>
         </Menu>
 
-        <Border Grid.Column="2"
-                Background="Transparent"
-                PointerPressed="OnTitleBarPointerPressed"/>
-
         <cnc:SignalsControl Grid.Column="3"
                             DataContext="{Binding Grbl}"
                             HorizontalAlignment="Right"
                             VerticalAlignment="Center"
-                            Margin="24,0,12,0"/>
+                            Margin="24,0,12,0"
+                            chrome:WindowDecorationProperties.ElementRole="User"/>
 
         <StackPanel Grid.Column="4" Orientation="Horizontal" Spacing="2">
           <Button x:Name="BtnWindowMinimize"
                   Width="36" Height="30" Padding="10"
                   ToolTip.Tip="Minimize"
-                  Click="OnWindowMinimizeClick">
+                  Click="OnWindowMinimizeClick"
+                  chrome:WindowDecorationProperties.ElementRole="MinimizeButton">
             <Viewbox Width="12" Height="12">
               <Canvas Width="24" Height="24">
                 <Path Fill="{DynamicResource ThemeForegroundBrush}"
@@ -152,7 +168,8 @@
           <Button x:Name="BtnWindowMaximize"
                   Width="36" Height="30" Padding="9"
                   ToolTip.Tip="Maximize"
-                  Click="OnWindowMaximizeClick">
+                  Click="OnWindowMaximizeClick"
+                  chrome:WindowDecorationProperties.ElementRole="MaximizeButton">
             <Viewbox Width="12" Height="12">
               <Canvas Width="24" Height="24">
                 <Path x:Name="IconWindowMaximize"
@@ -164,7 +181,8 @@
           <Button x:Name="BtnWindowFullscreen"
                   Width="36" Height="30" Padding="8"
                   ToolTip.Tip="Fullscreen"
-                  Click="OnWindowFullscreenClick">
+                  Click="OnWindowFullscreenClick"
+                  chrome:WindowDecorationProperties.ElementRole="User">
             <Viewbox Width="13" Height="13">
               <Canvas Width="24" Height="24">
                 <Path x:Name="IconWindowFullscreen"
@@ -176,7 +194,8 @@
           <Button x:Name="BtnWindowClose"
                   Width="36" Height="30" Padding="9"
                   ToolTip.Tip="Close"
-                  Click="OnWindowCloseClick">
+                  Click="OnWindowCloseClick"
+                  chrome:WindowDecorationProperties.ElementRole="CloseButton">
             <Viewbox Width="12" Height="12">
               <Canvas Width="24" Height="24">
                 <Path Fill="{DynamicResource ThemeForegroundBrush}"

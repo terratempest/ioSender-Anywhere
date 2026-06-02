@@ -7,6 +7,7 @@ using Avalonia.Input;
 using Avalonia.Interactivity;
 using Avalonia.Layout;
 using Avalonia.VisualTree;
+using CNC.App;
 using CNC.Controls.Avalonia.Config;
 using CNC.Controls.Avalonia.Controls;
 using CNC.Controls.Avalonia.Services;
@@ -40,6 +41,7 @@ public partial class JogBaseControl : UserControl
     static bool _keyboardMappingsOk;
     static bool _jogDataHandlersHooked;
     static readonly JogViewModel SharedJogData = new();
+    AppConfigService? _appConfig;
 
     public event System.Action? QueueStatusChanged;
 
@@ -53,13 +55,26 @@ public partial class JogBaseControl : UserControl
         InitializeComponent();
         JogData = SharedJogData;
         Focusable = true;
-        Loaded += (_, _) => WireControls();
+        Loaded += (_, _) =>
+        {
+            if (_appConfig != null)
+            {
+                _appConfig.Saved -= AppConfig_Saved;
+                _appConfig.Saved += AppConfig_Saved;
+            }
+            WireControls();
+        };
         DataContextChanged += (_, _) =>
         {
             if (DataContext is GrblViewModel model)
                 ApplyJogUnits(model);
         };
-        Unloaded += (_, _) => DetachModelHandlers();
+        Unloaded += (_, _) =>
+        {
+            DetachModelHandlers();
+            if (_appConfig != null)
+                _appConfig.Saved -= AppConfig_Saved;
+        };
         _jogQueue.Changed += UpdateQueueStatus;
         UpdateQueueStatus();
     }
@@ -85,6 +100,27 @@ public partial class JogBaseControl : UserControl
     }
 
     public JogViewModel JogData { get; }
+
+    public AppConfigService? AppConfig
+    {
+        get => _appConfig;
+        set
+        {
+            if (ReferenceEquals(_appConfig, value))
+                return;
+
+            if (_appConfig != null)
+                _appConfig.Saved -= AppConfig_Saved;
+
+            _appConfig = value;
+
+            if (_appConfig != null)
+                _appConfig.Saved += AppConfig_Saved;
+
+            if (DataContext is GrblViewModel model)
+                ApplyJogUnits(model);
+        }
+    }
 
     public string QueueStatusText
     {
@@ -128,10 +164,16 @@ public partial class JogBaseControl : UserControl
             ApplyJogUnits(model);
     }
 
+    void AppConfig_Saved(object? sender, EventArgs e)
+    {
+        if (DataContext is GrblViewModel model)
+            ApplyJogUnits(model);
+    }
+
     void ApplyJogUnits(GrblViewModel model)
     {
         _mode = model.IsMetric ? "G21" : "G20";
-        JogData.SetMetric(model.IsMetric);
+        JogData.SetMetric(model.IsMetric, AppConfig?.Base);
         SyncJogSelectors();
     }
 

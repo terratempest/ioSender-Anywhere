@@ -49,6 +49,7 @@ public partial class RenderControl : UserControl
         ViewportInput.PointerPressed += OnViewportPointerPressed;
         ViewportInput.PointerMoved += OnViewportPointerMoved;
         ViewportInput.PointerReleased += OnViewportPointerReleased;
+        ViewportInput.PointerCaptureLost += OnViewportPointerCaptureLost;
         ViewportInput.PointerWheelChanged += OnViewportPointerWheelChanged;
         GlViewport.InitializationFailed += (_, _) =>
         {
@@ -580,6 +581,9 @@ public partial class RenderControl : UserControl
 
     void OnViewportPointerReleased(object? sender, PointerReleasedEventArgs e) =>
         GlViewport.HandlePointerReleased(e, ViewportInput);
+
+    void OnViewportPointerCaptureLost(object? sender, PointerCaptureLostEventArgs e) =>
+        GlViewport.HandlePointerCaptureLost(e);
 
     void OnViewportPointerWheelChanged(object? sender, PointerWheelEventArgs e) =>
         GlViewport.HandlePointerWheelChanged(e, ViewportInput);

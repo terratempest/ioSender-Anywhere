@@ -184,6 +184,14 @@ public sealed class ViewerCamera
     public void ZoomWheel(double deltaY, global::Avalonia.Point pointer, double viewportWidth, double viewportHeight)
     {
         var scale = deltaY > 0d ? 0.88d : 1.14d;
+        ZoomAtScale(scale, pointer, viewportWidth, viewportHeight);
+    }
+
+    public void ZoomAtScale(double scale, global::Avalonia.Point pointer, double viewportWidth, double viewportHeight)
+    {
+        if (double.IsNaN(scale) || double.IsInfinity(scale) || scale <= 0d)
+            return;
+
         var oldWidth = ViewWidth;
         ViewWidth = Math.Clamp(ViewWidth * scale, 0.01d, 1_000_000d);
 

@@ -29,6 +29,7 @@
     <ProjectReference Include="..\CNC.Controls.Avalonia\CNC.Controls.Avalonia.csproj" />
     <ProjectReference Include="..\CNC.Controls.Config.Avalonia\CNC.Controls.Config.Avalonia.csproj" />
     <ProjectReference Include="..\CNC.Controls.Probing.Avalonia\CNC.Controls.Probing.Avalonia.csproj" />
+    <ProjectReference Include="..\CNC.GCodeViewer.Avalonia\CNC.GCodeViewer.Avalonia.csproj" />
     <ProjectReference Include="..\ioSender\ioSender.csproj" />
   </ItemGroup>
 

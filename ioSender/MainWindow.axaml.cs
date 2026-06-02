@@ -1,6 +1,5 @@
 using Avalonia;
 using Avalonia.Controls;
-using Avalonia.Input;
 using Avalonia.Interactivity;
 using Avalonia.Media;
 using Avalonia.Platform.Storage;
@@ -94,25 +93,6 @@ public partial class MainWindow : Window
         {
             UpdateWindowChromeState();
         }
-    }
-
-    void OnTitleBarPointerPressed(object? sender, PointerPressedEventArgs e)
-    {
-        if (WindowState == WindowState.FullScreen)
-            return;
-
-        if (!e.GetCurrentPoint(this).Properties.IsLeftButtonPressed)
-            return;
-
-        if (e.ClickCount == 2)
-        {
-            ToggleMaximized();
-            e.Handled = true;
-            return;
-        }
-
-        BeginMoveDrag(e);
-        e.Handled = true;
     }
 
     void OnWindowMinimizeClick(object? sender, RoutedEventArgs e) => WindowState = WindowState.Minimized;

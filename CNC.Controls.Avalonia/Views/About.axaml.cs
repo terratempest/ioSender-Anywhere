@@ -1,3 +1,5 @@
+using System.Diagnostics;
+using System.Reflection;
 using Avalonia.Controls;
 using Avalonia.Interactivity;
 using CNC.Core;
@@ -7,6 +9,8 @@ namespace CNC.Controls.Avalonia.Views;
 
 public partial class About : Window
 {
+    private const string GitHubRepositoryUrl = "https://github.com/terratempest/ioSender-crossplatform";
+
     private readonly string _baseTitle;
     private readonly string _connection;
 
@@ -44,6 +48,7 @@ public partial class About : Window
         TxtGrblNewOptions.Text = GrblInfo.NewOptions;
         TxtGrblConnection.Text = _connection;
         TxtSystemInfo.Text = string.Join(Environment.NewLine, GrblInfo.SystemInfo);
+        TxtAppVersion.Text = "Version " + GetAppVersion();
 
         var header = GrblInfo.Firmware;
         if (!string.IsNullOrEmpty(GrblInfo.Identity))
@@ -54,4 +59,20 @@ public partial class About : Window
     private void OnOkClick(object? sender, RoutedEventArgs e) => Close();
 
     private void OnToClipboardClick(object? sender, RoutedEventArgs e) => GrblSettings.CopyToClipboard();
+
+    private static string GetAppVersion()
+    {
+        var assembly = typeof(About).Assembly;
+        return assembly.GetCustomAttribute<AssemblyInformationalVersionAttribute>()?.InformationalVersion
+            ?? assembly.GetName().Version?.ToString()
+            ?? "-";
+    }
+
+    private static void OnGitHubClick(object? sender, RoutedEventArgs e)
+    {
+        Process.Start(new ProcessStartInfo(GitHubRepositoryUrl)
+        {
+            UseShellExecute = true
+        });
+    }
 }

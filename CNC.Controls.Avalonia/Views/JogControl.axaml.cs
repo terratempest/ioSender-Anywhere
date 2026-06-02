@@ -1,4 +1,5 @@
 using Avalonia.Controls;
+using CNC.App;
 
 namespace CNC.Controls.Avalonia.Views;
 
@@ -10,6 +11,11 @@ public partial class JogControl : UserControl
     {
         InitializeComponent();
         jogBase.QueueStatusChanged += () => HeaderStatusChanged?.Invoke();
+    }
+
+    public JogControl(AppConfigService appConfig) : this()
+    {
+        jogBase.AppConfig = appConfig;
     }
 
     public string HeaderStatusText => jogBase.QueueStatusText;

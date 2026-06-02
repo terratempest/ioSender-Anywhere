@@ -1,4 +1,5 @@
 using CNC.Controls.Avalonia.Config;
+using CNC.App;
 using CNC.Core;
 
 namespace CNC.Controls.Avalonia.ViewModels;
@@ -27,10 +28,14 @@ public class JogViewModel : ViewModelBase
     readonly double[] _distance = new double[5];
     readonly int[] _feedRate = new int[4];
 
-    public void SetMetric(bool on)
+    public void SetMetric(bool on, BaseConfig? config = null)
     {
-        var feeds = on ? JogDefaults.MetricFeedrates : JogDefaults.ImperialFeedrates;
-        var distances = on ? JogDefaults.MetricDistances : JogDefaults.ImperialDistances;
+        var feeds = config is null
+            ? (on ? JogDefaults.MetricFeedrates : JogDefaults.ImperialFeedrates)
+            : (on ? config.JogUiMetric.Feedrate : config.JogUiImperial.Feedrate);
+        var distances = config is null
+            ? (on ? JogDefaults.MetricDistances : JogDefaults.ImperialDistances)
+            : (on ? config.JogUiMetric.Distance : config.JogUiImperial.Distance);
         for (var i = 0; i < _feedRate.Length; i++)
         {
             _distance[i] = distances[i];
@@ -39,6 +44,8 @@ public class JogViewModel : ViewModelBase
             OnPropertyChanged("Distance" + i);
         }
         _distance[(int)JogStep.Continuous] = -1d;
+        OnPropertyChanged(nameof(Distance));
+        OnPropertyChanged(nameof(FeedRate));
     }
 
     public JogStep StepSize
