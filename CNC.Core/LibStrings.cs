@@ -48,6 +48,7 @@ public static class LibStrings
         ["ContClearResetUnlock"] = "clear then <Reset> then <Unlock> to continue",
         ["ContHome"] = "<Home> to continue",
         ["ContResetUnlock"] = "<Reset> then <Unlock> to continue",
+        ["MsgHome"] = "Homing cycle required, <Home> to continue",
         ["ProbePrimary"] = "Primary",
         ["ProbeToolSetter"] = "Toolsetter",
         ["ProbeSecondary"] = "Secondary",

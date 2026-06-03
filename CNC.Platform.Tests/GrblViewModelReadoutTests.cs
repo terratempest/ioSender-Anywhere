@@ -79,6 +79,18 @@ public sealed class GrblViewModelReadoutTests
     }
 
     [Fact]
+    public void DataReceived_startup_banner_keeps_homed_state()
+    {
+        var vm = new GrblViewModel { IsReady = true };
+        vm.DataReceived("<Idle|MPos:0,0,0|H:1|Bf:15,128>");
+
+        vm.DataReceived("Grbl 1.1h ['$' for help]");
+
+        Assert.Equal(GrblStates.Unknown, vm.GrblState.State);
+        Assert.Equal(HomedState.Homed, vm.HomedState);
+    }
+
+    [Fact]
     public void DataReceived_status_report_without_fields_updates_state()
     {
         var vm = new GrblViewModel();
@@ -238,13 +250,13 @@ public sealed class GrblViewModelReadoutTests
     }
 
     [Fact]
-    public void DataReceived_not_homed_field_sets_not_homed_state()
+    public void DataReceived_not_homed_field_sets_unknown_state_when_not_alarm_11()
     {
         var vm = new GrblViewModel();
 
         vm.DataReceived("<Idle|MPos:0,0,0|H:0|Bf:15,128>");
 
-        Assert.Equal(HomedState.NotHomed, vm.HomedState);
+        Assert.Equal(HomedState.Unknown, vm.HomedState);
     }
 
     [Fact]
@@ -255,6 +267,79 @@ public sealed class GrblViewModelReadoutTests
         vm.DataReceived("<Alarm:11|MPos:0,0,0|Bf:15,128>");
 
         Assert.Equal(HomedState.NotHomed, vm.HomedState);
+    }
+
+    [Fact]
+    public void DataReceived_alarm_11_homed_field_sets_not_homed_state()
+    {
+        var vm = new GrblViewModel();
+
+        vm.DataReceived("<Alarm:11|MPos:0,0,0|H:0|Bf:15,128>");
+
+        Assert.Equal(GrblStates.Alarm, vm.GrblState.State);
+        Assert.Equal(11, vm.GrblState.Substate);
+        Assert.Equal(HomedState.NotHomed, vm.HomedState);
+    }
+
+    [Fact]
+    public void DataReceived_hard_limit_alarm_keeps_existing_homed_state()
+    {
+        var vm = new GrblViewModel();
+        vm.DataReceived("<Idle|MPos:0,0,0|H:1|Bf:15,128>");
+
+        vm.DataReceived("ALARM:1");
+
+        Assert.Equal(GrblStates.Alarm, vm.GrblState.State);
+        Assert.Equal(1, vm.GrblState.Substate);
+        Assert.Equal(HomedState.Homed, vm.HomedState);
+    }
+
+    [Fact]
+    public void DataReceived_soft_limit_alarm_keeps_existing_homed_state()
+    {
+        var vm = new GrblViewModel();
+        vm.DataReceived("<Idle|MPos:0,0,0|H:1|Bf:15,128>");
+
+        vm.DataReceived("ALARM:2");
+
+        Assert.Equal(GrblStates.Alarm, vm.GrblState.State);
+        Assert.Equal(2, vm.GrblState.Substate);
+        Assert.Equal(HomedState.Homed, vm.HomedState);
+    }
+
+    [Fact]
+    public void DataReceived_estop_alarm_keeps_existing_homed_state()
+    {
+        var vm = new GrblViewModel();
+        vm.DataReceived("<Idle|MPos:0,0,0|H:1|Bf:15,128>");
+
+        vm.DataReceived("ALARM:10");
+
+        Assert.Equal(GrblStates.Alarm, vm.GrblState.State);
+        Assert.Equal(10, vm.GrblState.Substate);
+        Assert.Equal(HomedState.Homed, vm.HomedState);
+    }
+
+    [Fact]
+    public void Clear_resets_homed_state_to_unknown()
+    {
+        var vm = new GrblViewModel();
+        vm.DataReceived("<Idle|MPos:0,0,0|H:1|Bf:15,128>");
+
+        vm.Clear();
+
+        Assert.Equal(HomedState.Unknown, vm.HomedState);
+    }
+
+    [Fact]
+    public void ClearPosition_keeps_existing_homed_state()
+    {
+        var vm = new GrblViewModel();
+        vm.DataReceived("<Idle|MPos:0,0,0|H:1|Bf:15,128>");
+
+        vm.ClearPosition();
+
+        Assert.Equal(HomedState.Homed, vm.HomedState);
     }
 
     [Fact]

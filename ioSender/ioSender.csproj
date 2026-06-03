@@ -7,7 +7,7 @@
     <RootNamespace>ioSender</RootNamespace>
     <AssemblyName>ioSender</AssemblyName>
     <ApplicationIcon>..\Icon\iosendericon.ico</ApplicationIcon>
-    <NoWarn>$(NoWarn);CA1416</NoWarn>
+    <NoWarn>$(NoWarn);CA1416;AVALONIA_X11_CSD</NoWarn>
   </PropertyGroup>
 
   <PropertyGroup>

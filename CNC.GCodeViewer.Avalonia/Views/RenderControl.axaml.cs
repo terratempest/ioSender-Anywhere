@@ -551,6 +551,8 @@ public partial class RenderControl : UserControl
             UpdateDynamicLayers();
         else if (e.PropertyName is nameof(GrblViewModel.BlockExecuting))
             UpdateDynamicLayers();
+        else if (e.PropertyName is nameof(GrblViewModel.HomedState))
+            RebuildStaticLayers();
     }
 
     void OnResetViewClick(object? sender, RoutedEventArgs e) => GlViewport.ResetView();

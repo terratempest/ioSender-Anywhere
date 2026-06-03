@@ -122,12 +122,12 @@ public class HomedStateToColorConverter : IValueConverter
         {
             return homed switch
             {
-                HomedState.NotHomed => ControlConverters.ThemeBrush("IoSenderNotHomedBrush", Brushes.Transparent),
-                HomedState.Homed => ControlConverters.ThemeBrush("IoSenderHomedBrush", Brushes.Transparent),
-                _ => Brushes.Transparent
+                HomedState.NotHomed => ControlConverters.ThemeBrush("IoSenderNotHomedBrush", Brushes.Gray),
+                HomedState.Homed => ControlConverters.ThemeBrush("IoSenderHomedBrush", Brushes.Gray),
+                _ => ControlConverters.ThemeBrush("ThemeControlHighBrush", Brushes.Gray)
             };
         }
-        return Brushes.Transparent;
+        return ControlConverters.ThemeBrush("ThemeControlHighBrush", Brushes.Gray);
     }
 
     public object? ConvertBack(object? value, Type targetType, object? parameter, CultureInfo culture)

@@ -53,6 +53,7 @@ public sealed class MachineConnectionCoordinator
         model.Poller.SetState(0);
         PollGrbl.Resume();
         model.IsReady = false;
+        model.ClearConnectionState();
         _connection.Disconnect();
     }
 }

@@ -59,6 +59,7 @@ class Program
                 X11RenderingMode.Egl,
                 X11RenderingMode.Software,
             ],
+            EnableDrawnDecorations = true,
             UseDBusMenu = false,
         });
     }

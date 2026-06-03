@@ -84,16 +84,7 @@ public sealed class MachineConnectionInitializer
             ResumePolling();
             var gotStatus = RequestInitialStatusSnapshot(model);
             model.IsReady = true;
-            if (model.IsCheckMode)
-                model.Message = "Check mode active - cycle start will validate only.";
-            else if (!model.IsDroPositionKnown)
-            {
-                model.Message = gotStatus
-                    ? "Connected — no position in status report (check $10 / poll interval)."
-                    : "Connected — no status report; DRO may stay blank until polling.";
-            }
-            else
-                model.Message = string.Empty;
+            ApplyReadyMessage(model, gotStatus);
             return true;
         }
         catch (Exception ex)
@@ -172,6 +163,22 @@ public sealed class MachineConnectionInitializer
             EventUtils.DoEvents();
 
         return received == true;
+    }
+
+    internal static void ApplyReadyMessage(GrblViewModel model, bool gotStatus)
+    {
+        if (model.GrblState.State == GrblStates.Alarm && model.GrblState.Substate == 11)
+            model.Message = LibStrings.FindResource("MsgHome");
+        else if (model.IsCheckMode)
+            model.Message = "Check mode active - cycle start will validate only.";
+        else if (!model.IsDroPositionKnown)
+        {
+            model.Message = gotStatus
+                ? "Connected — no position in status report (check $10 / poll interval)."
+                : "Connected — no status report; DRO may stay blank until polling.";
+        }
+        else
+            model.Message = string.Empty;
     }
 
     static void CleanupAfterFailedInit(GrblViewModel model)

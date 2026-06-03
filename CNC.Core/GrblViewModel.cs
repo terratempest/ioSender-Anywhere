@@ -255,6 +255,24 @@ namespace CNC.Core
             ProgramLimits.Clear();
         }
 
+        public void ClearConnectionState()
+        {
+            _grblState.Error = 0;
+            _grblState.State = GrblStates.Unknown;
+            _grblState.Substate = 0;
+            _grblState.MPG = false;
+            GrblState = _grblState;
+            IsMPGActive = null;
+
+            ClearPosition();
+            Set("Pn", string.Empty);
+            Set("A", string.Empty);
+            Set("FS", string.Empty);
+            Set("P", "0");
+            HomedState = HomedState.Unknown;
+            IgnoreNextCycleStart = true;
+        }
+
         public void ClearSignals()
         {
             Set("Pn", string.Empty);
@@ -1316,7 +1334,9 @@ namespace CNC.Core
                         HomedState = hs[0] switch
                         {
                             "1" => HomedState.Homed,
-                            "0" => HomedState.NotHomed,
+                            "0" => GrblState.State == GrblStates.Alarm && GrblState.Substate == 11
+                                ? HomedState.NotHomed
+                                : HomedState.Unknown,
                             _ => HomedState.Unknown
                         };
                     }
@@ -1469,6 +1489,7 @@ namespace CNC.Core
                                     if (GrblSettings.GetInteger(grblHALSetting.UnlockAfterEStop) != 0)
                                     {
                                         msg = "Emergecy stop";
+                                        // "clear" means physically release/clear the E-stop or limit input before reset.
                                         _message = LibStrings.FindResource("ContClearResetUnlock");
                                     }
                                     break;

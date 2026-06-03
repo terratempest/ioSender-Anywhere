@@ -10,27 +10,40 @@
         WindowStartupLocation="CenterScreen"
         Background="{DynamicResource ThemeBackgroundBrush}">
   <Border Padding="24"
-          Background="{DynamicResource ThemeControlLowBrush}"
-          BorderBrush="{DynamicResource ThemeBorderMidBrush}"
-          BorderThickness="1"
-          CornerRadius="4">
+    Background="{DynamicResource ThemeControlLowBrush}"
+    BorderBrush="{DynamicResource ThemeBorderMidBrush}"
+    BorderThickness="1"
+    CornerRadius="4">
     <Grid RowDefinitions="Auto,8,Auto,22,Auto">
       <TextBlock Grid.Row="0"
-                 Text="ioSender"
-                 FontSize="28"
-                 FontWeight="SemiBold"
-                 HorizontalAlignment="Center"/>
+        Text="ioSender"
+        FontSize="28"
+        FontWeight="SemiBold"
+        HorizontalAlignment="Center"/>
+
+      <TextBlock Grid.Row="0"
+        Text="ANYWHERE"
+        FontSize="8"
+        Foreground="SlateGray"
+        FontWeight="SemiBold"
+        HorizontalAlignment="Center">
+        <TextBlock.RenderTransform>
+          <TransformGroup>
+            <TranslateTransform X="0" Y="32" />
+          </TransformGroup>
+        </TextBlock.RenderTransform>
+      </TextBlock>
 
       <TextBlock Grid.Row="2"
-                 Text="Loading workspace..."
-                 Foreground="{DynamicResource ThemeForegroundBrush}"
-                 HorizontalAlignment="Center"/>
+        Text="Loading workspace..."
+        Foreground="{DynamicResource ThemeForegroundBrush}"
+        HorizontalAlignment="Center"/>
 
       <ProgressBar Grid.Row="4"
-                   Height="4"
-                   Minimum="0"
-                   Maximum="100"
-                   IsIndeterminate="True"/>
+        Height="4"
+        Minimum="0"
+        Maximum="100"
+        IsIndeterminate="True"/>
     </Grid>
   </Border>
 </Window>

@@ -71,6 +71,9 @@ public sealed class GrblCommandRouter
             return;
         }
 
+        if (_model != null && !CanSendCommand(_model, command))
+            return;
+
         try
         {
             var parsed = command;
@@ -114,5 +117,16 @@ public sealed class GrblCommandRouter
 
         if (b <= 255)
             Comms.com.WriteByte(GrblLegacy.ConvertRTCommand((byte)b));
+    }
+
+    static bool CanSendCommand(GrblViewModel model, string command)
+    {
+        var state = model.StreamingState;
+        return state is StreamingState.Idle
+            or StreamingState.NoFile
+            or StreamingState.JobFinished
+            or StreamingState.ToolChange
+            or StreamingState.Stop
+            || (command == GrblConstants.CMD_UNLOCK && state != StreamingState.Send);
     }
 }

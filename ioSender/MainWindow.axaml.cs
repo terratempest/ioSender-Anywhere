@@ -1,5 +1,6 @@
 using Avalonia;
 using Avalonia.Controls;
+using Avalonia.Input;
 using Avalonia.Interactivity;
 using Avalonia.Media;
 using Avalonia.Platform.Storage;
@@ -104,6 +105,15 @@ public partial class MainWindow : Window
     void OnWindowFullscreenClick(object? sender, RoutedEventArgs e) => ToggleFullscreen();
 
     void OnWindowCloseClick(object? sender, RoutedEventArgs e) => Close();
+
+    void OnTitleBarPointerPressed(object? sender, PointerPressedEventArgs e)
+    {
+        if (WindowState == WindowState.FullScreen || e.Pointer.Type != PointerType.Touch)
+            return;
+
+        BeginMoveDrag(e);
+        e.Handled = true;
+    }
 
     void ToggleMaximized()
     {

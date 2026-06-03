@@ -23,7 +23,7 @@ internal static class ViewerEnvelopeBuilder
 
     public static List<NumericVector3> WorkAreaBox(GrblViewModel? grbl)
     {
-        if (!GrblInfo.HomingEnabled)
+        if (!GrblInfo.HomingEnabled || grbl?.HomedState != HomedState.Homed)
             return [];
 
         var x = GrblInfo.MaxTravel.X;
