@@ -12,7 +12,8 @@ public partial class OffsetView : UserControl
     readonly GrblViewModel _parameters = new();
     CoordinateSystem? _selectedOffset;
     volatile bool _awaitCoord;
-    Action<string>? _gotPosition;
+    readonly object _currentPositionLock = new();
+    Task<bool>? _currentPositionRequest;
 
     public static readonly StyledProperty<bool> CanEditProperty =
         AvaloniaProperty.Register<OffsetView, bool>(nameof(CanEdit));
@@ -72,16 +73,6 @@ public partial class OffsetView : UserControl
     {
         switch (e.PropertyName)
         {
-            case nameof(GrblViewModel.MachinePosition):
-                if (!(_awaitCoord = double.IsNaN(_parameters.MachinePosition.Values[0])))
-                {
-                    Offset.Set(_parameters.MachinePosition);
-                    _parameters.SuspendPositionNotifications = true;
-                    _parameters.Clear();
-                    _parameters.MachinePosition.Clear();
-                    _parameters.SuspendPositionNotifications = false;
-                }
-                break;
             case nameof(GrblViewModel.GrblError):
                 GrblWorkParameters.Get(_parameters);
                 break;
@@ -173,37 +164,95 @@ public partial class OffsetView : UserControl
         Comms.com?.WriteByte(GrblLegacy.ConvertRTCommand(GrblConstants.CMD_STATUS_REPORT_ALL));
     }
 
-    void btnCurrPos_Click(object? sender, RoutedEventArgs e)
+    bool TryCaptureMachinePosition()
     {
-        bool? res = null;
-        var cancellationToken = new CancellationToken();
-        _awaitCoord = true;
-        _parameters.OnRealtimeStatusProcessed += DataReceived;
+        if (double.IsNaN(_parameters.MachinePosition.Values[0]))
+            return false;
 
-        new Thread(() =>
-        {
-            res = WaitFor.AckResponse<string>(
-                cancellationToken,
-                null,
-                a => _gotPosition += a,
-                a => _gotPosition = (Action<string>?)Delegate.Remove(_gotPosition, a),
-                1000, RequestStatus);
-        }).Start();
-
-        while (res == null)
-            EventUtils.DoEvents();
-
-        _parameters.OnRealtimeStatusProcessed = (Action<string>)Delegate.Remove(_parameters.OnRealtimeStatusProcessed, DataReceived)!;
+        Offset.Set(_parameters.MachinePosition);
+        _parameters.SuspendPositionNotifications = true;
+        _parameters.Clear();
+        _parameters.MachinePosition.Clear();
+        _parameters.SuspendPositionNotifications = false;
+        return true;
     }
 
-    void DataReceived(string data)
+    void btnCurrPos_Click(object? sender, RoutedEventArgs e)
+    {
+        _ = RequestCurrentPositionAsync();
+    }
+
+    internal Task<bool> RequestCurrentPositionAsync(int timeoutMilliseconds = 1000)
+    {
+        if (Comms.com is not { IsOpen: true })
+            return Task.FromResult(false);
+
+        lock (_currentPositionLock)
+        {
+            if (_currentPositionRequest is { IsCompleted: false })
+                return _currentPositionRequest;
+
+            var request = RequestCurrentPositionCoreAsync(timeoutMilliseconds);
+            _currentPositionRequest = request;
+            _ = request.ContinueWith(_ =>
+            {
+                lock (_currentPositionLock)
+                {
+                    if (ReferenceEquals(_currentPositionRequest, request))
+                        _currentPositionRequest = null;
+                }
+            }, TaskScheduler.Default);
+            return request;
+        }
+    }
+
+    async Task<bool> RequestCurrentPositionCoreAsync(int timeoutMilliseconds)
+    {
+        using var timeout = new CancellationTokenSource(timeoutMilliseconds);
+        var completion = new TaskCompletionSource<bool>(TaskCreationOptions.RunContinuationsAsynchronously);
+
+        _awaitCoord = true;
+        void statusProcessed(string data) => DataReceived(data, timeout.Token, completion);
+
+        _parameters.OnRealtimeStatusProcessed += statusProcessed;
+        try
+        {
+            using var registration = timeout.Token.Register(() => completion.TrySetResult(false));
+            RequestStatus();
+            return await completion.Task.ConfigureAwait(false);
+        }
+        finally
+        {
+            _parameters.OnRealtimeStatusProcessed = (Action<string>)Delegate.Remove(_parameters.OnRealtimeStatusProcessed, statusProcessed)!;
+            _awaitCoord = false;
+        }
+    }
+
+    void DataReceived(string data, CancellationToken cancellationToken, TaskCompletionSource<bool> completion)
     {
         if (_awaitCoord)
         {
-            Thread.Sleep(50);
-            Comms.com?.WriteByte(GrblLegacy.ConvertRTCommand(GrblConstants.CMD_STATUS_REPORT));
+            if (TryCaptureMachinePosition())
+            {
+                _awaitCoord = false;
+                completion.TrySetResult(true);
+            }
+            else
+                _ = RequestStatusAfterDelayAsync(cancellationToken);
         }
         else
-            _gotPosition?.Invoke("ok");
+            completion.TrySetResult(true);
+    }
+
+    static async Task RequestStatusAfterDelayAsync(CancellationToken cancellationToken)
+    {
+        try
+        {
+            await Task.Delay(50, cancellationToken).ConfigureAwait(false);
+            Comms.com?.WriteByte(GrblLegacy.ConvertRTCommand(GrblConstants.CMD_STATUS_REPORT));
+        }
+        catch (OperationCanceledException)
+        {
+        }
     }
 }
