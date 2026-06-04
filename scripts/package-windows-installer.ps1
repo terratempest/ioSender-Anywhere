@@ -76,6 +76,7 @@ dotnet publish $Project `
     -r $RuntimeIdentifier `
     --self-contained true `
     -p:PublishSingleFile=false `
+    --force `
     -o $PublishDir
 
 $exe = Join-Path $PublishDir "ioSender.exe"

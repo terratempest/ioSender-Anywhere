@@ -4,12 +4,18 @@ set -euo pipefail
 ROOT="$(cd "$(dirname "$0")/.." && pwd)"
 OUT_DIR="${OUT_DIR:-$ROOT/artifacts/publish/linux-x64}"
 
+if [[ -d "$OUT_DIR" ]]; then
+  rm -rf "$OUT_DIR"
+fi
+mkdir -p "$OUT_DIR"
+
 publish() {
   dotnet publish "$ROOT/ioSender/ioSender.csproj" \
     -c Release \
     -r linux-x64 \
     --self-contained true \
     -p:PublishSingleFile=false \
+    --force \
     -o "$OUT_DIR"
 }
 

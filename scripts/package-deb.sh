@@ -31,10 +31,8 @@ if [[ -z "$VERSION" ]]; then
   fi
 fi
 
-if [[ ! -f "$PUBLISH_DIR/ioSender" ]]; then
-  echo "Publish output missing; running publish-linux.sh ..."
-  OUT_DIR="$PUBLISH_DIR" bash "$ROOT/scripts/publish-linux.sh"
-fi
+echo "Publishing fresh linux-x64 output..."
+OUT_DIR="$PUBLISH_DIR" bash "$ROOT/scripts/publish-linux.sh"
 
 if [[ ! -f "$PUBLISH_DIR/ioSender" ]]; then
   echo "error: $PUBLISH_DIR/ioSender not found after publish" >&2
