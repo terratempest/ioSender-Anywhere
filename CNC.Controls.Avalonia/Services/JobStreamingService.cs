@@ -247,11 +247,11 @@ public sealed class JobStreamingService
 
     public void StopJob(bool force)
     {
-        AbortImmediately();
+        PrepareStop();
         _streamingHandler.Call(StreamingState.Stop, true);
     }
 
-    private void AbortImmediately()
+    private void PrepareStop()
     {
         _stopRequested = true;
         _feedHoldRequested = false;
@@ -259,7 +259,6 @@ public sealed class JobStreamingService
         _injectCommands.Clear();
 
         JobTimer.Stop();
-        _job.Stopped = true;
         _job.Started = false;
         _job.Transferred = false;
         _job.Complete = false;
@@ -276,15 +275,7 @@ public sealed class JobStreamingService
         }
 
         if (Comms.com is { IsOpen: true } comms)
-        {
             comms.PurgeQueue();
-            WriteRtByte(GrblConstants.CMD_FEED_HOLD);
-            WriteRtByte(GrblConstants.CMD_JOG_CANCEL);
-            WriteRtByte(GrblConstants.CMD_SPINDLE_OVR_STOP);
-            if (GrblInfo.IsGrblHAL)
-                WriteRtByte(GrblConstants.CMD_STOP);
-            WriteRtByte(GrblConstants.CMD_RESET);
-        }
 
         if (GCode.IsLoaded && _model != null)
         {

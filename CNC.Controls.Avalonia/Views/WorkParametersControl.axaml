@@ -58,7 +58,7 @@
       HorizontalAlignment="Right" VerticalAlignment="Center">
       <views:LEDControl x:Name="LedTlo" Label="TLO" 
         IsSet="{Binding IsToolOffsetActive, Mode=OneWay}"
-        IsVisible="{Binding IsParserStateLive, Converter={StaticResource IsVisibleConverter}}"/>
+        IsVisible="{Binding IsToolOffsetIndicatorVisible, Converter={StaticResource IsVisibleConverter}}"/>
       <views:LEDControl x:Name="LedTloRef" Label="TLO ref'd" 
         IsSet="{Binding IsTloReferenceSet, Mode=OneWay}"/>
     </StackPanel>

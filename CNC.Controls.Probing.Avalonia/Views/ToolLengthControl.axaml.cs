@@ -27,7 +27,7 @@ public partial class ToolLengthControl : UserControl, IProbeTab
             probing.Instructions = string.Empty;
             probing.ProbeFixture = _probeFixture;
             if (!probing.Grbl!.IsParserStateLive)
-                probing.Grbl.ExecuteCommand(probing.Grbl.IsGrblHAL
+                probing.SendInternalCommand(probing.Grbl.IsGrblHAL
                     ? GrblConstants.CMD_GETPARSERSTATE
                     : GrblConstants.CMD_GETNGCPARAMETERS);
         }
@@ -113,7 +113,7 @@ public partial class ToolLengthControl : UserControl, IProbeTab
             if (probing.ReferenceToolOffset)
             {
                 probing.TloReference = pos.Z;
-                grbl.ExecuteCommand("G49");
+                probing.SendInternalCommand("G49");
             }
 
             if (probing.AddAction)
@@ -143,7 +143,7 @@ public partial class ToolLengthControl : UserControl, IProbeTab
                     tlo = tlo - (grbl.WorkPositionOffset.Z - grbl.ToolOffset.Z) - probing.FixtureHeight;
 
                 if (ok)
-                    grbl.ExecuteCommand("G43.1Z" + tlo.ToInvariantString(grbl.Format));
+                    probing.SendInternalCommand("G43.1Z" + tlo.ToInvariantString(grbl.Format));
             }
 
             if (probing.ProbeFixture)
@@ -158,13 +158,13 @@ public partial class ToolLengthControl : UserControl, IProbeTab
         if (probing.ReferenceToolOffset)
         {
             probing.ReferenceToolOffset = !ok;
-            grbl.ExecuteCommand("$TLR");
+            probing.SendInternalCommand("$TLR");
         }
 
         if (!grbl.IsParserStateLive)
         {
             if (GrblInfo.IsGrblHAL)
-                grbl.ExecuteCommand(GrblConstants.CMD_GETPARSERSTATE);
+                probing.SendInternalCommand(GrblConstants.CMD_GETPARSERSTATE);
             else
                 GrblParserState.Get(true);
         }

@@ -21,6 +21,12 @@ public partial class ProbingProgram
     bool _cancelling;
     bool _hasPause;
     bool _probeOnCycleStart;
+    bool _ignoreNextOk;
+    DateTime? _ignoreNextOkUntil;
+    bool _probeAckReceived;
+    bool _probeResultReceived;
+    bool _suppressProbeProtectForCurrentCommand;
+    DateTime? _idleProbeAssertedAt;
     int _step;
 
     int PollInterval => _probing.Config?.PollInterval ?? 250;
@@ -59,16 +65,33 @@ public partial class ProbingProgram
         switch (e.PropertyName)
         {
             case nameof(GrblViewModel.IsProbeSuccess):
+                _probing.TraceWorkflow("probe:" + (Grbl.IsProbeSuccess ? "success" : "fail"));
                 if (Grbl.IsProbeSuccess)
                 {
                     _probing.Positions.Add(new Position(Grbl.ProbePosition, Grbl.UnitFactor));
                     _probing.NotifyProbePositionsChanged();
+                    _probeResultReceived = true;
+                    _idleProbeAssertedAt = null;
+                    if (IsCurrentCommandProbe())
+                    {
+                        if (!_probeAckReceived)
+                        {
+                            _ignoreNextOk = true;
+                            _ignoreNextOkUntil = DateTime.UtcNow.AddMilliseconds(250);
+                        }
+                        ResponseReceived("probe:ok");
+                    }
                 }
                 else
+                {
+                    _probeResultReceived = true;
+                    _idleProbeAssertedAt = null;
                     ResponseReceived("fail");
+                }
                 break;
 
             case nameof(GrblViewModel.GrblState):
+                _probing.TraceWorkflow("state:" + Grbl.GrblState);
                 if (Grbl.GrblState.State == GrblStates.Alarm)
                     ResponseReceived("alarm");
                 break;
@@ -82,7 +105,21 @@ public partial class ProbingProgram
                         _probing.IsPaused = false;
                     }
 
-                    if (_probeProtect && model.Signals.Value.HasFlag(Signals.Probe) &&
+                    if (model.Signals.Value.HasFlag(Signals.Probe))
+                        _probing.TraceWorkflow("status:probe-asserted");
+
+                    if (IsCurrentCommandProbe() &&
+                        model.Signals.Value.HasFlag(Signals.Probe) &&
+                        model.GrblState.State == GrblStates.Idle)
+                    {
+                        _probing.TraceWorkflow("probe:idle-asserted");
+                        _idleProbeAssertedAt ??= DateTime.UtcNow;
+                    }
+
+                    if (_probeProtect &&
+                        !IsCurrentCommandProbe() &&
+                        !_suppressProbeProtectForCurrentCommand &&
+                        model.Signals.Value.HasFlag(Signals.Probe) &&
                         model.GrblState.State == GrblStates.Run && model.GrblState.Substate != 2)
                     {
                         Comms.com?.WriteByte(GrblConstants.CMD_STOP);
@@ -322,10 +359,11 @@ public partial class ProbingProgram
 
             grbl.PropertyChanged -= Grbl_PropertyChanged;
             Unsubscribe(ref grbl.OnCommandResponseReceived, ResponseReceived);
+            Unsubscribe(ref grbl.OnResponseReceived, TraceResponseReceived);
             if (_hasPause)
                 _probing.PropertyChanged -= Probing_PropertyChanged;
             _isRunning = grbl.IsJobRunning = false;
-            grbl.ExecuteCommand(_probing.DistanceMode == DistanceMode.Absolute ? "G90" : "G91");
+            _probing.SendInternalCommand(_probing.DistanceMode == DistanceMode.Absolute ? "G90" : "G91");
         }
 
         if (!_isComplete || _probing.IsSuccess || forceMessage)
@@ -336,6 +374,7 @@ public partial class ProbingProgram
     public bool Execute(bool go)
     {
         _ = go;
+        _probing.TraceWorkflow("wait:Execute");
         _isComplete = false;
         _probing.ClearExeStatus();
 
@@ -360,6 +399,7 @@ public partial class ProbingProgram
             _probeProtect = GrblInfo.HasSimpleProbeProtect;
             ClearResponseQueue();
             grbl.OnCommandResponseReceived += ResponseReceived;
+            grbl.OnResponseReceived += TraceResponseReceived;
             grbl.PropertyChanged += Grbl_PropertyChanged;
             if (_hasPause)
                 _probing.PropertyChanged += Probing_PropertyChanged;
@@ -369,27 +409,72 @@ public partial class ProbingProgram
             _program.InsertRange(0, _probing.Macro.PreJobCommands);
 
         _cancelling = false;
+        _ignoreNextOk = false;
+        _ignoreNextOkUntil = null;
+        _probeAckReceived = false;
+        _probeResultReceived = false;
+        _suppressProbeProtectForCurrentCommand = false;
+        _idleProbeAssertedAt = null;
         grbl.IsJobRunning = true;
 
         if (_probing.Message == string.Empty)
             _probing.Message = ProbingStrings.Probing;
 
-        grbl.ExecuteCommand(_program[_step]);
+        ExecuteCurrentCommand(grbl);
 
         while (!_isComplete)
         {
             EventUtils.DoEvents();
 
+            if (IsCurrentCommandProbe() &&
+                _idleProbeAssertedAt is { } idleProbeAssertedAt &&
+                !_probeResultReceived &&
+                DateTime.UtcNow - idleProbeAssertedAt >= TimeSpan.FromMilliseconds(Math.Max(PollInterval * 2, 250)))
+            {
+                _idleProbeAssertedAt = null;
+                ResponseReceived("fail");
+            }
+
             if (!_cmdResponse.TryDequeue(out var response))
                 continue;
 
+            if (_ignoreNextOk && response == "ok")
+            {
+                if (_ignoreNextOkUntil == null || DateTime.UtcNow <= _ignoreNextOkUntil.Value)
+                {
+                    _ignoreNextOk = false;
+                    _ignoreNextOkUntil = null;
+                    continue;
+                }
+
+                _ignoreNextOk = false;
+                _ignoreNextOkUntil = null;
+            }
+
+            if (response == "probe:ok")
+                response = "ok";
+
             if (grbl.ResponseLogVerbose)
                 grbl.ResponseLog.Add("PM:" + response);
+
+            if (IsCurrentCommandProbe())
+            {
+                if (response == "ok" && !_probeResultReceived)
+                {
+                    _probeAckReceived = true;
+                    continue;
+                }
+
+                if (response == "ok")
+                    _probeAckReceived = false;
+            }
 
             if (response == "ok")
             {
                 if (++_step < _program.Count)
                 {
+                    _suppressProbeProtectForCurrentCommand = false;
+
                     if (_program[_step].StartsWith('#'))
                     {
                         grbl.Message = _program[_step][1..];
@@ -401,6 +486,7 @@ public partial class ProbingProgram
                     {
                         _program[_step] = _program[_step][1..];
                         _probing.RemoveLastPosition();
+                        _suppressProbeProtectForCurrentCommand = true;
                     }
 
                     if (_program[_step] == "pause")
@@ -410,7 +496,7 @@ public partial class ProbingProgram
                     }
                     else
                     {
-                        grbl.ExecuteCommand(_program[_step]);
+                        ExecuteCurrentCommand(grbl);
                     }
                 }
             }
@@ -418,7 +504,7 @@ public partial class ProbingProgram
             if (_step == _program.Count || response != "ok")
             {
                 _probing.IsSuccess = _step == _program.Count && response == "ok";
-                if (!_probing.IsSuccess && response != "probe!")
+                if (!_probing.IsSuccess)
                     End(grbl.GrblState.State == GrblStates.Alarm
                         ? ProbingStrings.FailedAlarm
                         : ProbingStrings.FailedCancelled);
@@ -449,12 +535,31 @@ public partial class ProbingProgram
 
     void ResponseReceived(string response)
     {
+        _probing.TraceWorkflow("command-response:" + response);
         if (!_cancelling)
             _cmdResponse.Enqueue(response);
 
         if (response == "cancel")
             _cancelling = true;
     }
+
+    void TraceResponseReceived(string response) =>
+        _probing.TraceWorkflow("response:" + response);
+
+    void ExecuteCurrentCommand(GrblViewModel grbl)
+    {
+        _probeAckReceived = false;
+        _probeResultReceived = false;
+        _idleProbeAssertedAt = null;
+        _probing.TraceWorkflow("command:" + _program[_step]);
+        _probing.SendInternalCommand(_program[_step]);
+    }
+
+    bool IsCurrentCommandProbe() =>
+        _isRunning && _step >= 0 && _step < _program.Count && IsProbingCommand(_program[_step]);
+
+    static bool IsProbingCommand(string command) =>
+        command.Contains("G38.", StringComparison.OrdinalIgnoreCase);
 
     public override string ToString() => string.Join('\n', _program);
 }

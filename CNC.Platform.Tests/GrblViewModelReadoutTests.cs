@@ -343,6 +343,63 @@ public sealed class GrblViewModelReadoutTests
     }
 
     [Fact]
+    public void DataReceived_tlo_report_activates_tool_offset_indicator()
+    {
+        var vm = new GrblViewModel();
+        Assert.False(vm.IsToolOffsetIndicatorVisible);
+        Assert.False(vm.IsToolOffsetActive);
+
+        var changed = new HashSet<string>(StringComparer.Ordinal);
+        vm.PropertyChanged += (_, e) =>
+        {
+            if (!string.IsNullOrEmpty(e.PropertyName))
+                changed.Add(e.PropertyName);
+        };
+
+        vm.DataReceived("[TLO:0.000,0.000,12.345]");
+
+        Assert.Equal(12.345d, vm.ToolOffset.Z, 3);
+        Assert.True(vm.IsToolOffsetIndicatorVisible);
+        Assert.True(vm.IsToolOffsetActive);
+        Assert.Contains(nameof(GrblViewModel.IsToolOffsetIndicatorVisible), changed);
+        Assert.Contains(nameof(GrblViewModel.IsToolOffsetActive), changed);
+    }
+
+    [Fact]
+    public void DataReceived_tlo_zero_report_clears_tool_offset_indicator()
+    {
+        var vm = new GrblViewModel();
+        vm.DataReceived("[TLO:0.000,0.000,12.345]");
+
+        var changed = new HashSet<string>(StringComparer.Ordinal);
+        vm.PropertyChanged += (_, e) =>
+        {
+            if (!string.IsNullOrEmpty(e.PropertyName))
+                changed.Add(e.PropertyName);
+        };
+
+        vm.DataReceived("[TLO:0.000,0.000,0.000]");
+
+        Assert.Equal(0d, vm.ToolOffset.Z, 3);
+        Assert.True(vm.IsToolOffsetIndicatorVisible);
+        Assert.False(vm.IsToolOffsetActive);
+        Assert.Contains(nameof(GrblViewModel.IsToolOffsetIndicatorVisible), changed);
+        Assert.Contains(nameof(GrblViewModel.IsToolOffsetActive), changed);
+    }
+
+    [Fact]
+    public void Parser_state_offset_detection_treats_non_zero_position_as_offset()
+    {
+        var method = typeof(GrblParserState).GetMethod(
+            "IsPositionOffset",
+            System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Static);
+
+        Assert.NotNull(method);
+        Assert.False((bool)method.Invoke(null, [new Position(0d, 0d, 0d)])!);
+        Assert.True((bool)method.Invoke(null, [new Position(0d, 0d, 12.345d)])!);
+    }
+
+    [Fact]
     public void Spindle_override_does_not_shrink_setpoint_while_fs_lags()
     {
         var vm = new GrblViewModel();

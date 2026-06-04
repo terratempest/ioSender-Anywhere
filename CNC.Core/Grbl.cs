@@ -1639,7 +1639,7 @@ namespace CNC.Core
             bool isOffset = false;
 
             foreach (int i in GrblInfo.AxisFlags.ToIndices())
-                isOffset |= !(double.IsNaN(pos.Values[i]) || pos.Values[i] != 0d);
+                isOffset |= !(double.IsNaN(pos.Values[i]) || pos.Values[i] == 0d);
 
             return isOffset;
         }
@@ -1659,6 +1659,12 @@ namespace CNC.Core
         public static int Probe { get; set; }
         public static string WorkOffset { get; set; }
         public static bool IsLoaded { get { return state.Count > 0; } }
+
+        public static void Clear()
+        {
+            state.Clear();
+            _tool = string.Empty;
+        }
 
         public static SpindleState SpindleState { get; private set; } = SpindleState.Off;
         public static CoolantState CoolantState { get; private set; } = CoolantState.Off;

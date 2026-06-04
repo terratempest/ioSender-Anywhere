@@ -30,10 +30,14 @@ public sealed class UiJogCommandQueueTests : IDisposable
 
         Assert.Equal(new[] { "$J=X+" }, _comms.Commands);
 
+        queue.OnGrblStateChanged(jog);
         queue.OnGrblStateChanged(idle);
         Assert.Equal(new[] { "$J=X+", "$J=Y+" }, _comms.Commands);
 
-        queue.OnGrblStateChanged(idle);
+        queue.OnResponseReceived("ok", idle);
+        Assert.Equal(new[] { "$J=X+", "$J=Y+" }, _comms.Commands);
+
+        queue.OnRealtimeStatusProcessed(idle);
         Assert.Equal(new[] { "$J=X+", "$J=Y+", "$J=X-" }, _comms.Commands);
     }
 
@@ -47,7 +51,10 @@ public sealed class UiJogCommandQueueTests : IDisposable
         Assert.True(queue.TryEnqueueStep("$J=X+", idle));
         Assert.True(queue.TryEnqueueStep("$J=Y+", jog));
 
-        queue.OnGrblStateChanged(idle);
+        queue.OnResponseReceived("ok", jog);
+        Assert.Equal(new[] { "$J=X+" }, _comms.Commands);
+
+        queue.OnRealtimeStatusProcessed(idle);
         Assert.Equal(new[] { "$J=X+", "$J=Y+" }, _comms.Commands);
     }
 
@@ -66,7 +73,10 @@ public sealed class UiJogCommandQueueTests : IDisposable
         Assert.False(queue.TryEnqueueStep("$J=rejected", jog));
         Assert.Equal(UiJogCommandQueue.MaxPendingClicks, queue.PendingCount);
 
-        queue.OnGrblStateChanged(idle);
+        queue.OnResponseReceived("ok", idle);
+        Assert.Equal(new[] { "$J=active" }, _comms.Commands);
+
+        queue.OnRealtimeStatusProcessed(idle);
 
         Assert.Equal("$J=pending0", _comms.Commands[1]);
         Assert.DoesNotContain("$J=rejected", _comms.Commands);
@@ -108,7 +118,7 @@ public sealed class UiJogCommandQueueTests : IDisposable
     }
 
     [Fact]
-    public void Repeated_idle_state_advances_without_sticking()
+    public void Raw_ok_with_current_idle_does_not_advance_without_fresh_status()
     {
         var queue = new UiJogCommandQueue();
         var idle = State(GrblStates.Idle);
@@ -119,9 +129,277 @@ public sealed class UiJogCommandQueueTests : IDisposable
 
         Assert.Equal(new[] { "$J=X+" }, _comms.Commands);
 
-        queue.OnGrblStateChanged(idle);
-        Assert.Equal(new[] { "$J=X+", "$J=Y+" }, _comms.Commands);
+        queue.OnResponseReceived("ok", idle);
+        Assert.Equal(new[] { "$J=X+" }, _comms.Commands);
         Assert.Equal(UiJogQueueState.Idle, queue.State);
+    }
+
+    [Fact]
+    public void Raw_ok_then_fresh_idle_status_advances_next_step()
+    {
+        var queue = new UiJogCommandQueue();
+        var idle = State(GrblStates.Idle);
+        var jog = State(GrblStates.Jog);
+
+        Assert.True(queue.TryEnqueueStep("$J=X+", idle));
+        Assert.True(queue.TryEnqueueStep("$J=Y+", jog));
+
+        queue.OnResponseReceived("ok", idle);
+        queue.OnRealtimeStatusProcessed(idle);
+
+        Assert.Equal(new[] { "$J=X+", "$J=Y+" }, _comms.Commands);
+    }
+
+    [Fact]
+    public void Fresh_idle_status_before_delayed_ok_does_not_advance_next_step()
+    {
+        var queue = new UiJogCommandQueue();
+        var idle = State(GrblStates.Idle);
+        var jog = State(GrblStates.Jog);
+
+        Assert.True(queue.TryEnqueueStep("$J=X+", idle));
+        Assert.True(queue.TryEnqueueStep("$J=Y+", jog));
+
+        queue.OnRealtimeStatusProcessed(idle);
+        Assert.Equal(new[] { "$J=X+" }, _comms.Commands);
+
+        queue.OnResponseReceived("ok", idle);
+
+        Assert.Equal(new[] { "$J=X+" }, _comms.Commands);
+    }
+
+    [Fact]
+    public void Jog_to_idle_advances_even_if_ok_is_suppressed()
+    {
+        var queue = new UiJogCommandQueue();
+        var idle = State(GrblStates.Idle);
+        var jog = State(GrblStates.Jog);
+
+        Assert.True(queue.TryEnqueueStep("$J=X+", idle));
+        Assert.True(queue.TryEnqueueStep("$J=Y+", jog));
+
+        queue.OnGrblStateChanged(jog);
+        queue.OnGrblStateChanged(idle);
+
+        Assert.Equal(new[] { "$J=X+", "$J=Y+" }, _comms.Commands);
+    }
+
+    [Fact]
+    public void Continuous_stop_does_not_poison_later_step_queue()
+    {
+        var queue = new UiJogCommandQueue();
+        var idle = State(GrblStates.Idle);
+        var jog = State(GrblStates.Jog);
+
+        Assert.True(queue.TryStartContinuous("$J=X100", idle));
+        queue.Stop();
+        queue.OnGrblStateChanged(idle);
+
+        Assert.True(queue.TryEnqueueStep("$J=X+", idle));
+        Assert.True(queue.TryEnqueueStep("$J=Y+", jog));
+
+        queue.OnResponseReceived("ok", idle);
+        queue.OnRealtimeStatusProcessed(idle);
+
+        Assert.Equal(new[] { "$J=X100", "$J=X+", "$J=Y+" }, _comms.Commands);
+        Assert.Equal(new[] { GrblConstants.CMD_JOG_CANCEL }, _comms.Bytes);
+    }
+
+    [Fact]
+    public void Rapid_continuous_restart_can_be_stopped_by_center_button()
+    {
+        var queue = new UiJogCommandQueue();
+        var idle = State(GrblStates.Idle);
+
+        Assert.True(queue.TryStartContinuous("$J=X100", idle));
+        queue.Stop();
+        queue.OnGrblStateChanged(idle);
+
+        Assert.True(queue.TryStartContinuous("$J=X100", idle));
+        queue.Stop();
+
+        Assert.Equal(new[] { "$J=X100", "$J=X100" }, _comms.Commands);
+        Assert.Equal(new[] { GrblConstants.CMD_JOG_CANCEL, GrblConstants.CMD_JOG_CANCEL }, _comms.Bytes);
+    }
+
+    [Fact]
+    public void Active_continuous_jog_blocks_step_queue_until_stopped_and_idle()
+    {
+        var queue = new UiJogCommandQueue();
+        var idle = State(GrblStates.Idle);
+
+        Assert.True(queue.TryStartContinuous("$J=X100", idle));
+        Assert.False(queue.TryEnqueueStep("$J=Y+", idle));
+
+        queue.Stop();
+        queue.OnGrblStateChanged(idle);
+
+        Assert.True(queue.TryEnqueueStep("$J=Y+", idle));
+        Assert.Equal(new[] { "$J=X100", "$J=Y+" }, _comms.Commands);
+    }
+
+    [Fact]
+    public void Active_continuous_jog_blocks_second_continuous_start()
+    {
+        var queue = new UiJogCommandQueue();
+        var idle = State(GrblStates.Idle);
+
+        Assert.True(queue.TryStartContinuous("$J=X100", idle));
+        Assert.False(queue.TryStartContinuous("$J=Y100", idle));
+
+        Assert.Equal(new[] { "$J=X100" }, _comms.Commands);
+    }
+
+    [Fact]
+    public void Non_joggable_state_clears_active_continuous_jog()
+    {
+        var queue = new UiJogCommandQueue();
+        var idle = State(GrblStates.Idle);
+
+        Assert.True(queue.TryStartContinuous("$J=X100", idle));
+
+        queue.OnGrblStateChanged(State(GrblStates.Alarm));
+
+        Assert.Equal(UiJogQueueState.Idle, queue.State);
+        Assert.True(queue.TryStartContinuous("$J=Y100", idle));
+        Assert.Equal(new[] { "$J=X100", "$J=Y100" }, _comms.Commands);
+    }
+
+    [Fact]
+    public void Error_after_active_step_clears_pending_queue()
+    {
+        var queue = new UiJogCommandQueue();
+        var idle = State(GrblStates.Idle);
+        var jog = State(GrblStates.Jog);
+
+        Assert.True(queue.TryEnqueueStep("$J=X+", idle));
+        Assert.True(queue.TryEnqueueStep("$J=Y+", jog));
+
+        queue.OnResponseReceived("error:9", jog);
+
+        Assert.Equal(0, queue.PendingCount);
+        Assert.Equal(UiJogQueueState.Idle, queue.State);
+        Assert.Equal(new[] { "$J=X+" }, _comms.Commands);
+    }
+
+    [Fact]
+    public void Changed_fires_when_pending_count_decrements_during_dispatch()
+    {
+        var queue = new UiJogCommandQueue();
+        var idle = State(GrblStates.Idle);
+        var jog = State(GrblStates.Jog);
+
+        Assert.True(queue.TryEnqueueStep("$J=X+", idle));
+        Assert.True(queue.TryEnqueueStep("$J=Y+", jog));
+        Assert.Equal(1, queue.PendingCount);
+
+        var counts = new List<int>();
+        queue.Changed += () => counts.Add(queue.PendingCount);
+
+        queue.OnResponseReceived("ok", idle);
+        Assert.Empty(counts);
+
+        queue.OnRealtimeStatusProcessed(idle);
+
+        Assert.Equal(0, queue.PendingCount);
+        Assert.Contains(0, counts);
+    }
+
+    [Fact]
+    public void Queue_status_count_excludes_active_step()
+    {
+        var queue = new UiJogCommandQueue();
+        var idle = State(GrblStates.Idle);
+        var jog = State(GrblStates.Jog);
+
+        Assert.True(queue.TryEnqueueStep("$J=X+", idle));
+        Assert.True(queue.TryEnqueueStep("$J=Y+", jog));
+        Assert.Equal(1, queue.PendingCount);
+
+        queue.OnResponseReceived("ok", idle);
+        queue.OnRealtimeStatusProcessed(idle);
+
+        Assert.Equal(new[] { "$J=X+", "$J=Y+" }, _comms.Commands);
+        Assert.Equal(0, queue.PendingCount);
+
+        queue.OnResponseReceived("ok", idle);
+        queue.OnRealtimeStatusProcessed(idle);
+
+        Assert.Equal(0, queue.PendingCount);
+    }
+
+    [Fact]
+    public void Pending_count_steps_down_by_one_for_each_completed_step()
+    {
+        var queue = new UiJogCommandQueue();
+        var idle = State(GrblStates.Idle);
+        var jog = State(GrblStates.Jog);
+
+        Assert.True(queue.TryEnqueueStep("$J=0", idle));
+        Assert.True(queue.TryEnqueueStep("$J=1", jog));
+        Assert.True(queue.TryEnqueueStep("$J=2", jog));
+
+        var counts = new List<int>();
+        queue.Changed += () => counts.Add(queue.PendingCount);
+
+        queue.OnResponseReceived("ok", idle);
+        queue.OnRealtimeStatusProcessed(idle);
+        queue.OnResponseReceived("ok", idle);
+        queue.OnRealtimeStatusProcessed(idle);
+        queue.OnResponseReceived("ok", idle);
+        queue.OnRealtimeStatusProcessed(idle);
+
+        Assert.Contains(1, counts);
+        Assert.Contains(0, counts);
+    }
+
+    [Fact]
+    public void Same_status_cycle_cannot_drain_two_pending_steps()
+    {
+        var queue = new UiJogCommandQueue();
+        var idle = State(GrblStates.Idle);
+        var jog = State(GrblStates.Jog);
+
+        Assert.True(queue.TryEnqueueStep("$J=0", idle));
+        Assert.True(queue.TryEnqueueStep("$J=1", jog));
+        Assert.True(queue.TryEnqueueStep("$J=2", jog));
+
+        queue.OnGrblStateChanged(State(GrblStates.Jog));
+        queue.OnGrblStateChanged(idle);
+        queue.OnRealtimeStatusProcessed(idle);
+        queue.OnResponseReceived("ok", idle);
+
+        Assert.Equal(new[] { "$J=0", "$J=1" }, _comms.Commands);
+        Assert.Equal(1, queue.PendingCount);
+    }
+
+    [Fact]
+    public void Five_step_burst_dispatches_one_command_per_completion_cycle()
+    {
+        var queue = new UiJogCommandQueue();
+        var idle = State(GrblStates.Idle);
+        var jog = State(GrblStates.Jog);
+
+        for (var i = 0; i < 5; i++)
+            Assert.True(queue.TryEnqueueStep($"$J={i}", i == 0 ? idle : jog));
+
+        Assert.Equal(new[] { "$J=0" }, _comms.Commands);
+        Assert.Equal(4, queue.PendingCount);
+
+        for (var i = 1; i < 5; i++)
+        {
+            queue.OnResponseReceived("ok", idle);
+            queue.OnRealtimeStatusProcessed(idle);
+
+            Assert.Equal(i + 1, _comms.Commands.Count);
+            Assert.Equal(4 - i, queue.PendingCount);
+        }
+
+        queue.OnResponseReceived("ok", idle);
+        queue.OnRealtimeStatusProcessed(idle);
+
+        Assert.Equal(5, _comms.Commands.Count);
+        Assert.Equal(0, queue.PendingCount);
     }
 
     [Fact]

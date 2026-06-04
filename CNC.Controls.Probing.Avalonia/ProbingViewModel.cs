@@ -22,6 +22,8 @@ public sealed partial class ProbingViewModel : ProbingPanelViewModel
     readonly CancellationToken _cancellationToken = new();
     readonly List<Position> _positions = [];
     readonly List<Position> _machine = [];
+    readonly List<string> _workflowTrace = [];
+    readonly object _workflowTraceLock = new();
 
     string _message = string.Empty;
     string _tool = string.Empty;
@@ -65,6 +67,15 @@ public sealed partial class ProbingViewModel : ProbingPanelViewModel
 
     public BaseConfig? Config { get; }
 
+    public string[] WorkflowTrace
+    {
+        get
+        {
+            lock (_workflowTraceLock)
+                return [.. _workflowTrace];
+        }
+    }
+
     public ProbeMacroViewModel Macro { get; } = new();
 
     public Measurement Measurement { get; } = new();
@@ -86,6 +97,46 @@ public sealed partial class ProbingViewModel : ProbingPanelViewModel
         source ??= _ => { };
     }
 #pragma warning restore CS8601
+
+    public void ClearWorkflowTrace()
+    {
+        lock (_workflowTraceLock)
+            _workflowTrace.Clear();
+    }
+
+    public void TraceWorkflow(string entry)
+    {
+        lock (_workflowTraceLock)
+        {
+            if (_workflowTrace.Count >= 512)
+                _workflowTrace.RemoveAt(0);
+            _workflowTrace.Add(entry);
+        }
+    }
+
+    public bool SendInternalCommand(string command)
+    {
+        var com = Comms.com;
+        if (com == null || command == null)
+            return false;
+
+        TraceWorkflow("command:" + command);
+
+        if (command.Length == 0)
+        {
+            Grbl?.ExecuteCommand(command);
+            return true;
+        }
+
+        if (command.Length == 1)
+        {
+            com.WriteByte(GrblLegacy.ConvertRTCommand((byte)command[0]));
+            return true;
+        }
+
+        com.WriteCommand(command);
+        return true;
+    }
 
     public string FastProbe => string.Format(ProbingCommand + "F{0}", ProbeFeedRate.ToInvariantString());
 
@@ -452,7 +503,7 @@ public sealed partial class ProbingViewModel : ProbingPanelViewModel
             WaitForResponse("G20");
 
         WaitForResponse(DistanceMode == DistanceMode.Absolute ? "G90" : "G91");
-        Grbl.Poller.SetState(0);
+        Grbl.Poller.SetState(PollInterval);
         Message = string.Empty;
     }
 
@@ -488,6 +539,7 @@ public sealed partial class ProbingViewModel : ProbingPanelViewModel
 
     public bool WaitForResponse(string command)
     {
+        TraceWorkflow("wait:WaitForResponse");
         bool? res = null;
         var grbl = Grbl;
         if (grbl == null)
@@ -500,7 +552,7 @@ public sealed partial class ProbingViewModel : ProbingPanelViewModel
                 null,
                 a => grbl.OnResponseReceived += a,
                 a => Unsubscribe(ref grbl.OnResponseReceived, a),
-                5000, () => grbl.ExecuteCommand(command));
+                5000, () => SendInternalCommand(command));
         });
         t.Start();
 
@@ -512,6 +564,7 @@ public sealed partial class ProbingViewModel : ProbingPanelViewModel
 
     public bool WaitForIdle(string command = "")
     {
+        TraceWorkflow("wait:WaitForIdle");
         bool? res = null;
         var grbl = Grbl;
         var com = Comms.com;
@@ -532,7 +585,7 @@ public sealed partial class ProbingViewModel : ProbingPanelViewModel
                     null,
                     a => grbl.OnResponseReceived += a,
                     a => Unsubscribe(ref grbl.OnResponseReceived, a),
-                    1000, () => grbl.ExecuteCommand(command));
+                    1000, () => SendInternalCommand(command));
             }).Start();
 
             while (res == null)
@@ -595,6 +648,7 @@ public sealed partial class ProbingViewModel : ProbingPanelViewModel
 
     public bool WaitForWcoUpdate()
     {
+        TraceWorkflow("wait:WaitForWcoUpdate");
         bool? res = null;
         var grbl = Grbl;
         if (grbl == null)
@@ -625,6 +679,7 @@ public sealed partial class ProbingViewModel : ProbingPanelViewModel
 
     public bool GotoMachinePosition(Position pos, AxisFlags axisflags)
     {
+        TraceWorkflow("wait:GotoMachinePosition");
         bool? res = null;
         var wait = true;
         var running = false;
@@ -646,7 +701,7 @@ public sealed partial class ProbingViewModel : ProbingPanelViewModel
                 null,
                 a => grbl.OnResponseReceived += a,
                 a => Unsubscribe(ref grbl.OnResponseReceived, a),
-                1000, () => grbl.ExecuteCommand(command));
+                1000, () => SendInternalCommand(command));
         }).Start();
 
         while (res == null)
@@ -654,8 +709,16 @@ public sealed partial class ProbingViewModel : ProbingPanelViewModel
 
         if (res == true)
         {
+            var timer = Stopwatch.StartNew();
             while (wait && !_isCancelled)
             {
+                if (timer.Elapsed.TotalSeconds > 120)
+                {
+                    TraceWorkflow("timeout:GotoMachinePosition");
+                    _isCancelled = true;
+                    break;
+                }
+
                 res = null;
 
                 new Thread(() =>
@@ -697,6 +760,7 @@ public sealed partial class ProbingViewModel : ProbingPanelViewModel
                 if (wait)
                     Thread.Sleep(PollInterval);
             }
+            timer.Stop();
         }
 
         grbl.Poller.SetState(PollInterval);

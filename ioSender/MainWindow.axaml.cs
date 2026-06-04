@@ -56,6 +56,11 @@ public partial class MainWindow : Window
     {
         using var _ = StartupTrace.Measure("MainWindow constructor");
         InitializeComponent();
+        WindowDecorations = OperatingSystem.IsWindows()
+            ? WindowDecorations.Full
+            : WindowDecorations.None;
+        if (OperatingSystem.IsLinux())
+            TitleBar.PointerPressed += OnTitleBarPointerPressed;
         RestoreWindowPlacement();
         UpdateWindowChromeState();
         using (StartupTrace.Measure("MainWindow localization"))
@@ -108,7 +113,10 @@ public partial class MainWindow : Window
 
     void OnTitleBarPointerPressed(object? sender, PointerPressedEventArgs e)
     {
-        if (WindowState == WindowState.FullScreen || e.Pointer.Type != PointerType.Touch)
+        if (WindowState == WindowState.FullScreen)
+            return;
+
+        if (!e.GetCurrentPoint((Visual)sender!).Properties.IsLeftButtonPressed)
             return;
 
         BeginMoveDrag(e);

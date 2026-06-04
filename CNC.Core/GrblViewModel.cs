@@ -55,7 +55,7 @@ namespace CNC.Core
         private string[] _rtState = new string[3];
         private bool has_wco = false, _hasFans = false;
         private SDState _sdMounted = SDState.Unmounted;
-        private bool _flood, _mist, _fan0, _toolChange, _reset, _isMPos, _isJobRunning, _isProbeSuccess, _pgmEnd, _isParserStateLive, _isTloRefSet;
+        private bool _flood, _mist, _fan0, _toolChange, _reset, _isMPos, _isJobRunning, _isProbeSuccess, _pgmEnd, _isParserStateLive, _isTloRefSet, _hasToolOffsetReport;
         private bool _isCameraVisible = false, _responseLogVerbose = false, _isProbing = false, _autoReporting = false;
         private bool _feedOverrideDisabled = false, _rpmOverrideDisabled = false, _feedHoldDisabled = false;
         private bool? _mpg;
@@ -141,8 +141,18 @@ namespace CNC.Core
             // since Poller.Run() returns immediately after creating the timer.
         }
 
-        private void ToolOffset_PropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e) =>
+        private void ToolOffset_PropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)
+        {
             RelayNestedPositionChangedInstance(nameof(ToolOffset), e.PropertyName);
+
+            if (string.IsNullOrEmpty(e.PropertyName) ||
+                e.PropertyName == nameof(Core.Position) ||
+                e.PropertyName == nameof(Position.Z))
+            {
+                OnPropertyChanged(nameof(IsToolOffsetActive));
+                OnPropertyChanged(nameof(IsToolOffsetIndicatorVisible));
+            }
+        }
 
         private void ProbePosition_PropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e) =>
             RelayNestedPositionChangedInstance(nameof(ProbePosition), e.PropertyName);
@@ -209,7 +219,7 @@ namespace CNC.Core
         {
             _fileName = _mdiCommand = _mdiText = string.Empty;
             _streamingState = StreamingState.NoFile;
-            _isMPos = _reset = _isJobRunning = _isProbeSuccess = _pgmEnd = _isTloRefSet = false;
+            _isMPos = _reset = _isJobRunning = _isProbeSuccess = _pgmEnd = _isTloRefSet = _hasToolOffsetReport = false;
             _feedOverrideDisabled = _rpmOverrideDisabled = _feedHoldDisabled = false;
             _pb_avail = _rxb_avail = _rtState[0] = _rtState[1] = _rtState[2] = _spindle = _probe = string.Empty;
             _mpg = null;
@@ -224,6 +234,7 @@ namespace CNC.Core
             IsMPGActive = null; //??
 
             ClearPosition();
+            GrblParserState.Clear();
 
             Set("Pn", string.Empty);
             Set("A", string.Empty);
@@ -257,6 +268,7 @@ namespace CNC.Core
 
         public void ClearConnectionState()
         {
+            _hasToolOffsetReport = false;
             _grblState.Error = 0;
             _grblState.State = GrblStates.Unknown;
             _grblState.Substate = 0;
@@ -265,6 +277,7 @@ namespace CNC.Core
             IsMPGActive = null;
 
             ClearPosition();
+            GrblParserState.Clear();
             Set("Pn", string.Empty);
             Set("A", string.Empty);
             Set("FS", string.Empty);
@@ -502,7 +515,17 @@ namespace CNC.Core
         public bool IsCheckMode { get { return _grblState.State == GrblStates.Check; } }
         public bool IsSleepMode { get { return _grblState.State == GrblStates.Sleep; } }
         public bool IsG92Active { get { return GrblParserState.IsActive("G92") != null; } }
-        public bool IsToolOffsetActive { get { return IsGrblHAL ? GrblParserState.IsActive("G49") == null : !(double.IsNaN(ToolOffset.Z) || ToolOffset.Z == 0d); } }
+        public bool IsToolOffsetActive
+        {
+            get
+            {
+                if (GrblParserState.IsLoaded)
+                    return GrblParserState.IsActive("G49") == null;
+
+                return _hasToolOffsetReport && !(double.IsNaN(ToolOffset.Z) || ToolOffset.Z == 0d);
+            }
+        }
+        public bool IsToolOffsetIndicatorVisible { get { return IsParserStateLive || GrblParserState.IsLoaded || _hasToolOffsetReport; } }
         public bool IsJobRunning {
             get { return _isJobRunning; }
             set {
@@ -858,11 +881,21 @@ namespace CNC.Core
                     OnPropertyChanged();
                     OnPropertyChanged(nameof(IsG92Active));
                     OnPropertyChanged(nameof(IsToolOffsetActive));
+                    OnPropertyChanged(nameof(IsToolOffsetIndicatorVisible));
                 }
             }
         }
 
-        public bool IsParserStateLive { get { return _isParserStateLive; } set { _isParserStateLive = value; OnPropertyChanged(); } }
+        public bool IsParserStateLive
+        {
+            get { return _isParserStateLive; }
+            set
+            {
+                _isParserStateLive = value;
+                OnPropertyChanged();
+                OnPropertyChanged(nameof(IsToolOffsetIndicatorVisible));
+            }
+        }
         public bool SysCommandsAlwaysAvailable { get; private set; }
         
         #endregion
@@ -1455,7 +1488,7 @@ namespace CNC.Core
                         ToolOffset.SuspendNotifications = false;
                         // End workaround    
 
-                        ToolOffset.Parse(data.Substring(5).TrimEnd(']'));
+                        var parsedToolOffset = ToolOffset.Parse(data.Substring(5).TrimEnd(']'));
 
                         // Workaround for legacy grbl, copy X offset to Z (there is no info available for which axis...)
                         if (double.IsNaN(ToolOffset.Z))
@@ -1465,7 +1498,17 @@ namespace CNC.Core
                             OnPropertyChanged(nameof(IsToolOffsetActive));
                         }
 
-                        GrblWorkParameters.ToolLengtOffset.Z = ToolOffset.Z;
+                        if (parsedToolOffset)
+                        {
+                            if (!_hasToolOffsetReport)
+                            {
+                                _hasToolOffsetReport = true;
+                                OnPropertyChanged(nameof(IsToolOffsetIndicatorVisible));
+                            }
+
+                            OnPropertyChanged(nameof(IsToolOffsetActive));
+                            GrblWorkParameters.ToolLengtOffset.Z = ToolOffset.Z;
+                        }
                         // End workaround
                         break;
 

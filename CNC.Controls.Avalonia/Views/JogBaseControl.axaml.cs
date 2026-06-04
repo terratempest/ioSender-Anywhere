@@ -201,6 +201,18 @@ public partial class JogBaseControl : UserControl
             _jogQueue.OnGrblStateChanged(model.GrblState);
     }
 
+    void Model_ResponseReceived(string response)
+    {
+        if (_subscribedModel is { } model)
+            _jogQueue.OnResponseReceived(response, model.GrblState);
+    }
+
+    void Model_RealtimeStatusProcessed(string status)
+    {
+        if (_subscribedModel is { } model)
+            _jogQueue.OnRealtimeStatusProcessed(model.GrblState);
+    }
+
     void JogControl_Loaded(object? sender, RoutedEventArgs e)
     {
         ApplyLocalization();
@@ -300,6 +312,8 @@ public partial class JogBaseControl : UserControl
         _subscribedModel = model;
         model.PropertyChanged += Model_IsMetricChanged;
         model.PropertyChanged += Model_PropertyChanged;
+        model.OnResponseReceived += Model_ResponseReceived;
+        model.OnRealtimeStatusProcessed += Model_RealtimeStatusProcessed;
     }
 
     void DetachModelHandlers()
@@ -309,6 +323,8 @@ public partial class JogBaseControl : UserControl
 
         _subscribedModel.PropertyChanged -= Model_IsMetricChanged;
         _subscribedModel.PropertyChanged -= Model_PropertyChanged;
+        _subscribedModel.OnResponseReceived = (Action<string>)Delegate.Remove(_subscribedModel.OnResponseReceived, Model_ResponseReceived)!;
+        _subscribedModel.OnRealtimeStatusProcessed = (Action<string>)Delegate.Remove(_subscribedModel.OnRealtimeStatusProcessed, Model_RealtimeStatusProcessed)!;
         _subscribedModel = null;
         _jogQueue.Clear();
     }
