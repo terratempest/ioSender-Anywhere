@@ -460,6 +460,76 @@ public sealed class ProbingProgramCompletionTests : IDisposable
         _probing.Program.End(string.Empty);
     }
 
+    [Fact]
+    public async Task Tool_length_completion_updates_tlo_after_controller_report()
+    {
+        GrblInfoSnapshot.EnableSimpleProbeProtect();
+        _probing.ReferenceToolOffset = false;
+        _probing.IsSuccess = true;
+        _probing.Positions.Add(new Position(0d, 0d, -2.5d));
+        _probing.StartPosition.Zero();
+        _grbl.MachinePosition.Zero();
+
+        var complete = Task.Run(() => InvokeToolLengthCompleted(_probing));
+        await WaitForCommandContainingAsync("G43.1Z-2.5", complete);
+
+        Assert.False(_grbl.IsToolOffsetActive);
+        _grbl.DataReceived("ok");
+
+        Assert.False(_grbl.IsToolOffsetActive);
+        Assert.False(_grbl.IsToolOffsetIndicatorVisible);
+
+        await FinishToolLengthCompletionAsync(complete);
+
+        Assert.True(_grbl.IsToolOffsetActive);
+        Assert.True(_grbl.IsToolOffsetIndicatorVisible);
+        Assert.Contains(GrblConstants.CMD_GETPARSERSTATE, _comms.Commands);
+    }
+
+    [Fact]
+    public async Task Tool_length_completion_requests_tlo_refresh_when_parser_state_is_live()
+    {
+        GrblInfoSnapshot.EnableSimpleProbeProtect();
+        _grbl.IsParserStateLive = true;
+        _probing.ReferenceToolOffset = false;
+        _probing.IsSuccess = true;
+        _probing.Positions.Add(new Position(0d, 0d, -2.5d));
+        _probing.StartPosition.Zero();
+        _grbl.MachinePosition.Zero();
+
+        var complete = Task.Run(() => InvokeToolLengthCompleted(_probing));
+        await WaitForCommandContainingAsync("G43.1Z-2.5", complete);
+
+        _grbl.DataReceived("ok");
+        await FinishToolLengthCompletionAsync(complete);
+
+        Assert.True(_grbl.IsToolOffsetActive);
+        Assert.Contains(GrblConstants.CMD_GETPARSERSTATE, _comms.Commands);
+    }
+
+    [Fact]
+    public async Task Tool_length_completion_does_not_apply_tlo_after_g431_error()
+    {
+        GrblInfoSnapshot.EnableSimpleProbeProtect();
+        _probing.ReferenceToolOffset = false;
+        _probing.IsSuccess = true;
+        _probing.Positions.Add(new Position(0d, 0d, -2.5d));
+        _probing.StartPosition.Zero();
+        _grbl.MachinePosition.Zero();
+
+        var complete = Task.Run(() => InvokeToolLengthCompleted(_probing));
+        await WaitForCommandContainingAsync("G43.1Z-2.5", complete);
+
+        _grbl.DataReceived("error:1");
+
+        Assert.True(await WaitForAsync(() => _comms.Commands.Contains("G53G0Z0"), 1000));
+        Assert.False(_grbl.IsToolOffsetActive);
+        Assert.False(_grbl.IsToolOffsetIndicatorVisible);
+
+        await FinishToolLengthCompletionAsync(complete, parserTloActive: false);
+        Assert.Contains("Probing failed", _probing.Message);
+    }
+
     async Task WaitForCommandAsync(string command)
     {
         var found = await WaitForAsync(() => _comms.Commands.Contains(command), 1000);
@@ -470,6 +540,14 @@ public sealed class ProbingProgramCompletionTests : IDisposable
     {
         var found = await WaitForAsync(() => _comms.Commands.Any(c => c.Contains(command, StringComparison.Ordinal)), 1000);
         Assert.True(found, $"Expected command containing '{command}' was not sent. Commands: {string.Join(", ", _comms.Commands)}");
+    }
+
+    async Task WaitForCommandContainingAsync(string command, Task task)
+    {
+        var found = await WaitForAsync(() => _comms.Commands.Any(c => c.Contains(command, StringComparison.Ordinal)) || task.IsCompleted, 3000);
+        Assert.True(found, $"Expected command containing '{command}' was not sent. Commands: {string.Join(", ", _comms.Commands)}");
+        Assert.False(task.IsFaulted, task.Exception?.ToString());
+        Assert.False(task.IsCompletedSuccessfully, $"Completion finished before command '{command}' was sent. Commands: {string.Join(", ", _comms.Commands)}");
     }
 
     static async Task<bool> WaitForAsync(Func<bool> predicate, int timeoutMs)
@@ -483,6 +561,30 @@ public sealed class ProbingProgramCompletionTests : IDisposable
         }
 
         return predicate();
+    }
+
+    async Task FinishToolLengthCompletionAsync(Task complete, bool parserTloActive = true)
+    {
+        await WaitForCommandAsync("G53G0Z0");
+        var statusRequests = _comms.Bytes.Count;
+        _grbl.DataReceived("ok");
+        Assert.True(await WaitForAsync(() => _comms.Bytes.Count > statusRequests, 1000));
+        _grbl.DataReceived("<Idle|MPos:0.000,0.000,0.000|Bf:15,128>");
+        await WaitForCommandAsync(GrblConstants.CMD_GETPARSERSTATE);
+        _grbl.DataReceived(parserTloActive
+            ? "[GC:G0 G54 G17 G21 G90 G94 G43.1 M5 M9 T0 F0 S0]"
+            : "[GC:G0 G54 G17 G21 G90 G94 G49 M5 M9 T0 F0 S0]");
+        _grbl.DataReceived("ok");
+        Assert.True(await WaitForAsync(() => complete.IsCompleted, 1000));
+        await complete;
+    }
+
+    static void InvokeToolLengthCompleted(ProbingViewModel probing)
+    {
+        var control = new ToolLengthControl { DataContext = probing };
+        var method = typeof(ToolLengthControl).GetMethod("OnCompleted", BindingFlags.NonPublic | BindingFlags.Instance);
+        Assert.NotNull(method);
+        method.Invoke(control, null);
     }
 
     sealed record GrblInfoSnapshot(bool IsGrblHAL, int Build, bool HasSimpleProbeProtect)

@@ -108,6 +108,7 @@ public sealed class MachineConnectionInitializer
 
         ResumePolling();
         RequestImmediateStatusSnapshot();
+        ControllerWorkParametersSync.Refresh(_model);
     }
 
     void ResumePolling()

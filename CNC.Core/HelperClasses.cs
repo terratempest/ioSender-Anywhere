@@ -244,8 +244,12 @@ public static class WaitFor
             while (q.TryTake(out var eventResult, msTimeout, token))
             {
                 handler?.Invoke(eventResult);
-                if ((string)(object)eventResult! == "ok")
+                var response = (string)(object)eventResult!;
+                if (response == "ok")
                     return true;
+                if (response.StartsWith("error:", StringComparison.OrdinalIgnoreCase) ||
+                    response.StartsWith("ALARM", StringComparison.OrdinalIgnoreCase))
+                    return false;
             }
             return false;
         }

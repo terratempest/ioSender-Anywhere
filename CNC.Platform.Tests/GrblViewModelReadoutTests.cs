@@ -67,6 +67,34 @@ public sealed class GrblViewModelReadoutTests
     }
 
     [Fact]
+    public void DataReceived_parser_state_updates_tool_offset_active_state()
+    {
+        var vm = new GrblViewModel();
+        var changed = new HashSet<string>(StringComparer.Ordinal);
+        vm.PropertyChanged += (_, e) =>
+        {
+            if (!string.IsNullOrEmpty(e.PropertyName))
+                changed.Add(e.PropertyName);
+        };
+
+        vm.DataReceived("[GC:G0 G54 G17 G21 G90 G94 G43.1 M5 M9 T0 F0 S0]");
+
+        Assert.True(vm.IsToolOffsetActive);
+        Assert.True(vm.IsToolOffsetIndicatorVisible);
+        Assert.Contains(nameof(GrblViewModel.IsToolOffsetActive), changed);
+        Assert.Contains(nameof(GrblViewModel.IsToolOffsetIndicatorVisible), changed);
+
+        changed.Clear();
+
+        vm.DataReceived("[GC:G0 G54 G17 G21 G90 G94 G49 M5 M9 T0 F0 S0]");
+
+        Assert.False(vm.IsToolOffsetActive);
+        Assert.True(vm.IsToolOffsetIndicatorVisible);
+        Assert.Contains(nameof(GrblViewModel.IsToolOffsetActive), changed);
+        Assert.Contains(nameof(GrblViewModel.IsToolOffsetIndicatorVisible), changed);
+    }
+
+    [Fact]
     public void DataReceived_grbl_banner_then_status_restores_idle_display()
     {
         var vm = new GrblViewModel { IsReady = true };
@@ -384,6 +412,127 @@ public sealed class GrblViewModelReadoutTests
         Assert.True(vm.IsToolOffsetIndicatorVisible);
         Assert.False(vm.IsToolOffsetActive);
         Assert.Contains(nameof(GrblViewModel.IsToolOffsetIndicatorVisible), changed);
+        Assert.Contains(nameof(GrblViewModel.IsToolOffsetActive), changed);
+    }
+
+    [Fact]
+    public void Tlo_report_overrides_stale_parser_cancel_state()
+    {
+        var vm = new GrblViewModel();
+        vm.DataReceived("[GC:G0 G54 G17 G21 G90 G94 G49 M5 M9 T0 F0 S0]");
+
+        var changed = new HashSet<string>(StringComparer.Ordinal);
+        vm.PropertyChanged += (_, e) =>
+        {
+            if (!string.IsNullOrEmpty(e.PropertyName))
+                changed.Add(e.PropertyName);
+        };
+
+        vm.DataReceived("[TLO:0.000,0.000,12.345]");
+
+        Assert.True(vm.IsToolOffsetIndicatorVisible);
+        Assert.True(vm.IsToolOffsetActive);
+        Assert.Contains(nameof(GrblViewModel.IsToolOffsetIndicatorVisible), changed);
+        Assert.Contains(nameof(GrblViewModel.IsToolOffsetActive), changed);
+    }
+
+    [Fact]
+    public void Tlo_zero_report_overrides_stale_parser_active_state()
+    {
+        var vm = new GrblViewModel();
+        vm.DataReceived("[GC:G0 G54 G17 G21 G90 G94 G43.1 M5 M9 T0 F0 S0]");
+
+        var changed = new HashSet<string>(StringComparer.Ordinal);
+        vm.PropertyChanged += (_, e) =>
+        {
+            if (!string.IsNullOrEmpty(e.PropertyName))
+                changed.Add(e.PropertyName);
+        };
+
+        vm.DataReceived("[TLO:0.000,0.000,0.000]");
+
+        Assert.True(vm.IsToolOffsetIndicatorVisible);
+        Assert.False(vm.IsToolOffsetActive);
+        Assert.Contains(nameof(GrblViewModel.IsToolOffsetActive), changed);
+    }
+
+    [Fact]
+    public void Parser_active_state_overrides_stale_numeric_zero_report()
+    {
+        var vm = new GrblViewModel();
+        vm.DataReceived("[TLO:0.000,0.000,0.000]");
+
+        var changed = new HashSet<string>(StringComparer.Ordinal);
+        vm.PropertyChanged += (_, e) =>
+        {
+            if (!string.IsNullOrEmpty(e.PropertyName))
+                changed.Add(e.PropertyName);
+        };
+
+        vm.DataReceived("[GC:G0 G54 G17 G21 G90 G94 G43.1 M5 M9 T0 F0 S0]");
+
+        Assert.True(vm.IsToolOffsetIndicatorVisible);
+        Assert.True(vm.IsToolOffsetActive);
+        Assert.Contains(nameof(GrblViewModel.IsToolOffsetActive), changed);
+    }
+
+    [Fact]
+    public void Realtime_parser_state_updates_tool_offset_state()
+    {
+        var vm = new GrblViewModel();
+
+        vm.DataReceived("<Idle|MPos:0,0,0|GC:G0 G54 G17 G21 G90 G94 G43.1 M5 M9 T0 F0 S0|Bf:15,128>");
+
+        Assert.True(vm.IsToolOffsetIndicatorVisible);
+        Assert.True(vm.IsToolOffsetActive);
+
+        vm.DataReceived("<Idle|MPos:0,0,0|GC:G0 G54 G17 G21 G90 G94 G49 M5 M9 T0 F0 S0|Bf:15,128>");
+
+        Assert.True(vm.IsToolOffsetIndicatorVisible);
+        Assert.False(vm.IsToolOffsetActive);
+    }
+
+    [Fact]
+    public void Realtime_tlo_state_updates_tool_offset_state()
+    {
+        var vm = new GrblViewModel();
+
+        vm.DataReceived("<Idle|MPos:0,0,0|TLO:0.000,0.000,12.345|Bf:15,128>");
+
+        Assert.Equal(12.345d, vm.ToolOffset.Z, 3);
+        Assert.True(vm.IsToolOffsetIndicatorVisible);
+        Assert.True(vm.IsToolOffsetActive);
+
+        vm.DataReceived("<Idle|MPos:0,0,0|TLO:0.000,0.000,0.000|Bf:15,128>");
+
+        Assert.Equal(0d, vm.ToolOffset.Z, 3);
+        Assert.True(vm.IsToolOffsetIndicatorVisible);
+        Assert.False(vm.IsToolOffsetActive);
+    }
+
+    [Fact]
+    public void ToolOffset_z_change_updates_tool_offset_state()
+    {
+        var vm = new GrblViewModel();
+        var changed = new HashSet<string>(StringComparer.Ordinal);
+        vm.PropertyChanged += (_, e) =>
+        {
+            if (!string.IsNullOrEmpty(e.PropertyName))
+                changed.Add(e.PropertyName);
+        };
+
+        vm.ToolOffset.Z = 4.5d;
+
+        Assert.True(vm.IsToolOffsetIndicatorVisible);
+        Assert.True(vm.IsToolOffsetActive);
+        Assert.Contains(nameof(GrblViewModel.IsToolOffsetIndicatorVisible), changed);
+        Assert.Contains(nameof(GrblViewModel.IsToolOffsetActive), changed);
+
+        changed.Clear();
+        vm.ToolOffset.Z = 0d;
+
+        Assert.True(vm.IsToolOffsetIndicatorVisible);
+        Assert.False(vm.IsToolOffsetActive);
         Assert.Contains(nameof(GrblViewModel.IsToolOffsetActive), changed);
     }
 

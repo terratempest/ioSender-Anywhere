@@ -1999,6 +1999,7 @@ namespace CNC.Core
 //            GrblParserState.Tool = GrblParserState.Tool;    // Add tool to Tools if not in list
             model.Tool = model.Tool;                        // Force UI update
             model.ToolOffset.Z = ToolLengtOffset.Z;
+            model.ApplyToolLengthOffsetState(ToolLengtOffset.Z);
 
             return res == true;
         }

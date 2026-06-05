@@ -473,6 +473,9 @@ public sealed class JobStreamingService
                 WriteRtByte(GrblConstants.CMD_FEED_HOLD);
         }
 
+        var leavingToolChange = _grblState.State == GrblStates.Tool &&
+            newstate.State is GrblStates.Idle or GrblStates.Run or GrblStates.Hold;
+
         switch (newstate.State)
         {
             case GrblStates.Idle:
@@ -571,6 +574,9 @@ public sealed class JobStreamingService
 
         if (_feedHoldRequested)
             SetButtons(cycleStart: false, feedHold: false, stop: true, rewind: false);
+
+        if (leavingToolChange)
+            ControllerWorkParametersSync.Refresh(_model);
 
         _grblState.State = newstate.State;
         _grblState.Substate = newstate.Substate;
@@ -844,6 +850,7 @@ public sealed class JobStreamingService
                     SetStreamingHandler(StreamingHandler.Previous);
 
                 _job.ToolChanged = true;
+                ControllerWorkParametersSync.Refresh(_model);
                 break;
 
             case StreamingState.Error:

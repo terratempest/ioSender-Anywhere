@@ -113,7 +113,7 @@ public partial class ToolLengthControl : UserControl, IProbeTab
             if (probing.ReferenceToolOffset)
             {
                 probing.TloReference = pos.Z;
-                probing.SendInternalCommand("G49");
+                ok = probing.WaitForResponse("G49");
             }
 
             if (probing.AddAction)
@@ -143,7 +143,9 @@ public partial class ToolLengthControl : UserControl, IProbeTab
                     tlo = tlo - (grbl.WorkPositionOffset.Z - grbl.ToolOffset.Z) - probing.FixtureHeight;
 
                 if (ok)
-                    probing.SendInternalCommand("G43.1Z" + tlo.ToInvariantString(grbl.Format));
+                {
+                    ok = probing.WaitForResponse("G43.1Z" + tlo.ToInvariantString(grbl.Format));
+                }
             }
 
             if (probing.ProbeFixture)
@@ -161,13 +163,7 @@ public partial class ToolLengthControl : UserControl, IProbeTab
             probing.SendInternalCommand("$TLR");
         }
 
-        if (!grbl.IsParserStateLive)
-        {
-            if (GrblInfo.IsGrblHAL)
-                probing.SendInternalCommand(GrblConstants.CMD_GETPARSERSTATE);
-            else
-                GrblParserState.Get(true);
-        }
+        RefreshToolOffsetState(probing, grbl);
 
         probing.Program.End(ok ? ProbingCompleted : ProbingFailed, probing.Positions.Count != 1);
         probing.Program.OnCompleted?.Invoke(ok);
@@ -184,14 +180,18 @@ public partial class ToolLengthControl : UserControl, IProbeTab
 
         model.ReferenceToolOffset = model.CanReferenceToolOffset &&
             !(grbl.IsTloReferenceSet && !double.IsNaN(grbl.TloReference));
-        grbl.ExecuteCommand("G49");
-        if (!grbl.IsParserStateLive)
+        if (model.WaitForResponse("G49"))
         {
-            if (GrblInfo.IsGrblHAL)
-                grbl.ExecuteCommand(GrblConstants.CMD_GETPARSERSTATE);
-            else
-                GrblParserState.Get(true);
+            RefreshToolOffsetState(model, grbl);
         }
+    }
+
+    static void RefreshToolOffsetState(ProbingViewModel probing, GrblViewModel grbl)
+    {
+        if (GrblInfo.IsGrblHAL)
+            probing.WaitForResponse(GrblConstants.CMD_GETPARSERSTATE);
+        else
+            GrblParserState.Get(true);
     }
 
     void OnStartClick(object? sender, RoutedEventArgs e) => Start();
