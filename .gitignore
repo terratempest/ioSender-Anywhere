@@ -32,3 +32,5 @@ obj/
 .fake
 *.af~lock~
 agents.md
+/.github
+/.vscode
