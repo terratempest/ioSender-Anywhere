@@ -1,24 +1,44 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
+
+
   <PropertyGroup>
+
     <TargetFramework>net8.0</TargetFramework>
+
     <ImplicitUsings>enable</ImplicitUsings>
+
     <Nullable>enable</Nullable>
-    <RootNamespace>CNC.Controls.Config</RootNamespace>
-    <AssemblyName>CNC.Controls.Config.Avalonia</AssemblyName>
+
+    <RootNamespace>CNC.Controls.DragKnife</RootNamespace>
+
+    <AssemblyName>CNC.Controls.DragKnife.Avalonia</AssemblyName>
+
     <AvaloniaUseCompiledBindingsByDefault>false</AvaloniaUseCompiledBindingsByDefault>
+
   </PropertyGroup>
 
-  <ItemGroup>
-    <PackageReference Include="Avalonia" Version="$(AvaloniaVersion)" />
-    <PackageReference Include="Avalonia.Controls.DataGrid" Version="$(AvaloniaDataGridVersion)" />
-  </ItemGroup>
+
 
   <ItemGroup>
-    <ProjectReference Include="..\CNC.App\CNC.App.csproj" />
-    <ProjectReference Include="..\CNC.Controls.Avalonia\CNC.Controls.Avalonia.csproj" />
-    <ProjectReference Include="..\CNC.Controls.Probing.Avalonia\CNC.Controls.Probing.Avalonia.csproj" />
-    <ProjectReference Include="..\CNC.Core\CNC.Core.csproj" />
+
+    <PackageReference Include="Avalonia" Version="$(AvaloniaVersion)" />
+
   </ItemGroup>
+
+
+
+  <ItemGroup>
+
+    <ProjectReference Include="..\CNC.App\CNC.App.csproj" />
+
+    <ProjectReference Include="..\CNC.Controls\CNC.Controls.csproj" />
+
+    <ProjectReference Include="..\CNC.Core\CNC.Core.csproj" />
+
+  </ItemGroup>
+
+
 
 </Project>
+

@@ -1,44 +1,28 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
-
-
   <PropertyGroup>
-
     <TargetFramework>net8.0</TargetFramework>
-
     <ImplicitUsings>enable</ImplicitUsings>
-
     <Nullable>enable</Nullable>
-
-    <RootNamespace>CNC.Converters</RootNamespace>
-
-    <AssemblyName>CNC.Converters.Avalonia</AssemblyName>
-
+    <RootNamespace>CNC.Controls.Probing</RootNamespace>
+    <AssemblyName>CNC.Controls.Probing.Avalonia</AssemblyName>
     <AvaloniaUseCompiledBindingsByDefault>false</AvaloniaUseCompiledBindingsByDefault>
-
   </PropertyGroup>
 
-
-
   <ItemGroup>
-
     <PackageReference Include="Avalonia" Version="$(AvaloniaVersion)" />
-
   </ItemGroup>
-
-
 
   <ItemGroup>
-
-    <ProjectReference Include="..\CNC.App\CNC.App.csproj" />
-
-    <ProjectReference Include="..\CNC.Controls.Avalonia\CNC.Controls.Avalonia.csproj" />
-
-    <ProjectReference Include="..\CNC.Core\CNC.Core.csproj" />
-
+    <AvaloniaResource Include="Views\Resources\*.png" />
   </ItemGroup>
 
-
+  <ItemGroup>
+    <ProjectReference Include="..\CNC.App\CNC.App.csproj" />
+    <ProjectReference Include="..\CNC.Controls\CNC.Controls.csproj" />
+    <ProjectReference Include="..\CNC.Core\CNC.Core.csproj" />
+    <ProjectReference Include="..\CNC.GCodeViewer\CNC.GCodeViewer.csproj" />
+    <ProjectReference Include="..\CNC.Localization\CNC.Localization.csproj" />
+  </ItemGroup>
 
 </Project>
-

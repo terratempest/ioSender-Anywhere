@@ -30,13 +30,13 @@
   <ItemGroup>
     <ProjectReference Include="..\CNC.App\CNC.App.csproj" />
     <ProjectReference Include="..\CNC.Localization\CNC.Localization.csproj" />
-    <ProjectReference Include="..\CNC.Controls.Avalonia\CNC.Controls.Avalonia.csproj" />
-    <ProjectReference Include="..\CNC.GCodeViewer.Avalonia\CNC.GCodeViewer.Avalonia.csproj" />
-    <ProjectReference Include="..\CNC.Controls.Config.Avalonia\CNC.Controls.Config.Avalonia.csproj" />
-    <ProjectReference Include="..\CNC.Controls.Lathe.Avalonia\CNC.Controls.Lathe.Avalonia.csproj" />
-    <ProjectReference Include="..\CNC.Controls.Dragknife.Avalonia\CNC.Controls.Dragknife.Avalonia.csproj" />
-    <ProjectReference Include="..\CNC.Converters.Avalonia\CNC.Converters.Avalonia.csproj" />
-    <ProjectReference Include="..\CNC.Controls.Probing.Avalonia\CNC.Controls.Probing.Avalonia.csproj" />
+    <ProjectReference Include="..\CNC.Controls\CNC.Controls.csproj" />
+    <ProjectReference Include="..\CNC.GCodeViewer\CNC.GCodeViewer.csproj" />
+    <ProjectReference Include="..\CNC.Controls.Config\CNC.Controls.Config.csproj" />
+    <ProjectReference Include="..\CNC.Controls.Lathe\CNC.Controls.Lathe.csproj" />
+    <ProjectReference Include="..\CNC.Controls.Dragknife\CNC.Controls.Dragknife.csproj" />
+    <ProjectReference Include="..\CNC.Converters\CNC.Converters.csproj" />
+    <ProjectReference Include="..\CNC.Controls.Probing\CNC.Controls.Probing.csproj" />
     <ProjectReference Include="..\CNC.Core\CNC.Core.csproj" />
     <ProjectReference Include="..\CNC.Platform.Abstractions\CNC.Platform.Abstractions.csproj" />
     <ProjectReference Include="..\CNC.Platform.Camera.OpenCv\CNC.Platform.Camera.OpenCv.csproj" />

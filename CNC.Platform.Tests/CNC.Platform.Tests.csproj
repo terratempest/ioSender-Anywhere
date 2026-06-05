@@ -26,10 +26,10 @@
     <ProjectReference Include="..\CNC.Platform.Windows\CNC.Platform.Windows.csproj" />
     <ProjectReference Include="..\CNC.App\CNC.App.csproj" />
     <ProjectReference Include="..\CNC.Core\CNC.Core.csproj" />
-    <ProjectReference Include="..\CNC.Controls.Avalonia\CNC.Controls.Avalonia.csproj" />
-    <ProjectReference Include="..\CNC.Controls.Config.Avalonia\CNC.Controls.Config.Avalonia.csproj" />
-    <ProjectReference Include="..\CNC.Controls.Probing.Avalonia\CNC.Controls.Probing.Avalonia.csproj" />
-    <ProjectReference Include="..\CNC.GCodeViewer.Avalonia\CNC.GCodeViewer.Avalonia.csproj" />
+    <ProjectReference Include="..\CNC.Controls\CNC.Controls.csproj" />
+    <ProjectReference Include="..\CNC.Controls.Config\CNC.Controls.Config.csproj" />
+    <ProjectReference Include="..\CNC.Controls.Probing\CNC.Controls.Probing.csproj" />
+    <ProjectReference Include="..\CNC.GCodeViewer\CNC.GCodeViewer.csproj" />
     <ProjectReference Include="..\ioSender\ioSender.csproj" />
   </ItemGroup>
 

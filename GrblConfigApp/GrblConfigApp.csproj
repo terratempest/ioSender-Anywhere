@@ -28,8 +28,8 @@
 
   <ItemGroup>
     <ProjectReference Include="..\CNC.App\CNC.App.csproj" />
-    <ProjectReference Include="..\CNC.Controls.Avalonia\CNC.Controls.Avalonia.csproj" />
-    <ProjectReference Include="..\CNC.Controls.Config.Avalonia\CNC.Controls.Config.Avalonia.csproj" />
+    <ProjectReference Include="..\CNC.Controls\CNC.Controls.csproj" />
+    <ProjectReference Include="..\CNC.Controls.Config\CNC.Controls.Config.csproj" />
     <ProjectReference Include="..\CNC.Core\CNC.Core.csproj" />
     <ProjectReference Include="..\CNC.Platform.Abstractions\CNC.Platform.Abstractions.csproj" />
   </ItemGroup>

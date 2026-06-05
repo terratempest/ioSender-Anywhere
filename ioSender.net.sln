@@ -17,23 +17,23 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CNC.Platform.Tests", "CNC.P
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CNC.Core", "CNC.Core\CNC.Core.csproj", "{D7A4E1C2-8F3B-4A6D-9E2C-1B5F0A3D6E8C}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CNC.Controls.Avalonia", "CNC.Controls.Avalonia\CNC.Controls.Avalonia.csproj", "{F8E2A1B3-4C5D-6E7F-8A9B-0C1D2E3F4A5B}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CNC.Controls", "CNC.Controls\CNC.Controls.csproj", "{F8E2A1B3-4C5D-6E7F-8A9B-0C1D2E3F4A5B}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CNC.GCodeViewer.Avalonia", "CNC.GCodeViewer.Avalonia\CNC.GCodeViewer.Avalonia.csproj", "{A3B4C5D6-E7F8-9012-3456-789ABCDEF012}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CNC.GCodeViewer", "CNC.GCodeViewer\CNC.GCodeViewer.csproj", "{A3B4C5D6-E7F8-9012-3456-789ABCDEF012}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CNC.App", "CNC.App\CNC.App.csproj", "{A1B2C3D4-E5F6-7890-ABCD-EF1234567890}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CNC.Localization", "CNC.Localization\CNC.Localization.csproj", "{B2C3D4E5-F6A7-8901-BCDE-F123456789AB}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CNC.Controls.Probing.Avalonia", "CNC.Controls.Probing.Avalonia\CNC.Controls.Probing.Avalonia.csproj", "{E1F2A3B4-C5D6-7890-ABCD-EF1234567891}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CNC.Controls.Probing", "CNC.Controls.Probing\CNC.Controls.Probing.csproj", "{E1F2A3B4-C5D6-7890-ABCD-EF1234567891}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CNC.Controls.Lathe.Avalonia", "CNC.Controls.Lathe.Avalonia\CNC.Controls.Lathe.Avalonia.csproj", "{E1F2A3B4-C5D6-7890-ABCD-EF1234567892}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CNC.Controls.Lathe", "CNC.Controls.Lathe\CNC.Controls.Lathe.csproj", "{E1F2A3B4-C5D6-7890-ABCD-EF1234567892}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CNC.Controls.Config.Avalonia", "CNC.Controls.Config.Avalonia\CNC.Controls.Config.Avalonia.csproj", "{E1F2A3B4-C5D6-7890-ABCD-EF1234567893}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CNC.Controls.Config", "CNC.Controls.Config\CNC.Controls.Config.csproj", "{E1F2A3B4-C5D6-7890-ABCD-EF1234567893}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CNC.Controls.Dragknife.Avalonia", "CNC.Controls.Dragknife.Avalonia\CNC.Controls.Dragknife.Avalonia.csproj", "{E1F2A3B4-C5D6-7890-ABCD-EF1234567894}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CNC.Controls.Dragknife", "CNC.Controls.Dragknife\CNC.Controls.Dragknife.csproj", "{E1F2A3B4-C5D6-7890-ABCD-EF1234567894}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CNC.Converters.Avalonia", "CNC.Converters.Avalonia\CNC.Converters.Avalonia.csproj", "{E1F2A3B4-C5D6-7890-ABCD-EF1234567895}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CNC.Converters", "CNC.Converters\CNC.Converters.csproj", "{E1F2A3B4-C5D6-7890-ABCD-EF1234567895}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GrblConfigApp", "GrblConfigApp\GrblConfigApp.csproj", "{9911F5B6-52B6-40F9-BDA0-70A98C6E24FD}"
 EndProject

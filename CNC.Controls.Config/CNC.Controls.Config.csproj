@@ -4,22 +4,21 @@
     <TargetFramework>net8.0</TargetFramework>
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
-    <RootNamespace>CNC.Controls.Avalonia</RootNamespace>
-    <AssemblyName>CNC.Controls.Avalonia</AssemblyName>
+    <RootNamespace>CNC.Controls.Config</RootNamespace>
+    <AssemblyName>CNC.Controls.Config.Avalonia</AssemblyName>
     <AvaloniaUseCompiledBindingsByDefault>false</AvaloniaUseCompiledBindingsByDefault>
   </PropertyGroup>
 
   <ItemGroup>
     <PackageReference Include="Avalonia" Version="$(AvaloniaVersion)" />
     <PackageReference Include="Avalonia.Controls.DataGrid" Version="$(AvaloniaDataGridVersion)" />
-    <PackageReference Include="Avalonia.Themes.Fluent" Version="$(AvaloniaVersion)" />
   </ItemGroup>
 
   <ItemGroup>
     <ProjectReference Include="..\CNC.App\CNC.App.csproj" />
-    <ProjectReference Include="..\CNC.Localization\CNC.Localization.csproj" />
+    <ProjectReference Include="..\CNC.Controls\CNC.Controls.csproj" />
+    <ProjectReference Include="..\CNC.Controls.Probing\CNC.Controls.Probing.csproj" />
     <ProjectReference Include="..\CNC.Core\CNC.Core.csproj" />
-    <ProjectReference Include="..\CNC.GCodeViewer.Avalonia\CNC.GCodeViewer.Avalonia.csproj" />
-    <ProjectReference Include="..\CNC.Platform.Abstractions\CNC.Platform.Abstractions.csproj" />
   </ItemGroup>
+
 </Project>

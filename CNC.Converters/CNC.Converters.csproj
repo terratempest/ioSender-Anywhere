@@ -10,9 +10,9 @@
 
     <Nullable>enable</Nullable>
 
-    <RootNamespace>CNC.Controls.DragKnife</RootNamespace>
+    <RootNamespace>CNC.Converters</RootNamespace>
 
-    <AssemblyName>CNC.Controls.DragKnife.Avalonia</AssemblyName>
+    <AssemblyName>CNC.Converters.Avalonia</AssemblyName>
 
     <AvaloniaUseCompiledBindingsByDefault>false</AvaloniaUseCompiledBindingsByDefault>
 
@@ -32,7 +32,7 @@
 
     <ProjectReference Include="..\CNC.App\CNC.App.csproj" />
 
-    <ProjectReference Include="..\CNC.Controls.Avalonia\CNC.Controls.Avalonia.csproj" />
+    <ProjectReference Include="..\CNC.Controls\CNC.Controls.csproj" />
 
     <ProjectReference Include="..\CNC.Core\CNC.Core.csproj" />
 
