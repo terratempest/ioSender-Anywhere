@@ -19,6 +19,7 @@ public partial class AppConfigView : UserControl
         _appConfig = appConfig;
         InitializeComponent();
         controllerConfig.Capture = controllerCapture;
+        appearanceConfig.PreviewViewerRequested += (_, _) => PreviewViewerRequested?.Invoke(this, EventArgs.Empty);
         SettingsList.SelectedIndex = 0;
         ShowSettingsPage(0);
         if (appConfig != null)
@@ -35,6 +36,8 @@ public partial class AppConfigView : UserControl
         jogUiConfig.IsVisible = mode != JogConfig.JogMode.Keypad;
         jogConfig.IsVisible = mode != JogConfig.JogMode.UI;
     }
+
+    public event EventHandler? PreviewViewerRequested;
 
     void OnSettingsSelectionChanged(object? sender, SelectionChangedEventArgs e)
     {

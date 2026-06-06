@@ -60,9 +60,9 @@
           <local:JogConfigControl x:Name="jogConfig" DataContext="{Binding}" Margin="0,0,8,8"/>
         </WrapPanel>
 
-        <WrapPanel x:Name="AppearancePage" Orientation="Vertical" ItemWidth="320" IsVisible="False">
+        <Grid x:Name="AppearancePage" IsVisible="False">
           <local:AppAppearanceConfigPanel x:Name="appearanceConfig" DataContext="{Binding}" Margin="0,0,8,8"/>
-        </WrapPanel>
+        </Grid>
 
         <WrapPanel x:Name="MachinePage" Orientation="Vertical" ItemWidth="320" IsVisible="False">
           <local:AppMachineConfigPanel x:Name="machineConfig" DataContext="{Binding}" Margin="0,0,8,8"/>

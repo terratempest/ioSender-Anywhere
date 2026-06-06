@@ -10,6 +10,60 @@ using static CNC.GCode.GCodeParser;
 namespace CNC.App;
 
 [Serializable]
+public class ThemeColorSetting : ViewModelBase
+{
+    private string _key = string.Empty;
+    private string _value = "#FFFFFFFF";
+
+    public string Key
+    {
+        get => _key;
+        set { _key = value ?? string.Empty; OnPropertyChanged(); }
+    }
+
+    public string Value
+    {
+        get => _value;
+        set { _value = value ?? string.Empty; OnPropertyChanged(); }
+    }
+
+    public ThemeColorSetting Clone() => new() { Key = Key, Value = Value };
+}
+
+[Serializable]
+public class AppThemeDefinition : ViewModelBase
+{
+    private string _name = string.Empty;
+    private string _baseTheme = AppThemeKeys.Dark;
+    private ObservableCollection<ThemeColorSetting> _colors = new();
+
+    public string Name
+    {
+        get => _name;
+        set { _name = value ?? string.Empty; OnPropertyChanged(); }
+    }
+
+    public string BaseTheme
+    {
+        get => _baseTheme;
+        set { _baseTheme = AppThemeKeys.Normalize(value); OnPropertyChanged(); }
+    }
+
+    public ObservableCollection<ThemeColorSetting> Colors
+    {
+        get => _colors;
+        set { _colors = value ?? new ObservableCollection<ThemeColorSetting>(); OnPropertyChanged(); }
+    }
+
+    public AppThemeDefinition Clone() => new()
+    {
+        Name = Name,
+        BaseTheme = BaseTheme,
+        Colors = new ObservableCollection<ThemeColorSetting>(Colors.Select(c => c.Clone())),
+    };
+}
+
+[Serializable]
 public class LatheConfig : ViewModelBase
 {
     private bool _isEnabled;
@@ -759,6 +813,20 @@ public class BaseConfig : ViewModelBase
     }
 
     public ObservableCollection<Macro> Macros { get; set; } = new();
+    public AppThemeDefinition CustomThemeDraft { get; set; } = new()
+    {
+        Name = AppThemeKeys.Custom,
+        BaseTheme = AppThemeKeys.Dark,
+    };
+
+    [XmlIgnore]
+    public ObservableCollection<AppThemeDefinition> UserThemes { get; set; } = new();
+
+    [XmlArray("UserThemes")]
+    public ObservableCollection<AppThemeDefinition> LegacyUserThemes { get; set; } = new();
+
+    public bool ShouldSerializeLegacyUserThemes() => false;
+
     public JogConfig Jog { get; set; } = new();
     public JogUIConfig JogUiMetric { get; set; } = new(new[] { 5, 100, 500, 1000 }, new[] { .01d, .1d, 1d, 10d });
     public JogUIConfig JogUiImperial { get; set; } = new(new[] { 5, 10, 50, 100 }, new[] { .001d, .01d, .1d, 1d });

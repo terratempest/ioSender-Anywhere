@@ -85,6 +85,24 @@ public class WorkspaceSavedLayoutSerializationTests
         Assert.Null(deserialized.QuickAccessSidebar);
     }
 
+    [Fact]
+    public void Serialization_does_not_include_theme_settings()
+    {
+        var layout = new WorkspaceSavedLayout
+        {
+            Name = "Machine setup",
+            Root = new WorkspaceLeaf { Editor = WorkspaceEditorId.Program },
+            QuickAccessSidebar = new QuickAccessSidebarConfig(),
+        };
+
+        var xml = Serialize(layout);
+
+        Assert.DoesNotContain("CustomTheme", xml);
+        Assert.DoesNotContain("UserThemes", xml);
+        Assert.DoesNotContain("ThemeBackgroundBrush", xml);
+        Assert.DoesNotContain("IoSenderViewerCutColor", xml);
+    }
+
     static string Serialize(WorkspaceSavedLayout layout)
     {
         using var writer = new StringWriter();

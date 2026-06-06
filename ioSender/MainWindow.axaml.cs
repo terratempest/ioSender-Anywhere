@@ -16,6 +16,8 @@ using CNC.Controls.DragKnife;
 using CNC.Controls.Lathe;
 using CNC.Controls.Probing;
 using CNC.Core;
+using CNC.GCodeViewer.Avalonia;
+using CNC.GCodeViewer.Avalonia.Views;
 using CNC.Localization.Avalonia;
 using ioSender.Navigation;
 using ioSender.QuickAccess;
@@ -37,6 +39,7 @@ public partial class MainWindow : Window
     private CameraWindow? _cameraWindow;
     private Window? _sdCardWindow;
     private Window? _latheWizardsWindow;
+    private Window? _viewerPreviewWindow;
     private SDCardView? _sdCardView;
     private LatheWizardsView? _latheWizardsView;
     private bool _shellReady;
@@ -736,8 +739,45 @@ public partial class MainWindow : Window
             HorizontalAlignment = Avalonia.Layout.HorizontalAlignment.Stretch,
             VerticalAlignment = Avalonia.Layout.VerticalAlignment.Stretch,
         };
+        _appConfigView.PreviewViewerRequested += OnPreviewViewerRequested;
         AppConfigPageHost.Content = _appConfigView;
         return _appConfigView;
+    }
+
+    void OnPreviewViewerRequested(object? sender, EventArgs e)
+    {
+        if (_viewerPreviewWindow is { IsVisible: true })
+        {
+            _viewerPreviewWindow.Activate();
+            return;
+        }
+
+        var viewer = new RenderControl
+        {
+            Session = new GCodeViewerSession(
+                _session.AppConfig,
+                _viewModel.Grbl,
+                () => _session.Program.Tokens),
+            HorizontalAlignment = Avalonia.Layout.HorizontalAlignment.Stretch,
+            VerticalAlignment = Avalonia.Layout.VerticalAlignment.Stretch,
+        };
+
+        _viewerPreviewWindow = new Window
+        {
+            Title = "3D Viewer Preview",
+            Width = 760,
+            Height = 560,
+            MinWidth = 360,
+            MinHeight = 260,
+            WindowStartupLocation = WindowStartupLocation.CenterOwner,
+            Content = viewer,
+        };
+        _viewerPreviewWindow.Closed += (_, _) =>
+        {
+            viewer.Close();
+            _viewerPreviewWindow = null;
+        };
+        _viewerPreviewWindow.Show(this);
     }
 
     void UpdateLayoutMenuEnabled()

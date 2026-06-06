@@ -98,6 +98,8 @@ public sealed class AppConfigService
                 migrated = true;
             if (MigrateGameController(Base))
                 migrated = true;
+            if (MigrateThemes(Base))
+                migrated = true;
             if (migrated)
                 Save();
             return true;
@@ -163,5 +165,44 @@ public sealed class AppConfigService
         var before = config.GameController.Bindings.Count;
         config.GameController.EnsureDefaultBindings();
         return config.GameController.Bindings.Count != before;
+    }
+
+    static bool MigrateThemes(BaseConfig config)
+    {
+        var migrated = false;
+
+        if (config.CustomThemeDraft is null)
+        {
+            config.CustomThemeDraft = new AppThemeDefinition
+            {
+                Name = AppThemeKeys.Custom,
+                BaseTheme = AppThemeKeys.Dark,
+            };
+            migrated = true;
+        }
+
+        if (string.IsNullOrWhiteSpace(config.CustomThemeDraft.Name))
+        {
+            config.CustomThemeDraft.Name = AppThemeKeys.Custom;
+            migrated = true;
+        }
+
+        if (string.IsNullOrWhiteSpace(config.CustomThemeDraft.BaseTheme))
+        {
+            config.CustomThemeDraft.BaseTheme = AppThemeKeys.Dark;
+            migrated = true;
+        }
+
+        config.UserThemes ??= new();
+        foreach (var theme in config.UserThemes)
+        {
+            if (string.IsNullOrWhiteSpace(theme.BaseTheme))
+            {
+                theme.BaseTheme = AppThemeKeys.Dark;
+                migrated = true;
+            }
+        }
+
+        return migrated;
     }
 }

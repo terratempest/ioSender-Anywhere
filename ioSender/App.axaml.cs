@@ -76,6 +76,11 @@ public partial class App : Application
         {
             appConfig.InitializePaths(AppContext.BaseDirectory);
             appConfig.EnsureLoaded();
+            var migratedThemes = AppThemeFileService.MigrateLegacyThemes(appConfig.Base);
+            if (!migratedThemes)
+                AppThemeFileService.LoadInto(appConfig.Base);
+            else
+                appConfig.Save();
         }
 
         var startupArgs = desktop.Args ?? [];
@@ -86,7 +91,7 @@ public partial class App : Application
 
         ReportStartupProgress(startupBanner, "Applying theme...", 52);
         using (StartupTrace.Measure("Theme apply"))
-            AppTheme.Apply(appConfig.Base.Theme);
+            AppTheme.Apply(appConfig.Base.Theme, appConfig.Base);
 
         ReportStartupProgress(startupBanner, "Loading localization...", 60);
         using (StartupTrace.Measure("Localization load"))

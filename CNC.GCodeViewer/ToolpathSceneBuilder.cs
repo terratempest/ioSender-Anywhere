@@ -43,11 +43,10 @@ internal static class ToolpathSceneBuilder
             if (cfg.ShowGrid)
             {
                 var gridLines = ViewerGridBuilder.Build(bounds);
-                var color = ViewerColors.ResolveGridColor(cfg, theme);
                 if (gridLines.Minor.Count > 1)
-                    grid = ViewerLineLayerBuilder.FromPoints(gridLines.Minor, IsDefaultGridColor(cfg) ? theme.GridMinor : HalfBrightness(color), 0.5f);
+                    grid = ViewerLineLayerBuilder.FromPoints(gridLines.Minor, theme.GridMinor, 0.5f);
                 if (gridLines.Major.Count > 1)
-                    gridMajor = ViewerLineLayerBuilder.FromPoints(gridLines.Major, IsDefaultGridColor(cfg) ? theme.GridMajor : color, 1.25f);
+                    gridMajor = ViewerLineLayerBuilder.FromPoints(gridLines.Major, theme.GridMajor, 1.25f);
             }
 
             if (cfg.ShowBoundingBox)
@@ -77,12 +76,4 @@ internal static class ToolpathSceneBuilder
         };
     }
 
-    static Color HalfBrightness(Color color) =>
-        Color.FromArgb(color.A, (byte)(color.R / 2), (byte)(color.G / 2), (byte)(color.B / 2));
-
-    static bool IsDefaultGridColor(GCodeViewerConfig cfg) =>
-        cfg.GridColor.R == UiColor.Gray.R
-        && cfg.GridColor.G == UiColor.Gray.G
-        && cfg.GridColor.B == UiColor.Gray.B
-        && cfg.GridColor.A == UiColor.Gray.A;
 }

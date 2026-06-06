@@ -6,6 +6,7 @@ public static class AppThemeKeys
     public const string LightHighContrast = "LightHighContrast";
     public const string Dark = "Dark";
     public const string DarkHighContrast = "DarkHighContrast";
+    public const string Custom = "Custom";
 
     public static event EventHandler? ThemeApplied;
 
@@ -22,7 +23,8 @@ public static class AppThemeKeys
             return DarkHighContrast;
 
         if (theme.Equals("White", StringComparison.OrdinalIgnoreCase)
-            || theme.Equals("Light (bright)", StringComparison.OrdinalIgnoreCase))
+            || theme.Equals("Light (bright)", StringComparison.OrdinalIgnoreCase)
+            || theme.Equals("Light (High Contrast)", StringComparison.OrdinalIgnoreCase))
             return LightHighContrast;
 
         if (theme.Equals(Light, StringComparison.OrdinalIgnoreCase))
@@ -31,10 +33,14 @@ public static class AppThemeKeys
         if (theme.Equals(LightHighContrast, StringComparison.OrdinalIgnoreCase))
             return LightHighContrast;
 
-        if (theme.Equals(DarkHighContrast, StringComparison.OrdinalIgnoreCase))
+        if (theme.Equals(DarkHighContrast, StringComparison.OrdinalIgnoreCase)
+            || theme.Equals("Dark (High Contrast)", StringComparison.OrdinalIgnoreCase))
             return DarkHighContrast;
 
-        return Dark;
+        if (theme.Equals(Custom, StringComparison.OrdinalIgnoreCase))
+            return Custom;
+
+        return theme.Trim();
     }
 
     public static void NotifyThemeApplied() => ThemeApplied?.Invoke(null, EventArgs.Empty);

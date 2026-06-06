@@ -42,11 +42,11 @@
   </ResourceDictionary>
 
   <ResourceDictionary x:Key="Light">
-    <SolidColorBrush x:Key="ThemeBackgroundBrush" Color="#E4E6E8"/>
+    <SolidColorBrush x:Key="ThemeBackgroundBrush" Color="#FBFDFF"/>
     <SolidColorBrush x:Key="ThemeForegroundBrush" Color="#000000"/>
     <SolidColorBrush x:Key="ThemeControlLowBrush" Color="#FFFFFF"/>
-    <SolidColorBrush x:Key="ThemeControlMidBrush" Color="#D5D8DC"/>
-    <SolidColorBrush x:Key="ThemeControlHighBrush" Color="#BCC2C8"/>
+    <SolidColorBrush x:Key="ThemeControlMidBrush" Color="#F0F2F7"/>
+    <SolidColorBrush x:Key="ThemeControlHighBrush" Color="#EEEDFF"/>
     <SolidColorBrush x:Key="ThemeControlHighlightLowBrush" Color="#A9B1BA"/>
     <SolidColorBrush x:Key="ThemeControlHighlightMidBrush" Color="#919BA6"/>
     <SolidColorBrush x:Key="ThemeControlHighlightHighBrush" Color="#77838F"/>
@@ -70,15 +70,15 @@
     <SolidColorBrush x:Key="IoSenderDroReadoutForegroundBrush" Color="#000000"/>
     <SolidColorBrush x:Key="IoSenderJogSelectedBrush" Color="#0B6F22"/>
     <Color x:Key="IoSenderViewerBackgroundColor">#FFFFFF</Color>
-    <Color x:Key="IoSenderViewerCutColor">#8F0000</Color>
-    <Color x:Key="IoSenderViewerRapidColor">#771232</Color>
-    <Color x:Key="IoSenderViewerRetractColor">#004F12</Color>
+    <Color x:Key="IoSenderViewerCutColor">#392E2E</Color>
+    <Color x:Key="IoSenderViewerRapidColor">#39A6B5</Color>
+    <Color x:Key="IoSenderViewerRetractColor">#00A927</Color>
     <Color x:Key="IoSenderViewerGridColor">#000000</Color>
-    <Color x:Key="IoSenderViewerGridMinorColor">#9FA8B1</Color>
+    <Color x:Key="IoSenderViewerGridMinorColor">#D6D6D6</Color>
     <Color x:Key="IoSenderViewerGridMajorColor">#000000</Color>
-    <Color x:Key="IoSenderViewerHighlightColor">#000000</Color>
-    <Color x:Key="IoSenderViewerToolColor">#004F12</Color>
-    <Color x:Key="IoSenderViewerWorkEnvelopeColor">#002B55</Color>
+    <Color x:Key="IoSenderViewerHighlightColor">#D3D3D3</Color>
+    <Color x:Key="IoSenderViewerToolColor">#CD9023</Color>
+    <Color x:Key="IoSenderViewerWorkEnvelopeColor">#005EB9</Color>
   </ResourceDictionary>
   </ResourceDictionary.ThemeDictionaries>
 </ResourceDictionary>
