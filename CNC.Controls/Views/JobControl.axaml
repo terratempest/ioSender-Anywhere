@@ -3,7 +3,7 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              xmlns:loc="using:CNC.Localization.Avalonia"
-             mc:Ignorable="d" d:DesignWidth="230" d:DesignHeight="210"
+             mc:Ignorable="d" d:DesignWidth="230" d:DesignHeight="64"
              x:Class="CNC.Controls.Avalonia.Views.JobControl"
              Loaded="OnLoaded"
              SizeChanged="OnSizeChanged">

@@ -60,6 +60,10 @@
     <Setter Property="BorderThickness" Value="2"/>
   </Style>
 
+  <Style Selector="Border.workspace-splitter-line">
+    <Setter Property="Background" Value="{DynamicResource ThemeBorderLowBrush}"/>
+  </Style>
+
   <Style Selector="GridSplitter.workspace-splitter">
     <Setter Property="Background" Value="{DynamicResource ThemeBorderLowBrush}"/>
   </Style>

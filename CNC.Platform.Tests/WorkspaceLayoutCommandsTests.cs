@@ -27,6 +27,30 @@ public class WorkspaceLayoutCommandsTests
         Assert.Equal(leaf.Editor, clonedLeaf.Editor);
     }
 
+    [Fact]
+    public void TrySplitRegion_clears_locks_from_both_split_branches()
+    {
+        var leaf = new WorkspaceLeaf
+        {
+            Editor = WorkspaceEditorId.Program,
+            LockedWidth = 250,
+            LockedHeight = 180,
+        };
+
+        WorkspaceLayoutCommands.TrySplitRegion(
+            leaf,
+            leaf,
+            WorkspaceSplitOrientation.Horizontal,
+            0.5,
+            out var newRoot);
+
+        var split = Assert.IsType<WorkspaceSplit>(newRoot);
+        Assert.Equal(0, split.First.LockedWidth);
+        Assert.Equal(0, split.First.LockedHeight);
+        Assert.Equal(0, split.Second.LockedWidth);
+        Assert.Equal(0, split.Second.LockedHeight);
+    }
+
     [Theory]
     [InlineData(-1, 0.08)]
     [InlineData(2, 0.92)]

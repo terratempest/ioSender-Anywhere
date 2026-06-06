@@ -18,7 +18,7 @@ namespace CNC.Controls.Avalonia.Views;
 public partial class JobControl : UserControl, IKeyHandlerContext
 {
     const double ButtonGap = 6;
-    const double VerticalLayoutMinHeight = 180;
+    const double VerticalLayoutMinHeight = 130;
 
     static bool _keyboardMappingsOk;
 

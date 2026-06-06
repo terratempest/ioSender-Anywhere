@@ -144,33 +144,32 @@ public partial class WorkspaceRegionChrome : Border
         EditorHost.Content = content;
         AttachHeaderStatusSource(content);
 
+        ApplyEditorConstraints(content);
         var fills = WorkspaceEditorCatalog.Get(EditorId).FillsWorkspace;
-        content.HorizontalAlignment = fills
-            ? Avalonia.Layout.HorizontalAlignment.Stretch
-            : Avalonia.Layout.HorizontalAlignment.Left;
-        content.VerticalAlignment = fills
-            ? Avalonia.Layout.VerticalAlignment.Stretch
-            : Avalonia.Layout.VerticalAlignment.Top;
-
         if (fills && content is Layoutable layoutable)
         {
             layoutable.Width = double.NaN;
             layoutable.Height = double.NaN;
         }
 
-        if (fills)
-        {
-            EditorScroll.HorizontalScrollBarVisibility = Avalonia.Controls.Primitives.ScrollBarVisibility.Disabled;
-            EditorScroll.VerticalScrollBarVisibility = Avalonia.Controls.Primitives.ScrollBarVisibility.Disabled;
-            EditorHost.Margin = new Thickness(0);
-        }
-        else
-        {
-            EditorScroll.HorizontalScrollBarVisibility = Avalonia.Controls.Primitives.ScrollBarVisibility.Auto;
-            EditorScroll.VerticalScrollBarVisibility = Avalonia.Controls.Primitives.ScrollBarVisibility.Auto;
-            EditorHost.Margin = new Thickness(2);
-        }
+        EditorScroll.HorizontalScrollBarVisibility = fills
+            ? Avalonia.Controls.Primitives.ScrollBarVisibility.Disabled
+            : Avalonia.Controls.Primitives.ScrollBarVisibility.Auto;
+        EditorScroll.VerticalScrollBarVisibility = fills
+            ? Avalonia.Controls.Primitives.ScrollBarVisibility.Disabled
+            : Avalonia.Controls.Primitives.ScrollBarVisibility.Auto;
+        EditorHost.Margin = new Thickness(0);
     }
+
+    void ApplyEditorConstraints(Control content)
+    {
+        MinWidth = Math.Max(80, content.MinWidth);
+        MinHeight = Math.Max(60, content.MinHeight);
+        MaxWidth = IsFinite(content.MaxWidth) ? Math.Max(content.MaxWidth, MinWidth) : double.PositiveInfinity;
+        MaxHeight = IsFinite(content.MaxHeight) ? Math.Max(content.MaxHeight, MinHeight) : double.PositiveInfinity;
+    }
+
+    static bool IsFinite(double value) => !double.IsNaN(value) && !double.IsInfinity(value);
 
     public void RefreshTitle()
     {

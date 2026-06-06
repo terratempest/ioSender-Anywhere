@@ -21,6 +21,7 @@ public sealed class SplitLayoutBuilder
     readonly List<Control> _splitterMenuTargets = new();
     readonly Dictionary<WorkspaceNode, WorkspaceRegionChrome> _regions = new();
     const double SplitterHitTargetThickness = 5;
+    const double SplitterVisualThickness = 1;
     const double SplitterOverlap = (SplitterHitTargetThickness - 1) / 2;
 
     public SplitLayoutBuilder(
@@ -44,10 +45,10 @@ public sealed class SplitLayoutBuilder
         _splitters.Clear();
         _splitterMenuTargets.Clear();
         _regions.Clear();
-        return BuildNode(root, editMode, wireRegion);
+        return BuildNode(root, editMode, wireRegion).Control;
     }
 
-    Control BuildNode(WorkspaceNode node, bool editMode, Action<WorkspaceRegionChrome>? wireRegion)
+    LayoutBuildResult BuildNode(WorkspaceNode node, bool editMode, Action<WorkspaceRegionChrome>? wireRegion)
     {
         if (node is WorkspaceLeaf leaf)
             return BuildLeaf(leaf, editMode, wireRegion);
@@ -61,40 +62,66 @@ public sealed class SplitLayoutBuilder
 
         if (split.Orientation == WorkspaceSplitOrientation.Horizontal)
         {
-            grid.ColumnDefinitions.Add(new ColumnDefinition(GetGridLength(split.First, WorkspaceLockAxis.Width, ratio)));
-            grid.ColumnDefinitions.Add(new ColumnDefinition(GridLength.Auto));
-            grid.ColumnDefinitions.Add(new ColumnDefinition(GetGridLength(split.Second, WorkspaceLockAxis.Width, 1 - ratio)));
-
             var first = BuildNode(split.First, editMode, wireRegion);
             var splitter = CreateSplitter(split, GridResizeDirection.Columns, editMode);
             var second = BuildNode(split.Second, editMode, wireRegion);
 
-            Grid.SetColumn(first, 0);
+            var firstDefinition = new ColumnDefinition(GetGridLength(split.First, WorkspaceLockAxis.Width, ratio, first.Constraints.MinWidth));
+            var secondDefinition = new ColumnDefinition(GetGridLength(split.Second, WorkspaceLockAxis.Width, 1 - ratio, second.Constraints.MinWidth));
+            ApplyColumnConstraints(firstDefinition, first.Constraints);
+            ApplyColumnConstraints(secondDefinition, second.Constraints);
+            grid.ColumnDefinitions.Add(firstDefinition);
+            grid.ColumnDefinitions.Add(new ColumnDefinition(GridLength.Auto)
+            {
+                MinWidth = SplitterVisualThickness,
+                MaxWidth = SplitterVisualThickness,
+            });
+            grid.ColumnDefinitions.Add(secondDefinition);
+
+            Grid.SetColumn(first.Control, 0);
             Grid.SetColumn(splitter, 1);
-            Grid.SetColumn(second, 2);
-            grid.Children.Add(first);
-            grid.Children.Add(second);
+            Grid.SetColumn(second.Control, 2);
+            grid.Children.Add(first.Control);
+            grid.Children.Add(second.Control);
             grid.Children.Add(splitter);
+
+            ApplyConstraints(grid, WorkspaceLayoutConstraints.ForHorizontalSplit(
+                first.Constraints,
+                second.Constraints,
+                SplitterVisualThickness));
         }
         else
         {
-            grid.RowDefinitions.Add(new RowDefinition(GetGridLength(split.First, WorkspaceLockAxis.Height, ratio)));
-            grid.RowDefinitions.Add(new RowDefinition(GridLength.Auto));
-            grid.RowDefinitions.Add(new RowDefinition(GetGridLength(split.Second, WorkspaceLockAxis.Height, 1 - ratio)));
-
             var first = BuildNode(split.First, editMode, wireRegion);
             var splitter = CreateSplitter(split, GridResizeDirection.Rows, editMode);
             var second = BuildNode(split.Second, editMode, wireRegion);
 
-            Grid.SetRow(first, 0);
+            var firstDefinition = new RowDefinition(GetGridLength(split.First, WorkspaceLockAxis.Height, ratio, first.Constraints.MinHeight));
+            var secondDefinition = new RowDefinition(GetGridLength(split.Second, WorkspaceLockAxis.Height, 1 - ratio, second.Constraints.MinHeight));
+            ApplyRowConstraints(firstDefinition, first.Constraints);
+            ApplyRowConstraints(secondDefinition, second.Constraints);
+            grid.RowDefinitions.Add(firstDefinition);
+            grid.RowDefinitions.Add(new RowDefinition(GridLength.Auto)
+            {
+                MinHeight = SplitterVisualThickness,
+                MaxHeight = SplitterVisualThickness,
+            });
+            grid.RowDefinitions.Add(secondDefinition);
+
+            Grid.SetRow(first.Control, 0);
             Grid.SetRow(splitter, 1);
-            Grid.SetRow(second, 2);
-            grid.Children.Add(first);
-            grid.Children.Add(second);
+            Grid.SetRow(second.Control, 2);
+            grid.Children.Add(first.Control);
+            grid.Children.Add(second.Control);
             grid.Children.Add(splitter);
+
+            ApplyConstraints(grid, WorkspaceLayoutConstraints.ForVerticalSplit(
+                first.Constraints,
+                second.Constraints,
+                SplitterVisualThickness));
         }
 
-        return grid;
+        return new LayoutBuildResult(grid, WorkspaceLayoutConstraints.FromControl(grid));
     }
 
     Control CreateSplitter(WorkspaceSplit split, GridResizeDirection direction, bool editMode)
@@ -138,7 +165,16 @@ public sealed class SplitLayoutBuilder
 
     Control CreateLockedSplitterMenuTarget(bool isColumnSplitter, bool editMode)
     {
-        var target = new Border
+        var line = new Border
+        {
+            Width = isColumnSplitter ? 1 : double.NaN,
+            Height = isColumnSplitter ? double.NaN : 1,
+            HorizontalAlignment = isColumnSplitter ? HorizontalAlignment.Center : HorizontalAlignment.Stretch,
+            VerticalAlignment = isColumnSplitter ? VerticalAlignment.Stretch : VerticalAlignment.Center,
+        };
+        line.Classes.Add("workspace-splitter-line");
+
+        var target = new Grid
         {
             Width = isColumnSplitter ? SplitterHitTargetThickness : double.NaN,
             Height = isColumnSplitter ? double.NaN : SplitterHitTargetThickness,
@@ -155,6 +191,7 @@ public sealed class SplitLayoutBuilder
             IsHitTestVisible = editMode,
             ContextMenu = editMode ? BuildSplitterContextMenu() : null,
         };
+        target.Children.Add(line);
         target.Classes.Add("workspace-splitter");
         AttachSplitterContextMenu(target);
         return target;
@@ -234,7 +271,7 @@ public sealed class SplitLayoutBuilder
         }
     }
 
-    WorkspaceRegionChrome BuildLeaf(WorkspaceLeaf leaf, bool editMode, Action<WorkspaceRegionChrome>? wireRegion)
+    LayoutBuildResult BuildLeaf(WorkspaceLeaf leaf, bool editMode, Action<WorkspaceRegionChrome>? wireRegion)
     {
         var chrome = new WorkspaceRegionChrome
         {
@@ -250,10 +287,10 @@ public sealed class SplitLayoutBuilder
 
         _regions[leaf] = chrome;
         wireRegion?.Invoke(chrome);
-        return chrome;
+        return new LayoutBuildResult(chrome, WorkspaceLayoutConstraints.FromControl(chrome));
     }
 
-    WorkspaceRegionChrome BuildTabGroup(WorkspaceTabGroup tabGroup, bool editMode, Action<WorkspaceRegionChrome>? wireRegion)
+    LayoutBuildResult BuildTabGroup(WorkspaceTabGroup tabGroup, bool editMode, Action<WorkspaceRegionChrome>? wireRegion)
     {
         var chrome = new WorkspaceRegionChrome
         {
@@ -273,16 +310,16 @@ public sealed class SplitLayoutBuilder
 
         _regions[tabGroup] = chrome;
         wireRegion?.Invoke(chrome);
-        return chrome;
+        return new LayoutBuildResult(chrome, WorkspaceLayoutConstraints.FromControl(chrome));
     }
 
     static double ClampRatio(double ratio) => Math.Clamp(ratio, 0.08, 0.92);
 
-    static GridLength GetGridLength(WorkspaceNode node, WorkspaceLockAxis axis, double starValue)
+    static GridLength GetGridLength(WorkspaceNode node, WorkspaceLockAxis axis, double starValue, double minimum)
     {
         var lockedSize = WorkspaceLayoutLocks.ResolveLockedSize(node, axis);
         return lockedSize > 0
-            ? new GridLength(lockedSize, GridUnitType.Pixel)
+            ? new GridLength(Math.Max(lockedSize, minimum), GridUnitType.Pixel)
             : new GridLength(starValue, GridUnitType.Star);
     }
 
@@ -291,14 +328,88 @@ public sealed class SplitLayoutBuilder
         var axis = split.Orientation == WorkspaceSplitOrientation.Horizontal
             ? WorkspaceLockAxis.Width
             : WorkspaceLockAxis.Height;
-        return WorkspaceLayoutLocks.ResolveLockedSize(split.First, axis) > 0
-            || WorkspaceLayoutLocks.ResolveLockedSize(split.Second, axis) > 0;
+        return WorkspaceLayoutLocks.ContainsLockedSize(split.First, axis)
+            || WorkspaceLayoutLocks.ContainsLockedSize(split.Second, axis);
     }
+
+    static void ApplyColumnConstraints(ColumnDefinition definition, WorkspaceLayoutConstraints constraints)
+    {
+        definition.MinWidth = constraints.MinWidth;
+        if (IsFinite(constraints.MaxWidth))
+            definition.MaxWidth = Math.Max(constraints.MaxWidth, constraints.MinWidth);
+    }
+
+    static void ApplyRowConstraints(RowDefinition definition, WorkspaceLayoutConstraints constraints)
+    {
+        definition.MinHeight = constraints.MinHeight;
+        if (IsFinite(constraints.MaxHeight))
+            definition.MaxHeight = Math.Max(constraints.MaxHeight, constraints.MinHeight);
+    }
+
+    static void ApplyConstraints(Layoutable target, WorkspaceLayoutConstraints constraints)
+    {
+        target.MinWidth = constraints.MinWidth;
+        target.MinHeight = constraints.MinHeight;
+        if (IsFinite(constraints.MaxWidth))
+            target.MaxWidth = Math.Max(constraints.MaxWidth, constraints.MinWidth);
+        if (IsFinite(constraints.MaxHeight))
+            target.MaxHeight = Math.Max(constraints.MaxHeight, constraints.MinHeight);
+    }
+
+    static bool IsFinite(double value) => !double.IsNaN(value) && !double.IsInfinity(value);
 
     static MenuItem MakeItem(string header, Action action)
     {
         var item = new MenuItem { Header = header };
         item.Click += (_, _) => action();
         return item;
+    }
+
+    readonly record struct LayoutBuildResult(Control Control, WorkspaceLayoutConstraints Constraints);
+
+    readonly record struct WorkspaceLayoutConstraints(
+        double MinWidth,
+        double MinHeight,
+        double MaxWidth,
+        double MaxHeight)
+    {
+        public static WorkspaceLayoutConstraints FromControl(Layoutable control) =>
+            new(
+                NormalizeMin(control.MinWidth),
+                NormalizeMin(control.MinHeight),
+                NormalizeMax(control.MaxWidth),
+                NormalizeMax(control.MaxHeight));
+
+        public static WorkspaceLayoutConstraints ForHorizontalSplit(
+            WorkspaceLayoutConstraints first,
+            WorkspaceLayoutConstraints second,
+            double splitterSize) =>
+            new(
+                first.MinWidth + splitterSize + second.MinWidth,
+                Math.Max(first.MinHeight, second.MinHeight),
+                SumMax(first.MaxWidth, splitterSize, second.MaxWidth),
+                double.PositiveInfinity);
+
+        public static WorkspaceLayoutConstraints ForVerticalSplit(
+            WorkspaceLayoutConstraints first,
+            WorkspaceLayoutConstraints second,
+            double splitterSize) =>
+            new(
+                Math.Max(first.MinWidth, second.MinWidth),
+                first.MinHeight + splitterSize + second.MinHeight,
+                double.PositiveInfinity,
+                SumMax(first.MaxHeight, splitterSize, second.MaxHeight));
+
+        static double NormalizeMin(double value) =>
+            IsFinite(value) && value > 0 ? value : 0;
+
+        static double NormalizeMax(double value) =>
+            IsFinite(value) && value >= 0 ? value : double.PositiveInfinity;
+
+        static double SumMax(double first, double splitterSize, double second) =>
+            IsFinite(first) && IsFinite(second)
+                ? first + splitterSize + second
+                : double.PositiveInfinity;
+
     }
 }

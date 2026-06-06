@@ -60,6 +60,36 @@ public class WorkspaceLayoutLocksTests
     }
 
     [Fact]
+    public void Same_axis_nested_width_lock_is_detected_for_splitter_blocking()
+    {
+        var row = new WorkspaceSplit
+        {
+            Orientation = WorkspaceSplitOrientation.Horizontal,
+            First = new WorkspaceLeaf { LockedWidth = 250 },
+            Second = new WorkspaceLeaf(),
+        };
+
+        var hasLock = WorkspaceLayoutLocks.ContainsLockedSize(row, WorkspaceLockAxis.Width);
+
+        Assert.True(hasLock);
+    }
+
+    [Fact]
+    public void Same_axis_nested_height_lock_is_detected_for_splitter_blocking()
+    {
+        var column = new WorkspaceSplit
+        {
+            Orientation = WorkspaceSplitOrientation.Vertical,
+            First = new WorkspaceLeaf { LockedHeight = 180 },
+            Second = new WorkspaceLeaf(),
+        };
+
+        var hasLock = WorkspaceLayoutLocks.ContainsLockedSize(column, WorkspaceLockAxis.Height);
+
+        Assert.True(hasLock);
+    }
+
+    [Fact]
     public void Perpendicular_stack_uses_largest_child_lock()
     {
         var stack = new WorkspaceSplit

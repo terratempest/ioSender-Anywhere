@@ -27,6 +27,18 @@ public static class WorkspaceLayoutLocks
             ResolveLockedSize(split.Second, axis));
     }
 
+    public static bool ContainsLockedSize(WorkspaceNode node, WorkspaceLockAxis axis)
+    {
+        var direct = axis == WorkspaceLockAxis.Width
+            ? node.LockedWidth
+            : node.LockedHeight;
+        if (direct > 0)
+            return true;
+
+        return node is WorkspaceSplit split
+            && (ContainsLockedSize(split.First, axis) || ContainsLockedSize(split.Second, axis));
+    }
+
     public static bool SplitControlsAxis(WorkspaceSplit split, WorkspaceLockAxis axis) =>
         axis == WorkspaceLockAxis.Width
             ? split.Orientation == WorkspaceSplitOrientation.Horizontal

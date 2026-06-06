@@ -85,9 +85,16 @@ public static class WorkspaceLayoutCommands
         {
             Orientation = orientation,
             Ratio = ClampSplitRatio(ratio),
-            First = existing,
-            Second = existing.Clone(),
+            First = ClearLocks(existing),
+            Second = ClearLocks(existing.Clone()),
         };
+
+    static WorkspaceNode ClearLocks(WorkspaceNode node)
+    {
+        node.LockedWidth = 0;
+        node.LockedHeight = 0;
+        return node;
+    }
 
     public static double ClampSplitRatio(double ratio) => Math.Clamp(ratio, 0.08, 0.92);
 
