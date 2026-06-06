@@ -14,10 +14,11 @@ public partial class AppConfigView : UserControl
     {
     }
 
-    public AppConfigView(AppConfigService? appConfig)
+    public AppConfigView(AppConfigService? appConfig, IGameControllerBindingCapture? controllerCapture = null)
     {
         _appConfig = appConfig;
         InitializeComponent();
+        controllerConfig.Capture = controllerCapture;
         SettingsList.SelectedIndex = 0;
         ShowSettingsPage(0);
         if (appConfig != null)
@@ -53,6 +54,7 @@ public partial class AppConfigView : UserControl
         ViewerPage.IsVisible = selectedIndex == 5;
         StripPage.IsVisible = selectedIndex == 6;
         KeyboardPage.IsVisible = selectedIndex == 7;
+        ControllerPage.IsVisible = selectedIndex == 8;
     }
 
     void OnSaveClick(object? sender, RoutedEventArgs e)

@@ -19,10 +19,12 @@ public sealed class AppSession
         CommandRouter = new GrblCommandRouter(Program);
         MachineCommands = new MachineCommandService(CommandRouter);
         MainWindow = new MainWindowViewModel(this);
+        GameController = new SdlGameControllerService(appConfig, platform, Grbl);
 
         Program.Model = Grbl;
         CNC.Core.Grbl.GrblViewModel = Grbl;
         MachineCommands.Attach(Grbl);
+        GameController.Start();
     }
 
     public PlatformServices Platform { get; }
@@ -43,11 +45,16 @@ public sealed class AppSession
 
     public MainWindowViewModel MainWindow { get; }
 
+    public SdlGameControllerService GameController { get; }
+
     public GrblViewModel Grbl => MainWindow.Grbl;
 
     public void Disconnect()
     {
         ConnectionInitializer.Unregister();
         ConnectionCoordinator.Detach(Grbl);
+        GameController.Cancel();
     }
+
+    public void Shutdown() => GameController.Dispose();
 }

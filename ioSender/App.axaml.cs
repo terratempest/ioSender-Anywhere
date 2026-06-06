@@ -40,6 +40,7 @@ public partial class App : Application
                 if (!EarlyStartupBanner.IsActive)
                 {
                     startupBanner = new StartupBannerWindow();
+                    startupBanner.ReportProgress("Preparing application...", 20);
                     startupBanner.Show();
                 }
             }
@@ -64,12 +65,12 @@ public partial class App : Application
         IClassicDesktopStyleApplicationLifetime desktop,
         StartupBannerWindow? startupBanner)
     {
-        EarlyStartupBanner.ReportProgress("Loading platform services...", 30);
+        ReportStartupProgress(startupBanner, "Loading platform services...", 30);
         PlatformServices platform;
         using (StartupTrace.Measure("Platform services"))
             platform = PlatformBootstrap.Create();
 
-        EarlyStartupBanner.ReportProgress("Loading configuration...", 40);
+        ReportStartupProgress(startupBanner, "Loading configuration...", 40);
         var appConfig = new AppConfigService(platform.PathService);
         using (StartupTrace.Measure("Configuration load"))
         {
@@ -83,11 +84,11 @@ public partial class App : Application
         CNC.Controls.Avalonia.Controls.PopupKeyboardService.TriggerClickCount =
             () => (int)AppHostContext.AppConfig.Base.PopupKeyboardTrigger;
 
-        EarlyStartupBanner.ReportProgress("Applying theme...", 52);
+        ReportStartupProgress(startupBanner, "Applying theme...", 52);
         using (StartupTrace.Measure("Theme apply"))
             AppTheme.Apply(appConfig.Base.Theme);
 
-        EarlyStartupBanner.ReportProgress("Loading localization...", 60);
+        ReportStartupProgress(startupBanner, "Loading localization...", 60);
         using (StartupTrace.Measure("Localization load"))
         {
             LocalizationBootstrap.Initialize(
@@ -96,14 +97,14 @@ public partial class App : Application
                 AppContext.BaseDirectory);
         }
 
-        EarlyStartupBanner.ReportProgress("Configuring controls...", 68);
+        ReportStartupProgress(startupBanner, "Configuring controls...", 68);
         Comms.UiDispatcher = platform.UiDispatcher;
 
         UiThread.Capture();
 
         AvaloniaGrblUi.Configure();
 
-        EarlyStartupBanner.ReportProgress("Checking running instances...", 75);
+        ReportStartupProgress(startupBanner, "Checking running instances...", 75);
         if (!platform.SingleInstanceHost.TryAcquire())
         {
             CloseStartupBanner(startupBanner);
@@ -120,13 +121,15 @@ public partial class App : Application
         {
             CloseStartupBanner(startupBanner);
 
+            if (AppHostContext.Session is not null)
+                AppHostContext.Session.Shutdown();
             appConfig.Shutdown();
             appConfig.Save();
         };
 
         try
         {
-            EarlyStartupBanner.ReportProgress("Building main window...", 84);
+            ReportStartupProgress(startupBanner, "Building main window...", 84);
             using (StartupTrace.Measure("App session"))
                 AppHostContext.EnsureSession();
             MainWindow mainWindow;
@@ -135,12 +138,12 @@ public partial class App : Application
             mainWindow.Opened += (_, _) =>
             {
                 StartupTrace.Mark("MainWindow opened");
-                EarlyStartupBanner.ReportProgress("Opening workspace...", 99);
+                ReportStartupProgress(startupBanner, "Opening workspace...", 99);
                 CloseStartupBanner(startupBanner);
             };
 
             desktop.MainWindow = mainWindow;
-            EarlyStartupBanner.ReportProgress("Showing main window...", 94);
+            ReportStartupProgress(startupBanner, "Showing main window...", 94);
             StartupTrace.Mark("Showing main window");
             mainWindow.Show();
         }
@@ -169,5 +172,14 @@ public partial class App : Application
 
         if (startupBanner is { IsVisible: true })
             startupBanner.Close();
+    }
+
+    private static void ReportStartupProgress(
+        StartupBannerWindow? startupBanner,
+        string statusText,
+        int percent)
+    {
+        EarlyStartupBanner.ReportProgress(statusText, percent);
+        startupBanner?.ReportProgress(statusText, percent);
     }
 }

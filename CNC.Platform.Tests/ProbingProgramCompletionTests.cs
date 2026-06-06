@@ -106,13 +106,13 @@ public sealed class ProbingProgramCompletionTests : IDisposable
 
         _grbl.OnCommandResponseReceived?.Invoke("ok");
         await Task.Delay(50);
-        Assert.DoesNotContain("G0Z1", _comms.Commands);
+        Assert.False(_comms.ContainsCommand("G0Z1"));
 
         _grbl.DataReceived("[PRB:0.000,0.000,-2.500:1]");
         await WaitForCommandAsync("G0Z1");
 
         await Task.Delay(50);
-        Assert.DoesNotContain("G0X1", _comms.Commands);
+        Assert.False(_comms.ContainsCommand("G0X1"));
 
         _grbl.OnCommandResponseReceived?.Invoke("ok");
         await WaitForCommandAsync("G0X1");
@@ -188,7 +188,7 @@ public sealed class ProbingProgramCompletionTests : IDisposable
         _grbl.DataReceived("<Run|MPos:0.000,0.000,-2.000|Pn:P|Bf:15,128>");
         await Task.Delay(50);
 
-        Assert.DoesNotContain(GrblConstants.CMD_STOP, _comms.Bytes);
+        Assert.False(_comms.ContainsByte(GrblConstants.CMD_STOP));
 
         _grbl.OnCommandResponseReceived?.Invoke("ok"); // retract ack
         await WaitForCommandContainingAsync("G38.3F25Z-");
@@ -332,7 +332,7 @@ public sealed class ProbingProgramCompletionTests : IDisposable
         _grbl.DataReceived("<Run|MPos:0.000,0.000,0.000|Pn:P|Bf:15,128>");
         await Task.Delay(50);
 
-        Assert.DoesNotContain(GrblConstants.CMD_STOP, _comms.Bytes);
+        Assert.False(_comms.ContainsByte(GrblConstants.CMD_STOP));
         Assert.False(execute.IsCompleted);
 
         _grbl.DataReceived("[PRB:0.000,0.000,-2.500:1]");
@@ -356,7 +356,7 @@ public sealed class ProbingProgramCompletionTests : IDisposable
 
         Assert.True(await WaitForAsync(() => execute.IsCompleted, 1000));
         Assert.False(await execute);
-        Assert.Contains(GrblConstants.CMD_STOP, _comms.Bytes);
+        Assert.True(_comms.ContainsByte(GrblConstants.CMD_STOP));
         Assert.False(_grbl.IsJobRunning);
     }
 
@@ -388,7 +388,7 @@ public sealed class ProbingProgramCompletionTests : IDisposable
         _grbl.ExecuteCommand("G0X1");
         await WaitForCommandAsync("G0X1");
 
-        Assert.Equal(["G21", "G0X1"], _comms.Commands);
+        Assert.Equal(["G21", "G0X1"], _comms.CommandSnapshot());
     }
 
     [Fact]
@@ -426,11 +426,11 @@ public sealed class ProbingProgramCompletionTests : IDisposable
         var retract = Task.Run(() => _probing.GotoMachinePosition(_probing.StartPosition, AxisFlags.Z));
         await WaitForCommandAsync("G53G0Z0");
         _grbl.DataReceived("ok");
-        var statusRequests = _comms.Bytes.Count;
-        Assert.True(await WaitForAsync(() => _comms.Bytes.Count > statusRequests, 1000));
+        var statusRequests = _comms.ByteCount;
+        Assert.True(await WaitForAsync(() => _comms.ByteCount > statusRequests, 1000));
         _grbl.DataReceived("<Run|MPos:0.000,0.000,-1.000|Pn:P|Bf:15,128>");
-        statusRequests = _comms.Bytes.Count;
-        Assert.True(await WaitForAsync(() => _comms.Bytes.Count > statusRequests, 1000));
+        statusRequests = _comms.ByteCount;
+        Assert.True(await WaitForAsync(() => _comms.ByteCount > statusRequests, 1000));
         _grbl.DataReceived("<Idle|MPos:0.000,0.000,0.000|Bf:15,128>");
 
         Assert.True(await WaitForAsync(() => retract.IsCompleted, 1000));
@@ -456,7 +456,7 @@ public sealed class ProbingProgramCompletionTests : IDisposable
         _grbl.OnCommandResponseReceived?.Invoke("ok");
 
         Assert.True(await WaitForAsync(() => execute.IsCompleted, 3000));
-        Assert.DoesNotContain(_comms.Commands, command => command.StartsWith("G65P5Q", StringComparison.OrdinalIgnoreCase));
+        Assert.False(_comms.AnyCommand(command => command.StartsWith("G65P5Q", StringComparison.OrdinalIgnoreCase)));
         _probing.Program.End(string.Empty);
     }
 
@@ -483,7 +483,7 @@ public sealed class ProbingProgramCompletionTests : IDisposable
 
         Assert.True(_grbl.IsToolOffsetActive);
         Assert.True(_grbl.IsToolOffsetIndicatorVisible);
-        Assert.Contains(GrblConstants.CMD_GETPARSERSTATE, _comms.Commands);
+        Assert.True(_comms.ContainsCommand(GrblConstants.CMD_GETPARSERSTATE));
     }
 
     [Fact]
@@ -504,7 +504,7 @@ public sealed class ProbingProgramCompletionTests : IDisposable
         await FinishToolLengthCompletionAsync(complete);
 
         Assert.True(_grbl.IsToolOffsetActive);
-        Assert.Contains(GrblConstants.CMD_GETPARSERSTATE, _comms.Commands);
+        Assert.True(_comms.ContainsCommand(GrblConstants.CMD_GETPARSERSTATE));
     }
 
     [Fact]
@@ -522,7 +522,7 @@ public sealed class ProbingProgramCompletionTests : IDisposable
 
         _grbl.DataReceived("error:1");
 
-        Assert.True(await WaitForAsync(() => _comms.Commands.Contains("G53G0Z0"), 1000));
+        Assert.True(await WaitForAsync(() => _comms.ContainsCommand("G53G0Z0"), 1000));
         Assert.False(_grbl.IsToolOffsetActive);
         Assert.False(_grbl.IsToolOffsetIndicatorVisible);
 
@@ -532,22 +532,22 @@ public sealed class ProbingProgramCompletionTests : IDisposable
 
     async Task WaitForCommandAsync(string command)
     {
-        var found = await WaitForAsync(() => _comms.Commands.Contains(command), 1000);
-        Assert.True(found, $"Expected command '{command}' was not sent. Commands: {string.Join(", ", _comms.Commands)}");
+        var found = await WaitForAsync(() => _comms.ContainsCommand(command), 1000);
+        Assert.True(found, $"Expected command '{command}' was not sent. Commands: {string.Join(", ", _comms.CommandSnapshot())}");
     }
 
     async Task WaitForCommandContainingAsync(string command)
     {
-        var found = await WaitForAsync(() => _comms.Commands.Any(c => c.Contains(command, StringComparison.Ordinal)), 1000);
-        Assert.True(found, $"Expected command containing '{command}' was not sent. Commands: {string.Join(", ", _comms.Commands)}");
+        var found = await WaitForAsync(() => _comms.AnyCommand(c => c.Contains(command, StringComparison.Ordinal)), 1000);
+        Assert.True(found, $"Expected command containing '{command}' was not sent. Commands: {string.Join(", ", _comms.CommandSnapshot())}");
     }
 
     async Task WaitForCommandContainingAsync(string command, Task task)
     {
-        var found = await WaitForAsync(() => _comms.Commands.Any(c => c.Contains(command, StringComparison.Ordinal)) || task.IsCompleted, 3000);
-        Assert.True(found, $"Expected command containing '{command}' was not sent. Commands: {string.Join(", ", _comms.Commands)}");
+        var found = await WaitForAsync(() => _comms.AnyCommand(c => c.Contains(command, StringComparison.Ordinal)) || task.IsCompleted, 3000);
+        Assert.True(found, $"Expected command containing '{command}' was not sent. Commands: {string.Join(", ", _comms.CommandSnapshot())}");
         Assert.False(task.IsFaulted, task.Exception?.ToString());
-        Assert.False(task.IsCompletedSuccessfully, $"Completion finished before command '{command}' was sent. Commands: {string.Join(", ", _comms.Commands)}");
+        Assert.False(task.IsCompletedSuccessfully, $"Completion finished before command '{command}' was sent. Commands: {string.Join(", ", _comms.CommandSnapshot())}");
     }
 
     static async Task<bool> WaitForAsync(Func<bool> predicate, int timeoutMs)
@@ -566,9 +566,9 @@ public sealed class ProbingProgramCompletionTests : IDisposable
     async Task FinishToolLengthCompletionAsync(Task complete, bool parserTloActive = true)
     {
         await WaitForCommandAsync("G53G0Z0");
-        var statusRequests = _comms.Bytes.Count;
+        var statusRequests = _comms.ByteCount;
         _grbl.DataReceived("ok");
-        Assert.True(await WaitForAsync(() => _comms.Bytes.Count > statusRequests, 1000));
+        Assert.True(await WaitForAsync(() => _comms.ByteCount > statusRequests, 1000));
         _grbl.DataReceived("<Idle|MPos:0.000,0.000,0.000|Bf:15,128>");
         await WaitForCommandAsync(GrblConstants.CMD_GETPARSERSTATE);
         _grbl.DataReceived(parserTloActive
@@ -616,8 +616,49 @@ public sealed class ProbingProgramCompletionTests : IDisposable
 
     sealed class FakeStreamComms : StreamComms
     {
-        public List<byte> Bytes { get; } = new();
-        public List<string> Commands { get; } = new();
+        readonly object _sync = new();
+        readonly List<byte> _bytes = new();
+        readonly List<string> _commands = new();
+
+        public int ByteCount
+        {
+            get
+            {
+                lock (_sync)
+                    return _bytes.Count;
+            }
+        }
+
+        public byte[] ByteSnapshot()
+        {
+            lock (_sync)
+                return _bytes.ToArray();
+        }
+
+        public string[] CommandSnapshot()
+        {
+            lock (_sync)
+                return _commands.ToArray();
+        }
+
+        public bool ContainsByte(byte data)
+        {
+            lock (_sync)
+                return _bytes.Contains(data);
+        }
+
+        public bool ContainsCommand(string command)
+        {
+            lock (_sync)
+                return _commands.Contains(command);
+        }
+
+        public bool AnyCommand(Func<string, bool> predicate)
+        {
+            lock (_sync)
+                return _commands.Any(predicate);
+        }
+
         public bool IsOpen { get; private set; } = true;
         public int OutCount => 0;
         public string Reply { get; private set; } = string.Empty;
@@ -629,10 +670,18 @@ public sealed class ProbingProgramCompletionTests : IDisposable
 
         public void Close() => IsOpen = false;
         public int ReadByte() => -1;
-        public void WriteByte(byte data) => Bytes.Add(data);
+        public void WriteByte(byte data)
+        {
+            lock (_sync)
+                _bytes.Add(data);
+        }
         public void WriteBytes(byte[] bytes, int len) { }
         public void WriteString(string data) { }
-        public void WriteCommand(string command) => Commands.Add(command);
+        public void WriteCommand(string command)
+        {
+            lock (_sync)
+                _commands.Add(command);
+        }
         public string GetReply(string command) => Reply;
         public void AwaitAck() { }
         public void AwaitAck(string command) { }

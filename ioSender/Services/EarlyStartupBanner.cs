@@ -75,7 +75,7 @@ internal static class EarlyStartupBanner
         _windowHandle = CreateWindowEx(
             WS_EX_TOOLWINDOW | WS_EX_TOPMOST,
             WindowClassName,
-            "ioSender",
+            "ioSender Anywhere",
             WS_POPUP,
             left,
             top,
@@ -170,6 +170,21 @@ internal static class EarlyStartupBanner
             CLEARTYPE_QUALITY,
             DEFAULT_PITCH | FF_SWISS,
             "Segoe UI");
+        var versionFont = CreateFont(
+            -14,
+            0,
+            0,
+            0,
+            FW_NORMAL,
+            0,
+            0,
+            0,
+            DEFAULT_CHARSET,
+            OUT_DEFAULT_PRECIS,
+            CLIP_DEFAULT_PRECIS,
+            CLEARTYPE_QUALITY,
+            DEFAULT_PITCH | FF_SWISS,
+            "Segoe UI");
         var statusFont = CreateFont(
             -16,
             0,
@@ -204,9 +219,15 @@ internal static class EarlyStartupBanner
 
             var titleRect = new RECT { Left = 24, Top = 42, Right = Width - 24, Bottom = 84 };
             var previousFont = SelectObject(hdc, titleFont);
-            DrawText(hdc, "ioSender", -1, ref titleRect, DT_CENTER | DT_SINGLELINE | DT_VCENTER);
+            DrawText(hdc, "ioSender Anywhere", -1, ref titleRect, DT_CENTER | DT_SINGLELINE | DT_VCENTER);
 
-            var statusRect = new RECT { Left = 24, Top = 92, Right = Width - 24, Bottom = 122 };
+            SetTextColor(hdc, 0x00908080);
+            var versionRect = new RECT { Left = 24, Top = 84, Right = Width - 24, Bottom = 108 };
+            SelectObject(hdc, versionFont);
+            DrawText(hdc, "Version: " + AppVersion.DisplayVersion, -1, ref versionRect, DT_CENTER | DT_SINGLELINE | DT_VCENTER);
+
+            SetTextColor(hdc, 0x00D4D4D4);
+            var statusRect = new RECT { Left = 24, Top = 112, Right = Width - 24, Bottom = 132 };
             SelectObject(hdc, statusFont);
             DrawText(hdc, statusText, -1, ref statusRect, DT_CENTER | DT_SINGLELINE | DT_VCENTER);
 
@@ -228,6 +249,7 @@ internal static class EarlyStartupBanner
         finally
         {
             DeleteObject(statusFont);
+            DeleteObject(versionFont);
             DeleteObject(titleFont);
             DeleteObject(accent);
             DeleteObject(background);

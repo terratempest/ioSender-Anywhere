@@ -96,6 +96,8 @@ public sealed class AppConfigService
                 migrated = true;
             if (MigrateQuickAccessSidebar(Base))
                 migrated = true;
+            if (MigrateGameController(Base))
+                migrated = true;
             if (migrated)
                 Save();
             return true;
@@ -148,5 +150,18 @@ public sealed class AppConfigService
         var after = (config.QuickAccessSidebar.ShowLeft, config.QuickAccessSidebar.ShowRight,
             config.QuickAccessSidebar.LegacySidesMigrated);
         return before != after;
+    }
+
+    static bool MigrateGameController(BaseConfig config)
+    {
+        if (config.GameController is null)
+        {
+            config.GameController = new GameControllerConfig();
+            return true;
+        }
+
+        var before = config.GameController.Bindings.Count;
+        config.GameController.EnsureDefaultBindings();
+        return config.GameController.Bindings.Count != before;
     }
 }

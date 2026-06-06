@@ -90,6 +90,8 @@ public partial class MainWindow : Window
         };
         MnuLayouts.SubmenuOpened += (_, _) => RebuildLayoutsMenu();
         Opened += OnMainWindowOpened;
+        Activated += (_, _) => _session.GameController.IsApplicationActive = true;
+        Deactivated += (_, _) => _session.GameController.IsApplicationActive = false;
         Closing += OnMainWindowClosing;
         PositionChanged += (_, _) => SaveWindowPlacement();
     }
@@ -728,7 +730,7 @@ public partial class MainWindow : Window
             return _appConfigView;
 
         using var _ = StartupTrace.Measure("Create AppConfigView");
-        _appConfigView = new AppConfigView(_session.AppConfig)
+        _appConfigView = new AppConfigView(_session.AppConfig, _session.GameController)
         {
             DataContext = AppHostContext.AppConfig.Base,
             HorizontalAlignment = Avalonia.Layout.HorizontalAlignment.Stretch,

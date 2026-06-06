@@ -46,6 +46,7 @@
           <ListBoxItem Content="Keyboard"
                        loc:Localize.Key="ioSender.appconfig.tab_keyboard"
                        loc:Localize.Fallback="Keyboard"/>
+          <ListBoxItem Content="Controller bindings"/>
         </ListBox>
       </Border>
 
@@ -81,6 +82,10 @@
 
         <WrapPanel x:Name="KeyboardPage" Orientation="Vertical" ItemWidth="320" IsVisible="False">
           <local:AppKeyboardConfigPanel x:Name="keyboardConfig" DataContext="{Binding}" Margin="0,0,8,8"/>
+        </WrapPanel>
+
+        <WrapPanel x:Name="ControllerPage" Orientation="Vertical" ItemWidth="430" IsVisible="False">
+          <local:AppControllerConfigPanel x:Name="controllerConfig" DataContext="{Binding}" Margin="0,0,8,8"/>
         </WrapPanel>
       </Grid>
     </Grid>

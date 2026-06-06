@@ -6,6 +6,8 @@ namespace CNC.Controls.Avalonia.ViewModels;
 
 public class JogViewModel : ViewModelBase
 {
+    public static JogViewModel Shared { get; } = CreateShared();
+
     public enum JogStep
     {
         Step0 = 0,
@@ -27,6 +29,13 @@ public class JogViewModel : ViewModelBase
     JogFeed _jogFeed = JogFeed.Feed1;
     readonly double[] _distance = new double[5];
     readonly int[] _feedRate = new int[4];
+
+    static JogViewModel CreateShared()
+    {
+        var model = new JogViewModel();
+        model.SetMetric(true);
+        return model;
+    }
 
     public void SetMetric(bool on, BaseConfig? config = null)
     {
@@ -94,6 +103,13 @@ public class JogViewModel : ViewModelBase
             StepSize += 1;
     }
 
+    public void CycleStepSkippingContinuous()
+    {
+        StepSize = StepSize is JogStep.Step3 or JogStep.Continuous
+            ? JogStep.Step0
+            : StepSize + 1;
+    }
+
     public void StepDec()
     {
         if (StepSize != JogStep.Step0)
@@ -104,6 +120,11 @@ public class JogViewModel : ViewModelBase
     {
         if (Feed != JogFeed.Feed3)
             Feed += 1;
+    }
+
+    public void CycleFeed()
+    {
+        Feed = Feed == JogFeed.Feed3 ? JogFeed.Feed0 : Feed + 1;
     }
 
     public void FeedDec()

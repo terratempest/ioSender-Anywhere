@@ -1,7 +1,7 @@
 <Window xmlns="https://github.com/avaloniaui"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         x:Class="ioSender.Views.StartupBannerWindow"
-        Title="ioSender"
+        Title="ioSender Anywhere"
         Width="420"
         Height="180"
         CanResize="False"
@@ -14,36 +14,32 @@
     BorderBrush="{DynamicResource ThemeBorderMidBrush}"
     BorderThickness="1"
     CornerRadius="4">
-    <Grid RowDefinitions="Auto,8,Auto,22,Auto">
+    <Grid RowDefinitions="Auto,14,Auto,14,Auto,22,Auto">
       <TextBlock Grid.Row="0"
-        Text="ioSender"
+        Text="ioSender Anywhere"
         FontSize="28"
         FontWeight="SemiBold"
         HorizontalAlignment="Center"/>
 
-      <TextBlock Grid.Row="0"
-        Text="ANYWHERE"
-        FontSize="8"
+      <TextBlock x:Name="VersionTextBlock"
+        Grid.Row="2"
+        Text="Version: -"
+        FontSize="13"
         Foreground="SlateGray"
-        FontWeight="SemiBold"
-        HorizontalAlignment="Center">
-        <TextBlock.RenderTransform>
-          <TransformGroup>
-            <TranslateTransform X="0" Y="32" />
-          </TransformGroup>
-        </TextBlock.RenderTransform>
-      </TextBlock>
+        HorizontalAlignment="Center"/>
 
-      <TextBlock Grid.Row="2"
+      <TextBlock x:Name="StatusTextBlock"
+        Grid.Row="4"
         Text="Loading workspace..."
         Foreground="{DynamicResource ThemeForegroundBrush}"
         HorizontalAlignment="Center"/>
 
-      <ProgressBar Grid.Row="4"
+      <ProgressBar x:Name="StartupProgress"
+        Grid.Row="6"
         Height="4"
         Minimum="0"
         Maximum="100"
-        IsIndeterminate="True"/>
+        Value="0"/>
     </Grid>
   </Border>
 </Window>

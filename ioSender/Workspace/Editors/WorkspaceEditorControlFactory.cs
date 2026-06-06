@@ -144,5 +144,5 @@ public sealed class WorkspaceEditorControlFactory
     };
 
     Control CreateAppConfig() =>
-        new AppConfigView(_session.AppConfig) { DataContext = _appConfigContext };
+        new AppConfigView(_session.AppConfig, _session.GameController) { DataContext = _appConfigContext };
 }

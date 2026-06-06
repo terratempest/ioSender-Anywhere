@@ -410,6 +410,190 @@ public class JogConfig : ViewModelBase
 }
 
 [Serializable]
+public enum GameControllerAction
+{
+    JogYPlus,
+    JogYMinus,
+    JogXMinus,
+    JogXPlus,
+    JogZPlus,
+    JogZMinus,
+    CycleJogDistance,
+    CycleJogFeedRate,
+    JogDistanceMode,
+    JogCancel
+}
+
+[Serializable]
+public enum GameControllerInputKind
+{
+    Button,
+    Axis
+}
+
+[Serializable]
+public class GameControllerBinding : ViewModelBase
+{
+    private GameControllerAction _action;
+    private GameControllerInputKind _inputKind;
+    private string _inputName = string.Empty;
+    private int _threshold = 16000;
+
+    public GameControllerAction Action
+    {
+        get => _action;
+        set { _action = value; OnPropertyChanged(); OnPropertyChanged(nameof(ActionLabel)); }
+    }
+
+    public GameControllerInputKind InputKind
+    {
+        get => _inputKind;
+        set { _inputKind = value; OnPropertyChanged(); OnPropertyChanged(nameof(InputDisplay)); }
+    }
+
+    public string InputName
+    {
+        get => _inputName;
+        set { _inputName = value ?? string.Empty; OnPropertyChanged(); OnPropertyChanged(nameof(InputDisplay)); }
+    }
+
+    public int Threshold
+    {
+        get => _threshold;
+        set { _threshold = value; OnPropertyChanged(); }
+    }
+
+    [XmlIgnore]
+    public string ActionLabel => GameControllerConfig.GetActionLabel(Action);
+
+    [XmlIgnore]
+    public string InputDisplay => InputKind == GameControllerInputKind.Axis
+        ? $"{InputName} axis"
+        : InputName;
+
+    public GameControllerBinding Clone() => new()
+    {
+        Action = Action,
+        InputKind = InputKind,
+        InputName = InputName,
+        Threshold = Threshold
+    };
+}
+
+[Serializable]
+public class GameControllerConfig : ViewModelBase
+{
+    private bool _enabled;
+    private string _preferredControllerName = string.Empty;
+    private ObservableCollection<GameControllerBinding> _bindings = CreateDefaultBindings();
+
+    public bool Enabled
+    {
+        get => _enabled;
+        set { _enabled = value; OnPropertyChanged(); }
+    }
+
+    public string PreferredControllerName
+    {
+        get => _preferredControllerName;
+        set { _preferredControllerName = value ?? string.Empty; OnPropertyChanged(); }
+    }
+
+    public ObservableCollection<GameControllerBinding> Bindings
+    {
+        get => _bindings;
+        set
+        {
+            _bindings = value ?? CreateDefaultBindings();
+            EnsureDefaultBindings();
+            OnPropertyChanged();
+        }
+    }
+
+    public void ResetBindings()
+    {
+        Bindings = CreateDefaultBindings();
+    }
+
+    public void EnsureDefaultBindings()
+    {
+        DeduplicateBindings();
+        var defaults = CreateDefaultBindings();
+
+        foreach (var defaultBinding in defaults)
+        {
+            if (_bindings.Any(binding => binding.Action == defaultBinding.Action))
+                continue;
+
+            _bindings.Add(defaultBinding);
+        }
+    }
+
+    void DeduplicateBindings()
+    {
+        var seen = new HashSet<GameControllerAction>();
+        for (var i = _bindings.Count - 1; i >= 0; i--)
+        {
+            if (seen.Add(_bindings[i].Action))
+                continue;
+
+            _bindings.RemoveAt(i);
+        }
+    }
+
+    public static ObservableCollection<GameControllerBinding> CreateDefaultBindings() =>
+    [
+        Button(GameControllerAction.JogYPlus, "DPadUp"),
+        Button(GameControllerAction.JogYMinus, "DPadDown"),
+        Button(GameControllerAction.JogXMinus, "DPadLeft"),
+        Button(GameControllerAction.JogXPlus, "DPadRight"),
+        Button(GameControllerAction.JogZPlus, "East"),
+        Button(GameControllerAction.JogZMinus, "South"),
+        Button(GameControllerAction.CycleJogDistance, "LeftShoulder"),
+        Button(GameControllerAction.CycleJogFeedRate, "RightShoulder"),
+        Axis(GameControllerAction.JogDistanceMode, "LeftTrigger"),
+        Button(GameControllerAction.JogCancel, "Start"),
+    ];
+
+    public static string GetActionLabel(GameControllerAction action) => action switch
+    {
+        GameControllerAction.JogYPlus => "Jog Y+",
+        GameControllerAction.JogYMinus => "Jog Y-",
+        GameControllerAction.JogXMinus => "Jog X-",
+        GameControllerAction.JogXPlus => "Jog X+",
+        GameControllerAction.JogZPlus => "Jog Z+",
+        GameControllerAction.JogZMinus => "Jog Z-",
+        GameControllerAction.CycleJogDistance => "Cycle jog distance",
+        GameControllerAction.CycleJogFeedRate => "Cycle jog feed rate",
+        GameControllerAction.JogDistanceMode => "Distance mode while held",
+        GameControllerAction.JogCancel => "Cancel jog",
+        _ => action.ToString()
+    };
+
+    static GameControllerBinding Button(GameControllerAction action, string button) => new()
+    {
+        Action = action,
+        InputKind = GameControllerInputKind.Button,
+        InputName = button
+    };
+
+    static GameControllerBinding Axis(GameControllerAction action, string axis) => new()
+    {
+        Action = action,
+        InputKind = GameControllerInputKind.Axis,
+        InputName = axis,
+        Threshold = 16000
+    };
+}
+
+public interface IGameControllerBindingCapture
+{
+    string StatusText { get; }
+
+    Task<GameControllerBinding?> CaptureAsync(CancellationToken cancellationToken = default);
+}
+
+[Serializable]
 public enum PopupKeyboardTrigger
 {
     Off = 0,
@@ -578,6 +762,7 @@ public class BaseConfig : ViewModelBase
     public JogConfig Jog { get; set; } = new();
     public JogUIConfig JogUiMetric { get; set; } = new(new[] { 5, 100, 500, 1000 }, new[] { .01d, .1d, 1d, 10d });
     public JogUIConfig JogUiImperial { get; set; } = new(new[] { 5, 10, 50, 100 }, new[] { .001d, .01d, .1d, 1d });
+    public GameControllerConfig GameController { get; set; } = new();
     public LatheConfig Lathe { get; set; } = new();
     public CameraConfig Camera { get; set; } = new();
     public GCodeViewerConfig GCodeViewer { get; set; } = new();
