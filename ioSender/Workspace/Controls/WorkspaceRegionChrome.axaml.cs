@@ -32,6 +32,7 @@ public partial class WorkspaceRegionChrome : Border
     MenuItem? _lockWidthItem;
     MenuItem? _lockHeightItem;
     JogControl? _jogHeaderStatusSource;
+    WorkspaceNode? _layoutNode;
 
     public WorkspaceRegionChrome()
     {
@@ -55,7 +56,15 @@ public partial class WorkspaceRegionChrome : Border
         set => SetValue(IsEditModeProperty, value);
     }
 
-    public WorkspaceNode? LayoutNode { get; set; }
+    public WorkspaceNode? LayoutNode
+    {
+        get => _layoutNode;
+        set
+        {
+            _layoutNode = value;
+            UpdateLockIndicators();
+        }
+    }
 
     protected override void OnPropertyChanged(AvaloniaPropertyChangedEventArgs change)
     {
@@ -162,8 +171,19 @@ public partial class WorkspaceRegionChrome : Border
     void UpdateEditChrome()
     {
         EditHint.IsVisible = IsEditMode;
+        UpdateLockIndicators();
         Classes.Set("workspace-region-edit", IsEditMode);
         TitleBar.ContextMenu = IsEditMode ? _editContextMenu : null;
+    }
+
+    void UpdateLockIndicators()
+    {
+        var hasWidthLock = IsEditMode && (LayoutNode?.LockedWidth ?? 0) > 0;
+        var hasHeightLock = IsEditMode && (LayoutNode?.LockedHeight ?? 0) > 0;
+
+        WidthLockIndicator.IsVisible = hasWidthLock;
+        HeightLockIndicator.IsVisible = hasHeightLock;
+        LockIndicators.IsVisible = hasWidthLock || hasHeightLock;
     }
 
     void AttachHeaderStatusSource(Control content)
@@ -343,6 +363,7 @@ public partial class WorkspaceRegionChrome : Border
             _lockWidthItem.Header = FormatLockHeader("Lock width", LayoutNode?.LockedWidth ?? 0);
         if (_lockHeightItem is not null)
             _lockHeightItem.Header = FormatLockHeader("Lock height", LayoutNode?.LockedHeight ?? 0);
+        UpdateLockIndicators();
     }
 
     static string FormatLockHeader(string label, double value) =>

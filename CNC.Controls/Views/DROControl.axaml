@@ -9,6 +9,7 @@
              x:DataType="core:GrblViewModel"
              HorizontalAlignment="Stretch"
              VerticalAlignment="Stretch"
+             MinWidth="180"
              >
   <UserControl.Resources>
     <ResourceDictionary>

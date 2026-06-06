@@ -12,11 +12,22 @@
             BorderBrush="{DynamicResource ThemeBorderLowBrush}"
             BorderThickness="0,0,0,1"
             Cursor="Hand">
-      <Grid ColumnDefinitions="*,Auto,Auto">
+      <Grid ColumnDefinitions="*,Auto,Auto,Auto">
         <TextBlock x:Name="TitleText" Grid.Column="0" VerticalAlignment="Center" FontWeight="SemiBold"/>
         <TextBlock x:Name="HeaderStatusText" Grid.Column="1" VerticalAlignment="Center"
                    Margin="8,0,0,0" FontWeight="SemiBold" IsVisible="False"/>
-        <TextBlock x:Name="EditHint" Grid.Column="2" Text="⋮⋮" Opacity="0.5" VerticalAlignment="Center"
+        <StackPanel x:Name="LockIndicators" Grid.Column="2" Orientation="Horizontal"
+                    VerticalAlignment="Center" IsVisible="False" Margin="6,0,0,0">
+          <Border x:Name="WidthLockIndicator" Classes="layout-lock-indicator"
+                  ToolTip.Tip="Layout width locked" IsVisible="False">
+            <TextBlock Classes="layout-lock-indicator-text" Text="W"/>
+          </Border>
+          <Border x:Name="HeightLockIndicator" Classes="layout-lock-indicator"
+                  ToolTip.Tip="Layout height locked" IsVisible="False">
+            <TextBlock Classes="layout-lock-indicator-text" Text="H"/>
+          </Border>
+        </StackPanel>
+        <TextBlock x:Name="EditHint" Grid.Column="3" Text="⋮⋮" Opacity="0.5" VerticalAlignment="Center"
                    IsVisible="False" Margin="4,0,0,0"/>
       </Grid>
     </Border>
