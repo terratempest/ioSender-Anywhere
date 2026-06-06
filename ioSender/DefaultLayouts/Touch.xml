@@ -5,7 +5,7 @@
     <LockedWidth>0</LockedWidth>
     <LockedHeight>0</LockedHeight>
     <Orientation>Vertical</Orientation>
-    <Ratio>0.6655555555555556</Ratio>
+    <Ratio>0.6454891994917408</Ratio>
     <First xsi:type="WorkspaceSplit">
       <LockedWidth>0</LockedWidth>
       <LockedHeight>0</LockedHeight>
@@ -19,24 +19,24 @@
         <First xsi:type="WorkspaceTabGroup">
           <LockedWidth>399</LockedWidth>
           <LockedHeight>0</LockedHeight>
-          <Id>f3e8e2c1-3524-491c-847a-35f27c657391</Id>
+          <Id>aa07185d-bf7d-4631-8763-849b77c95a57</Id>
           <Tabs>
             <WorkspaceTabEntry>
-              <Id>117f2570-9a4a-449f-bef6-29e408dbb582</Id>
+              <Id>cdba858f-9679-4e72-a0b8-391a49399d93</Id>
               <Editor>Console</Editor>
             </WorkspaceTabEntry>
             <WorkspaceTabEntry>
-              <Id>0425cbaf-fa5f-4eeb-b055-88843fd5ad2f</Id>
+              <Id>4d659dd0-58a2-4cdf-b06b-9e0d6f01edab</Id>
               <Editor>Program</Editor>
             </WorkspaceTabEntry>
           </Tabs>
-          <ActiveTabId>117f2570-9a4a-449f-bef6-29e408dbb582</ActiveTabId>
+          <ActiveTabId>cdba858f-9679-4e72-a0b8-391a49399d93</ActiveTabId>
           <TabStripPlacement>Bottom</TabStripPlacement>
         </First>
         <Second xsi:type="WorkspaceLeaf">
           <LockedWidth>0</LockedWidth>
           <LockedHeight>0</LockedHeight>
-          <Id>ac7f73da-2de0-47c6-8fee-37ab17f914a5</Id>
+          <Id>5ec809a8-7c4d-41fd-9973-88609893bcdf</Id>
           <Editor>Viewer3D</Editor>
         </Second>
       </First>
@@ -44,11 +44,11 @@
         <LockedWidth>0</LockedWidth>
         <LockedHeight>0</LockedHeight>
         <Orientation>Vertical</Orientation>
-        <Ratio>0.1624790619765494</Ratio>
+        <Ratio>0.11003236245954692</Ratio>
         <First xsi:type="WorkspaceLeaf">
           <LockedWidth>267</LockedWidth>
-          <LockedHeight>97</LockedHeight>
-          <Id>b35639f0-dc2b-4adf-9d10-00ef26a6f086</Id>
+          <LockedHeight>69</LockedHeight>
+          <Id>56077ac2-3954-46fc-b3e4-6b1fe070bc6c</Id>
           <Editor>WorkParams</Editor>
         </First>
         <Second xsi:type="WorkspaceSplit">
@@ -59,13 +59,13 @@
           <First xsi:type="WorkspaceLeaf">
             <LockedWidth>0</LockedWidth>
             <LockedHeight>0</LockedHeight>
-            <Id>ada476a0-9f30-483a-8b5d-4bd71514ad1d</Id>
+            <Id>32bb0990-5a5e-4e09-98ea-d19517787279</Id>
             <Editor>JobBar</Editor>
           </First>
           <Second xsi:type="WorkspaceLeaf">
             <LockedWidth>0</LockedWidth>
             <LockedHeight>105</LockedHeight>
-            <Id>37c8458a-b041-454f-8975-3cbaf41b660f</Id>
+            <Id>4cf8d546-ecbd-4bdc-bf5c-e7e727cb5776</Id>
             <Editor>Coolant</Editor>
           </Second>
         </Second>
@@ -75,7 +75,7 @@
       <LockedWidth>0</LockedWidth>
       <LockedHeight>0</LockedHeight>
       <Orientation>Horizontal</Orientation>
-      <Ratio>0.35539343408025015</Ratio>
+      <Ratio>0.441678520625889</Ratio>
       <First xsi:type="WorkspaceSplit">
         <LockedWidth>0</LockedWidth>
         <LockedHeight>0</LockedHeight>
@@ -83,14 +83,14 @@
         <Ratio>0.5483425414364641</Ratio>
         <First xsi:type="WorkspaceLeaf">
           <LockedWidth>399</LockedWidth>
-          <LockedHeight>302</LockedHeight>
-          <Id>30f2e02f-58cc-434c-a8a3-7a80d04cbeb9</Id>
+          <LockedHeight>279</LockedHeight>
+          <Id>67f2247e-83b5-4d7e-acf6-ba117fcd5972</Id>
           <Editor>MdiTouch</Editor>
         </First>
         <Second xsi:type="WorkspaceLeaf">
           <LockedWidth>0</LockedWidth>
           <LockedHeight>0</LockedHeight>
-          <Id>abfa1dc2-0358-4d9b-a2af-d959f70b76fd</Id>
+          <Id>35fc0671-45ab-4093-8e6c-4ee5132929ef</Id>
           <Editor>Dro</Editor>
         </Second>
       </First>
@@ -98,29 +98,29 @@
         <LockedWidth>0</LockedWidth>
         <LockedHeight>0</LockedHeight>
         <Orientation>Horizontal</Orientation>
-        <Ratio>0.7838056680161943</Ratio>
+        <Ratio>0.7309184993531694</Ratio>
         <First xsi:type="WorkspaceSplit">
           <LockedWidth>0</LockedWidth>
           <LockedHeight>0</LockedHeight>
           <Orientation>Horizontal</Orientation>
-          <Ratio>0.7166494312306101</Ratio>
+          <Ratio>0.6123893805309735</Ratio>
           <First xsi:type="WorkspaceLeaf">
             <LockedWidth>0</LockedWidth>
             <LockedHeight>0</LockedHeight>
-            <Id>8102763b-c72c-4be8-b056-5c486ddef341</Id>
+            <Id>b0778e67-8049-465e-ac1a-ec583cd3f66c</Id>
             <Editor>Jog</Editor>
           </First>
           <Second xsi:type="WorkspaceLeaf">
-            <LockedWidth>0</LockedWidth>
+            <LockedWidth>224</LockedWidth>
             <LockedHeight>0</LockedHeight>
-            <Id>db16e6db-cce3-4c47-a809-40e69b7b2255</Id>
+            <Id>219f03ef-99f6-49da-af60-d79e091d8e8d</Id>
             <Editor>FeedTouch</Editor>
           </Second>
         </First>
         <Second xsi:type="WorkspaceLeaf">
-          <LockedWidth>0</LockedWidth>
+          <LockedWidth>213</LockedWidth>
           <LockedHeight>0</LockedHeight>
-          <Id>ddac7722-1d64-4c5b-b152-4ca04cdf0931</Id>
+          <Id>154ffb6c-bcdc-4edc-b4ed-aca2cdc0f6d6</Id>
           <Editor>SpindleTouch</Editor>
         </Second>
       </Second>

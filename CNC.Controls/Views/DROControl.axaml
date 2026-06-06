@@ -25,6 +25,7 @@
 
   <Grid RowDefinitions="Auto,Auto,*,Auto" Margin="4">
     <Button x:Name="btnHomeAll" Grid.Row="0" Content="Home All"
+      Classes="status-indicator"
       loc:Localize.Key="CNC.Controls.Avalonia.drocontrol.btn_homeAll"
       loc:Localize.Fallback="Home All"
       ToolTip.Tip="Ctrl+H"

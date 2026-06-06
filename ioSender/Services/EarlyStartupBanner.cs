@@ -227,11 +227,11 @@ internal static class EarlyStartupBanner
             DrawText(hdc, "Version: " + AppVersion.DisplayVersion, -1, ref versionRect, DT_CENTER | DT_SINGLELINE | DT_VCENTER);
 
             SetTextColor(hdc, 0x00D4D4D4);
-            var statusRect = new RECT { Left = 24, Top = 112, Right = Width - 24, Bottom = 132 };
+            var statusRect = new RECT { Left = 24, Top = 104, Right = Width - 24, Bottom = 144 };
             SelectObject(hdc, statusFont);
             DrawText(hdc, statusText, -1, ref statusRect, DT_CENTER | DT_SINGLELINE | DT_VCENTER);
 
-            var barRect = new RECT { Left = 96, Top = 140, Right = Width - 96, Bottom = 144 };
+            var barRect = new RECT { Left = 96, Top = 150, Right = Width - 96, Bottom = 154 };
             using var barBackground = new NativeBrush(0x00403D3D);
             FillRect(hdc, ref barRect, barBackground.Handle);
 

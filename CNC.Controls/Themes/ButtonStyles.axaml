@@ -17,6 +17,17 @@
     <Setter Property="VerticalContentAlignment" Value="Center"/>
   </Style>
 
+  <Style Selector="Button.status-indicator:disabled">
+    <Setter Property="Opacity" Value="1"/>
+    <Setter Property="Foreground" Value="{DynamicResource ThemeForegroundBrush}"/>
+  </Style>
+  <Style Selector="Button.status-indicator:disabled /template/ ContentPresenter">
+    <Setter Property="Opacity" Value="1"/>
+    <Setter Property="Background" Value="{Binding Background, RelativeSource={RelativeSource TemplatedParent}}"/>
+    <Setter Property="BorderBrush" Value="{Binding BorderBrush, RelativeSource={RelativeSource TemplatedParent}}"/>
+    <Setter Property="Foreground" Value="{Binding Foreground, RelativeSource={RelativeSource TemplatedParent}}"/>
+  </Style>
+
   <Style Selector="Button.panel-action">
     <Setter Property="Background" Value="{DynamicResource ThemeControlHighBrush}"/>
     <Setter Property="Foreground" Value="{DynamicResource ThemeForegroundBrush}"/>

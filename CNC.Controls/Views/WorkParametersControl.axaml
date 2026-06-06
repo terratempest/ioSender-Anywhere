@@ -1,7 +1,6 @@
 <UserControl xmlns="https://github.com/avaloniaui"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:conv="using:CNC.Controls.Avalonia.Converters"
-             xmlns:views="using:CNC.Controls.Avalonia.Views"
              xmlns:loc="using:CNC.Localization.Avalonia"
              xmlns:core="using:CNC.Core"
              x:Class="CNC.Controls.Avalonia.Views.WorkParametersControl"
@@ -13,10 +12,9 @@
 
   <UserControl.Resources>
     <conv:LogicalNotConverter x:Key="BooleanConverter"/>
-    <conv:BoolToVisibleConverter x:Key="IsVisibleConverter"/>
   </UserControl.Resources>
 
-  <Grid Margin="4" ColumnDefinitions="Auto,*,Auto,*" RowDefinitions="28,28" TextElement.FontSize="12"
+  <Grid Margin="4" ColumnDefinitions="Auto,*,Auto,*" RowDefinitions="28" TextElement.FontSize="12"
         HorizontalAlignment="Stretch" VerticalAlignment="Stretch">
 
     <TextBlock x:Name="LblOffset" Grid.Row="0" Grid.Column="0" Text="Offset:" 
@@ -52,16 +50,6 @@
         </DataTemplate>
       </ComboBox.ItemTemplate>
     </ComboBox>
-
-    <StackPanel Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="4"
-      Orientation="Horizontal" Spacing="12"
-      HorizontalAlignment="Right" VerticalAlignment="Center">
-      <views:LEDControl x:Name="LedTlo" Label="TLO" 
-        IsSet="{Binding IsToolOffsetActive, Mode=OneWay}"
-        IsVisible="{Binding IsToolOffsetIndicatorVisible, Converter={StaticResource IsVisibleConverter}}"/>
-      <views:LEDControl x:Name="LedTloRef" Label="TLO ref'd" 
-        IsSet="{Binding IsTloReferenceSet, Mode=OneWay}"/>
-    </StackPanel>
 
   </Grid>
 </UserControl>
