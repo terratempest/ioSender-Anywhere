@@ -43,22 +43,32 @@ public static class WorkspaceLayoutCommands
         WorkspaceSplitOrientation orientation,
         out WorkspaceNode newRoot)
     {
+        return TrySplitRegion(root, target, orientation, 0.5, out newRoot);
+    }
+
+    public static bool TrySplitRegion(
+        WorkspaceNode root,
+        WorkspaceNode target,
+        WorkspaceSplitOrientation orientation,
+        double ratio,
+        out WorkspaceNode newRoot)
+    {
         if (ReferenceEquals(root, target))
         {
-            newRoot = CreateSplit(root, orientation);
+            newRoot = CreateSplit(root, orientation, ratio);
             return true;
         }
 
         if (root is WorkspaceSplit split)
         {
-            if (TrySplitRegion(split.First, target, orientation, out var newFirst))
+            if (TrySplitRegion(split.First, target, orientation, ratio, out var newFirst))
             {
                 split.First = newFirst;
                 newRoot = root;
                 return true;
             }
 
-            if (TrySplitRegion(split.Second, target, orientation, out var newSecond))
+            if (TrySplitRegion(split.Second, target, orientation, ratio, out var newSecond))
             {
                 split.Second = newSecond;
                 newRoot = root;
@@ -70,14 +80,16 @@ public static class WorkspaceLayoutCommands
         return false;
     }
 
-    static WorkspaceSplit CreateSplit(WorkspaceNode existing, WorkspaceSplitOrientation orientation) =>
+    static WorkspaceSplit CreateSplit(WorkspaceNode existing, WorkspaceSplitOrientation orientation, double ratio) =>
         new()
         {
             Orientation = orientation,
-            Ratio = 0.5,
+            Ratio = ClampSplitRatio(ratio),
             First = existing,
             Second = existing.Clone(),
         };
+
+    public static double ClampSplitRatio(double ratio) => Math.Clamp(ratio, 0.08, 0.92);
 
     public static bool TryJoinRegion(WorkspaceNode root, WorkspaceNode target, out WorkspaceNode newRoot)
     {

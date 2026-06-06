@@ -1,6 +1,8 @@
 using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Controls.Primitives;
+using Avalonia.Input;
+using Avalonia.Interactivity;
 using Avalonia.Layout;
 using CNC.App.Workspace;
 using ioSender.Workspace.Controls;
@@ -14,7 +16,9 @@ public sealed class SplitLayoutBuilder
     readonly Action? _onSplitterResizeCompleted;
     readonly Action? _onLayoutPersistRequested;
     readonly Action? _onActiveEditorsChanged;
+    readonly Action<WorkspaceSplitIntent>? _onSplitModeRequested;
     readonly Dictionary<WorkspaceSplit, WorkspaceGridSplitter> _splitters = new();
+    readonly List<Control> _splitterMenuTargets = new();
     readonly Dictionary<WorkspaceNode, WorkspaceRegionChrome> _regions = new();
     const double SplitterHitTargetThickness = 5;
     const double SplitterOverlap = (SplitterHitTargetThickness - 1) / 2;
@@ -23,12 +27,14 @@ public sealed class SplitLayoutBuilder
         WorkspaceEditorFactory factory,
         Action? onSplitterResizeCompleted = null,
         Action? onLayoutPersistRequested = null,
-        Action? onActiveEditorsChanged = null)
+        Action? onActiveEditorsChanged = null,
+        Action<WorkspaceSplitIntent>? onSplitModeRequested = null)
     {
         _factory = factory;
         _onSplitterResizeCompleted = onSplitterResizeCompleted;
         _onLayoutPersistRequested = onLayoutPersistRequested;
         _onActiveEditorsChanged = onActiveEditorsChanged;
+        _onSplitModeRequested = onSplitModeRequested;
     }
 
     public IReadOnlyDictionary<WorkspaceNode, WorkspaceRegionChrome> Regions => _regions;
@@ -36,6 +42,7 @@ public sealed class SplitLayoutBuilder
     public Control Build(WorkspaceNode root, bool editMode, Action<WorkspaceRegionChrome>? wireRegion)
     {
         _splitters.Clear();
+        _splitterMenuTargets.Clear();
         _regions.Clear();
         return BuildNode(root, editMode, wireRegion);
     }
@@ -90,10 +97,17 @@ public sealed class SplitLayoutBuilder
         return grid;
     }
 
-    WorkspaceGridSplitter CreateSplitter(WorkspaceSplit split, GridResizeDirection direction, bool editMode)
+    Control CreateSplitter(WorkspaceSplit split, GridResizeDirection direction, bool editMode)
     {
         var isColumnSplitter = direction == GridResizeDirection.Columns;
         var hasLockedBranch = HasLockedBranch(split);
+        if (hasLockedBranch)
+        {
+            var lockedTarget = CreateLockedSplitterMenuTarget(isColumnSplitter, editMode);
+            _splitterMenuTargets.Add(lockedTarget);
+            return lockedTarget;
+        }
+
         var splitter = new WorkspaceGridSplitter
         {
             Width = isColumnSplitter ? SplitterHitTargetThickness : double.NaN,
@@ -108,31 +122,85 @@ public sealed class SplitLayoutBuilder
                 ? new Thickness(-SplitterOverlap, 0)
                 : new Thickness(0, -SplitterOverlap),
             ResizeDirection = direction,
-            IsEnabled = editMode && !hasLockedBranch,
-            IsHitTestVisible = editMode && !hasLockedBranch,
-            Tag = hasLockedBranch,
+            IsEnabled = editMode,
+            IsHitTestVisible = editMode,
+            ContextMenu = editMode ? BuildSplitterContextMenu() : null,
         };
         splitter.Classes.Add("workspace-splitter");
+        AttachSplitterContextMenu(splitter);
 
         _splitters[split] = splitter;
+        _splitterMenuTargets.Add(splitter);
         splitter.DragDelta += (_, _) => UpdateRatioFromGrid(split, splitter);
         splitter.DragCompleted += (_, _) => _onSplitterResizeCompleted?.Invoke();
         return splitter;
+    }
+
+    Control CreateLockedSplitterMenuTarget(bool isColumnSplitter, bool editMode)
+    {
+        var target = new Border
+        {
+            Width = isColumnSplitter ? SplitterHitTargetThickness : double.NaN,
+            Height = isColumnSplitter ? double.NaN : SplitterHitTargetThickness,
+            MinWidth = isColumnSplitter ? SplitterHitTargetThickness : 0,
+            MinHeight = isColumnSplitter ? 0 : SplitterHitTargetThickness,
+            MaxWidth = isColumnSplitter ? SplitterHitTargetThickness : double.PositiveInfinity,
+            MaxHeight = isColumnSplitter ? double.PositiveInfinity : SplitterHitTargetThickness,
+            HorizontalAlignment = isColumnSplitter ? HorizontalAlignment.Center : HorizontalAlignment.Stretch,
+            VerticalAlignment = isColumnSplitter ? VerticalAlignment.Stretch : VerticalAlignment.Center,
+            Margin = isColumnSplitter
+                ? new Thickness(-SplitterOverlap, 0)
+                : new Thickness(0, -SplitterOverlap),
+            Background = Avalonia.Media.Brushes.Transparent,
+            IsHitTestVisible = editMode,
+            ContextMenu = editMode ? BuildSplitterContextMenu() : null,
+        };
+        target.Classes.Add("workspace-splitter");
+        AttachSplitterContextMenu(target);
+        return target;
+    }
+
+    void AttachSplitterContextMenu(Control target)
+    {
+        target.AddHandler(
+            InputElement.PointerPressedEvent,
+            OnSplitterPointerPressed,
+            RoutingStrategies.Tunnel,
+            handledEventsToo: true);
+    }
+
+    void OnSplitterPointerPressed(object? sender, PointerPressedEventArgs e)
+    {
+        if (sender is not Control target || target.ContextMenu is null)
+            return;
+
+        if (!e.GetCurrentPoint(target).Properties.IsRightButtonPressed)
+            return;
+
+        target.ContextMenu.Open(target);
+        e.Handled = true;
+    }
+
+    ContextMenu BuildSplitterContextMenu()
+    {
+        var menu = new ContextMenu();
+        menu.Items.Add(MakeItem("Split Vertically", () => _onSplitModeRequested?.Invoke(WorkspaceSplitIntent.Vertical)));
+        menu.Items.Add(MakeItem("Split Horizontally", () => _onSplitModeRequested?.Invoke(WorkspaceSplitIntent.Horizontal)));
+        return menu;
     }
 
     public void SetEditMode(bool editMode)
     {
         foreach (var splitter in _splitters.Values)
         {
-            if (splitter.Tag is bool hasLockedBranch && hasLockedBranch)
-            {
-                splitter.IsEnabled = false;
-                splitter.IsHitTestVisible = false;
-                continue;
-            }
-
             splitter.IsEnabled = editMode;
             splitter.IsHitTestVisible = editMode;
+        }
+
+        foreach (var target in _splitterMenuTargets)
+        {
+            target.IsHitTestVisible = editMode;
+            target.ContextMenu = editMode ? BuildSplitterContextMenu() : null;
         }
     }
 
@@ -225,5 +293,12 @@ public sealed class SplitLayoutBuilder
             : WorkspaceLockAxis.Height;
         return WorkspaceLayoutLocks.ResolveLockedSize(split.First, axis) > 0
             || WorkspaceLayoutLocks.ResolveLockedSize(split.Second, axis) > 0;
+    }
+
+    static MenuItem MakeItem(string header, Action action)
+    {
+        var item = new MenuItem { Header = header };
+        item.Click += (_, _) => action();
+        return item;
     }
 }

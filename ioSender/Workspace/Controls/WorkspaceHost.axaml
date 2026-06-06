@@ -1,5 +1,15 @@
 <UserControl xmlns="https://github.com/avaloniaui"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-             x:Class="ioSender.Workspace.Controls.WorkspaceHost">
-  <Panel x:Name="RootPanel"/>
+             x:Class="ioSender.Workspace.Controls.WorkspaceHost"
+             Focusable="True">
+  <Grid>
+    <Panel x:Name="RootPanel"/>
+    <Border x:Name="SplitPreviewLine"
+            Classes="workspace-split-preview"
+            HorizontalAlignment="Left"
+            VerticalAlignment="Top"
+            IsHitTestVisible="False"
+            IsVisible="False"
+            ZIndex="10"/>
+  </Grid>
 </UserControl>

@@ -50,6 +50,11 @@
     <Setter Property="Foreground" Value="{DynamicResource ThemeForegroundBrush}"/>
   </Style>
 
+  <Style Selector="Border.workspace-split-preview">
+    <Setter Property="Background" Value="{DynamicResource ThemeAccentBrushHigh}"/>
+    <Setter Property="Opacity" Value="0.85"/>
+  </Style>
+
   <Style Selector="Border.workspace-drop-target">
     <Setter Property="BorderBrush" Value="{DynamicResource ThemeAccentBrushHigh}"/>
     <Setter Property="BorderThickness" Value="2"/>

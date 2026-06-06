@@ -28,6 +28,7 @@ public partial class WorkspaceRegionChrome : Border
     public event EventHandler<WorkspaceEditorId>? ChangeEditorRequested;
 
     bool _isDropTarget;
+    bool _isSplitMode;
     ContextMenu? _editContextMenu;
     MenuItem? _lockWidthItem;
     MenuItem? _lockHeightItem;
@@ -63,6 +64,20 @@ public partial class WorkspaceRegionChrome : Border
         {
             _layoutNode = value;
             UpdateLockIndicators();
+        }
+    }
+
+    public bool IsSplitMode
+    {
+        get => _isSplitMode;
+        set
+        {
+            if (_isSplitMode == value)
+                return;
+
+            _isSplitMode = value;
+            ClearDropTarget();
+            UpdateEditChrome();
         }
     }
 
@@ -173,7 +188,7 @@ public partial class WorkspaceRegionChrome : Border
         EditHint.IsVisible = IsEditMode;
         UpdateLockIndicators();
         Classes.Set("workspace-region-edit", IsEditMode);
-        TitleBar.ContextMenu = IsEditMode ? _editContextMenu : null;
+        TitleBar.ContextMenu = IsEditMode && !IsSplitMode ? _editContextMenu : null;
     }
 
     void UpdateLockIndicators()
@@ -235,7 +250,7 @@ public partial class WorkspaceRegionChrome : Border
 
     void OnTitleBarPointerPressed(object? sender, PointerPressedEventArgs e)
     {
-        if (!IsEditMode)
+        if (!IsEditMode || IsSplitMode)
             return;
 
         if (!e.GetCurrentPoint(this).Properties.IsLeftButtonPressed)
@@ -249,7 +264,7 @@ public partial class WorkspaceRegionChrome : Border
 
     void OnTitleBarPointerReleased(object? sender, PointerReleasedEventArgs e)
     {
-        if (!IsEditMode)
+        if (!IsEditMode || IsSplitMode)
             return;
 
         if (_isDropTarget && WorkspaceDragBroker.Source is { } source && !ReferenceEquals(source, this))
@@ -263,7 +278,7 @@ public partial class WorkspaceRegionChrome : Border
 
     void OnPointerEntered(object? sender, PointerEventArgs e)
     {
-        if (!IsEditMode || WorkspaceDragBroker.Source is not { } source || ReferenceEquals(source, this))
+        if (!IsEditMode || IsSplitMode || WorkspaceDragBroker.Source is not { } source || ReferenceEquals(source, this))
             return;
 
         _isDropTarget = true;
@@ -284,8 +299,8 @@ public partial class WorkspaceRegionChrome : Border
     {
         var menu = new ContextMenu();
         menu.Opened += (_, _) => UpdateLockMenuItems();
-        menu.Items.Add(MakeItem("Split horizontally", () => RequestSplit(SplitHorizontalRequested)));
-        menu.Items.Add(MakeItem("Split vertically", () => RequestSplit(SplitVerticalRequested)));
+        menu.Items.Add(MakeItem("Split Vertically", () => RequestSplit(SplitVerticalRequested)));
+        menu.Items.Add(MakeItem("Split Horizontally", () => RequestSplit(SplitHorizontalRequested)));
         menu.Items.Add(MakeItem("Join with neighbor", () => RequestJoin()));
         menu.Items.Add(new Separator());
         _lockWidthItem = MakeItem(string.Empty, ToggleLockedWidth);
@@ -305,7 +320,7 @@ public partial class WorkspaceRegionChrome : Border
         menu.Items.Add(change);
         _editContextMenu = menu;
         ContextMenu = null;
-        TitleBar.ContextMenu = IsEditMode ? _editContextMenu : null;
+        TitleBar.ContextMenu = IsEditMode && !IsSplitMode ? _editContextMenu : null;
         UpdateLockMenuItems();
     }
 

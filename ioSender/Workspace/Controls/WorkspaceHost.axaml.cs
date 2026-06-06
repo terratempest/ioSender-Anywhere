@@ -1,6 +1,9 @@
 using Avalonia;
 using Avalonia.Controls;
+using Avalonia.Input;
+using Avalonia.Interactivity;
 using Avalonia.Threading;
+using Avalonia.VisualTree;
 using CNC.App.Workspace;
 using CNC.Controls.Avalonia.Services;
 using CNC.Core;
@@ -25,6 +28,10 @@ public partial class WorkspaceHost : UserControl
     readonly List<WorkspaceRegionChrome> _regionChromes = new();
     HashSet<WorkspaceEditorId> _activeEditors = new();
     ProgramService? _programService;
+    WorkspaceSplitIntent? _activeSplitIntent;
+    WorkspaceRegionChrome? _splitTarget;
+    double _splitRatio = 0.5;
+    const double SplitPreviewThickness = 2;
 
     public event EventHandler? LayoutChanged;
     public event EventHandler<IReadOnlyCollection<WorkspaceEditorId>>? ActiveEditorsChanged;
@@ -32,6 +39,8 @@ public partial class WorkspaceHost : UserControl
     public WorkspaceHost()
     {
         InitializeComponent();
+        AddHandler(PointerPressedEvent, OnHostPointerPressed, RoutingStrategies.Tunnel, true);
+        KeyDown += OnKeyDown;
     }
 
     public bool IsEditMode
@@ -116,7 +125,8 @@ public partial class WorkspaceHost : UserControl
             _factory,
             OnSplitterResizeCompleted,
             PersistCurrentLayout,
-            SyncActiveEditors);
+            SyncActiveEditors,
+            BeginSplitMode);
         var content = _builder.Build(_root, IsEditMode, chrome =>
         {
             WireRegion(chrome);
@@ -132,13 +142,11 @@ public partial class WorkspaceHost : UserControl
     {
         chrome.SplitHorizontalRequested += (_, _) =>
         {
-            if (chrome.LayoutNode is { } node)
-                OnSplit(node, WorkspaceSplitOrientation.Horizontal);
+            BeginSplitMode(WorkspaceSplitIntent.Horizontal);
         };
         chrome.SplitVerticalRequested += (_, _) =>
         {
-            if (chrome.LayoutNode is { } node)
-                OnSplit(node, WorkspaceSplitOrientation.Vertical);
+            BeginSplitMode(WorkspaceSplitIntent.Vertical);
         };
         chrome.JoinRequested += (_, _) =>
         {
@@ -152,17 +160,163 @@ public partial class WorkspaceHost : UserControl
         };
         chrome.ChangeEditorRequested += (_, id) => OnChangeEditor(chrome, id);
         chrome.DropCompleted += (_, target) => OnDropSwap(target);
+        chrome.AddHandler(PointerEnteredEvent, OnRegionPointerEntered, RoutingStrategies.Tunnel, true);
+        chrome.AddHandler(PointerMovedEvent, OnRegionPointerMoved, RoutingStrategies.Tunnel, true);
+        chrome.AddHandler(PointerExitedEvent, OnRegionPointerExited, RoutingStrategies.Tunnel, true);
+        chrome.AddHandler(PointerPressedEvent, OnRegionPointerPressed, RoutingStrategies.Tunnel, true);
     }
 
-    void OnSplit(WorkspaceNode node, WorkspaceSplitOrientation orientation)
+    void BeginSplitMode(WorkspaceSplitIntent intent)
+    {
+        if (!IsEditMode)
+            return;
+
+        WorkspaceDragBroker.Clear();
+        _activeSplitIntent = intent;
+        _splitTarget = null;
+        _splitRatio = 0.5;
+        SplitPreviewLine.IsVisible = false;
+        SetRegionSplitMode(true);
+        Focus();
+    }
+
+    void CancelSplitMode()
+    {
+        _activeSplitIntent = null;
+        _splitTarget = null;
+        _splitRatio = 0.5;
+        SplitPreviewLine.IsVisible = false;
+        SetRegionSplitMode(false);
+    }
+
+    void SetRegionSplitMode(bool isSplitMode)
+    {
+        foreach (var chrome in _regionChromes)
+            chrome.IsSplitMode = isSplitMode;
+    }
+
+    void OnRegionPointerEntered(object? sender, PointerEventArgs e)
+    {
+        if (_activeSplitIntent is null || sender is not WorkspaceRegionChrome chrome)
+            return;
+
+        UpdateSplitPreview(chrome, e.GetPosition(chrome));
+    }
+
+    void OnRegionPointerMoved(object? sender, PointerEventArgs e)
+    {
+        if (_activeSplitIntent is null || sender is not WorkspaceRegionChrome chrome)
+            return;
+
+        UpdateSplitPreview(chrome, e.GetPosition(chrome));
+    }
+
+    void OnRegionPointerExited(object? sender, PointerEventArgs e)
+    {
+        if (_activeSplitIntent is null || !ReferenceEquals(sender, _splitTarget))
+            return;
+
+        _splitTarget = null;
+        SplitPreviewLine.IsVisible = false;
+    }
+
+    void OnRegionPointerPressed(object? sender, PointerPressedEventArgs e)
+    {
+        if (_activeSplitIntent is not { } intent || sender is not WorkspaceRegionChrome chrome)
+            return;
+
+        var properties = e.GetCurrentPoint(chrome).Properties;
+        if (properties.IsRightButtonPressed)
+        {
+            CancelSplitMode();
+            e.Handled = true;
+            return;
+        }
+
+        if (!properties.IsLeftButtonPressed)
+            return;
+
+        UpdateSplitPreview(chrome, e.GetPosition(chrome));
+        if (chrome.LayoutNode is { } node)
+            OnSplit(node, intent.ToLayoutOrientation(), _splitRatio);
+
+        e.Handled = true;
+    }
+
+    void OnHostPointerPressed(object? sender, PointerPressedEventArgs e)
+    {
+        if (_activeSplitIntent is null)
+            return;
+
+        if (!e.GetCurrentPoint(this).Properties.IsRightButtonPressed)
+            return;
+
+        CancelSplitMode();
+        e.Handled = true;
+    }
+
+    void OnKeyDown(object? sender, KeyEventArgs e)
+    {
+        if (_activeSplitIntent is null || e.Key != Key.Escape)
+            return;
+
+        CancelSplitMode();
+        e.Handled = true;
+    }
+
+    void UpdateSplitPreview(WorkspaceRegionChrome chrome, Point localPoint)
+    {
+        if (_activeSplitIntent is not { } intent)
+            return;
+
+        var width = chrome.Bounds.Width;
+        var height = chrome.Bounds.Height;
+        if (width <= 0 || height <= 0)
+            return;
+
+        _splitTarget = chrome;
+        _splitRatio = WorkspaceLayoutCommands.ClampSplitRatio(
+            intent == WorkspaceSplitIntent.Vertical
+                ? localPoint.X / width
+                : localPoint.Y / height);
+
+        if (chrome.TranslatePoint(new Point(0, 0), RootPanel) is not { } origin)
+            return;
+
+        if (intent == WorkspaceSplitIntent.Vertical)
+        {
+            SplitPreviewLine.Width = SplitPreviewThickness;
+            SplitPreviewLine.Height = height;
+            SplitPreviewLine.Margin = new Thickness(
+                origin.X + width * _splitRatio - SplitPreviewThickness / 2,
+                origin.Y,
+                0,
+                0);
+        }
+        else
+        {
+            SplitPreviewLine.Width = width;
+            SplitPreviewLine.Height = SplitPreviewThickness;
+            SplitPreviewLine.Margin = new Thickness(
+                origin.X,
+                origin.Y + height * _splitRatio - SplitPreviewThickness / 2,
+                0,
+                0);
+        }
+
+        SplitPreviewLine.IsVisible = true;
+    }
+
+    void OnSplit(WorkspaceNode node, WorkspaceSplitOrientation orientation, double ratio)
     {
         if (_factory is null)
             return;
 
-        if (!WorkspaceLayoutCommands.TrySplitRegion(_root, node, orientation, out var newRoot))
+        if (!WorkspaceLayoutCommands.TrySplitRegion(_root, node, orientation, ratio, out var newRoot))
             return;
 
         _root = newRoot;
+        CancelSplitMode();
         PersistCurrentLayout();
         WorkspaceDragBroker.Clear();
         Rebuild();
@@ -278,5 +432,7 @@ public partial class WorkspaceHost : UserControl
         foreach (var chrome in _regionChromes)
             chrome.IsEditMode = IsEditMode;
         _builder?.SetEditMode(IsEditMode);
+        if (!IsEditMode)
+            CancelSplitMode();
     }
 }
