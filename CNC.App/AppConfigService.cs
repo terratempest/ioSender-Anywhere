@@ -193,6 +193,9 @@ public sealed class AppConfigService
             migrated = true;
         }
 
+        if (!config.CustomThemeDraft.UseSystemAccentColorSpecified)
+            config.CustomThemeDraft.UseSystemAccentColor = true;
+
         config.UserThemes ??= new();
         foreach (var theme in config.UserThemes)
         {
@@ -201,6 +204,9 @@ public sealed class AppConfigService
                 theme.BaseTheme = AppThemeKeys.Dark;
                 migrated = true;
             }
+
+            if (!theme.UseSystemAccentColorSpecified)
+                theme.UseSystemAccentColor = true;
         }
 
         return migrated;

@@ -1,6 +1,7 @@
 using System.Collections.ObjectModel;
 using System.Diagnostics;
 using CNC.Controls.Avalonia.Services;
+using CNC.Controls.Avalonia.ViewModels;
 using CNC.Core;
 using CNC.Platform.Abstractions;
 using ioSender.Services;
@@ -34,6 +35,8 @@ public sealed class MainWindowViewModel
     public PlatformServices Platform { get; }
 
     public GrblViewModel Grbl { get; }
+
+    public JogViewModel Jog => JogViewModel.Shared;
 
     public bool IsConnected => _connectionService?.IsConnected == true;
 

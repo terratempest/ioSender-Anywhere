@@ -3,6 +3,7 @@ using Avalonia.Controls;
 using Avalonia.Input;
 using Avalonia.Layout;
 using Avalonia.Media;
+using CNC.App;
 using CNC.App.Workspace;
 using CNC.GCodeViewer.Avalonia.Views;
 using CNC.Localization.Avalonia;
@@ -31,6 +32,7 @@ public sealed class WorkspaceTabGroupControl : UserControl
     };
     Guid? _activeEditorId;
     Control? _activeEditor;
+    bool _themeAppliedHooked;
 
     public WorkspaceTabGroupControl(
         WorkspaceTabGroup group,
@@ -45,10 +47,12 @@ public sealed class WorkspaceTabGroupControl : UserControl
         _activeEditorsChanged = activeEditorsChanged;
         _titleChanged = titleChanged;
 
-        _tabRail.Background = ResourceBrush("ThemeControlMidBrush");
-        _tabRail.BorderBrush = ResourceBrush("ThemeBorderLowBrush");
+        RefreshTabRailResources();
         _tabRail.Padding = new Thickness(3, 2);
         _tabRail.Child = _tabStack;
+
+        AttachedToVisualTree += (_, _) => HookThemeApplied();
+        DetachedFromVisualTree += (_, _) => UnhookThemeApplied();
 
         Content = _root;
         Build();
@@ -107,6 +111,36 @@ public sealed class WorkspaceTabGroupControl : UserControl
         foreach (var tab in _group.Tabs)
             _tabStack.Children.Add(CreateTabButton(tab));
         _tabStack.Children.Add(CreateAddButton());
+    }
+
+    void HookThemeApplied()
+    {
+        if (_themeAppliedHooked)
+            return;
+
+        AppThemeKeys.ThemeApplied += OnThemeApplied;
+        _themeAppliedHooked = true;
+    }
+
+    void UnhookThemeApplied()
+    {
+        if (!_themeAppliedHooked)
+            return;
+
+        AppThemeKeys.ThemeApplied -= OnThemeApplied;
+        _themeAppliedHooked = false;
+    }
+
+    void OnThemeApplied(object? sender, EventArgs e)
+    {
+        RefreshTabRailResources();
+        BuildTabs();
+    }
+
+    void RefreshTabRailResources()
+    {
+        _tabRail.Background = ResourceBrush("ThemeControlMidBrush");
+        _tabRail.BorderBrush = ResourceBrush("ThemeBorderLowBrush");
     }
 
     Button CreateTabButton(WorkspaceTabEntry tab)

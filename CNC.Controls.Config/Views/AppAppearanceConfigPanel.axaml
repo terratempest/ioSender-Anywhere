@@ -21,6 +21,10 @@
         </Grid>
         <Button Content="Reset colors" FontSize="12" MinWidth="95" Click="OnResetColorsClick"/>
         <Button Content="Save as theme" FontSize="12" MinWidth="105" Click="OnSaveAsThemeClick"/>
+        <CheckBox x:Name="UseSystemAccentCheck"
+                  Content="Use system accent color"
+                  FontSize="12"
+                  VerticalAlignment="Center"/>
       </StackPanel>
 
       <ScrollViewer Grid.Row="1" Grid.Column="0" VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled">

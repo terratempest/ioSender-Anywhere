@@ -19,6 +19,7 @@ public static class AppTheme
 
     static ResourceDictionary? _highContrastOverlay;
     static ResourceDictionary? _customOverlay;
+    static ResourceDictionary? _accentOverlay;
 
     public static void Apply(string? themeKey)
         => Apply(themeKey, null);
@@ -34,6 +35,8 @@ public static class AppTheme
         app.RequestedThemeVariant = IsLightKey(baseKey) ? ThemeVariant.Light : ThemeVariant.Dark;
         SyncHighContrastOverlay(app, IsHighContrastKey(baseKey));
         SyncCustomOverlay(app, customTheme);
+        var effectiveTheme = customTheme ?? AppThemePalette.CreateTheme(key, key);
+        SyncAccentOverlay(app, ShouldUseSystemAccent(config, customTheme), IsLightKey(baseKey), effectiveTheme);
         AppThemeKeys.NotifyThemeApplied();
     }
 
@@ -57,6 +60,9 @@ public static class AppTheme
     public static bool IsLightTheme(string key) => IsLightKey(key);
 
     public static bool IsHighContrastTheme(string key) => IsHighContrastKey(key);
+
+    public static bool ShouldUseSystemAccent(BaseConfig? config, AppThemeDefinition? theme) =>
+        theme?.UseSystemAccentColor ?? config?.UseSystemAccentColor ?? true;
 
     public static AppThemeDefinition? FindTheme(BaseConfig? config, string? themeKey)
     {
@@ -110,6 +116,18 @@ public static class AppTheme
         merged.Add(_customOverlay);
     }
 
+    static void SyncAccentOverlay(Application app, bool useSystemAccent, bool isLightTheme, AppThemeDefinition theme)
+    {
+        var merged = app.Resources.MergedDictionaries;
+        if (_accentOverlay != null && merged.Contains(_accentOverlay))
+            merged.Remove(_accentOverlay);
+
+        _accentOverlay = useSystemAccent
+            ? BuildSystemAccentResourceDictionary(app, isLightTheme)
+            : BuildCustomAccentResourceDictionary(theme);
+        merged.Add(_accentOverlay);
+    }
+
     internal static ResourceDictionary BuildResourceDictionary(AppThemeDefinition theme)
     {
         var dictionary = new ResourceDictionary();
@@ -124,12 +142,95 @@ public static class AppTheme
 
         return dictionary;
     }
+
+    internal static ResourceDictionary BuildSystemAccentResourceDictionary(Application app, bool isLightTheme)
+    {
+        var accent = ResolveColorResource(app, "SystemAccentColor", Color.FromRgb(0, 120, 215));
+        var low = ResolveAccentVariant(app, isLightTheme ? "SystemAccentColorLight2" : "SystemAccentColorDark2",
+            isLightTheme ? Lighten(accent, 0.55) : Darken(accent, 0.35));
+        var high = ResolveAccentVariant(app, isLightTheme ? "SystemAccentColorDark1" : "SystemAccentColorLight1",
+            isLightTheme ? Darken(accent, 0.25) : Lighten(accent, 0.30));
+
+        return BuildAccentResourceDictionary(accent, low, high);
+    }
+
+    internal static ResourceDictionary BuildCustomAccentResourceDictionary(AppThemeDefinition theme)
+    {
+        var colors = AppThemePalette.NormalizeColors(theme).Colors
+            .ToDictionary(c => c.Key, c => AppThemePalette.ParseColor(c.Value), StringComparer.OrdinalIgnoreCase);
+
+        var accent = colors[AppThemePalette.EditableAccentKey];
+        var low = Darken(accent, 0.35);
+        var high = Lighten(accent, 0.30);
+        var dictionary = BuildAccentResourceDictionary(accent, low, high);
+
+        dictionary["SystemAccentColor"] = accent;
+        dictionary["SystemAccentColorLight1"] = high;
+        dictionary["SystemAccentColorLight2"] = high;
+        dictionary["SystemAccentColorLight3"] = high;
+        dictionary["SystemAccentColorDark1"] = low;
+        dictionary["SystemAccentColorDark2"] = low;
+        dictionary["SystemAccentColorDark3"] = low;
+
+        return dictionary;
+    }
+
+    internal static ResourceDictionary BuildAccentResourceDictionary(Color accent, Color low, Color high)
+    {
+        return new ResourceDictionary
+        {
+            ["ThemeAccentBrush"] = new SolidColorBrush(accent),
+            ["ThemeAccentBrushLow"] = new SolidColorBrush(low),
+            ["ThemeAccentBrushHigh"] = new SolidColorBrush(high),
+            ["ThemeAccentColor"] = accent,
+            ["ThemeAccentColor1"] = accent,
+            ["ThemeAccentColor2"] = low,
+            ["ThemeAccentColor3"] = high,
+        };
+    }
+
+    static Color ResolveAccentVariant(Application app, string key, Color fallback) =>
+        ResolveColorResource(app, key, fallback);
+
+    static Color ResolveColorResource(Application app, string key, Color fallback)
+    {
+        if (app.TryGetResource(key, app.ActualThemeVariant, out var value))
+        {
+            if (value is Color color)
+                return color;
+            if (value is SolidColorBrush brush)
+                return brush.Color;
+        }
+
+        return fallback;
+    }
+
+    static Color Lighten(Color color, double amount) => Color.FromArgb(
+        color.A,
+        (byte)Math.Clamp(color.R + (255 - color.R) * amount, 0, 255),
+        (byte)Math.Clamp(color.G + (255 - color.G) * amount, 0, 255),
+        (byte)Math.Clamp(color.B + (255 - color.B) * amount, 0, 255));
+
+    static Color Darken(Color color, double amount) => Color.FromArgb(
+        color.A,
+        (byte)Math.Clamp(color.R * (1 - amount), 0, 255),
+        (byte)Math.Clamp(color.G * (1 - amount), 0, 255),
+        (byte)Math.Clamp(color.B * (1 - amount), 0, 255));
 }
 
 public sealed record AppThemePaletteEntry(string Key, string Label, bool IsViewerColor, bool IsBrush);
 
 public static class AppThemePalette
 {
+    public const string EditableAccentKey = "SystemAccentColor";
+
+    const string DefaultAccent = "#FF3794FF";
+
+    public static readonly string[] AccentKeys =
+    [
+        EditableAccentKey,
+    ];
+
     public static readonly AppThemePaletteEntry[] Entries =
     [
         new("ThemeBackgroundBrush", "Background", false, true),
@@ -143,13 +244,7 @@ public static class AppThemePalette
         new("ThemeBorderLowBrush", "Border low", false, true),
         new("ThemeBorderMidBrush", "Border mid", false, true),
         new("ThemeBorderHighBrush", "Border high", false, true),
-        new("ThemeAccentBrush", "Accent", false, true),
-        new("ThemeAccentBrushLow", "Accent low", false, true),
-        new("ThemeAccentBrushHigh", "Accent high", false, true),
-        new("ThemeAccentColor", "Accent color", false, false),
-        new("ThemeAccentColor1", "Accent color 1", false, false),
-        new("ThemeAccentColor2", "Accent color 2", false, false),
-        new("ThemeAccentColor3", "Accent color 3", false, false),
+        new(EditableAccentKey, "Accent", false, false),
         new("IoSenderReadOnlyBrush", "Read-only", false, true),
         new("IoSenderOverlayBrush", "Overlay", false, true),
         new("IoSenderDangerBrush", "Danger", false, true),
@@ -184,13 +279,7 @@ public static class AppThemePalette
         ["ThemeBorderLowBrush"] = "#FF3F3F46",
         ["ThemeBorderMidBrush"] = "#FF505050",
         ["ThemeBorderHighBrush"] = "#FF6A6A6A",
-        ["ThemeAccentBrush"] = "#FF3794FF",
-        ["ThemeAccentBrushLow"] = "#FF264F78",
-        ["ThemeAccentBrushHigh"] = "#FF4DA3FF",
-        ["ThemeAccentColor"] = "#FF3794FF",
-        ["ThemeAccentColor1"] = "#FF3794FF",
-        ["ThemeAccentColor2"] = "#FF264F78",
-        ["ThemeAccentColor3"] = "#FF4DA3FF",
+        [EditableAccentKey] = DefaultAccent,
         ["IoSenderReadOnlyBrush"] = "#FF2A2A2E",
         ["IoSenderOverlayBrush"] = "#99000000",
         ["IoSenderDangerBrush"] = "#FFC62828",
@@ -225,13 +314,7 @@ public static class AppThemePalette
         ["ThemeBorderLowBrush"] = "#FFB9C1CA",
         ["ThemeBorderMidBrush"] = "#FFA5AFBA",
         ["ThemeBorderHighBrush"] = "#FF8F9AA6",
-        ["ThemeAccentBrush"] = "#FF3A718F",
-        ["ThemeAccentBrushLow"] = "#FFC1D5DF",
-        ["ThemeAccentBrushHigh"] = "#FF2F5F79",
-        ["ThemeAccentColor"] = "#FF3A718F",
-        ["ThemeAccentColor1"] = "#FF3A718F",
-        ["ThemeAccentColor2"] = "#FFC1D5DF",
-        ["ThemeAccentColor3"] = "#FF2F5F79",
+        [EditableAccentKey] = DefaultAccent,
         ["IoSenderReadOnlyBrush"] = "#FFCDD3D9",
         ["IoSenderOverlayBrush"] = "#55000000",
         ["IoSenderDangerBrush"] = "#FFA14B47",
@@ -266,13 +349,7 @@ public static class AppThemePalette
         ["ThemeBorderLowBrush"] = "#FF777777",
         ["ThemeBorderMidBrush"] = "#FFA0A0A0",
         ["ThemeBorderHighBrush"] = "#FFD6D6D6",
-        ["ThemeAccentBrush"] = "#FF66B8FF",
-        ["ThemeAccentBrushLow"] = "#FF0B5794",
-        ["ThemeAccentBrushHigh"] = "#FFA7D8FF",
-        ["ThemeAccentColor"] = "#FF66B8FF",
-        ["ThemeAccentColor1"] = "#FF66B8FF",
-        ["ThemeAccentColor2"] = "#FF0B5794",
-        ["ThemeAccentColor3"] = "#FFA7D8FF",
+        [EditableAccentKey] = DefaultAccent,
         ["IoSenderReadOnlyBrush"] = "#FF202020",
         ["IoSenderOverlayBrush"] = "#CC000000",
         ["IoSenderDangerBrush"] = "#FFFF4D4D",
@@ -307,13 +384,7 @@ public static class AppThemePalette
         ["ThemeBorderLowBrush"] = "#FF4D5862",
         ["ThemeBorderMidBrush"] = "#FF26313B",
         ["ThemeBorderHighBrush"] = "#FF000000",
-        ["ThemeAccentBrush"] = "#FF003C70",
-        ["ThemeAccentBrushLow"] = "#FF75B8EA",
-        ["ThemeAccentBrushHigh"] = "#FF001E3D",
-        ["ThemeAccentColor"] = "#FF003C70",
-        ["ThemeAccentColor1"] = "#FF003C70",
-        ["ThemeAccentColor2"] = "#FF75B8EA",
-        ["ThemeAccentColor3"] = "#FF001E3D",
+        [EditableAccentKey] = DefaultAccent,
         ["IoSenderReadOnlyBrush"] = "#FFBEC4CA",
         ["IoSenderOverlayBrush"] = "#88000000",
         ["IoSenderDangerBrush"] = "#FF8C1D18",
@@ -338,6 +409,9 @@ public static class AppThemePalette
     public static bool IsBrushKey(string key) =>
         Entries.FirstOrDefault(e => e.Key.Equals(key, StringComparison.OrdinalIgnoreCase))?.IsBrush ?? false;
 
+    public static bool IsAccentKey(string key) =>
+        AccentKeys.Any(k => k.Equals(key, StringComparison.OrdinalIgnoreCase));
+
     public static AppThemeDefinition CreateTheme(string name, string baseTheme)
     {
         var colors = DefaultsFor(baseTheme)
@@ -348,6 +422,7 @@ public static class AppThemePalette
         {
             Name = name,
             BaseTheme = AppThemeKeys.Normalize(baseTheme),
+            UseSystemAccentColor = true,
             Colors = new System.Collections.ObjectModel.ObservableCollection<ThemeColorSetting>(colors),
         };
     }
@@ -364,6 +439,7 @@ public static class AppThemePalette
         {
             Name = theme.Name,
             BaseTheme = theme.BaseTheme,
+            UseSystemAccentColor = theme.UseSystemAccentColor,
         };
 
         foreach (var entry in Entries)

@@ -19,90 +19,97 @@
     </ResourceDictionary>
   </UserControl.Resources>
 
-  <Grid Background="Transparent" ColumnDefinitions="Auto,Auto" TextElement.FontSize="12">
-    <DataGrid x:Name="dgrOffsets" Grid.Column="0" IsReadOnly="True"
-              SelectionMode="Single" AutoGenerateColumns="False"
-              CanUserReorderColumns="False" CanUserResizeColumns="False"
-              CanUserSortColumns="False" SelectionChanged="dgrOffsets_SelectionChanged">
-      
-      <DataGrid.Columns>
-        <DataGridTextColumn Header="Offset" Binding="{Binding Code}"/>
-        <DataGridTextColumn Header="X" Binding="{Binding X}"/>
-        <DataGridTextColumn Header="Y" Binding="{Binding Y}">
-          <DataGridTextColumn.IsVisible>
-            <MultiBinding Converter="{StaticResource IsAxisVisibleConverter}">
-              <Binding Path="DataContext.AxisEnabledFlags" ElementName="root"/>
-              <Binding Source="{x:Static gcode:AxisFlags.Y}"/>
-            </MultiBinding>
-          </DataGridTextColumn.IsVisible>
-        </DataGridTextColumn>
-        <DataGridTextColumn Header="Z" Binding="{Binding Z}">
-          <DataGridTextColumn.IsVisible>
-            <MultiBinding Converter="{StaticResource IsAxisVisibleConverter}">
-              <Binding Path="DataContext.AxisEnabledFlags" ElementName="root"/>
-              <Binding Source="{x:Static gcode:AxisFlags.Z}"/>
-            </MultiBinding>
-          </DataGridTextColumn.IsVisible>
-        </DataGridTextColumn>
-        <DataGridTextColumn Binding="{Binding A}">
-          <DataGridTextColumn.Header>
-            <TextBlock Text="{Binding DataContext.AxisLetter.A, ElementName=root}"/>
-          </DataGridTextColumn.Header>
-          <DataGridTextColumn.IsVisible>
-            <MultiBinding Converter="{StaticResource IsAxisVisibleConverter}">
-              <Binding Path="DataContext.AxisEnabledFlags" ElementName="root"/>
-              <Binding Source="{x:Static gcode:AxisFlags.A}"/>
-            </MultiBinding>
-          </DataGridTextColumn.IsVisible>
-        </DataGridTextColumn>
-        <DataGridTextColumn Binding="{Binding B}">
-          <DataGridTextColumn.Header>
-            <TextBlock Text="{Binding DataContext.AxisLetter.B, ElementName=root}"/>
-          </DataGridTextColumn.Header>
-          <DataGridTextColumn.IsVisible>
-            <MultiBinding Converter="{StaticResource IsAxisVisibleConverter}">
-              <Binding Path="DataContext.AxisEnabledFlags" ElementName="root"/>
-              <Binding Source="{x:Static gcode:AxisFlags.B}"/>
-            </MultiBinding>
-          </DataGridTextColumn.IsVisible>
-        </DataGridTextColumn>
-        <DataGridTextColumn Binding="{Binding C}">
-          <DataGridTextColumn.Header>
-            <TextBlock Text="{Binding DataContext.AxisLetter.C, ElementName=root}"/>
-          </DataGridTextColumn.Header>
-          <DataGridTextColumn.IsVisible>
-            <MultiBinding Converter="{StaticResource IsAxisVisibleConverter}">
-              <Binding Path="DataContext.AxisEnabledFlags" ElementName="root"/>
-              <Binding Source="{x:Static gcode:AxisFlags.C}"/>
-            </MultiBinding>
-          </DataGridTextColumn.IsVisible>
-        </DataGridTextColumn>
-        <DataGridTextColumn Header="U" Binding="{Binding U}">
-          <DataGridTextColumn.IsVisible>
-            <MultiBinding Converter="{StaticResource IsAxisVisibleConverter}">
-              <Binding Path="DataContext.AxisEnabledFlags" ElementName="root"/>
-              <Binding Source="{x:Static gcode:AxisFlags.U}"/>
-            </MultiBinding>
-          </DataGridTextColumn.IsVisible>
-        </DataGridTextColumn>
-        <DataGridTextColumn Header="V" Binding="{Binding V}">
-          <DataGridTextColumn.IsVisible>
-            <MultiBinding Converter="{StaticResource IsAxisVisibleConverter}">
-              <Binding Path="DataContext.AxisEnabledFlags" ElementName="root"/>
-              <Binding Source="{x:Static gcode:AxisFlags.V}"/>
-            </MultiBinding>
-          </DataGridTextColumn.IsVisible>
-        </DataGridTextColumn>
-        <DataGridTextColumn Header="W" Binding="{Binding W}">
-          <DataGridTextColumn.IsVisible>
-            <MultiBinding Converter="{StaticResource IsAxisVisibleConverter}">
-              <Binding Path="DataContext.AxisEnabledFlags" ElementName="root"/>
-              <Binding Source="{x:Static gcode:AxisFlags.W}"/>
-            </MultiBinding>
-          </DataGridTextColumn.IsVisible>
-        </DataGridTextColumn>
-      </DataGrid.Columns>
-    </DataGrid>
+  <Grid Background="Transparent" ColumnDefinitions="Auto,Auto" TextElement.FontSize="12" Margin="4">
+    <Border Grid.Column="0"
+            Background="{DynamicResource ThemeControlLowBrush}"
+            BorderBrush="{DynamicResource ThemeBorderLowBrush}"
+            BorderThickness="1"
+            Padding="4"
+            Margin="0,0,8,0">
+      <DataGrid x:Name="dgrOffsets" IsReadOnly="True"
+                SelectionMode="Single" AutoGenerateColumns="False"
+                CanUserReorderColumns="False" CanUserResizeColumns="False"
+                CanUserSortColumns="False" SelectionChanged="dgrOffsets_SelectionChanged">
+
+        <DataGrid.Columns>
+          <DataGridTextColumn Header="Offset" Binding="{Binding Code}"/>
+          <DataGridTextColumn Header="X" Binding="{Binding X}"/>
+          <DataGridTextColumn Header="Y" Binding="{Binding Y}">
+            <DataGridTextColumn.IsVisible>
+              <MultiBinding Converter="{StaticResource IsAxisVisibleConverter}">
+                <Binding Path="DataContext.AxisEnabledFlags" ElementName="root"/>
+                <Binding Source="{x:Static gcode:AxisFlags.Y}"/>
+              </MultiBinding>
+            </DataGridTextColumn.IsVisible>
+          </DataGridTextColumn>
+          <DataGridTextColumn Header="Z" Binding="{Binding Z}">
+            <DataGridTextColumn.IsVisible>
+              <MultiBinding Converter="{StaticResource IsAxisVisibleConverter}">
+                <Binding Path="DataContext.AxisEnabledFlags" ElementName="root"/>
+                <Binding Source="{x:Static gcode:AxisFlags.Z}"/>
+              </MultiBinding>
+            </DataGridTextColumn.IsVisible>
+          </DataGridTextColumn>
+          <DataGridTextColumn Binding="{Binding A}">
+            <DataGridTextColumn.Header>
+              <TextBlock Text="{Binding DataContext.AxisLetter.A, ElementName=root}"/>
+            </DataGridTextColumn.Header>
+            <DataGridTextColumn.IsVisible>
+              <MultiBinding Converter="{StaticResource IsAxisVisibleConverter}">
+                <Binding Path="DataContext.AxisEnabledFlags" ElementName="root"/>
+                <Binding Source="{x:Static gcode:AxisFlags.A}"/>
+              </MultiBinding>
+            </DataGridTextColumn.IsVisible>
+          </DataGridTextColumn>
+          <DataGridTextColumn Binding="{Binding B}">
+            <DataGridTextColumn.Header>
+              <TextBlock Text="{Binding DataContext.AxisLetter.B, ElementName=root}"/>
+            </DataGridTextColumn.Header>
+            <DataGridTextColumn.IsVisible>
+              <MultiBinding Converter="{StaticResource IsAxisVisibleConverter}">
+                <Binding Path="DataContext.AxisEnabledFlags" ElementName="root"/>
+                <Binding Source="{x:Static gcode:AxisFlags.B}"/>
+              </MultiBinding>
+            </DataGridTextColumn.IsVisible>
+          </DataGridTextColumn>
+          <DataGridTextColumn Binding="{Binding C}">
+            <DataGridTextColumn.Header>
+              <TextBlock Text="{Binding DataContext.AxisLetter.C, ElementName=root}"/>
+            </DataGridTextColumn.Header>
+            <DataGridTextColumn.IsVisible>
+              <MultiBinding Converter="{StaticResource IsAxisVisibleConverter}">
+                <Binding Path="DataContext.AxisEnabledFlags" ElementName="root"/>
+                <Binding Source="{x:Static gcode:AxisFlags.C}"/>
+              </MultiBinding>
+            </DataGridTextColumn.IsVisible>
+          </DataGridTextColumn>
+          <DataGridTextColumn Header="U" Binding="{Binding U}">
+            <DataGridTextColumn.IsVisible>
+              <MultiBinding Converter="{StaticResource IsAxisVisibleConverter}">
+                <Binding Path="DataContext.AxisEnabledFlags" ElementName="root"/>
+                <Binding Source="{x:Static gcode:AxisFlags.U}"/>
+              </MultiBinding>
+            </DataGridTextColumn.IsVisible>
+          </DataGridTextColumn>
+          <DataGridTextColumn Header="V" Binding="{Binding V}">
+            <DataGridTextColumn.IsVisible>
+              <MultiBinding Converter="{StaticResource IsAxisVisibleConverter}">
+                <Binding Path="DataContext.AxisEnabledFlags" ElementName="root"/>
+                <Binding Source="{x:Static gcode:AxisFlags.V}"/>
+              </MultiBinding>
+            </DataGridTextColumn.IsVisible>
+          </DataGridTextColumn>
+          <DataGridTextColumn Header="W" Binding="{Binding W}">
+            <DataGridTextColumn.IsVisible>
+              <MultiBinding Converter="{StaticResource IsAxisVisibleConverter}">
+                <Binding Path="DataContext.AxisEnabledFlags" ElementName="root"/>
+                <Binding Source="{x:Static gcode:AxisFlags.W}"/>
+              </MultiBinding>
+            </DataGridTextColumn.IsVisible>
+          </DataGridTextColumn>
+        </DataGrid.Columns>
+      </DataGrid>
+    </Border>
 
     <StackPanel Grid.Column="1" VerticalAlignment="Top">
       <StackPanel Orientation="Horizontal" Margin="73,0,0,2">

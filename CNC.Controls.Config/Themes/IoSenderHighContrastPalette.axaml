@@ -13,13 +13,13 @@
     <SolidColorBrush x:Key="ThemeBorderLowBrush" Color="#777777"/>
     <SolidColorBrush x:Key="ThemeBorderMidBrush" Color="#A0A0A0"/>
     <SolidColorBrush x:Key="ThemeBorderHighBrush" Color="#D6D6D6"/>
-    <SolidColorBrush x:Key="ThemeAccentBrush" Color="#66B8FF"/>
-    <SolidColorBrush x:Key="ThemeAccentBrushLow" Color="#0B5794"/>
-    <SolidColorBrush x:Key="ThemeAccentBrushHigh" Color="#A7D8FF"/>
-    <Color x:Key="ThemeAccentColor">#66B8FF</Color>
-    <Color x:Key="ThemeAccentColor1">#66B8FF</Color>
-    <Color x:Key="ThemeAccentColor2">#0B5794</Color>
-    <Color x:Key="ThemeAccentColor3">#A7D8FF</Color>
+    <SolidColorBrush x:Key="ThemeAccentBrush" Color="#3794FF"/>
+    <SolidColorBrush x:Key="ThemeAccentBrushLow" Color="#264F78"/>
+    <SolidColorBrush x:Key="ThemeAccentBrushHigh" Color="#4DA3FF"/>
+    <Color x:Key="ThemeAccentColor">#3794FF</Color>
+    <Color x:Key="ThemeAccentColor1">#3794FF</Color>
+    <Color x:Key="ThemeAccentColor2">#264F78</Color>
+    <Color x:Key="ThemeAccentColor3">#4DA3FF</Color>
     <SolidColorBrush x:Key="IoSenderReadOnlyBrush" Color="#202020"/>
     <SolidColorBrush x:Key="IoSenderOverlayBrush" Color="#CC000000"/>
     <SolidColorBrush x:Key="IoSenderDangerBrush" Color="#FF4D4D"/>
@@ -53,13 +53,13 @@
     <SolidColorBrush x:Key="ThemeBorderLowBrush" Color="#4D5862"/>
     <SolidColorBrush x:Key="ThemeBorderMidBrush" Color="#26313B"/>
     <SolidColorBrush x:Key="ThemeBorderHighBrush" Color="#000000"/>
-    <SolidColorBrush x:Key="ThemeAccentBrush" Color="#003C70"/>
-    <SolidColorBrush x:Key="ThemeAccentBrushLow" Color="#75B8EA"/>
-    <SolidColorBrush x:Key="ThemeAccentBrushHigh" Color="#001E3D"/>
-    <Color x:Key="ThemeAccentColor">#003C70</Color>
-    <Color x:Key="ThemeAccentColor1">#003C70</Color>
-    <Color x:Key="ThemeAccentColor2">#75B8EA</Color>
-    <Color x:Key="ThemeAccentColor3">#001E3D</Color>
+    <SolidColorBrush x:Key="ThemeAccentBrush" Color="#3794FF"/>
+    <SolidColorBrush x:Key="ThemeAccentBrushLow" Color="#264F78"/>
+    <SolidColorBrush x:Key="ThemeAccentBrushHigh" Color="#4DA3FF"/>
+    <Color x:Key="ThemeAccentColor">#3794FF</Color>
+    <Color x:Key="ThemeAccentColor1">#3794FF</Color>
+    <Color x:Key="ThemeAccentColor2">#264F78</Color>
+    <Color x:Key="ThemeAccentColor3">#4DA3FF</Color>
     <SolidColorBrush x:Key="IoSenderReadOnlyBrush" Color="#BEC4CA"/>
     <SolidColorBrush x:Key="IoSenderOverlayBrush" Color="#88000000"/>
     <SolidColorBrush x:Key="IoSenderDangerBrush" Color="#8C1D18"/>

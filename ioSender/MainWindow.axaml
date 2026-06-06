@@ -229,7 +229,14 @@
         <TextBlock Grid.Column="0" Text="{Binding Grbl.Blocks, StringFormat='Blocks: {0}'}"/>
         <TextBlock Grid.Column="2" Text="{Binding Grbl.Message}" TextWrapping="NoWrap"/>
         <TextBlock Grid.Column="4" Text="{Binding Grbl.RunTime, StringFormat='Run time: {0}'}"/>
-        <TextBlock Grid.Column="6" Text="{Binding Grbl.JogStep, StringFormat='Jog step: {0}'}"/>
+        <TextBlock Grid.Column="6">
+          <TextBlock.Text>
+            <MultiBinding StringFormat="Jog | Step: {0}  Feed: {1:####0}">
+              <Binding Path="Grbl.JogStep"/>
+              <Binding Path="Jog.FeedRate"/>
+            </MultiBinding>
+          </TextBlock.Text>
+        </TextBlock>
       </Grid>
     </Border>
 

@@ -35,6 +35,8 @@ public class AppThemeDefinition : ViewModelBase
 {
     private string _name = string.Empty;
     private string _baseTheme = AppThemeKeys.Dark;
+    private bool _useSystemAccentColor = true;
+    private bool _useSystemAccentColorSpecified;
     private ObservableCollection<ThemeColorSetting> _colors = new();
 
     public string Name
@@ -49,6 +51,24 @@ public class AppThemeDefinition : ViewModelBase
         set { _baseTheme = AppThemeKeys.Normalize(value); OnPropertyChanged(); }
     }
 
+    public bool UseSystemAccentColor
+    {
+        get => _useSystemAccentColor;
+        set
+        {
+            _useSystemAccentColor = value;
+            _useSystemAccentColorSpecified = true;
+            OnPropertyChanged();
+        }
+    }
+
+    [XmlIgnore]
+    public bool UseSystemAccentColorSpecified
+    {
+        get => _useSystemAccentColorSpecified;
+        set => _useSystemAccentColorSpecified = value;
+    }
+
     public ObservableCollection<ThemeColorSetting> Colors
     {
         get => _colors;
@@ -59,6 +79,7 @@ public class AppThemeDefinition : ViewModelBase
     {
         Name = Name,
         BaseTheme = BaseTheme,
+        UseSystemAccentColor = UseSystemAccentColor,
         Colors = new ObservableCollection<ThemeColorSetting>(Colors.Select(c => c.Clone())),
     };
 }
@@ -666,6 +687,8 @@ public class BaseConfig : ViewModelBase
     private CommandIgnoreState _ignoreG61G64 = CommandIgnoreState.Strip;
     private string _theme = "Dark";
     private string _locale = string.Empty;
+    private bool _useSystemAccentColor = true;
+    private bool _useSystemAccentColorSpecified;
     private UiLayoutMode _layoutMode = UiLayoutMode.Compact;
     private WorkspaceNode? _workspaceRoot;
     private string _workspacePreset = string.Empty;
@@ -690,6 +713,24 @@ public class BaseConfig : ViewModelBase
     {
         get => _theme;
         set { _theme = value; OnPropertyChanged(); }
+    }
+
+    public bool UseSystemAccentColor
+    {
+        get => _useSystemAccentColor;
+        set
+        {
+            _useSystemAccentColor = value;
+            _useSystemAccentColorSpecified = true;
+            OnPropertyChanged();
+        }
+    }
+
+    [XmlIgnore]
+    public bool UseSystemAccentColorSpecified
+    {
+        get => _useSystemAccentColorSpecified;
+        set => _useSystemAccentColorSpecified = value;
     }
 
     /// <summary>UI culture (e.g. de-DE). Empty = en-US resources, system culture unchanged unless -locale is passed.</summary>

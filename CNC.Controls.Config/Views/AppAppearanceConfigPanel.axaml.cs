@@ -24,6 +24,11 @@ public partial class AppAppearanceConfigPanel : UserControl
     public AppAppearanceConfigPanel()
     {
         InitializeComponent();
+        UseSystemAccentCheck.PropertyChanged += (_, e) =>
+        {
+            if (e.Property == ToggleButton.IsCheckedProperty)
+                OnUseSystemAccentChanged();
+        };
         DataContextChanged += (_, _) => BindThemes();
     }
 
@@ -53,6 +58,7 @@ public partial class AppAppearanceConfigPanel : UserControl
         var themeKey = ResolveSelectedThemeKey();
         _config.Theme = themeKey;
         ThemeCombo.SelectedItem = FindThemeItem(themeKey);
+        RefreshSystemAccentCheck();
         RebuildColorRows();
     }
 
@@ -78,6 +84,7 @@ public partial class AppAppearanceConfigPanel : UserControl
         _config.Theme = item.Key;
         EnsureSelectedCustomTheme();
         AppTheme.Apply(item.Key, _config);
+        RefreshSystemAccentCheck();
         RebuildColorRows();
     }
 
@@ -104,6 +111,7 @@ public partial class AppAppearanceConfigPanel : UserControl
     Control CreateColorRow(AppThemePaletteEntry entry, Dictionary<string, string> colors)
     {
         var color = AppThemePalette.ParseColor(colors[entry.Key]);
+        var systemAccent = UsesSystemAccentForCurrentTheme() && AppThemePalette.IsAccentKey(entry.Key);
         var picker = new Button
         {
             Width = 42,
@@ -111,6 +119,8 @@ public partial class AppAppearanceConfigPanel : UserControl
             Padding = new Thickness(0),
             Background = new SolidColorBrush(color),
             BorderBrush = new SolidColorBrush(Color.FromRgb(96, 96, 96)),
+            IsEnabled = !systemAccent,
+            Opacity = systemAccent ? 0.65 : 1,
             Tag = entry.Key,
         };
         picker.Click += OnColorButtonClick;
@@ -126,6 +136,7 @@ public partial class AppAppearanceConfigPanel : UserControl
                 {
                     Text = entry.Label,
                     FontSize = 12,
+                    Opacity = systemAccent ? 0.65 : 1,
                     VerticalAlignment = global::Avalonia.Layout.VerticalAlignment.Center,
                 },
                 picker,
@@ -136,6 +147,9 @@ public partial class AppAppearanceConfigPanel : UserControl
     async void OnColorButtonClick(object? sender, global::Avalonia.Interactivity.RoutedEventArgs e)
     {
         if (_binding || _config == null || sender is not Button button || button.Tag is not string key)
+            return;
+
+        if (UsesSystemAccentForCurrentTheme() && AppThemePalette.IsAccentKey(key))
             return;
 
         var colors = CurrentThemeColors();
@@ -224,8 +238,10 @@ public partial class AppAppearanceConfigPanel : UserControl
         if (AppTheme.IsBuiltInTheme(selected))
         {
             _config.CustomThemeDraft = AppThemePalette.CreateTheme(AppThemeKeys.Custom, selected);
+            _config.CustomThemeDraft.UseSystemAccentColor = _config.UseSystemAccentColor;
             _config.Theme = AppThemeKeys.Custom;
             RefreshThemeComboSelection();
+            RefreshSystemAccentCheck();
             return _config.CustomThemeDraft;
         }
 
@@ -256,8 +272,16 @@ public partial class AppAppearanceConfigPanel : UserControl
             ? AppThemePalette.CreateTheme(selected, selected)
             : AppTheme.FindTheme(_config, selected) ?? AppThemePalette.CreateTheme(AppThemeKeys.Custom, AppTheme.Dark);
 
-        return AppThemePalette.NormalizeColors(theme)
+        var values = AppThemePalette.NormalizeColors(theme)
             .Colors.ToDictionary(c => c.Key, c => c.Value, StringComparer.OrdinalIgnoreCase);
+
+        var useSystemAccent = AppTheme.IsBuiltInTheme(selected)
+            ? _config.UseSystemAccentColor
+            : UsesSystemAccentForTheme(theme);
+        if (useSystemAccent)
+            OverlaySystemAccentValues(selected, values);
+
+        return values;
     }
 
     void SetThemeColor(AppThemeDefinition theme, string key, string value)
@@ -279,6 +303,81 @@ public partial class AppAppearanceConfigPanel : UserControl
         _binding = false;
     }
 
+    void RefreshSystemAccentCheck()
+    {
+        if (_config == null)
+            return;
+
+        _binding = true;
+        UseSystemAccentCheck.IsChecked = UsesSystemAccentForCurrentTheme();
+        _binding = false;
+    }
+
+    void OnUseSystemAccentChanged()
+    {
+        if (_binding || _config == null)
+            return;
+
+        SetUseSystemAccentForCurrentTheme(UseSystemAccentCheck.IsChecked == true);
+        AppTheme.Apply(_config.Theme, _config);
+        RebuildColorRows();
+    }
+
+    bool UsesSystemAccentForCurrentTheme()
+    {
+        if (_config == null)
+            return true;
+
+        var selected = AppTheme.NormalizeThemeKey(_config.Theme);
+        var theme = AppTheme.IsBuiltInTheme(selected) ? null : AppTheme.FindTheme(_config, selected);
+        return AppTheme.ShouldUseSystemAccent(_config, theme);
+    }
+
+    bool UsesSystemAccentForTheme(AppThemeDefinition? theme) =>
+        AppTheme.ShouldUseSystemAccent(_config, theme);
+
+    void SetUseSystemAccentForCurrentTheme(bool value)
+    {
+        if (_config == null)
+            return;
+
+        var selected = AppTheme.NormalizeThemeKey(_config.Theme);
+        if (AppTheme.IsBuiltInTheme(selected))
+        {
+            _config.UseSystemAccentColor = value;
+            return;
+        }
+
+        var theme = AppTheme.FindTheme(_config, selected);
+        if (theme == null)
+        {
+            _config.UseSystemAccentColor = value;
+            return;
+        }
+
+        theme.UseSystemAccentColor = value;
+        if (selected.Equals(AppThemeKeys.Custom, StringComparison.OrdinalIgnoreCase))
+            _config.CustomThemeDraft.UseSystemAccentColor = value;
+    }
+
+    void OverlaySystemAccentValues(string selectedTheme, Dictionary<string, string> values)
+    {
+        if (Application.Current is not { } app)
+            return;
+
+        if (app.TryGetResource(AppThemePalette.EditableAccentKey, app.ActualThemeVariant, out var systemAccent))
+        {
+            values[AppThemePalette.EditableAccentKey] = systemAccent switch
+            {
+                Color color => ToHex(color),
+                SolidColorBrush brush => ToHex(brush.Color),
+                _ => values[AppThemePalette.EditableAccentKey],
+            };
+        }
+
+        _ = selectedTheme;
+    }
+
     void OnResetColorsClick(object? sender, global::Avalonia.Interactivity.RoutedEventArgs e)
     {
         if (_config == null)
@@ -293,6 +392,7 @@ public partial class AppAppearanceConfigPanel : UserControl
             return;
 
         var reset = AppThemePalette.CreateTheme(theme.Name, theme.BaseTheme);
+        reset.UseSystemAccentColor = theme.UseSystemAccentColor;
         theme.Colors = reset.Colors;
         AppTheme.Apply(_config.Theme, _config);
         RebuildColorRows();
@@ -321,6 +421,7 @@ public partial class AppAppearanceConfigPanel : UserControl
             : AppTheme.FindTheme(_config, _config.Theme)?.Clone() ?? _config.CustomThemeDraft.Clone();
 
         source.Name = name;
+        source.UseSystemAccentColor = UsesSystemAccentForCurrentTheme();
         var saved = AppThemePalette.NormalizeColors(source);
         AppThemeFileService.Save(saved);
         AppThemeFileService.LoadInto(_config);
