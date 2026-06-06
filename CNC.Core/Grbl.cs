@@ -2887,12 +2887,28 @@ namespace CNC.Core
                     }
                 }
 
-                return _description;
+                return WithLocalGuidance(_description);
             }
             internal set
             {
                 _description = value;
             }
+        }
+
+        string WithLocalGuidance(string description)
+        {
+            if (!GrblInfo.IsGrblHAL || Id != (int)GrblSetting.SoftLimitsEnable)
+                return description;
+
+            const string jogLimitNote =
+                "Note: On grblHAL controllers, enable $40 (Limit jog commands) with soft limits to let firmware clip jogs at the travel limits. Without $40, jog commands that would exceed travel may be rejected instead of stopping cleanly at the boundary.";
+
+            if (description.Contains(jogLimitNote, StringComparison.Ordinal))
+                return description;
+
+            return string.IsNullOrWhiteSpace(description)
+                ? jogLimitNote
+                : description + "\r\n\r\n" + jogLimitNote;
         }
 
         private void ProcessDetail(string data)

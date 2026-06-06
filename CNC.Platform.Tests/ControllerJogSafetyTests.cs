@@ -32,6 +32,7 @@ public sealed class ControllerJogSafetyTests : IDisposable
     public void Dispose()
     {
         Comms.com = null;
+        UiJogController.IsGrblHALController = () => GrblInfo.IsGrblHAL;
         GrblInfo.MaxTravel.X = _oldMaxTravelX;
         GrblInfo.MaxTravel.Y = _oldMaxTravelY;
         GrblInfo.MaxTravel.Z = _oldMaxTravelZ;
@@ -85,6 +86,7 @@ public sealed class ControllerJogSafetyTests : IDisposable
         Assert.True(controller.Jog("X+", UiJogCommandMode.Continuous));
 
         Assert.Contains("$J=G53G21X-0.5F100", _comms.Commands.Single());
+        Assert.DoesNotContain("G91", _comms.Commands.Single());
     }
 
     [Fact]
@@ -94,6 +96,103 @@ public sealed class ControllerJogSafetyTests : IDisposable
         var controller = Controller(model);
 
         Assert.True(controller.Jog("X-", UiJogCommandMode.Continuous));
+
+        Assert.Contains("$J=G53G21X-99.5F100", _comms.Commands.Single());
+        Assert.DoesNotContain("G91", _comms.Commands.Single());
+    }
+
+    [Fact]
+    public void Sender_clamped_soft_limit_jog_uses_original_g53_command_shape()
+    {
+        var model = ModelAt("<Idle|MPos:-50.000,-50.000,-50.000|GC:G0 G54 G17 G21 G91 G94 M5 M9 T0 F0 S0|Bf:15,128>");
+        var controller = Controller(model);
+
+        Assert.True(controller.Jog("X+", UiJogCommandMode.Step));
+
+        Assert.Contains("$J=G53G21X-49.9F100", _comms.Commands.Single());
+    }
+
+    [Fact]
+    public void Soft_limit_jog_uses_machine_position_computed_from_wpos_and_wco()
+    {
+        var model = ModelAt("<Idle|WPos:-51.000,-50.000,-50.000|WCO:1.000,0.000,0.000|Bf:15,128>");
+        var controller = Controller(model);
+
+        Assert.True(controller.Jog("X+", UiJogCommandMode.Step));
+
+        Assert.Contains("$J=G53G21X-49.9F100", _comms.Commands.Single());
+    }
+
+    [Fact]
+    public void Soft_limit_jog_without_known_machine_position_sends_no_relative_fallback()
+    {
+        var model = ModelAt("<Idle|WPos:-51.000,-50.000,-50.000|Bf:15,128>");
+        var controller = Controller(model);
+
+        Assert.False(controller.Jog("X+", UiJogCommandMode.Continuous));
+
+        Assert.Empty(_comms.Commands);
+        Assert.NotEmpty(_comms.Bytes);
+    }
+
+    [Fact]
+    public void Soft_limit_step_without_known_machine_position_sends_no_relative_fallback()
+    {
+        var model = ModelAt("<Idle|WPos:-51.000,-50.000,-50.000|Bf:15,128>");
+        var controller = Controller(model);
+
+        Assert.False(controller.Jog("X-", UiJogCommandMode.Step));
+
+        Assert.Empty(_comms.Commands);
+        Assert.NotEmpty(_comms.Bytes);
+    }
+
+    [Fact]
+    public void Imperial_soft_limit_jog_uses_g20_with_absolute_machine_coordinates()
+    {
+        var model = ModelAt("<Idle|MPos:-50.000,-50.000,-50.000|Bf:15,128>");
+        model.IsMetric = false;
+        var controller = Controller(model);
+
+        Assert.True(controller.Jog("X+", UiJogCommandMode.Step));
+
+        Assert.Contains("$J=G53G20X-49.9F100", _comms.Commands.Single());
+    }
+
+    [Fact]
+    public void Grblhal_firmware_jog_limiting_keeps_continuous_jog_relative()
+    {
+        SetFirmwareJogLimiting(enabled: true);
+        var model = ModelAt("<Idle|MPos:-50.000,-50.000,-50.000|Bf:15,128>");
+        var controller = Controller(model);
+
+        Assert.True(controller.Jog("X+", UiJogCommandMode.Continuous));
+
+        Assert.Contains("$J=G91G21X100F100", _comms.Commands.Single());
+        Assert.DoesNotContain("G53", _comms.Commands.Single());
+    }
+
+    [Fact]
+    public void Grblhal_firmware_jog_limiting_keeps_step_jog_relative()
+    {
+        SetFirmwareJogLimiting(enabled: true);
+        var model = ModelAt("<Idle|MPos:-99.000,-50.000,-50.000|Bf:15,128>");
+        var controller = Controller(model, JogViewModel.JogStep.Step2);
+
+        Assert.True(controller.Jog("X-", UiJogCommandMode.Step));
+
+        Assert.Contains("$J=G91G21X-10F100", _comms.Commands.Single());
+        Assert.DoesNotContain("G53", _comms.Commands.Single());
+    }
+
+    [Fact]
+    public void Grblhal_without_firmware_jog_limiting_uses_sender_boundary_clamp()
+    {
+        SetFirmwareJogLimiting(enabled: false);
+        var model = ModelAt("<Idle|MPos:-99.000,-50.000,-50.000|Bf:15,128>");
+        var controller = Controller(model, JogViewModel.JogStep.Step2);
+
+        Assert.True(controller.Jog("X-", UiJogCommandMode.Step));
 
         Assert.Contains("$J=G53G21X-99.5F100", _comms.Commands.Single());
     }
@@ -151,6 +250,15 @@ public sealed class ControllerJogSafetyTests : IDisposable
     {
         SetSetting(GrblSetting.SoftLimitsEnable, enabled ? "1" : "0");
         SetSetting(GrblSetting.HomingPulloff, "0.5");
+        SetSetting((GrblSetting)grblHALSetting.SoftLimitJogging, "0");
+        UiJogController.IsGrblHALController = () => false;
+    }
+
+    static void SetFirmwareJogLimiting(bool enabled)
+    {
+        SetSoftLimits(enabled: true);
+        SetSetting((GrblSetting)grblHALSetting.SoftLimitJogging, enabled ? "1" : "0");
+        UiJogController.IsGrblHALController = () => true;
     }
 
     static void SetSetting(GrblSetting key, string value)

@@ -20,7 +20,10 @@ public sealed class UiJogController : IDisposable
     readonly Func<AppConfigService?> _appConfig;
     GrblViewModel? _model;
     bool _softLimits;
+    bool _firmwareJogLimiting;
     double _limitSwitchesClearance = .5d;
+
+    internal static Func<bool> IsGrblHALController { get; set; } = () => GrblInfo.IsGrblHAL;
 
     public UiJogController(JogViewModel jogData, Func<AppConfigService?> appConfig)
     {
@@ -102,6 +105,10 @@ public sealed class UiJogController : IDisposable
         };
         var distance = (selectedDistance == -1d ? GrblInfo.MaxTravel.Values[axis] : selectedDistance) * (cmd[1] == '-' ? -1d : 1d);
         string command;
+        var hasSoftLimitBoundary = HasUsableSoftLimitBoundary(axis);
+
+        if (hasSoftLimitBoundary && !EnsureMachinePositionKnown(axis, model))
+            return false;
 
         if (TryClampToSoftLimitBoundary(axis, distance, model, out var position))
         {
@@ -110,7 +117,7 @@ public sealed class UiJogController : IDisposable
         }
         else
         {
-            if (_softLimits && CanUseSoftLimitBoundary(axis, model) && IsAtBoundary(axis, distance, model))
+            if (hasSoftLimitBoundary)
                 return false;
 
             var units = model.IsMetric ? "G21" : "G20";
@@ -159,13 +166,17 @@ public sealed class UiJogController : IDisposable
 
     bool CanUseSoftLimitBoundary(int axis, GrblViewModel model)
     {
+        return HasUsableSoftLimitBoundary(axis) && IsMachinePositionKnown(axis, model);
+    }
+
+    bool HasUsableSoftLimitBoundary(int axis)
+    {
         if (!_softLimits)
             return false;
 
-        var current = model.MachinePosition.Values[axis];
         var maxTravel = GrblInfo.MaxTravel.Values[axis];
 
-        if (!double.IsFinite(current) || !double.IsFinite(maxTravel) || maxTravel <= 0d || !double.IsFinite(_limitSwitchesClearance))
+        if (!double.IsFinite(maxTravel) || maxTravel <= 0d || !double.IsFinite(_limitSwitchesClearance))
             return false;
 
         var min = SoftLimitMinimum(axis);
@@ -173,17 +184,50 @@ public sealed class UiJogController : IDisposable
         return double.IsFinite(min) && double.IsFinite(max) && min <= max;
     }
 
-    bool IsAtBoundary(int axis, double distance, GrblViewModel model)
+    static bool IsMachinePositionKnown(int axis, GrblViewModel model)
     {
-        var current = model.MachinePosition.Values[axis];
+        var axisFlag = GrblInfo.AxisIndexToFlag(axis);
+        var canTrustMachinePosition =
+            model.IsMachinePosition ||
+            (model.WorkPosition.IsSet(axisFlag) && model.WorkPositionOffset.IsSet(axisFlag));
 
-        if (distance > 0d)
-            return current >= SoftLimitMaximum(axis);
+        return canTrustMachinePosition && double.IsFinite(model.MachinePosition.Values[axis]);
+    }
 
-        if (distance < 0d)
-            return current <= SoftLimitMinimum(axis);
+    bool EnsureMachinePositionKnown(int axis, GrblViewModel model)
+    {
+        if (IsMachinePositionKnown(axis, model))
+            return true;
 
-        return true;
+        if (Comms.com is not { IsOpen: true } comms)
+            return false;
+
+        using var positionReceived = new ManualResetEventSlim(false);
+
+        void OnStatus(string _)
+        {
+            if (IsMachinePositionKnown(axis, model))
+                positionReceived.Set();
+        }
+
+        model.OnRealtimeStatusProcessed += OnStatus;
+        try
+        {
+            var command = GrblInfo.IsGrblHAL
+                ? GrblConstants.CMD_STATUS_REPORT_ALL
+                : GrblLegacy.ConvertRTCommand(GrblConstants.CMD_STATUS_REPORT_ALL);
+            comms.WriteByte(command);
+
+            if (IsMachinePositionKnown(axis, model))
+                return true;
+
+            positionReceived.Wait(250);
+            return IsMachinePositionKnown(axis, model);
+        }
+        finally
+        {
+            model.OnRealtimeStatusProcessed = (Action<string>)Delegate.Remove(model.OnRealtimeStatusProcessed, OnStatus)!;
+        }
     }
 
     double SoftLimitMinimum(int axis)
@@ -219,7 +263,8 @@ public sealed class UiJogController : IDisposable
 
     public void RefreshMachineSettings()
     {
-        _softLimits = GrblSettings.GetInteger(GrblSetting.SoftLimitsEnable) == 1;
+        _firmwareJogLimiting = IsGrblHALController() && GrblSettings.GetInteger(grblHALSetting.SoftLimitJogging) == 1;
+        _softLimits = GrblSettings.GetInteger(GrblSetting.SoftLimitsEnable) == 1 && !_firmwareJogLimiting;
         _limitSwitchesClearance = GrblSettings.GetDouble(GrblSetting.HomingPulloff);
     }
 
