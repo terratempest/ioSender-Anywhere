@@ -11,12 +11,12 @@ This repo is a UI conversion of the original ioSender application by [terjeino](
 Application layout is configurable and have a few default layouts: 
 
 Main screen.
-![Sender](Media/ioSenderClassic.png
+![Sender](Media/ioSenderClassic.png)
 
 XL Layout
 
-![XL Layout](Media/ioSenderXL.png
+![XL Layout](Media/ioSenderXL.png)
 
 Touch Layout (inspired by [ioSenderTouch](https://github.com/Jay-Tech/ioSenderTouch))
 
-![Touch](Media/ioSenderTouch.png
+![Touch](Media/ioSenderTouch.png)
