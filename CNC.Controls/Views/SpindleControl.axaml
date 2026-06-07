@@ -14,7 +14,7 @@
              mc:Ignorable="d"
              d:DesignWidth="250"
              d:DesignHeight="150"
-             >
+             HorizontalAlignment="Stretch">
 
   <UserControl.Resources>
     <ResourceDictionary>
@@ -27,9 +27,9 @@
     </ResourceDictionary>
   </UserControl.Resources>
 
-  <Grid Margin="4" RowDefinitions="Auto,Auto">
+  <Grid Margin="4" RowDefinitions="Auto,Auto" HorizontalAlignment="Stretch">
 
-    <Grid Grid.Row="0" ColumnDefinitions="Auto,Auto,*" TextElement.FontSize="12">
+    <Grid Grid.Row="0" ColumnDefinitions="Auto,Auto,*" TextElement.FontSize="12" HorizontalAlignment="Stretch">
       <StackPanel Grid.Column="0" Orientation="Horizontal" Spacing="4" VerticalAlignment="Top">
         <TextBlock x:Name="lblRPM"
                    Text="RPM"
@@ -95,9 +95,9 @@
 
       <ComboBox x:Name="cbxSpindle"
                 Grid.Column="2"
+                HorizontalAlignment="Stretch"
                 VerticalAlignment="Top"
                 ItemsSource="{Binding Spindles}"
-                MaxWidth="150"
                 SelectedValue="{Binding SpindleNum, Mode=OneWay}"
                 IsEnabled="{Binding IsJobRunning, Converter={StaticResource LogicalNotConverter}}"
                 IsVisible="{Binding MultiSpindle, Converter={StaticResource IsVisibleConverter}}"
@@ -109,7 +109,7 @@
         </ComboBox.ItemTemplate>
       </ComboBox>
     </Grid>
-    <Grid Grid.Row="1" ColumnDefinitions="Auto, *" TextElement.FontSize="12">
+    <Grid Grid.Row="1" ColumnDefinitions="Auto, *" TextElement.FontSize="12" HorizontalAlignment="Stretch">
       <TextBlock x:Name="lblOverride"
           Grid.Column="0"
           Text="Override"
@@ -120,6 +120,7 @@
 
       <views:OverrideControl x:Name="overrideControl"
         Grid.Column="1"
+        HorizontalAlignment="Stretch"
         ShowLabel="False"
         Value="{Binding RPMOverride, Mode=OneWay}"
         OverrideDisabled="{Binding RPMOverrideDisabled}"

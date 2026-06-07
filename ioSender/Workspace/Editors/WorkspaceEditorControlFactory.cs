@@ -91,7 +91,7 @@ public sealed class WorkspaceEditorControlFactory
         },
         WorkspaceEditorId.Spindle => new SpindleControl(_session.MachineCommands)
         {
-            HorizontalAlignment = Avalonia.Layout.HorizontalAlignment.Left,
+            HorizontalAlignment = Avalonia.Layout.HorizontalAlignment.Stretch,
             VerticalAlignment = Avalonia.Layout.VerticalAlignment.Top,
         },
         WorkspaceEditorId.SpindleTouch => new SpindleControlTouch(_session.MachineCommands)
@@ -106,7 +106,7 @@ public sealed class WorkspaceEditorControlFactory
         },
         WorkspaceEditorId.Feed => new FeedControl(_session.MachineCommands)
         {
-            HorizontalAlignment = Avalonia.Layout.HorizontalAlignment.Left,
+            HorizontalAlignment = Avalonia.Layout.HorizontalAlignment.Stretch,
             VerticalAlignment = Avalonia.Layout.VerticalAlignment.Top,
         },
         WorkspaceEditorId.FeedTouch => new FeedControlTouch(_session.MachineCommands)
