@@ -10,38 +10,43 @@
   <Grid RowDefinitions="Auto, *">
     <Grid Grid.Row="0" ColumnDefinitions="Auto,*" Margin="4, 0" TextElement.FontSize="12">
       <Menu>
-        <MenuItem Header="Settings">
-          <CheckBox x:Name="ChkVerbose" Content="Verbose" IsChecked="{Binding ResponseLogVerbose}"
-                    loc:Localize.Key="CNC.Controls.Avalonia.consolecontrol.lbl_verbose" loc:Localize.Fallback="Verbose"/>
-          <CheckBox x:Name="ChkFilterRt" Content="Filter out realtime responses" IsChecked="{Binding ResponseLogFilterRT}" IsEnabled="{Binding ResponseLogVerbose}"
-                    loc:Localize.Key="CNC.Controls.Avalonia.consolecontrol.lbl_filterRT" loc:Localize.Fallback="Filter out realtime responses"/>
-          <CheckBox x:Name="ChkShowAllRt" Content="Show all realtime responses" IsChecked="{Binding ResponseLogShowRTAll}" IsEnabled="{Binding ResponseLogVerbose}"
-                    loc:Localize.Key="CNC.Controls.Avalonia.consolecontrol.lbl_showAll" loc:Localize.Fallback="Show all realtime responses"/>
+        <MenuItem Header="Log Filters">
+          <CheckBox x:Name="ChkVerbose" Content="Verbose logging" IsChecked="{Binding ResponseLogVerbose}"
+                    loc:Localize.Key="CNC.Controls.Avalonia.consolecontrol.lbl_verbose" loc:Localize.Fallback="Verbose logging"/>
+          <CheckBox x:Name="ChkFilterRt" Content="Hide realtime status reports" IsChecked="{Binding ResponseLogFilterRT}" IsEnabled="{Binding ResponseLogVerbose}"
+                    loc:Localize.Key="CNC.Controls.Avalonia.consolecontrol.lbl_filterRT" loc:Localize.Fallback="Hide realtime status reports"/>
+          <CheckBox x:Name="ChkShowAllRt" Content="Show repeated status reports" IsChecked="{Binding ResponseLogShowRTAll}" IsEnabled="{Binding ResponseLogCanShowRepeatedStatus}"
+                    loc:Localize.Key="CNC.Controls.Avalonia.consolecontrol.lbl_showAll" loc:Localize.Fallback="Show repeated status reports"/>
+          <CheckBox x:Name="ChkFilterOk" Content="Filter &quot;ok&quot; responses" IsChecked="{Binding ResponseLogFilterOk}"
+                    loc:Localize.Key="CNC.Controls.Avalonia.consolecontrol.lbl_filterOk" loc:Localize.Fallback="Filter &quot;ok&quot; responses"/>
         </MenuItem>
       </Menu>
-      <Button x:Name="BtnClear" Grid.Column="6" Content="Clear" Click="OnClearClick" HorizontalAlignment="Right"
-              loc:Localize.Key="CNC.Controls.Avalonia.consolecontrol.btn_clear" loc:Localize.Fallback="Clear"/>
+      <StackPanel Grid.Column="1" Orientation="Horizontal" HorizontalAlignment="Right" Spacing="8">
+        <CheckBox x:Name="ChkAutoscroll" Content="Autoscroll" IsChecked="{Binding ResponseLogAutoscroll}" VerticalAlignment="Center"
+                  loc:Localize.Key="CNC.Controls.Avalonia.consolecontrol.lbl_autoscroll" loc:Localize.Fallback="Autoscroll"/>
+        <Button x:Name="BtnClear" Content="Clear" Click="OnClearClick"
+                loc:Localize.Key="CNC.Controls.Avalonia.consolecontrol.btn_clear" loc:Localize.Fallback="Clear"/>
+      </StackPanel>
     </Grid>
-    <ListBox Grid.Row="1" ItemsSource="{Binding ResponseLog}" FontFamily="Consolas,Courier New,monospace" FontSize="10"
+    <TextBox x:Name="ConsoleText"
+             Grid.Row="1"
+             Text="{Binding ResponseLogText, Mode=OneWay}"
+             IsReadOnly="True"
+             AcceptsReturn="True"
+             TextWrapping="Wrap"
+             FontFamily="Consolas,Courier New,monospace"
+             FontSize="10"
              Background="{DynamicResource ThemeControlLowBrush}"
              Foreground="{DynamicResource ThemeForegroundBrush}"
-             BorderBrush="{DynamicResource ThemeBorderLowBrush}">
-      <ListBox.Styles>
-        <Style Selector="ListBoxItem">
-          <Setter Property="Height" Value="24"/>
-          <Setter Property="Padding" Value="4, 0"/>
-          <Setter Property="VerticalContentAlignment" Value="Center"/>
-          <Setter Property="Background" Value="Transparent"/>
-          <Setter Property="Foreground" Value="{DynamicResource ThemeForegroundBrush}"/>
+             BorderBrush="{DynamicResource ThemeBorderLowBrush}"
+             ScrollViewer.HorizontalScrollBarVisibility="Disabled"
+             ScrollViewer.VerticalScrollBarVisibility="Auto">
+      <TextBox.Styles>
+        <Style Selector="TextBox#ConsoleText:pointerover">
+          <Setter Property="Background" Value="{DynamicResource ThemeControlLowBrush}"/>
+          <Setter Property="BorderBrush" Value="{DynamicResource ThemeBorderLowBrush}"/>
         </Style>
-        <Style Selector="ListBoxItem:pointerover /template/ ContentPresenter">
-          <Setter Property="Background" Value="{DynamicResource ThemeControlHighlightLowBrush}"/>
-        </Style>
-        <Style Selector="ListBoxItem:selected /template/ ContentPresenter">
-          <Setter Property="Background" Value="{DynamicResource ThemeAccentBrushLow}"/>
-          <Setter Property="Foreground" Value="{DynamicResource ThemeForegroundBrush}"/>
-        </Style>
-      </ListBox.Styles>
-    </ListBox>
+      </TextBox.Styles>
+    </TextBox>
   </Grid>
 </UserControl>

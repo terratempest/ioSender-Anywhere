@@ -681,7 +681,7 @@ public class BaseConfig : ViewModelBase
 {
     private int _pollInterval = 200;
     private int _maxBufferSize = 300;
-    private bool _useBuffering, _keepMdiFocus = true, _filterOkResponse, _saveWindowSize = true, _autoCompress, _sendComments, _addLineNumbers;
+    private bool _useBuffering, _keepMdiFocus = true, _filterOkResponse, _consoleAutoscroll = true, _saveWindowSize = true, _autoCompress, _sendComments, _addLineNumbers;
     private PopupKeyboardTrigger _popupKeyboardTrigger = PopupKeyboardTrigger.TwoClick;
     private CommandIgnoreState _ignoreM6 = CommandIgnoreState.No, _ignoreM7 = CommandIgnoreState.No, _ignoreM8 = CommandIgnoreState.No;
     private CommandIgnoreState _ignoreG61G64 = CommandIgnoreState.Strip;
@@ -800,6 +800,12 @@ public class BaseConfig : ViewModelBase
     {
         get => _filterOkResponse;
         set { _filterOkResponse = value; OnPropertyChanged(); }
+    }
+
+    public bool ConsoleAutoscroll
+    {
+        get => _consoleAutoscroll;
+        set { _consoleAutoscroll = value; OnPropertyChanged(); }
     }
 
     public bool AutoCompress

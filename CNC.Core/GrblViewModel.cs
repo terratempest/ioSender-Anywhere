@@ -56,7 +56,8 @@ namespace CNC.Core
         private bool has_wco = false, _hasFans = false;
         private SDState _sdMounted = SDState.Unmounted;
         private bool _flood, _mist, _fan0, _toolChange, _reset, _isMPos, _isJobRunning, _isProbeSuccess, _pgmEnd, _isParserStateLive, _isTloRefSet, _isToolOffsetKnown, _isToolOffsetActive;
-        private bool _isCameraVisible = false, _responseLogVerbose = false, _isProbing = false, _autoReporting = false;
+        private bool _isCameraVisible = false, _responseLogVerbose = false, _responseLogAutoscroll = true, _isProbing = false, _autoReporting = false;
+        private string _responseLogText = string.Empty;
         private bool _feedOverrideDisabled = false, _rpmOverrideDisabled = false, _feedHoldDisabled = false;
         private bool? _mpg;
         private int _pwm, _line, _scrollpos, _blocks = 0, _startFromBlock = 0, _executingBlock = 0, _auxinValue = -2, _autoReportInterval = 0, _spindle_num = 0;
@@ -95,6 +96,7 @@ namespace CNC.Core
             Keyboard = new KeypressHandler(this);
             MDICommand = new ActionCommand<string>(ExecuteMDI);
             StartFromBlock = new ActionCommand<int>(ExecuteStartFromBlock, canExecuteStartFromBlock);
+            ResponseLog.CollectionChanged += ResponseLog_CollectionChanged;
 
             new Thread(new ThreadStart(Poller.Run)) { IsBackground = true }.Start();
 
@@ -426,15 +428,29 @@ namespace CNC.Core
 
         public KeypressHandler Keyboard { get; private set; }
 
-        public bool ResponseLogVerbose { get { return _responseLogVerbose; } set { _responseLogVerbose = value; OnPropertyChanged(); } }
+        public bool ResponseLogVerbose
+        {
+            get { return _responseLogVerbose; }
+            set
+            {
+                if (_responseLogVerbose != value)
+                {
+                    _responseLogVerbose = value;
+                    OnPropertyChanged();
+                    OnPropertyChanged(nameof(ResponseLogCanShowRepeatedStatus));
+                }
+            }
+        }
 
         private bool _responseLogFilterRT = false;
         private bool _responseLogFilterOk = false;
         private bool _responseLogShowRTAll = false;
 
-        public bool ResponseLogFilterRT { get { return _responseLogFilterRT; } set { if (_responseLogFilterRT != value) { _responseLogFilterRT = value; OnPropertyChanged(); } } }
+        public bool ResponseLogFilterRT { get { return _responseLogFilterRT; } set { if (_responseLogFilterRT != value) { _responseLogFilterRT = value; OnPropertyChanged(); OnPropertyChanged(nameof(ResponseLogCanShowRepeatedStatus)); } } }
         public bool ResponseLogFilterOk { get { return _responseLogFilterOk; } set { if (_responseLogFilterOk != value) { _responseLogFilterOk = value; OnPropertyChanged(); } } }
         public bool ResponseLogShowRTAll { get { return _responseLogShowRTAll; } set { if (_responseLogShowRTAll != value) { _responseLogShowRTAll = value; OnPropertyChanged(); } } }
+        public bool ResponseLogCanShowRepeatedStatus => ResponseLogVerbose && !ResponseLogFilterRT;
+        public bool ResponseLogAutoscroll { get { return _responseLogAutoscroll; } set { if (_responseLogAutoscroll != value) { _responseLogAutoscroll = value; OnPropertyChanged(); } } }
 
         private bool _isReady;
 
@@ -468,6 +484,24 @@ namespace CNC.Core
         #region Dependencyproperties
 
         public ObservableCollection<string> ResponseLog { get; private set; } = new ObservableCollection<string>();
+        public string ResponseLogText
+        {
+            get { return _responseLogText; }
+            private set
+            {
+                if (_responseLogText != value)
+                {
+                    _responseLogText = value;
+                    OnPropertyChanged();
+                }
+            }
+        }
+
+        private void ResponseLog_CollectionChanged(object? sender, NotifyCollectionChangedEventArgs e)
+        {
+            _ = e;
+            ResponseLogText = string.Join(Environment.NewLine, ResponseLog);
+        }
         public ObservableCollection<string> CommandLog { get; private set; } = new ObservableCollection<string>();
 
         public ProgramLimits ProgramLimits { get; private set; } = new ProgramLimits();

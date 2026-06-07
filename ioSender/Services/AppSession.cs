@@ -9,6 +9,8 @@ namespace ioSender.Services;
 /// <summary>Concrete composition root for app-wide UI services.</summary>
 public sealed class AppSession
 {
+    readonly ConsoleLogConfigSync _consoleLogConfigSync;
+
     public AppSession(PlatformServices platform, AppConfigService appConfig)
     {
         Platform = platform ?? throw new ArgumentNullException(nameof(platform));
@@ -19,6 +21,7 @@ public sealed class AppSession
         CommandRouter = new GrblCommandRouter(Program);
         MachineCommands = new MachineCommandService(CommandRouter);
         MainWindow = new MainWindowViewModel(this);
+        _consoleLogConfigSync = ConsoleLogConfigSync.Attach(appConfig.Base, Grbl);
         GameController = new SdlGameControllerService(appConfig, platform, Grbl);
 
         Program.Model = Grbl;
@@ -56,5 +59,9 @@ public sealed class AppSession
         GameController.Cancel();
     }
 
-    public void Shutdown() => GameController.Dispose();
+    public void Shutdown()
+    {
+        _consoleLogConfigSync.Dispose();
+        GameController.Dispose();
+    }
 }
