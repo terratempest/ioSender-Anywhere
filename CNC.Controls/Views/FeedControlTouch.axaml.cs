@@ -6,6 +6,7 @@ using Avalonia.Interactivity;
 
 using CNC.Core;
 using CNC.Controls.Avalonia.Services;
+using CNC.Controls.Avalonia.Utilities;
 using CNC.Controls.Avalonia.ViewModels;
 using CNC.Localization.Avalonia;
 
@@ -57,14 +58,11 @@ public partial class FeedControlTouch : UserControl
 
     void FeedControlTouch_DataContextChanged(object? sender, EventArgs e)
     {
-        if (_subscribedModel is INotifyPropertyChanged oldPc)
-            oldPc.PropertyChanged -= OnDataContextPropertyChanged;
-
-        _subscribedModel = DataContext as GrblViewModel;
+        PropertyChangedSubscription.Swap(
+            ref _subscribedModel,
+            DataContext as GrblViewModel,
+            OnDataContextPropertyChanged);
         _viewModel.Model = _subscribedModel;
-
-        if (_subscribedModel is INotifyPropertyChanged newPc)
-            newPc.PropertyChanged += OnDataContextPropertyChanged;
 
         UpdateFeedText();
     }

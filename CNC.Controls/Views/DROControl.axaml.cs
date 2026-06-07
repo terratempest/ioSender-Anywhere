@@ -26,6 +26,7 @@ public partial class DROControl : UserControl
     Position? _subscribedPosition;
     Position? _subscribedMachinePosition;
     readonly DROBaseControl[] _axes;
+    readonly AxisBinding[] _axisBindings;
     int _lastVisibleAxisCount = -1;
     bool _refreshingAxisLayout;
     bool _axisLayoutRefreshScheduled;
@@ -48,6 +49,18 @@ public partial class DROControl : UserControl
         btnZeroAll.Click += (_, _) => AxisPositionChanged("ALL", 0d);
 
         _axes = [axisX, axisY, axisZ, axisA, axisB, axisC, axisU, axisV, axisW];
+        _axisBindings =
+        [
+            new(axisX, 0, AxisFlags.X, CncKey.X, true),
+            new(axisY, 1, AxisFlags.Y, CncKey.Y, true),
+            new(axisZ, 2, AxisFlags.Z, CncKey.Z, true),
+            new(axisA, 3, AxisFlags.A, CncKey.A, false),
+            new(axisB, 4, AxisFlags.B, CncKey.B, false),
+            new(axisC, 5, AxisFlags.C, CncKey.C, false),
+            new(axisU, 6, AxisFlags.U, null, false),
+            new(axisV, 7, AxisFlags.V, null, false),
+            new(axisW, 8, AxisFlags.W, null, false)
+        ];
         foreach (var axis in _axes)
         {
             axis.TxtWorkReadout.LostFocus += txtReadout_LostFocus;
@@ -64,24 +77,11 @@ public partial class DROControl : UserControl
 
     void OnDataContextChanged(object? sender, EventArgs e)
     {
-        if (_subscribedModel is INotifyPropertyChanged oldNotify)
-            oldNotify.PropertyChanged -= OnGrblPropertyChanged;
-        if (_subscribedPosition is INotifyPropertyChanged oldPos)
-            oldPos.PropertyChanged -= OnPositionPropertyChanged;
-        if (_subscribedMachinePosition is INotifyPropertyChanged oldMachine)
-            oldMachine.PropertyChanged -= OnMachinePositionPropertyChanged;
-
-        _subscribedModel = DataContext as GrblViewModel;
-        _subscribedPosition = _subscribedModel?.Position;
-        _subscribedMachinePosition = _subscribedModel?.MachinePosition;
+        var model = DataContext as GrblViewModel;
+        PropertyChangedSubscription.Swap(ref _subscribedModel, model, OnGrblPropertyChanged);
+        PropertyChangedSubscription.Swap(ref _subscribedPosition, model?.Position, OnPositionPropertyChanged);
+        PropertyChangedSubscription.Swap(ref _subscribedMachinePosition, model?.MachinePosition, OnMachinePositionPropertyChanged);
         _keyboardMappingsOk = false;
-
-        if (_subscribedModel is INotifyPropertyChanged newNotify)
-            newNotify.PropertyChanged += OnGrblPropertyChanged;
-        if (_subscribedPosition is INotifyPropertyChanged newPos)
-            newPos.PropertyChanged += OnPositionPropertyChanged;
-        if (_subscribedMachinePosition is INotifyPropertyChanged newMachine)
-            newMachine.PropertyChanged += OnMachinePositionPropertyChanged;
 
         RefreshAxisTags();
         RefreshReadouts();
@@ -121,15 +121,8 @@ public partial class DROControl : UserControl
         var format = model.FormatSigned;
         var mp = model.MachinePosition;
         var p = model.Position;
-        UpdateAxisReadout(axisX, p.X, mp.X, format);
-        UpdateAxisReadout(axisY, p.Y, mp.Y, format);
-        UpdateAxisReadout(axisZ, p.Z, mp.Z, format);
-        UpdateAxisReadout(axisA, p.A, mp.A, format);
-        UpdateAxisReadout(axisB, p.B, mp.B, format);
-        UpdateAxisReadout(axisC, p.C, mp.C, format);
-        UpdateAxisReadout(axisU, p.U, mp.U, format);
-        UpdateAxisReadout(axisV, p.V, mp.V, format);
-        UpdateAxisReadout(axisW, p.W, mp.W, format);
+        foreach (var binding in _axisBindings)
+            UpdateAxisReadout(binding.Control, p.Values[binding.Index], mp.Values[binding.Index], format);
     }
 
     void UpdateAxisReadout(DROBaseControl axis, double work, double machine, string format)
@@ -221,21 +214,16 @@ public partial class DROControl : UserControl
             var keyboard = model.Keyboard;
             _keyboardMappingsOk = true;
 
-            keyboard.AddHandler(CncKey.X, ModifierKeys.Control | ModifierKeys.Shift, ZeroX);
-            keyboard.AddHandler(CncKey.Y, ModifierKeys.Control | ModifierKeys.Shift, ZeroY);
-            keyboard.AddHandler(CncKey.Z, ModifierKeys.Control | ModifierKeys.Shift, ZeroZ);
-            if (GrblInfo.AxisFlags.HasFlag(AxisFlags.A))
-                keyboard.AddHandler(CncKey.A, ModifierKeys.Control | ModifierKeys.Shift, ZeroA);
-            if (GrblInfo.AxisFlags.HasFlag(AxisFlags.B))
-                keyboard.AddHandler(CncKey.B, ModifierKeys.Control | ModifierKeys.Shift, ZeroB);
-            if (GrblInfo.AxisFlags.HasFlag(AxisFlags.C))
-                keyboard.AddHandler(CncKey.C, ModifierKeys.Control | ModifierKeys.Shift, ZeroC);
-            if (GrblInfo.AxisFlags.HasFlag(AxisFlags.U))
-                keyboard.AddFunction(ZeroU, null);
-            if (GrblInfo.AxisFlags.HasFlag(AxisFlags.V))
-                keyboard.AddFunction(ZeroV, null);
-            if (GrblInfo.AxisFlags.HasFlag(AxisFlags.W))
-                keyboard.AddFunction(ZeroW, null);
+            foreach (var binding in _axisBindings)
+            {
+                if (!binding.AlwaysRegisterShortcut && !GrblInfo.AxisFlags.HasFlag(binding.Flag))
+                    continue;
+
+                if (binding.ShortcutKey is { } key)
+                    keyboard.AddHandler(key, ModifierKeys.Control | ModifierKeys.Shift, _ => ZeroAxis(binding.Index));
+                else
+                    keyboard.AddFunction(_ => ZeroAxis(binding.Index), null);
+            }
             keyboard.AddHandler(CncKey.D0, ModifierKeys.Control | ModifierKeys.Shift, ZeroAxes);
         }
     }
@@ -308,15 +296,12 @@ public partial class DROControl : UserControl
     }
 
     bool ZeroAxes(CNC.Core.Input.Key _) { AxisPositionChanged("ALL", 0d); return true; }
-    bool ZeroX(CNC.Core.Input.Key _) { AxisPositionChanged("X", 0d); return true; }
-    bool ZeroY(CNC.Core.Input.Key _) { AxisPositionChanged("Y", 0d); return true; }
-    bool ZeroZ(CNC.Core.Input.Key _) { AxisPositionChanged("Z", 0d); return true; }
-    bool ZeroA(CNC.Core.Input.Key _) { AxisPositionChanged(GrblInfo.AxisIndexToLetter(3), 0d); return true; }
-    bool ZeroB(CNC.Core.Input.Key _) { AxisPositionChanged(GrblInfo.AxisIndexToLetter(4), 0d); return true; }
-    bool ZeroC(CNC.Core.Input.Key _) { AxisPositionChanged(GrblInfo.AxisIndexToLetter(5), 0d); return true; }
-    bool ZeroU(CNC.Core.Input.Key _) { AxisPositionChanged(GrblInfo.AxisIndexToLetter(6), 0d); return true; }
-    bool ZeroV(CNC.Core.Input.Key _) { AxisPositionChanged(GrblInfo.AxisIndexToLetter(7), 0d); return true; }
-    bool ZeroW(CNC.Core.Input.Key _) { AxisPositionChanged(GrblInfo.AxisIndexToLetter(8), 0d); return true; }
+
+    bool ZeroAxis(int index)
+    {
+        AxisPositionChanged(GrblInfo.AxisIndexToLetter(index), 0d);
+        return true;
+    }
 
     void AxisPositionChanged(string axis, double position)
     {
@@ -328,12 +313,31 @@ public partial class DROControl : UserControl
 
         if (axis == "ALL")
         {
-            var s = "G90G10L20P0";
-            foreach (var i in GrblInfo.AxisFlags.ToIndices())
-                s += GrblInfo.AxisIndexToLetter(i) + "{0}";
-            model.ExecuteCommand(string.Format(s, position.ToInvariantString(GrblParserState.IsMetric ? "F3" : "F4")));
+            model.ExecuteCommand(FormatAxisPositionCommand(axis, position, GrblParserState.IsMetric, GrblInfo.AxisFlags));
         }
         else
-            model.ExecuteCommand(string.Format("G10L20P0{0}{1}", axis, position.ToInvariantString(GrblParserState.IsMetric ? "F3" : "F4")));
+        {
+            model.ExecuteCommand(FormatAxisPositionCommand(axis, position, GrblParserState.IsMetric, GrblInfo.AxisFlags));
+        }
     }
+
+    internal static string FormatAxisPositionCommand(string axis, double position, bool isMetric, AxisFlags axisFlags)
+    {
+        var value = position.ToInvariantString(isMetric ? "F3" : "F4");
+        if (axis != "ALL")
+            return string.Format("G10L20P0{0}{1}", axis, value);
+
+        var command = "G90G10L20P0";
+        foreach (var i in axisFlags.ToIndices())
+            command += GrblInfo.AxisIndexToLetter(i) + "{0}";
+
+        return string.Format(command, value);
+    }
+
+    sealed record AxisBinding(
+        DROBaseControl Control,
+        int Index,
+        AxisFlags Flag,
+        CncKey? ShortcutKey,
+        bool AlwaysRegisterShortcut);
 }

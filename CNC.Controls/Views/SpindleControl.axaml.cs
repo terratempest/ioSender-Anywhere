@@ -4,6 +4,7 @@ using Avalonia.Controls;
 using Avalonia.Input;
 using Avalonia.Interactivity;
 using CNC.Controls.Avalonia.Services;
+using CNC.Controls.Avalonia.Utilities;
 using CNC.Controls.Avalonia.ViewModels;
 using CNC.Core;
 using CNC.GCode;
@@ -69,14 +70,11 @@ public partial class SpindleControl : UserControl
 
     void SpindleControl_DataContextChanged(object? sender, EventArgs e)
     {
-        if (_subscribedModel is INotifyPropertyChanged oldPc)
-            oldPc.PropertyChanged -= OnDataContextPropertyChanged;
-
-        _subscribedModel = DataContext as GrblViewModel;
+        PropertyChangedSubscription.Swap(
+            ref _subscribedModel,
+            DataContext as GrblViewModel,
+            OnDataContextPropertyChanged);
         _viewModel.Model = _subscribedModel;
-
-        if (_subscribedModel is INotifyPropertyChanged newPc)
-            newPc.PropertyChanged += OnDataContextPropertyChanged;
 
         UpdateSpindleStateEnabled();
     }
