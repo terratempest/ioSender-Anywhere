@@ -134,6 +134,9 @@ public static class AppTheme
         foreach (var color in AppThemePalette.NormalizeColors(theme).Colors)
         {
             var key = color.Key;
+            if (AppThemePalette.IsAccentKey(key))
+                continue;
+
             var avaloniaColor = AppThemePalette.ParseColor(color.Value);
             dictionary[key] = AppThemePalette.IsBrushKey(key)
                 ? new SolidColorBrush(avaloniaColor)

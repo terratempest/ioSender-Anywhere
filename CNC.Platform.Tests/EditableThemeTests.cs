@@ -205,6 +205,17 @@ public class EditableThemeTests
     }
 
     [Fact]
+    public void AppTheme_build_resource_dictionary_leaves_accent_to_accent_overlay()
+    {
+        var userTheme = AppThemePalette.CreateTheme("Mill", AppTheme.Dark);
+        userTheme.Colors.First(c => c.Key == AppThemePalette.EditableAccentKey).Value = "#FF112233";
+
+        var dictionary = AppTheme.BuildResourceDictionary(userTheme);
+
+        Assert.False(dictionary.ContainsKey(AppThemePalette.EditableAccentKey));
+    }
+
+    [Fact]
     public void AppTheme_build_accent_resource_dictionary_adds_all_accent_keys()
     {
         var dictionary = AppTheme.BuildAccentResourceDictionary(
