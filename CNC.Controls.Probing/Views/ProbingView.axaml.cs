@@ -75,7 +75,7 @@ public partial class ProbingView : UserControl, IKeyHandlerContext
         }
 
         _vm.Attach(grbl);
-        ProfileNameBox.Text = _vm.Profile?.Name ?? string.Empty;
+        SyncProfileName();
         _vm.OnActivated();
         grbl.OnCameraProbe += AddCameraPosition;
 
@@ -134,7 +134,7 @@ public partial class ProbingView : UserControl, IKeyHandlerContext
         _activeGrbl = grbl;
         grbl.IsProbing = true;
         _vm.Attach(grbl);
-        ProfileNameBox.Text = _vm.Profile?.Name ?? string.Empty;
+        SyncProfileName();
         _vm.OnActivated();
         grbl.OnCameraProbe += AddCameraPosition;
         grbl.PropertyChanged += Grbl_PropertyChanged;
@@ -215,6 +215,8 @@ public partial class ProbingView : UserControl, IKeyHandlerContext
         _vm.Positions.Clear();
         _vm.Message = string.Empty;
         _vm.PreviewEnable = false;
+        _vm.RestoreProfileForTab(view.ProbingType);
+        SyncProfileName();
         _vm.OnProbeTabActivated(view.ProbingType, true);
         if (_active)
             view.Activate(true);
@@ -295,6 +297,12 @@ public partial class ProbingView : UserControl, IKeyHandlerContext
         if (tab == null)
             return;
 
+        if (activate)
+        {
+            _vm.RestoreProfileForTab(tab.ProbingType);
+            SyncProfileName();
+        }
+
         _vm.OnProbeTabActivated(tab.ProbingType, activate);
         tab.Activate(activate);
     }
@@ -302,7 +310,13 @@ public partial class ProbingView : UserControl, IKeyHandlerContext
     bool StartActiveTab()
     {
         if (DataContext is GrblViewModel grbl && !grbl.IsJobRunning)
-            GetSelectedProbeTab()?.Start(_vm.PreviewEnable);
+        {
+            var tab = GetSelectedProbeTab();
+            if (tab != null)
+            {
+                tab.Start(_vm.PreviewEnable);
+            }
+        }
         return true;
     }
 
@@ -453,7 +467,8 @@ public partial class ProbingView : UserControl, IKeyHandlerContext
         _vm.ProfileStore.Save();
         ProfileList.ItemsSource = null;
         ProfileList.ItemsSource = _vm.Profiles;
-        ProfileNameBox.Text = _vm.Profile?.Name ?? string.Empty;
+        RememberSelectedProfileForActiveTab();
+        SyncProfileName();
     }
 
     void OnProfileDropDownClick(object? sender, RoutedEventArgs e) =>
@@ -465,8 +480,19 @@ public partial class ProbingView : UserControl, IKeyHandlerContext
             return;
 
         _vm.Profile = profile;
+        RememberSelectedProfileForActiveTab();
         ProfileNameBox.Text = profile.Name ?? string.Empty;
         ProfilePopup.IsOpen = false;
         ProfileList.SelectedItem = null;
     }
+
+    void RememberSelectedProfileForActiveTab()
+    {
+        var tab = GetSelectedProbeTab();
+        if (tab != null)
+            _vm.RememberProfileForTab(tab.ProbingType);
+    }
+
+    void SyncProfileName() =>
+        ProfileNameBox.Text = _vm.Profile?.Name ?? string.Empty;
 }

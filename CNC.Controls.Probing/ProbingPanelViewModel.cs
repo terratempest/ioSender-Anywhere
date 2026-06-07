@@ -7,6 +7,7 @@ namespace CNC.Controls.Probing;
 public class ProbingPanelViewModel : ViewModelBase
 {
     readonly ProbingProfiles _profiles = new();
+    readonly ProbingProfileUsageStore _profileUsage = new();
     ProbingProfile? _profile;
     GrblViewModel? _grbl;
     string _position = string.Empty;
@@ -30,6 +31,8 @@ public class ProbingPanelViewModel : ViewModelBase
     public ObservableCollection<ProbingProfile> Profiles => _profiles.Profiles;
 
     public ProbingProfiles ProfileStore => _profiles;
+
+    public ProbingProfileUsageStore ProfileUsageStore => _profileUsage;
 
     public GrblViewModel? Grbl => _grbl;
 
@@ -190,6 +193,27 @@ public class ProbingPanelViewModel : ViewModelBase
         ProbeOffsetX = _profile.ProbeOffsetX;
         ProbeOffsetY = _profile.ProbeOffsetY;
         TouchPlateIsXY = _profile.TouchPlateIsXY;
+    }
+
+    public void RestoreProfileForTab(ProbingType probingType)
+    {
+        if (probingType == ProbingType.None)
+            return;
+
+        _profileUsage.Load();
+        var name = _profileUsage.Get(probingType);
+        Profile = !string.IsNullOrEmpty(name)
+            ? Profiles.FirstOrDefault(p => string.Equals(p.Name, name, StringComparison.Ordinal)) ?? Profiles.FirstOrDefault()
+            : Profiles.FirstOrDefault();
+    }
+
+    public void RememberProfileForTab(ProbingType probingType)
+    {
+        if (probingType == ProbingType.None)
+            return;
+
+        _profileUsage.Set(probingType, Profile);
+        _profileUsage.Save();
     }
 
     void OnGrblPropertyChanged(object? sender, PropertyChangedEventArgs e)

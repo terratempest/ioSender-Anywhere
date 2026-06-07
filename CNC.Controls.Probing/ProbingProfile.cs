@@ -145,3 +145,74 @@ public sealed class ProbingProfiles
         }
     }
 }
+
+[Serializable]
+public sealed class ProbingProfileUsage
+{
+    public ProbingType ProbingType { get; set; }
+    public string ProfileName { get; set; } = string.Empty;
+}
+
+public sealed class ProbingProfileUsageStore
+{
+    readonly List<ProbingProfileUsage> _profiles = [];
+    bool _loaded;
+
+    public string? Get(ProbingType probingType) =>
+        _profiles.FirstOrDefault(x => x.ProbingType == probingType)?.ProfileName;
+
+    public void Set(ProbingType probingType, ProbingProfile? profile)
+    {
+        if (probingType == ProbingType.None || profile == null)
+            return;
+
+        var usage = _profiles.FirstOrDefault(x => x.ProbingType == probingType);
+        if (usage == null)
+        {
+            _profiles.Add(new ProbingProfileUsage
+            {
+                ProbingType = probingType,
+                ProfileName = profile.Name
+            });
+            return;
+        }
+
+        usage.ProfileName = profile.Name;
+    }
+
+    public void Save()
+    {
+        try
+        {
+            var path = Core.Resources.ConfigPath + "ProbingLastUsedProfiles.xml";
+            var xs = new XmlSerializer(typeof(List<ProbingProfileUsage>));
+            using var fs = File.Create(path);
+            xs.Serialize(fs, _profiles);
+        }
+        catch (Exception e)
+        {
+            CNC.Core.GrblUi.ShowError(e.Message);
+        }
+    }
+
+    public void Load()
+    {
+        if (_loaded)
+            return;
+
+        _loaded = true;
+
+        try
+        {
+            var path = Core.Resources.ConfigPath + "ProbingLastUsedProfiles.xml";
+            var xs = new XmlSerializer(typeof(List<ProbingProfileUsage>));
+            using var reader = new StreamReader(path);
+            _profiles.Clear();
+            _profiles.AddRange((List<ProbingProfileUsage>)xs.Deserialize(reader)!);
+        }
+        catch
+        {
+            _profiles.Clear();
+        }
+    }
+}
