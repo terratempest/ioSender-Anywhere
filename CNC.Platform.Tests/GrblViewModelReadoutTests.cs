@@ -511,6 +511,19 @@ public sealed class GrblViewModelReadoutTests
     }
 
     [Fact]
+    public void Realtime_tlo_state_overrides_parser_cancel_in_same_report()
+    {
+        var vm = new GrblViewModel();
+
+        vm.DataReceived("<Idle|MPos:0,0,0|GC:G0 G54 G17 G21 G90 G94 G49 M5 M9 T0 F0 S0|TLR:1|TLO:0.000,0.000,12.345|Bf:15,128>");
+
+        Assert.True(vm.IsTloReferenceSet);
+        Assert.Equal(12.345d, vm.ToolOffset.Z, 3);
+        Assert.True(vm.IsToolOffsetIndicatorVisible);
+        Assert.True(vm.IsToolOffsetActive);
+    }
+
+    [Fact]
     public void ToolOffset_z_change_updates_tool_offset_state()
     {
         var vm = new GrblViewModel();

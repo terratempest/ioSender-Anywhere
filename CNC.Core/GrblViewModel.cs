@@ -1132,15 +1132,22 @@ namespace CNC.Core
                 if (elements.Length > 0)
                 {
                     string[] pair = elements[0].Split(':', 2);
+                    string toolOffsetStatus = string.Empty;
                     SetGRBLState(pair[0].Substring(1), pair.Count() == 1 ? -1 : int.Parse(pair[1]), false);
 
                     for (int i = elements.Length - 1; i > 0; i--)
                     {
                         pair = elements[i].Split(':', 2);
 
+                        if (pair.Length == 2 && pair[0] == "TLO")
+                            toolOffsetStatus = pair[1];
+
                         if (pair.Length == 2 && Set(pair[0], pair[1]))
                             pos_changed = true;
                     }
+
+                    if (!string.IsNullOrEmpty(toolOffsetStatus))
+                        ParseToolOffsetStatus(toolOffsetStatus);
 
                     if (!data.Contains("|Pn:"))
                         Set("Pn", string.Empty);
