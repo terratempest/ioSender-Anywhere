@@ -1,0 +1,17 @@
+<Viewbox Width="64" Height="64">
+    <!-- Canvas handles absolute vector coordinate positioning up to 256x256 -->
+    <Canvas Width="256" Height="256">
+        
+        <!-- The converted <rect> control -->
+        <Rectangle Canvas.Left="69.341" Canvas.Top="69.341" 
+                   Width="117.319" Height="117.319" 
+                   Fill="#EBEBEB"/>
+        
+        <!-- The 4 Path Arrows -->
+        <Path Fill="White" Data="M24.226,132.371L24.226,123.629L51.359,123.629L51.359,115.51L63.849,128L51.359,140.49L51.359,132.371L24.226,132.371Z" />
+        <Path Fill="White" Data="M231.774,132.371L231.774,123.629L203.133,123.629L203.133,115.51L190.643,128L203.133,140.49L203.133,132.371L231.774,132.371Z" />
+        <Path Fill="White" Data="M123.629,24.226L132.371,24.226L132.371,51.359L140.49,51.359L128,63.849L115.51,51.359L123.629,51.359L123.629,24.226Z" />
+        <Path Fill="White" Data="M123.629,231.774L132.371,231.774L132.371,203.133L140.49,203.133L128,190.643L115.51,203.133L123.629,203.133L123.629,231.774Z" />
+        
+    </Canvas>
+</Viewbox>

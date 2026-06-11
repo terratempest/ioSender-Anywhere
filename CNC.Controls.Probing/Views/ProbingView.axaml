@@ -22,6 +22,39 @@
     <local:ProbingMacroActiveBrushConverter x:Key="MacroActiveBrushConverter"/>
   </UserControl.Resources>
 
+  <UserControl.Styles>
+    <Style Selector="Button.probing-action">
+      <Setter Property="Background" Value="{DynamicResource ThemeControlHighBrush}"/>
+      <Setter Property="Foreground" Value="{DynamicResource ThemeForegroundBrush}"/>
+      <Setter Property="BorderBrush" Value="{DynamicResource ThemeBorderMidBrush}"/>
+      <Setter Property="BorderThickness" Value="1"/>
+      <Setter Property="CornerRadius" Value="4"/>
+      <Setter Property="Height" Value="64"/>
+      <Setter Property="Width" Value="64"/>
+      <Setter Property="Margin" Value="0,0,4,0"/>
+      <Setter Property="MinWidth" Value="0"/>
+      <Setter Property="HorizontalAlignment" Value="Left"/>
+      <Setter Property="Padding" Value="0"/>
+      <Setter Property="HorizontalContentAlignment" Value="Center"/>
+      <Setter Property="VerticalContentAlignment" Value="Center"/>
+      <Setter Property="FontWeight" Value="SemiBold"/>
+      <Setter Property="FontSize" Value="10"/>
+      <Setter Property="Cursor" Value="Hand"/>
+    </Style>
+    <Style Selector="Button.probing-action:pointerover">
+      <Setter Property="Background" Value="{DynamicResource ThemeControlHighlightMidBrush}"/>
+      <Setter Property="BorderBrush" Value="{DynamicResource ThemeBorderHighBrush}"/>
+    </Style>
+    <Style Selector="Button.probing-action:pressed">
+      <Setter Property="Background" Value="{DynamicResource ThemeControlHighlightLowBrush}"/>
+    </Style>
+    <Style Selector="Button.probing-action.selected">
+      <Setter Property="Background" Value="{DynamicResource ThemeControlHighlightLowBrush}"/>
+      <Setter Property="BorderBrush" Value="{DynamicResource ThemeAccentBrush}"/>
+      <Setter Property="Foreground" Value="{DynamicResource ThemeAccentBrush}"/>
+    </Style>
+  </UserControl.Styles>
+
   <Grid TextElement.FontSize="12">
     <Grid x:Name="ProbingVmRoot"
           ColumnDefinitions="260,*"
@@ -32,52 +65,58 @@
               BorderBrush="{DynamicResource ThemeBorderLowBrush}"
               BorderThickness="1"
               Padding="4"
-              CornerRadius="2"
+              CornerRadius="2" 
               Background="{DynamicResource ThemeControlLowBrush}">
         <ScrollViewer HorizontalScrollBarVisibility="Disabled"
                       VerticalScrollBarVisibility="Auto">
           <StackPanel x:Name="SidebarHost" Spacing="5">
-            <Grid ColumnDefinitions="Auto,*,Auto">
-              <TextBlock Grid.Column="0" Text="Profile:" VerticalAlignment="Center" TextAlignment="Right" Margin="0,0,6,0"/>
-              <Grid Grid.Column="1" ColumnDefinitions="*,22">
-                <TextBox x:Name="ProfileNameBox"
-                         MinHeight="22"
-                         VerticalContentAlignment="Center"
-                         Padding="6,0,4,0"/>
-                <Button x:Name="ProfileDropDownBtn"
-                        Grid.Column="1"
+            <Border Classes="panel-chrome">
+              <Grid ColumnDefinitions="Auto,*,Auto">
+                <TextBlock Grid.Column="0" Text="Profile:" VerticalAlignment="Center" TextAlignment="Right" Margin="0,0,6,0"/>
+                <Grid Grid.Column="1" ColumnDefinitions="*,22">
+                  <TextBox x:Name="ProfileNameBox"
+                    MinHeight="22" CornerRadius="4,0,0,4"
+                    BorderBrush="{DynamicResource ThemeBorderMidBrush}"
+                    VerticalContentAlignment="Center" 
+                    Padding="6,0,4,0"/>
+
+                  <Button x:Name="ProfileDropDownBtn"
+                    Grid.Column="1"
+                    Classes="panel-action compact"
+                    Content="&#9660;"
+                    Width="22"
+                    MinHeight="22"
+                    BorderBrush="{DynamicResource ThemeBorderMidBrush}"
+                    Padding="0"
+                    Focusable="False"
+                    CornerRadius="0,4,4,0"
+                    Click="OnProfileDropDownClick"/>
+                  <Popup x:Name="ProfilePopup"
+                        PlacementTarget="{Binding #ProfileNameBox}"
+                        Placement="Bottom"
+                        IsLightDismissEnabled="True">
+                    <ListBox x:Name="ProfileList"
+                            MinWidth="180"
+                            MaxHeight="200"
+                            ItemsSource="{Binding Profiles}"
+                            SelectionChanged="OnProfileListSelectionChanged">
+                      <ListBox.ItemTemplate>
+                        <DataTemplate>
+                          <TextBlock Text="{Binding Name}"/>
+                        </DataTemplate>
+                      </ListBox.ItemTemplate>
+                    </ListBox>
+                  </Popup>
+                </Grid>
+                <Button x:Name="ProfileMenuBtn"
+                        Grid.Column="2"
                         Classes="panel-action compact"
-                        Content="&#9660;"
-                        Width="22"
-                        MinHeight="22"
-                        Padding="0"
-                        Focusable="False"
-                        Click="OnProfileDropDownClick"/>
-                <Popup x:Name="ProfilePopup"
-                       PlacementTarget="{Binding #ProfileNameBox}"
-                       Placement="Bottom"
-                       IsLightDismissEnabled="True">
-                  <ListBox x:Name="ProfileList"
-                           MinWidth="180"
-                           MaxHeight="200"
-                           ItemsSource="{Binding Profiles}"
-                           SelectionChanged="OnProfileListSelectionChanged">
-                    <ListBox.ItemTemplate>
-                      <DataTemplate>
-                        <TextBlock Text="{Binding Name}"/>
-                      </DataTemplate>
-                    </ListBox.ItemTemplate>
-                  </ListBox>
-                </Popup>
+                        Content="..."
+                        Width="26"
+                        Margin="4,0,0,0"
+                        Click="OnProfileMenuClick"/>
               </Grid>
-              <Button x:Name="ProfileMenuBtn"
-                      Grid.Column="2"
-                      Classes="panel-action compact"
-                      Content="..."
-                      Width="26"
-                      Margin="4,0,0,0"
-                      Click="OnProfileMenuClick"/>
-            </Grid>
+            </Border>
 
             <Border Classes="panel-chrome"
                     IsVisible="{Binding ProbeDiameterEnable, Converter={StaticResource IsVisibleConverter}}"
@@ -218,9 +257,153 @@
         </ScrollViewer>
       </Border>
 
-      <Grid Grid.Column="1" RowDefinitions="*,Auto">
+      <Grid Grid.Column="1" RowDefinitions="Auto,*,Auto">
+
+          <StackPanel Spacing="2" Margin="4">
+            <TextBlock Text="PROBING ACTIONS" FontWeight="SemiBold"/>
+            <Grid ColumnDefinitions="Auto,Auto,Auto,Auto,Auto,Auto">
+              <Button x:Name="ToolLengthActionButton"
+                      Grid.Column="0"
+                      Classes="probing-action"
+                      Tag="0"
+                      Click="OnWizardActionClick"
+                      HorizontalContentAlignment="Stretch"
+                      VerticalContentAlignment="Stretch">
+                
+                <Grid RowDefinitions="38,*" >
+                  <Viewbox Grid.Row="0" Width="36" Height="36">
+                    <Viewbox.RenderTransform>
+                      <TranslateTransform X="-3" Y="-2"/>
+                    </Viewbox.RenderTransform>
+                    <Path Fill="{Binding Foreground, RelativeSource={RelativeSource AncestorType=Button}}"
+                          Data="M203.321,198.719C205.443,198.719 207.478,199.561 208.978,201.062C210.478,202.562 211.321,204.597 211.321,206.719C211.321,208.689 211.321,210.799 211.321,212.77C211.321,214.891 210.478,216.926 208.978,218.427C207.478,219.927 205.443,220.77 203.321,220.77C175.99,220.77 86.505,220.77 59.175,220.77C57.053,220.77 55.018,219.927 53.518,218.427C52.017,216.926 51.175,214.891 51.175,212.77C51.175,210.799 51.175,208.689 51.175,206.719C51.175,204.597 52.017,202.562 53.518,201.062C55.018,199.561 57.053,198.719 59.175,198.719C86.505,198.719 175.99,198.719 203.321,198.719Z M146.546,82.371L146.546,94.603C146.546,100.968 144.017,107.072 139.516,111.573C135.015,116.074 128.911,118.603 122.546,118.603L83.995,118.603C77.63,118.603 71.525,116.074 67.024,111.573C62.524,107.072 59.995,100.968 59.995,94.603L59.995,39.084C59.995,36.875 61.786,35.084 63.995,35.084L142.546,35.084C144.755,35.084 146.546,36.875 146.546,39.084L146.546,66.66L195.61,66.66L195.61,41.55C195.61,38.078 198.423,35.265 201.895,35.265L202.054,35.265C203.707,35.265 205.293,35.921 206.463,37.091C207.632,38.26 208.289,39.846 208.289,41.5L208.289,78.738C208.289,80.745 206.662,82.371 204.656,82.371L146.546,82.371Z M121.459,122.662C122.52,122.662 123.538,123.084 124.288,123.834C125.038,124.584 125.459,125.601 125.459,126.662C125.459,130.246 125.459,135.475 125.459,139.059C125.459,140.12 125.038,141.138 124.288,141.888C123.538,142.638 122.52,143.059 121.459,143.059C113.027,143.059 93.513,143.059 85.081,143.059C84.021,143.059 83.003,142.638 82.253,141.888C81.503,141.138 81.081,140.12 81.081,139.059C81.081,135.475 81.081,130.246 81.081,126.662C81.081,125.601 81.503,124.584 82.253,123.834C83.003,123.084 84.021,122.662 85.081,122.662C93.513,122.662 113.027,122.662 121.459,122.662Z M99.184,173.853C95.938,173.557 92.881,172.134 90.557,169.811C87.931,167.185 86.456,163.624 86.456,159.911L86.456,146.898L120.084,146.898L120.084,159.911C120.084,163.624 118.609,167.185 115.984,169.811C113.66,172.134 110.603,173.557 107.357,173.853L107.357,184.937L103.27,191.801L99.184,184.937L99.184,173.853Z"/>
+                  </Viewbox>
+                  <TextBlock Grid.Row="1"
+                            Text="Tool Length&#x0a;Offset"
+                             TextAlignment="Center" FontSize="8"
+                             Foreground="{DynamicResource ThemeForegroundBrush}"/>
+                </Grid>
+              </Button>
+              <Button x:Name="EdgeExternalActionButton"
+                      Grid.Column="1"
+                      Classes="probing-action"
+                      Tag="1"
+                      Click="OnWizardActionClick"
+                      HorizontalContentAlignment="Stretch"
+                      VerticalContentAlignment="Stretch">
+                <Grid RowDefinitions="38,*">
+                  <Viewbox Grid.Row="0" Width="36" Height="36">
+                    <Canvas Width="256" Height="256">
+                      <Rectangle Canvas.Left="69.341" Canvas.Top="69.341" Width="117.319" Height="117.319" Fill="#EBEBEB"/>
+                      <Path Fill="{Binding Foreground, RelativeSource={RelativeSource AncestorType=Button}}" Data="M24.226,132.371L24.226,123.629L51.359,123.629L51.359,115.51L63.849,128L51.359,140.49L51.359,132.371L24.226,132.371Z"/>
+                      <Path Fill="{Binding Foreground, RelativeSource={RelativeSource AncestorType=Button}}" Data="M231.774,132.371L231.774,123.629L203.133,123.629L203.133,115.51L190.643,128L203.133,140.49L203.133,132.371L231.774,132.371Z"/>
+                      <Path Fill="{Binding Foreground, RelativeSource={RelativeSource AncestorType=Button}}" Data="M123.629,24.226L132.371,24.226L132.371,51.359L140.49,51.359L128,63.849L115.51,51.359L123.629,51.359L123.629,24.226Z"/>
+                      <Path Fill="{Binding Foreground, RelativeSource={RelativeSource AncestorType=Button}}" Data="M123.629,231.774L132.371,231.774L132.371,203.133L140.49,203.133L128,190.643L115.51,203.133L123.629,203.133L123.629,231.774Z"/>
+                    </Canvas>
+                  </Viewbox>
+                  <TextBlock Grid.Row="1"
+                             Text="Edge Finder&#x0a;(External)"
+                             TextAlignment="Center"
+                             FontSize="8"
+                             Foreground="{DynamicResource ThemeForegroundBrush}"/>
+                </Grid>
+              </Button>
+              <Button x:Name="EdgeInternalActionButton"
+                      Grid.Column="2"
+                      Classes="probing-action"
+                      Tag="2"
+                      Click="OnWizardActionClick"
+                      HorizontalContentAlignment="Stretch"
+                      VerticalContentAlignment="Stretch">
+                <Grid RowDefinitions="38,*">
+                  <Viewbox Grid.Row="0" Width="36" Height="36">
+                    <Canvas Width="256" Height="256">
+                      <Path Fill="#EBEBEB" Data="M231.774,24.226L231.774,231.774L24.226,231.774L24.226,24.226L231.774,24.226ZM196.725,59.275L59.275,59.275L59.275,196.725L196.725,196.725L196.725,59.275Z"/>
+                      <Path Fill="{Binding Foreground, RelativeSource={RelativeSource AncestorType=Button}}" Data="M151.912,132.371L151.912,123.629L179.045,123.629L179.045,115.51L191.535,128L179.045,140.49L179.045,132.371L151.912,132.371Z"/>
+                      <Path Fill="{Binding Foreground, RelativeSource={RelativeSource AncestorType=Button}}" Data="M105.596,132.371L105.596,123.629L76.955,123.629L76.955,115.51L64.465,128L76.955,140.49L76.955,132.371L105.596,132.371Z"/>
+                      <Path Fill="{Binding Foreground, RelativeSource={RelativeSource AncestorType=Button}}" Data="M123.629,151.912L132.371,151.912L132.371,179.045L140.49,179.045L128,191.535L115.51,179.045L123.629,179.045L123.629,151.912Z"/>
+                      <Path Fill="{Binding Foreground, RelativeSource={RelativeSource AncestorType=Button}}" Data="M123.629,105.596L132.371,105.596L132.371,76.955L140.49,76.955L128,64.465L115.51,76.955L123.629,76.955L123.629,105.596Z"/>
+                    </Canvas>
+                  </Viewbox>
+                  <TextBlock Grid.Row="1"
+                             Text="Edge Finder&#x0a;(Internal)"
+                             TextAlignment="Center"
+                             FontSize="8"
+                             Foreground="{DynamicResource ThemeForegroundBrush}"/>
+                </Grid>
+              </Button>
+              <Button x:Name="RotationActionButton"
+                      Grid.Column="3"
+                      Classes="probing-action"
+                      Tag="3"
+                      Click="OnWizardActionClick"
+                      HorizontalContentAlignment="Stretch"
+                      VerticalContentAlignment="Stretch">
+                <Grid RowDefinitions="38,*">
+                  <Viewbox Grid.Row="0" Width="28" Height="28">
+                    <Viewbox.RenderTransform>
+                      <TranslateTransform X="-2" Y="-1"/>
+                    </Viewbox.RenderTransform>
+                    <Path Fill="{Binding Foreground, RelativeSource={RelativeSource AncestorType=Button}}"
+                          Data="M128,24.899C184.903,24.899 231.101,71.097 231.101,128C231.101,184.903 184.903,231.101 128,231.101C71.097,231.101 24.899,184.903 24.899,128L33.857,128C33.857,179.959 76.041,222.143 128,222.143C179.959,222.143 222.143,179.959 222.143,128C222.143,76.041 179.959,33.857 128,33.857L128,43.758L102.503,29.287L128,14.816L128,24.899Z"/>
+                  </Viewbox>
+                  <TextBlock Grid.Row="1"
+                             Text="Rotation"
+                             TextAlignment="Center"
+                             FontSize="8"
+                             Foreground="{DynamicResource ThemeForegroundBrush}"/>
+                </Grid>
+              </Button>
+              <Button x:Name="CenterActionButton"
+                      Grid.Column="4"
+                      Classes="probing-action"
+                      Tag="4"
+                      Click="OnWizardActionClick"
+                      HorizontalContentAlignment="Stretch"
+                      VerticalContentAlignment="Stretch">
+                <Grid RowDefinitions="38,*">
+                  <Viewbox Grid.Row="0" Width="36" Height="36">
+                    <Viewbox.RenderTransform>
+                      <TranslateTransform X="-3" Y="-2"/>
+                    </Viewbox.RenderTransform>
+                    <Path Fill="{Binding Foreground, RelativeSource={RelativeSource AncestorType=Button}}"
+                          Data="M128,48A80,80,0,1,0,208,128,80,80,0,0,0,128,48ZM128,60A68,68,0,1,1,60,128,68,68,0,0,1,128,60ZM36.5,122H59.5V134H36.5ZM196.5,122H219.5V134H196.5ZM122,36.5H134V59.5H122ZM122,196.5H134V219.5H122ZM128,99.2A28.8,28.8,0,1,0,156.8,128,28.8,28.8,0,0,0,128,99.2Z"/>
+                  </Viewbox>
+                  <TextBlock Grid.Row="1"
+                             Text="Center Finder"
+                             TextAlignment="Center"
+                             FontSize="8"
+                             Foreground="{DynamicResource ThemeForegroundBrush}"/>
+                </Grid>
+              </Button>
+              <Button x:Name="HeightMapActionButton"
+                      Grid.Column="5"
+                      Classes="probing-action"
+                      Tag="5"
+                      Click="OnWizardActionClick"
+                      HorizontalContentAlignment="Stretch"
+                      VerticalContentAlignment="Stretch">
+                <Grid RowDefinitions="38,*">
+                  <Viewbox Grid.Row="0" Width="36" Height="36">
+                    <Viewbox.RenderTransform>
+                      <TranslateTransform X="-3" Y="-3"/>
+                    </Viewbox.RenderTransform>
+                    <Path Fill="{Binding Foreground, RelativeSource={RelativeSource AncestorType=Button}}"
+                          Data="M99.144,181.229L42.326,193.707C41.093,193.977 39.804,193.675 38.821,192.884C37.837,192.093 37.265,190.899 37.265,189.637L37.265,66.994C37.265,65.037 38.627,63.344 40.538,62.924L98.25,50.251C98.839,50.122 99.449,50.122 100.038,50.251L156.856,62.728L213.674,50.251C214.907,49.98 216.196,50.283 217.179,51.074C218.163,51.865 218.735,53.059 218.735,54.321L218.735,176.963C218.735,178.92 217.373,180.613 215.462,181.033L157.75,193.707C157.161,193.836 156.551,193.836 155.962,193.707L99.144,181.229ZM94.977,59.502L45.599,70.345L45.599,184.456L94.977,173.612L94.977,59.502ZM103.311,59.502L103.311,173.612L152.689,184.456L152.689,70.345L103.311,59.502ZM161.023,184.456L210.401,173.612L210.401,59.502L161.023,70.345L161.023,184.456Z"/>
+                  </Viewbox>
+                  <TextBlock Grid.Row="1"
+                             Text="Height Map"
+                             TextAlignment="Center"
+                             FontSize="8"
+                             Foreground="{DynamicResource ThemeForegroundBrush}"/>
+                </Grid>
+              </Button>
+            </Grid>
+          </StackPanel>
+
+
         <TabControl x:Name="WizardTabs"
-          Grid.Row="0"
+          Grid.Row="1"
           HorizontalAlignment="Stretch"
           VerticalAlignment="Stretch"
           SelectionChanged="OnTabSelectionChanged"
@@ -230,16 +413,10 @@
             <Style Selector="TabControl#WizardTabs">
               <Setter Property="Template">
                 <ControlTemplate>
-                  <Grid RowDefinitions="Auto,*">
-                    <Border Margin="4,0,4,0">
-                      <ItemsPresenter Name="PART_ItemsPresenter">
-                        <ItemsPresenter.ItemsPanel>
-                          <ItemsPanelTemplate>
-                            <WrapPanel/>
-                          </ItemsPanelTemplate>
-                        </ItemsPresenter.ItemsPanel>
-                      </ItemsPresenter>
-                    </Border>
+                  <Grid RowDefinitions="0,*">
+                    <ItemsPresenter Name="PART_ItemsPresenter"
+                                    Grid.Row="0"
+                                    IsVisible="False"/>
                     <ContentPresenter Name="PART_SelectedContentHost"
                                       Grid.Row="1"
                                       Content="{TemplateBinding SelectedContent}"
@@ -249,36 +426,6 @@
                   </Grid>
                 </ControlTemplate>
               </Setter>
-            </Style>
-
-            <Style Selector="TabItem">
-              <Setter Property="Background" Value="{DynamicResource ThemeControlMidBrush}"/>
-              <Setter Property="Foreground" Value="{DynamicResource ThemeForegroundBrush}"/>
-              <Setter Property="MinHeight" Value="30"/>
-              <Setter Property="Margin" Value="0"/>
-              <Setter Property="Template">
-                <ControlTemplate>
-                  <Border Name="PART_LayoutRoot"
-                    MinHeight="{TemplateBinding MinHeight}"
-                    Background="{TemplateBinding Background}"
-                    BorderBrush="{DynamicResource ThemeBorderMidBrush}"
-                    BorderThickness="1,1,1,0"
-                    CornerRadius="12,12,0,0" 
-                    Padding="8,0">
-                    <ContentPresenter Content="{TemplateBinding Header}"
-                      FontSize="12"
-                      VerticalAlignment="Center"/>
-                  </Border>
-                </ControlTemplate>
-              </Setter>
-            </Style>
-
-
-            <Style Selector="TabItem:selected">
-              <Setter Property="Background" Value="{DynamicResource ThemeControlHighBrush}"/>
-              <Setter Property="Foreground" Value="{DynamicResource ThemeForegroundBrush}"/>
-
-              <Setter Property="ZIndex" Value="10"/> 
             </Style>
 
             <Style Selector="Border.probing-tab-content">
@@ -322,7 +469,7 @@
           </TabItem>
         </TabControl>
 
-        <Grid Grid.Row="1" ColumnDefinitions="*,128" RowDefinitions="Auto,Auto" Margin="8">
+        <Grid Grid.Row="2" ColumnDefinitions="*,128" RowDefinitions="Auto,Auto" Margin="8">
           <TextBlock Grid.Row="0" Grid.Column="0"
                      Text="{Binding Instructions}"
                      TextWrapping="Wrap"

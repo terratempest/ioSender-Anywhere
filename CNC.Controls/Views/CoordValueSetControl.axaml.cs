@@ -15,6 +15,11 @@ public partial class CoordValueSetControl : UserControl
     public CoordValueSetControl()
     {
         InitializeComponent();
+        if (Design.IsDesignMode)
+        {
+            Label = "X axis:";
+            Value = 1323.456;
+        }
     }
 
     public event EventHandler<RoutedEventArgs>? Click;

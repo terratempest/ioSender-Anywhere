@@ -26,6 +26,7 @@ public partial class ProbingView : UserControl, IKeyHandlerContext
     bool _jogEnabled;
     bool _cycleStartSignal;
     GrblViewModel? _activeGrbl;
+    Button[]? _wizardActionButtons;
 
     public ProbingView() : this(null)
     {
@@ -36,9 +37,19 @@ public partial class ProbingView : UserControl, IKeyHandlerContext
         _vm = new ProbingViewModel(config);
         InitializeComponent();
         ProbingVmRoot.DataContext = _vm;
+        _wizardActionButtons =
+        [
+            ToolLengthActionButton,
+            EdgeExternalActionButton,
+            EdgeInternalActionButton,
+            RotationActionButton,
+            CenterActionButton,
+            HeightMapActionButton
+        ];
         _initialized = true;
         WizardTabs.PropertyChanged += OnWizardTabsPropertyChanged;
         CommitWizardTabChange(null, WizardTabs.SelectedItem as TabItem);
+        UpdateWizardActionButtons();
         DataContextChanged += OnDataContextChanged;
         DetachedFromVisualTree += (_, _) => DeactivateProbing();
         AddHandler(InputElement.KeyDownEvent, OnPreviewKeyDown, RoutingStrategies.Tunnel);
@@ -221,6 +232,7 @@ public partial class ProbingView : UserControl, IKeyHandlerContext
         if (_active)
             view.Activate(true);
         _vm.NotifySidebarVisibility();
+        UpdateWizardActionButtons();
     }
 
     void SyncSidebarFromSelectedTab()
@@ -246,6 +258,7 @@ public partial class ProbingView : UserControl, IKeyHandlerContext
             case nameof(GrblViewModel.IsJobRunning):
                 foreach (var item in WizardTabs.Items.OfType<TabItem>())
                     item.IsEnabled = !grbl.IsJobRunning || item == WizardTabs.SelectedItem;
+                UpdateWizardActionButtons();
                 break;
 
             case nameof(GrblViewModel.Signals):
@@ -435,6 +448,32 @@ public partial class ProbingView : UserControl, IKeyHandlerContext
             dialog.ShowDialog(owner);
         else
             dialog.Show();
+    }
+
+    void OnWizardActionClick(object? sender, RoutedEventArgs e)
+    {
+        if (sender is not Button { Tag: { } tag } || !int.TryParse(tag.ToString(), out var index))
+            return;
+
+        if (index >= 0 && index < WizardTabs.ItemCount)
+            WizardTabs.SelectedIndex = index;
+    }
+
+    void UpdateWizardActionButtons()
+    {
+        if (_wizardActionButtons == null)
+            return;
+
+        var selectedIndex = WizardTabs.SelectedIndex;
+        var isJobRunning = DataContext is GrblViewModel { IsJobRunning: true };
+
+        for (var i = 0; i < _wizardActionButtons.Length; i++)
+        {
+            var button = _wizardActionButtons[i];
+            var isSelected = i == selectedIndex;
+            button.Classes.Set("selected", isSelected);
+            button.IsEnabled = !isJobRunning || isSelected;
+        }
     }
 
     void OnProfileMenuItemClick(object? sender, RoutedEventArgs e)

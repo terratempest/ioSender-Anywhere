@@ -1,0 +1,55 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:controls="using:CNC.Controls.Avalonia.Controls"
+             x:Class="CNC.Controls.Avalonia.Views.CoordValueSetControl2"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             mc:Ignorable="d"
+             d:DesignHeight="36"
+             d:DesignWidth="450">
+
+  <Grid ColumnDefinitions="65,*,80" >
+
+    <TextBlock Grid.Column="0"
+        Text="{Binding Label, RelativeSource={RelativeSource AncestorType=UserControl}}"
+        VerticalAlignment="Center"
+        FontSize="18"
+        FontWeight="SemiBold"
+        Margin="0,0,8,0"/>
+
+    <Grid Grid.Column="1">
+      <controls:NumericTextBox x:Name="cvValue"
+        HorizontalAlignment="Stretch"
+        VerticalAlignment="Stretch"
+        HorizontalContentAlignment="Right"
+        VerticalContentAlignment="Center"
+        BorderBrush="{DynamicResource ThemeBorderHighBrush}"
+        Padding="0,0,38,0"
+        FontSize="18"
+        IsReadOnly="{Binding IsReadOnly, RelativeSource={RelativeSource AncestorType=UserControl}}"
+        Value="{Binding Value, RelativeSource={RelativeSource AncestorType=UserControl}, Mode=TwoWay}"
+        Format="{Binding DataContext.FormatSigned, RelativeSource={RelativeSource AncestorType=UserControl}}"/>
+
+      <TextBlock Text="{Binding Unit, RelativeSource={RelativeSource AncestorType=UserControl}}"
+        HorizontalAlignment="Right"
+        VerticalAlignment="Center"
+        Margin="0,0,8,0"
+        Opacity="0.65"
+        IsHitTestVisible="False"/>
+    </Grid>
+
+    <Button x:Name="btnSet"
+            Grid.Column="2"
+            Content="Set"
+            CornerRadius="4"
+            BorderThickness="1"
+            BorderBrush="{DynamicResource ThemeBorderHighBrush}"
+            Margin="8,0,0,0"
+            VerticalAlignment="Stretch"
+            HorizontalAlignment="Stretch"
+            HorizontalContentAlignment="Center"
+            VerticalContentAlignment="Center"
+            Click="btnSet_Click"/>
+
+  </Grid>
+</UserControl>

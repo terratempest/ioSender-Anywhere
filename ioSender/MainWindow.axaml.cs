@@ -59,6 +59,11 @@ public partial class MainWindow : Window
     {
         using var _ = StartupTrace.Measure("MainWindow constructor");
         InitializeComponent();
+
+        if (Avalonia.Controls.Design.IsDesignMode)
+        {
+            return;
+        }
         WindowDecorations = OperatingSystem.IsWindows()
             ? WindowDecorations.Full
             : WindowDecorations.None;

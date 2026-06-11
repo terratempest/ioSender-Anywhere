@@ -111,6 +111,12 @@ public partial class MainWindow : Window
 
     void RestoreWindowPlacement()
     {
+        // Guard: Prevent the previewer from executing this method
+        if (Avalonia.Controls.Design.IsDesignMode)
+        {
+            return;
+        }
+        
         var config = AppHostContext.AppConfig.Base;
         if (!config.KeepWindowSize)
             return;
@@ -159,6 +165,11 @@ public partial class MainWindow : Window
 
     void SaveWindowPlacement()
     {
+        // Guard: Prevent the previewer from executing this method
+        if (Avalonia.Controls.Design.IsDesignMode)
+        {
+            return;
+        }
         if (_restoringPlacement)
             return;
 

@@ -9,52 +9,60 @@
              x:DataType="core:GrblViewModel"
              mc:Ignorable="d"
              d:DesignWidth="350"
-             d:DesignHeight="28"
+             d:DesignHeight="56"
              MinWidth="216"
              MinHeight="24"
-             MaxHeight="28"
              HorizontalAlignment="Stretch"
              VerticalAlignment="Stretch">
 
   <UserControl.Resources>
     <conv:GrblStateToColorConverter x:Key="ToColorConverter"/>
   </UserControl.Resources>
+  <UserControl.Styles>
+    <Style Selector="TextBox#txtState:pointerover /template/ Border#PART_BorderElement">
+      <Setter Property="Background" Value="{Binding #txtState.Background}" />
+      <Setter Property="BorderBrush" Value="{Binding #txtState.BorderBrush}" />
+    </Style>
+  </UserControl.Styles>
 
-  <Grid Margin="4" ColumnDefinitions="Auto,*,Auto,Auto" MaxHeight="28" MinHeight="24"
+  <Grid x:Name="gridLayout" Margin="4" ColumnDefinitions="Auto,*,Auto,Auto" 
         HorizontalAlignment="Stretch" VerticalAlignment="Stretch">
-    <TextBlock x:Name="LblState" Grid.Column="0" Text="State:" VerticalAlignment="Center"
-               Margin="0,0,4,0"
-               Foreground="{DynamicResource ThemeForegroundBrush}"
-               loc:Localize.Key="CNC.Controls.Avalonia.statuscontrol.lbl_state"/>
+        
+    <TextBlock x:Name="LblState" Grid.Column="0" 
+      Text="State:" VerticalAlignment="Center"
+      Margin="0,0,4,0"
+      Foreground="{DynamicResource ThemeForegroundBrush}"
+      loc:Localize.Key="CNC.Controls.Avalonia.statuscontrol.lbl_state"/>
 
     <TextBox x:Name="txtState" Grid.Column="1"
-             IsReadOnly="True" Focusable="False"
-             MinHeight="24" Padding="0"
-             HorizontalAlignment="Stretch" VerticalAlignment="Stretch"
-             HorizontalContentAlignment="Center" VerticalContentAlignment="Center"
-             TextAlignment="Center" FontWeight="SemiBold"
-             Foreground="Black"
-             Text="{Binding GrblStateDisplay, Mode=OneWay}"
-             Background="{Binding GrblState, Converter={StaticResource ToColorConverter}}"/>
+      IsReadOnly="True" Focusable="False" Padding="0"
+      HorizontalAlignment="Stretch" VerticalAlignment="Stretch"
+      HorizontalContentAlignment="Center" VerticalContentAlignment="Center"
+      TextAlignment="Center" FontWeight="SemiBold"
+      Foreground="Black"
+      Text="{Binding GrblStateDisplay, Mode=OneWay}"
+      Background="{Binding GrblState, Converter={StaticResource ToColorConverter}}"/>
 
     <Button x:Name="btnUnlock" Grid.Column="2"
-            Content="Unlock" ToolTip.Tip="Ctrl+U"
-            Width="72" Margin="4,0,0,0" Padding="0"
-            HorizontalContentAlignment="Center"
-            VerticalContentAlignment="Center"
-            HorizontalAlignment="Right"
-            VerticalAlignment="Stretch"
-            Focusable="False"
-            loc:Localize.Key="CNC.Controls.Avalonia.statuscontrol.btn_unlock"/>
+      Content="Unlock" ToolTip.Tip="Ctrl+U"
+      Width="72" Margin="4,0,0,0" Padding="0"
+      HorizontalContentAlignment="Center"
+      VerticalContentAlignment="Center"
+      HorizontalAlignment="Right"
+      VerticalAlignment="Stretch"
+      Height="{Binding #txtState.Bounds.Height}"
+      Focusable="False"  
+      loc:Localize.Key="CNC.Controls.Avalonia.statuscontrol.btn_unlock"/>
 
     <Button x:Name="btnReset" Grid.Column="3"
-            Content="Reset" ToolTip.Tip="Ctrl+Shift+R"
-            Width="72" Margin="4,0,0,0" Padding="0"
-            HorizontalContentAlignment="Center"
-            VerticalContentAlignment="Center"
-            HorizontalAlignment="Right"
-            VerticalAlignment="Stretch"
-            Focusable="False" Classes="danger"
-            loc:Localize.Key="CNC.Controls.Avalonia.statuscontrol.btn_reset"/>
+      Content="Reset" ToolTip.Tip="Ctrl+Shift+R"
+      Width="72" Margin="4,0,0,0" Padding="0"
+      HorizontalContentAlignment="Center"
+      VerticalContentAlignment="Center"
+      HorizontalAlignment="Right"
+      VerticalAlignment="Stretch"
+      Height="{Binding #txtState.Bounds.Height}"
+      Focusable="False" Classes="danger"
+      loc:Localize.Key="CNC.Controls.Avalonia.statuscontrol.btn_reset"/>
   </Grid>
 </UserControl>

@@ -1,216 +1,157 @@
 <UserControl xmlns="https://github.com/avaloniaui"
-             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"             
+             xmlns:conv="using:CNC.Controls.Avalonia.Converters"
+             xmlns:views="using:CNC.Controls.Avalonia.Views"
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-             xmlns:conv="using:CNC.Controls.Avalonia.Converters"
-             xmlns:gcode="using:CNC.GCode"
-             xmlns:views="using:CNC.Controls.Avalonia.Views"
              mc:Ignorable="d"
+             d:DesignHeight="600"
+             d:DesignWidth="1000"
              x:Class="CNC.Controls.Avalonia.Views.OffsetView"
-             x:Name="root"
-             d:DesignHeight="515" d:DesignWidth="875">
+             x:Name="root">
 
   <UserControl.Resources>
     <ResourceDictionary>
       <ResourceDictionary.MergedDictionaries>
         <ResourceInclude Source="avares://CNC.Controls.Avalonia/Themes/Controls.axaml"/>
       </ResourceDictionary.MergedDictionaries>
+
       <conv:LogicalNotConverter x:Key="IsNotPredefined"/>
     </ResourceDictionary>
   </UserControl.Resources>
+  
 
-  <Grid Background="Transparent" ColumnDefinitions="Auto,Auto" TextElement.FontSize="12" Margin="4">
+  <Grid 
+        ColumnDefinitions="310,*"
+        >
+
+    <Border Grid.Column="1"
+            BorderBrush="{DynamicResource ThemeBorderLowBrush}">
+
+      <DataGrid x:Name="dgrOffsets"
+                HorizontalAlignment="Stretch"
+                IsReadOnly="True"
+                SelectionMode= "Single"
+                
+                AutoGenerateColumns="False"
+                CanUserReorderColumns="False"
+                CanUserResizeColumns="False"
+                CanUserSortColumns="False"
+                GridLinesVisibility="All"
+                RowHeight="33"
+                FontSize="18"
+                SelectionChanged="dgrOffsets_SelectionChanged">
+        <DataGrid.Columns>
+          <DataGridTextColumn Header="Offset"
+                              Binding="{Binding Code}"
+                              />
+        </DataGrid.Columns>
+        <DataGrid.Styles>
+          <Style Selector="DataGridColumnHeader">
+            <Setter Property="Background" Value="Transparent"/>
+          </Style>
+          <Style Selector="DataGridColumnHeader:not(:sortascending):not(:sortdescending) ContentPresenter#PART_ContentPresenter">
+            <Setter Property="Grid.ColumnSpan" Value="2"/>
+            <Setter Property="Padding" Value="0,0,10,0"/>
+          </Style>
+        </DataGrid.Styles>
+      </DataGrid>
+    </Border>
+
     <Border Grid.Column="0"
             Background="{DynamicResource ThemeControlLowBrush}"
             BorderBrush="{DynamicResource ThemeBorderLowBrush}"
             BorderThickness="1"
-            Padding="4"
-            Margin="0,0,8,0">
-      <DataGrid x:Name="dgrOffsets" IsReadOnly="True"
-                SelectionMode="Single" AutoGenerateColumns="False"
-                CanUserReorderColumns="False" CanUserResizeColumns="False"
-                CanUserSortColumns="False" SelectionChanged="dgrOffsets_SelectionChanged">
+            CornerRadius="6"
+            Margin="4"
+            Padding="8">
 
-        <DataGrid.Columns>
-          <DataGridTextColumn Header="Offset" Binding="{Binding Code}"/>
-          <DataGridTextColumn Header="X" Binding="{Binding X}"/>
-          <DataGridTextColumn Header="Y" Binding="{Binding Y}">
-            <DataGridTextColumn.IsVisible>
-              <MultiBinding Converter="{StaticResource IsAxisVisibleConverter}">
-                <Binding Path="DataContext.AxisEnabledFlags" ElementName="root"/>
-                <Binding Source="{x:Static gcode:AxisFlags.Y}"/>
-              </MultiBinding>
-            </DataGridTextColumn.IsVisible>
-          </DataGridTextColumn>
-          <DataGridTextColumn Header="Z" Binding="{Binding Z}">
-            <DataGridTextColumn.IsVisible>
-              <MultiBinding Converter="{StaticResource IsAxisVisibleConverter}">
-                <Binding Path="DataContext.AxisEnabledFlags" ElementName="root"/>
-                <Binding Source="{x:Static gcode:AxisFlags.Z}"/>
-              </MultiBinding>
-            </DataGridTextColumn.IsVisible>
-          </DataGridTextColumn>
-          <DataGridTextColumn Binding="{Binding A}">
-            <DataGridTextColumn.Header>
-              <TextBlock Text="{Binding DataContext.AxisLetter.A, ElementName=root}"/>
-            </DataGridTextColumn.Header>
-            <DataGridTextColumn.IsVisible>
-              <MultiBinding Converter="{StaticResource IsAxisVisibleConverter}">
-                <Binding Path="DataContext.AxisEnabledFlags" ElementName="root"/>
-                <Binding Source="{x:Static gcode:AxisFlags.A}"/>
-              </MultiBinding>
-            </DataGridTextColumn.IsVisible>
-          </DataGridTextColumn>
-          <DataGridTextColumn Binding="{Binding B}">
-            <DataGridTextColumn.Header>
-              <TextBlock Text="{Binding DataContext.AxisLetter.B, ElementName=root}"/>
-            </DataGridTextColumn.Header>
-            <DataGridTextColumn.IsVisible>
-              <MultiBinding Converter="{StaticResource IsAxisVisibleConverter}">
-                <Binding Path="DataContext.AxisEnabledFlags" ElementName="root"/>
-                <Binding Source="{x:Static gcode:AxisFlags.B}"/>
-              </MultiBinding>
-            </DataGridTextColumn.IsVisible>
-          </DataGridTextColumn>
-          <DataGridTextColumn Binding="{Binding C}">
-            <DataGridTextColumn.Header>
-              <TextBlock Text="{Binding DataContext.AxisLetter.C, ElementName=root}"/>
-            </DataGridTextColumn.Header>
-            <DataGridTextColumn.IsVisible>
-              <MultiBinding Converter="{StaticResource IsAxisVisibleConverter}">
-                <Binding Path="DataContext.AxisEnabledFlags" ElementName="root"/>
-                <Binding Source="{x:Static gcode:AxisFlags.C}"/>
-              </MultiBinding>
-            </DataGridTextColumn.IsVisible>
-          </DataGridTextColumn>
-          <DataGridTextColumn Header="U" Binding="{Binding U}">
-            <DataGridTextColumn.IsVisible>
-              <MultiBinding Converter="{StaticResource IsAxisVisibleConverter}">
-                <Binding Path="DataContext.AxisEnabledFlags" ElementName="root"/>
-                <Binding Source="{x:Static gcode:AxisFlags.U}"/>
-              </MultiBinding>
-            </DataGridTextColumn.IsVisible>
-          </DataGridTextColumn>
-          <DataGridTextColumn Header="V" Binding="{Binding V}">
-            <DataGridTextColumn.IsVisible>
-              <MultiBinding Converter="{StaticResource IsAxisVisibleConverter}">
-                <Binding Path="DataContext.AxisEnabledFlags" ElementName="root"/>
-                <Binding Source="{x:Static gcode:AxisFlags.V}"/>
-              </MultiBinding>
-            </DataGridTextColumn.IsVisible>
-          </DataGridTextColumn>
-          <DataGridTextColumn Header="W" Binding="{Binding W}">
-            <DataGridTextColumn.IsVisible>
-              <MultiBinding Converter="{StaticResource IsAxisVisibleConverter}">
-                <Binding Path="DataContext.AxisEnabledFlags" ElementName="root"/>
-                <Binding Source="{x:Static gcode:AxisFlags.W}"/>
-              </MultiBinding>
-            </DataGridTextColumn.IsVisible>
-          </DataGridTextColumn>
-        </DataGrid.Columns>
-      </DataGrid>
+      <Grid RowDefinitions="Auto,Auto,*">
+
+        <TextBlock Grid.Row="0"
+                  Text="{Binding Offset.Code, ElementName=root}"
+                  FontSize="36"
+                  FontWeight="Bold"
+                  Foreground="{DynamicResource ThemeAccentColor}"
+                  Margin="0,0,0,8"/>
+
+        <Separator Grid.Row="1"
+                  Margin="0,0,0,8"
+                  Background="{DynamicResource ThemeBorderLowBrush}"/>
+
+        <DockPanel Grid.Row="2"
+                  LastChildFill="True">
+
+          <Button DockPanel.Dock="Bottom"
+                  x:Name="btnClear"
+                  Content="Clear all"
+                  Height="36"
+                  FontSize="18"
+                  CornerRadius="4"
+                  BorderThickness="1"
+                  Foreground="IndianRed"
+                  BorderBrush="{DynamicResource ThemeBorderHighBrush}"
+                  HorizontalAlignment="Stretch"
+                  HorizontalContentAlignment="Center"
+                  VerticalContentAlignment="Center"
+                  IsEnabled="{Binding CanEdit, ElementName=root}"
+                  Click="btnClearAll_Click"/>
+
+          <ScrollViewer VerticalScrollBarVisibility="Auto"
+                        HorizontalScrollBarVisibility="Disabled">
+
+            <StackPanel Spacing="8">
+
+              <ItemsControl ItemsSource="{Binding OffsetAxes, ElementName=root}">
+                <ItemsControl.ItemTemplate>
+                  <DataTemplate>
+                    <views:CoordValueSetControl2
+                        Margin="0,0,0,8"
+                        Tag="{Binding Axis}"
+                        Label="{Binding Label}"
+                        Value="{Binding Value, Mode=TwoWay}"
+                        IsEnabled="{Binding CanEdit, ElementName=root}"
+                        Click="cvOffset_Click"/>
+                  </DataTemplate>
+                </ItemsControl.ItemTemplate>
+              </ItemsControl>
+
+              <Separator Margin="0,0,0,0"
+                        Background="{DynamicResource ThemeBorderLowBrush}"/>
+
+              <Button x:Name="btnCurrPos"
+                      Content="Get Current Position"
+                      Height="36"
+                      FontSize="18"
+                      CornerRadius="4"
+                      BorderThickness="1"
+                      BorderBrush="{DynamicResource ThemeBorderHighBrush}"
+                      HorizontalAlignment="Stretch"
+                      HorizontalContentAlignment="Center"
+                      VerticalContentAlignment="Center"
+                      IsEnabled="{Binding IsPredefined, ElementName=root, Converter={StaticResource IsNotPredefined}}"
+                      Click="btnCurrPos_Click"/>
+
+              <Button x:Name="btnSetAll"
+                      Content="Set all"
+                      Height="36"
+                      FontSize="18"
+                      CornerRadius="4"
+                      BorderThickness="1"
+                      BorderBrush="{DynamicResource ThemeBorderHighBrush}"
+                      HorizontalAlignment="Stretch"
+                      HorizontalContentAlignment="Center"
+                      VerticalContentAlignment="Center"
+                      Click="btnSetAll_Click"/>
+
+              <Separator Margin="0,0,0,0"
+                        Background="{DynamicResource ThemeBorderLowBrush}"/>
+
+            </StackPanel>
+          </ScrollViewer>
+
+        </DockPanel>
+      </Grid>
     </Border>
-
-    <StackPanel Grid.Column="1" VerticalAlignment="Top">
-      <StackPanel Orientation="Horizontal" Margin="73,0,0,2">
-        <TextBlock Text="Offset:" VerticalAlignment="Center" Margin="4,0"/>
-        <TextBox Text="{Binding Offset.Code, ElementName=root}" IsReadOnly="True"/>
-      </StackPanel>
-      <views:CoordValueSetControl x:Name="cvXOffset" Tag="X" Click="cvOffset_Click" Margin="2"
-                                  Label="{Binding DataContext.AxisLetter.X, ElementName=root, StringFormat='{}{0} axis:'}"
-                                  Value="{Binding Offset.X, ElementName=root, Mode=TwoWay}"
-                                  IsEnabled="{Binding CanEdit, ElementName=root}"/>
-      <views:CoordValueSetControl x:Name="cvYOffset" Tag="Y" Click="cvOffset_Click" Margin="2"
-                                  Label="{Binding DataContext.AxisLetter.Y, ElementName=root, StringFormat='{}{0} axis:'}"
-                                  Value="{Binding Offset.Y, ElementName=root, Mode=TwoWay}"
-                                  IsEnabled="{Binding CanEdit, ElementName=root}">
-        <views:CoordValueSetControl.IsVisible>
-          <MultiBinding Converter="{StaticResource IsAxisVisibleConverter}">
-            <Binding Path="DataContext.AxisEnabledFlags" ElementName="root"/>
-            <Binding Source="{x:Static gcode:AxisFlags.Y}"/>
-          </MultiBinding>
-        </views:CoordValueSetControl.IsVisible>
-      </views:CoordValueSetControl>
-      <views:CoordValueSetControl x:Name="cvZOffset" Tag="Z" Click="cvOffset_Click" Margin="2"
-                                  Label="{Binding DataContext.AxisLetter.Z, ElementName=root, StringFormat='{}{0} axis:'}"
-                                  Value="{Binding Offset.Z, ElementName=root, Mode=TwoWay}"
-                                  IsEnabled="{Binding CanEdit, ElementName=root}"/>
-      <views:CoordValueSetControl x:Name="cvAOffset" Tag="{Binding DataContext.AxisLetter.A, ElementName=root}" Click="cvOffset_Click" Margin="2"
-                                  Label="{Binding DataContext.AxisLetter.A, ElementName=root, StringFormat='{}{0} axis:'}"
-                                  Value="{Binding Offset.A, ElementName=root, Mode=TwoWay}"
-                                  IsEnabled="{Binding CanEdit, ElementName=root}">
-        <views:CoordValueSetControl.IsVisible>
-          <MultiBinding Converter="{StaticResource IsAxisVisibleConverter}">
-            <Binding Path="DataContext.AxisEnabledFlags" ElementName="root"/>
-            <Binding Source="{x:Static gcode:AxisFlags.A}"/>
-          </MultiBinding>
-        </views:CoordValueSetControl.IsVisible>
-      </views:CoordValueSetControl>
-      <views:CoordValueSetControl x:Name="cvBOffset" Tag="{Binding DataContext.AxisLetter.B, ElementName=root}" Click="cvOffset_Click" Margin="2"
-                                  Label="{Binding DataContext.AxisLetter.B, ElementName=root, StringFormat='{}{0} axis:'}"
-                                  Value="{Binding Offset.B, ElementName=root, Mode=TwoWay}"
-                                  IsEnabled="{Binding CanEdit, ElementName=root}">
-        <views:CoordValueSetControl.IsVisible>
-          <MultiBinding Converter="{StaticResource IsAxisVisibleConverter}">
-            <Binding Path="DataContext.AxisEnabledFlags" ElementName="root"/>
-            <Binding Source="{x:Static gcode:AxisFlags.B}"/>
-          </MultiBinding>
-        </views:CoordValueSetControl.IsVisible>
-      </views:CoordValueSetControl>
-      <views:CoordValueSetControl x:Name="cvCOffset" Tag="{Binding DataContext.AxisLetter.C, ElementName=root}" Click="cvOffset_Click" Margin="2"
-                                  Label="{Binding DataContext.AxisLetter.C, ElementName=root, StringFormat='{}{0} axis:'}"
-                                  Value="{Binding Offset.C, ElementName=root, Mode=TwoWay}"
-                                  IsEnabled="{Binding CanEdit, ElementName=root}">
-        <views:CoordValueSetControl.IsVisible>
-          <MultiBinding Converter="{StaticResource IsAxisVisibleConverter}">
-            <Binding Path="DataContext.AxisEnabledFlags" ElementName="root"/>
-            <Binding Source="{x:Static gcode:AxisFlags.C}"/>
-          </MultiBinding>
-        </views:CoordValueSetControl.IsVisible>
-      </views:CoordValueSetControl>
-      <views:CoordValueSetControl x:Name="cvUOffset" Tag="{Binding DataContext.AxisLetter.U, ElementName=root}" Click="cvOffset_Click" Margin="2"
-                                  Label="{Binding DataContext.AxisLetter.U, ElementName=root, StringFormat='{}{0} axis:'}"
-                                  Value="{Binding Offset.U, ElementName=root, Mode=TwoWay}"
-                                  IsEnabled="{Binding CanEdit, ElementName=root}">
-        <views:CoordValueSetControl.IsVisible>
-          <MultiBinding Converter="{StaticResource IsAxisVisibleConverter}">
-            <Binding Path="DataContext.AxisEnabledFlags" ElementName="root"/>
-            <Binding Source="{x:Static gcode:AxisFlags.U}"/>
-          </MultiBinding>
-        </views:CoordValueSetControl.IsVisible>
-      </views:CoordValueSetControl>
-      <views:CoordValueSetControl x:Name="cvVOffset" Tag="{Binding DataContext.AxisLetter.V, ElementName=root}" Click="cvOffset_Click" Margin="2"
-                                  Label="{Binding DataContext.AxisLetter.V, ElementName=root, StringFormat='{}{0} axis:'}"
-                                  Value="{Binding Offset.V, ElementName=root, Mode=TwoWay}"
-                                  IsEnabled="{Binding CanEdit, ElementName=root}">
-        <views:CoordValueSetControl.IsVisible>
-          <MultiBinding Converter="{StaticResource IsAxisVisibleConverter}">
-            <Binding Path="DataContext.AxisEnabledFlags" ElementName="root"/>
-            <Binding Source="{x:Static gcode:AxisFlags.V}"/>
-          </MultiBinding>
-        </views:CoordValueSetControl.IsVisible>
-      </views:CoordValueSetControl>
-      <views:CoordValueSetControl x:Name="cvWOffset" Tag="{Binding DataContext.AxisLetter.W, ElementName=root}" Click="cvOffset_Click" Margin="2"
-                                  Label="{Binding DataContext.AxisLetter.W, ElementName=root, StringFormat='{}{0} axis:'}"
-                                  Value="{Binding Offset.W, ElementName=root, Mode=TwoWay}"
-                                  IsEnabled="{Binding CanEdit, ElementName=root}">
-        <views:CoordValueSetControl.IsVisible>
-          <MultiBinding Converter="{StaticResource IsAxisVisibleConverter}">
-            <Binding Path="DataContext.AxisEnabledFlags" ElementName="root"/>
-            <Binding Source="{x:Static gcode:AxisFlags.W}"/>
-          </MultiBinding>
-        </views:CoordValueSetControl.IsVisible>
-      </views:CoordValueSetControl>
-
-      <StackPanel Orientation="Horizontal" Margin="0,4" Spacing="4">
-        <Button x:Name="btnCurrPos" Content="Get current position"
-                IsEnabled="{Binding IsPredefined, ElementName=root, Converter={StaticResource IsNotPredefined}}"
-                Click="btnCurrPos_Click"/>
-        <Button x:Name="btnClear" Content="Clear all" 
-                IsEnabled="{Binding CanEdit, ElementName=root}" Click="btnClearAll_Click"/>
-        <Button x:Name="btnSetAll" Content="Set all" Click="btnSetAll_Click"/>
-      </StackPanel>
-    </StackPanel>
-    
   </Grid>
 </UserControl>

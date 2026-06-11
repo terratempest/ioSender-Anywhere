@@ -7,7 +7,9 @@
              x:DataType="core:GrblViewModel"
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-             mc:Ignorable="d" d:DesignWidth="250" d:DesignHeight="80"
+             mc:Ignorable="d" d:DesignWidth="240" d:DesignHeight="36"
+             MinWidth="240"
+             MinHeight="36"
              >
 
   <UserControl.Resources>
@@ -26,7 +28,7 @@
         ItemsSource="{Binding CoordinateSystems}"
         IsEnabled="{Binding IsJobRunning, Converter={StaticResource BooleanConverter}}"
         SelectionChanged="cbxOffset_SelectionChanged"
-        PlaceholderText="G59.3">
+        PlaceholderText="GXX.X">
       <ComboBox.ItemTemplate>
         <DataTemplate>
           <TextBlock Text="{Binding Code}"/>
@@ -43,7 +45,7 @@
       SelectedValueBinding="{Binding Code}"
       IsEnabled="{Binding IsJobRunning, Converter={StaticResource BooleanConverter}}"
       SelectionChanged="cbxTool_SelectionChanged"
-      PlaceholderText="1000">
+      PlaceholderText="None">
       <ComboBox.ItemTemplate>
         <DataTemplate>
           <TextBlock Text="{Binding Code}"/>

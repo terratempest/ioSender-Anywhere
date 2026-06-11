@@ -7,44 +7,70 @@
              mc:Ignorable="d" d:DesignWidth="600" d:DesignHeight="600"
              x:Class="CNC.Controls.Avalonia.Views.ConsoleControl"
              x:DataType="core:GrblViewModel">
+  
   <Grid RowDefinitions="Auto, *">
     <Grid Grid.Row="0" ColumnDefinitions="Auto,*" Margin="4, 0" TextElement.FontSize="12">
       <Menu>
         <MenuItem Header="Log Filters">
-          <CheckBox x:Name="ChkVerbose" Content="Verbose logging" IsChecked="{Binding ResponseLogVerbose}"
-                    loc:Localize.Key="CNC.Controls.Avalonia.consolecontrol.lbl_verbose" loc:Localize.Fallback="Verbose logging"/>
-          <CheckBox x:Name="ChkFilterRt" Content="Hide realtime status reports" IsChecked="{Binding ResponseLogFilterRT}" IsEnabled="{Binding ResponseLogVerbose}"
-                    loc:Localize.Key="CNC.Controls.Avalonia.consolecontrol.lbl_filterRT" loc:Localize.Fallback="Hide realtime status reports"/>
-          <CheckBox x:Name="ChkShowAllRt" Content="Show repeated status reports" IsChecked="{Binding ResponseLogShowRTAll}" IsEnabled="{Binding ResponseLogCanShowRepeatedStatus}"
-                    loc:Localize.Key="CNC.Controls.Avalonia.consolecontrol.lbl_showAll" loc:Localize.Fallback="Show repeated status reports"/>
-          <CheckBox x:Name="ChkFilterOk" Content="Filter &quot;ok&quot; responses" IsChecked="{Binding ResponseLogFilterOk}"
-                    loc:Localize.Key="CNC.Controls.Avalonia.consolecontrol.lbl_filterOk" loc:Localize.Fallback="Filter &quot;ok&quot; responses"/>
+          <CheckBox x:Name="ChkVerbose" 
+            Content="Verbose logging" IsChecked="{Binding ResponseLogVerbose}"
+            loc:Localize.Key="CNC.Controls.Avalonia.consolecontrol.lbl_verbose" loc:Localize.Fallback="Verbose logging"/>
+          <CheckBox x:Name="ChkFilterRt" 
+            Content="Hide realtime status reports" IsChecked="{Binding ResponseLogFilterRT}" IsEnabled="{Binding ResponseLogVerbose}"
+            loc:Localize.Key="CNC.Controls.Avalonia.consolecontrol.lbl_filterRT" loc:Localize.Fallback="Hide realtime status reports"/>
+          <CheckBox x:Name="ChkShowAllRt" 
+            Content="Show repeated status reports" IsChecked="{Binding ResponseLogShowRTAll}" IsEnabled="{Binding ResponseLogCanShowRepeatedStatus}"
+            loc:Localize.Key="CNC.Controls.Avalonia.consolecontrol.lbl_showAll" loc:Localize.Fallback="Show repeated status reports"/>
+          <CheckBox x:Name="ChkFilterOk" 
+            Content="Filter &quot;ok&quot; responses" IsChecked="{Binding ResponseLogFilterOk}"
+            loc:Localize.Key="CNC.Controls.Avalonia.consolecontrol.lbl_filterOk" loc:Localize.Fallback="Filter &quot;ok&quot; responses"/>
         </MenuItem>
       </Menu>
-      <StackPanel Grid.Column="1" Orientation="Horizontal" HorizontalAlignment="Right" Spacing="8">
-        <CheckBox x:Name="ChkAutoscroll" Content="Autoscroll" IsChecked="{Binding ResponseLogAutoscroll}" VerticalAlignment="Center"
-                  loc:Localize.Key="CNC.Controls.Avalonia.consolecontrol.lbl_autoscroll" loc:Localize.Fallback="Autoscroll"/>
-        <Button x:Name="BtnClear" Content="Clear" Click="OnClearClick"
-                loc:Localize.Key="CNC.Controls.Avalonia.consolecontrol.btn_clear" loc:Localize.Fallback="Clear"/>
+      <StackPanel Grid.Column="1" Orientation="Horizontal" HorizontalAlignment="Right" Spacing="4">
+        <ToggleButton x:Name="ChkAutoscroll" 
+          Content="Autoscroll" 
+          IsChecked="{Binding ResponseLogAutoscroll}" 
+          VerticalAlignment="Center"
+          loc:Localize.Key="CNC.Controls.Avalonia.consolecontrol.lbl_autoscroll" 
+          loc:Localize.Fallback="Autoscroll"/>
+        <Button x:Name="BtnClear" 
+          Content="Clear" Click="OnClearClick"
+          loc:Localize.Key="CNC.Controls.Avalonia.consolecontrol.btn_clear" 
+          loc:Localize.Fallback="Clear"/>
       </StackPanel>
     </Grid>
     <TextBox x:Name="ConsoleText"
-             Grid.Row="1"
-             Text="{Binding ResponseLogText, Mode=OneWay}"
-             IsReadOnly="True"
-             AcceptsReturn="True"
-             TextWrapping="Wrap"
-             FontFamily="Consolas,Courier New,monospace"
-             FontSize="10"
-             Background="{DynamicResource ThemeControlLowBrush}"
-             Foreground="{DynamicResource ThemeForegroundBrush}"
-             BorderBrush="{DynamicResource ThemeBorderLowBrush}"
-             ScrollViewer.HorizontalScrollBarVisibility="Disabled"
-             ScrollViewer.VerticalScrollBarVisibility="Auto">
+      Grid.Row="1"
+      Text="{Binding ResponseLogText, Mode=OneWay}"
+      IsReadOnly="True"
+      AcceptsReturn="True"
+      TextWrapping="Wrap"
+      FontFamily="Consolas,Courier New,monospace"
+      FontSize="10"
+      BorderThickness="0"
+      CornerRadius="0"
+      Padding="4,2,4,4"
+      Background="{DynamicResource ThemeControlLowBrush}"
+      Foreground="{DynamicResource ThemeForegroundBrush}"
+      BorderBrush="{DynamicResource ThemeBorderLowBrush}"
+      ScrollViewer.HorizontalScrollBarVisibility="Disabled"
+      ScrollViewer.VerticalScrollBarVisibility="Auto">
       <TextBox.Styles>
-        <Style Selector="TextBox#ConsoleText:pointerover">
+        <Style Selector="TextBox#ConsoleText:pointerover /template/ Border#PART_BorderElement">
           <Setter Property="Background" Value="{DynamicResource ThemeControlLowBrush}"/>
           <Setter Property="BorderBrush" Value="{DynamicResource ThemeBorderLowBrush}"/>
+        </Style>
+
+        <Style Selector="TextBox#ConsoleText:focus /template/ Border#PART_BorderElement">
+          <Setter Property="Background" Value="{DynamicResource ThemeControlLowBrush}"/>
+          <Setter Property="BorderBrush" Value="{DynamicResource ThemeBorderLowBrush}"/>
+          <Setter Property="BorderThickness" Value="0"/> 
+        </Style>
+
+        <Style Selector="TextBox#ConsoleText:focus-within /template/ Border#PART_BorderElement">
+          <Setter Property="Background" Value="{DynamicResource ThemeControlLowBrush}"/>
+          <Setter Property="BorderBrush" Value="{DynamicResource ThemeBorderLowBrush}"/>
+          <Setter Property="BorderThickness" Value="0"/>
         </Style>
       </TextBox.Styles>
     </TextBox>
