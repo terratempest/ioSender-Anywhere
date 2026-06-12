@@ -58,7 +58,7 @@ public sealed class ViewerScene
         }
     }
 
-    public IEnumerable<ViewerLineLayer> AllLayers()
+    public IEnumerable<ViewerLineLayer> AllLayers(bool includeToolMarker = true)
     {
         if (Grid != null) yield return Grid;
         if (GridMajor != null) yield return GridMajor;
@@ -71,7 +71,7 @@ public sealed class ViewerScene
         if (ViewCube != null) yield return ViewCube;
         foreach (var axis in OriginAxes)
             yield return axis;
-        if (ToolMarker != null) yield return ToolMarker;
+        if (includeToolMarker && ToolMarker != null) yield return ToolMarker;
         foreach (var extra in ExtraLayers)
             yield return extra;
     }

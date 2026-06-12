@@ -1,6 +1,7 @@
 using System.ComponentModel;
 using CNC.Core;
 using CNC.GCode;
+using CNC.GCodeViewer.Avalonia;
 
 namespace CNC.Platform.Tests;
 
@@ -171,6 +172,37 @@ public sealed class GrblViewModelReadoutTests
         Assert.Contains("Position.Z", changed);
         Assert.Contains(nameof(GrblViewModel.Position), changed);
         Assert.True(vm.IsDroPositionKnown);
+    }
+
+    [Fact]
+    public void DataReceived_run_status_updates_tool_position_from_machine_position_and_wco()
+    {
+        var vm = new GrblViewModel();
+
+        vm.DataReceived("<Run|MPos:10.000,20.000,30.000|WCO:1.000,2.000,3.000|Ln:10|Bf:15,128>");
+
+        var toolPosition = ViewerToolMarker.GetToolPosition(vm);
+        Assert.Equal(9d, toolPosition.X, 3);
+        Assert.Equal(18d, toolPosition.Y, 3);
+        Assert.Equal(27d, toolPosition.Z, 3);
+    }
+
+    [Fact]
+    public void DataReceived_line_number_advances_execution_progress_without_streaming_state()
+    {
+        var vm = new GrblViewModel();
+
+        vm.DataReceived("<Run|MPos:0,0,0|WCO:0,0,0|Ln:10|Bf:15,128>");
+        vm.DataReceived("<Run|MPos:1,0,0|WCO:0,0,0|Ln:10|Bf:15,128>");
+
+        Assert.True(vm.ExecutionProgress.HasLineNumberReports);
+        Assert.Equal(10u, vm.ExecutionProgress.CurrentLineNumber);
+        Assert.Empty(vm.ExecutionProgress.CompletedLineNumbers);
+
+        vm.DataReceived("<Run|MPos:2,0,0|WCO:0,0,0|Ln:20|Bf:15,128>");
+
+        Assert.Equal(20u, vm.ExecutionProgress.CurrentLineNumber);
+        Assert.Contains(10u, vm.ExecutionProgress.CompletedLineNumbers);
     }
 
     [Fact]

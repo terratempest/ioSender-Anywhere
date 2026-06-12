@@ -202,6 +202,7 @@ public sealed class JobStreamingService
                 _job.ToolChangeLine = -1;
                 _model.BlockExecuting = fromBlock;
                 _job.CurrBlock = _job.AckPending = _job.PendingLine = fromBlock;
+                _model.ExecutionProgress.Reset();
                 _job.SerialUsed = _missed = 0;
                 _job.Started = _job.Transferred = _job.HasError = _job.ToolChanged = false;
                 _job.NextRow = GCode.Data[fromBlock];
@@ -300,6 +301,7 @@ public sealed class JobStreamingService
 
         SetButtons(cycleStart: false);
         ClearBlockStatus();
+        _model.ExecutionProgress.Reset();
         _model.ScrollPosition = 0;
         _job.ToolChangeLine = -1;
         _job.CurrBlock = _job.LastExecuting = _job.PendingLine = _job.AckPending = _model.BlockExecuting = 0;
@@ -391,6 +393,7 @@ public sealed class JobStreamingService
                     _job.ToolChangeLine = -1;
                     _job.ToolChanged = false;
                     _job.CurrBlock = _job.PendingLine = _job.AckPending = vm.BlockExecuting = 0;
+                    vm.ExecutionProgress.Reset();
                     _job.PgmEndLine = GCode.Blocks - 1;
                     if (vm.IsPhysicalFileLoaded)
                     {
@@ -601,7 +604,8 @@ public sealed class JobStreamingService
             {
                 if (!_job.HasError)
                 {
-                    GCode.Data[_job.PendingLine].Sent = response;
+                    if (response != "ok")
+                        GCode.Data[_job.PendingLine].Sent = response;
                     if (_job.PendingLine > 5)
                         _model!.ScrollPosition = _job.PendingLine - 5;
                 }

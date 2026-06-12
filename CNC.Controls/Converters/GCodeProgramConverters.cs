@@ -16,7 +16,7 @@ public sealed class GCodeLineStatusBrushConverter : IValueConverter
         var sent = Normalize(value);
         return sent switch
         {
-            "*" => CurrentBrush,
+            "@" => CurrentBrush,
             "pending" => PendingBrush,
             _ => Transparent
         };
@@ -38,7 +38,7 @@ public sealed class GCodeLineNumberForegroundConverter : IValueConverter
     public object Convert(object? value, Type targetType, object? parameter, CultureInfo culture)
     {
         var sent = Normalize(value);
-        if (sent is "*" or "pending")
+        if (sent is "@" or "pending")
             return ActiveBrush;
         return IsCompleted(sent) ? CompletedBrush : DefaultBrush;
     }
@@ -47,7 +47,7 @@ public sealed class GCodeLineNumberForegroundConverter : IValueConverter
         BindingOperations.DoNothing;
 
     static bool IsCompleted(string sent) =>
-        sent is "ok" or "@" || sent.StartsWith("ok", StringComparison.Ordinal);
+        sent is "ok" || sent.StartsWith("ok", StringComparison.Ordinal);
 
     static string Normalize(object? value) =>
         value?.ToString()?.Replace("BRK ", string.Empty, StringComparison.Ordinal) ?? string.Empty;
@@ -58,7 +58,7 @@ public sealed class GCodeCompletedConverter : IValueConverter
     public object Convert(object? value, Type targetType, object? parameter, CultureInfo culture)
     {
         var sent = value?.ToString()?.Replace("BRK ", string.Empty, StringComparison.Ordinal) ?? string.Empty;
-        return sent is "ok" or "@" || sent.StartsWith("ok", StringComparison.Ordinal);
+        return sent is "ok" || sent.StartsWith("ok", StringComparison.Ordinal);
     }
 
     public object ConvertBack(object? value, Type targetType, object? parameter, CultureInfo culture) =>

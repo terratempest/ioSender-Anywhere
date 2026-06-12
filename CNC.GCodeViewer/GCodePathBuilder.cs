@@ -231,6 +231,107 @@ public static class GCodePathBuilder
         return executed;
     }
 
+    public static List<NumericVector3> BuildCompletedCut(
+        IReadOnlyList<GCodeToken> tokens,
+        Point3D start,
+        IReadOnlySet<uint> completedLineNumbers,
+        double arcResolution = 10d,
+        double minDistance = 0.05d,
+        CancellationToken cancellationToken = default)
+    {
+        var executed = new List<NumericVector3>();
+        if (tokens.Count == 0 || completedLineNumbers.Count == 0)
+            return executed;
+
+        var tokenList = tokens as List<GCodeToken> ?? tokens.ToList();
+        var arcRes = ResolveArcResolution(tokenList.Count, arcResolution);
+        var emu = new GCodeEmulator(translate: true, syncMachineState: false);
+        emu.SetStartPosition(start);
+
+        var point0 = start;
+        var cutCount = 0;
+        var minDistanceSquared = minDistance > 0d ? minDistance * minDistance : 0d;
+
+        foreach (var cmd in emu.Execute(tokenList))
+        {
+            var isCompleted = completedLineNumbers.Contains(cmd.Token.LineNumber);
+            cancellationToken.ThrowIfCancellationRequested();
+
+            switch (cmd.Token.Command)
+            {
+                case Commands.G1:
+                    if (isCompleted)
+                        AddCutSegment(executed, ref cutCount, point0, cmd.End, minDistanceSquared);
+                    point0 = cmd.End;
+                    break;
+
+                case Commands.G2:
+                case Commands.G3:
+                    if (cmd.Token is GCArc arc)
+                    {
+                        if (isCompleted)
+                        {
+                            var plane = emu.Plane;
+                            var relative = emu.DistanceMode == DistanceMode.Incremental;
+                            var startArr = ToArray(point0);
+                            var last = point0;
+                            foreach (var p in GenerateArcPreviewPoints(arc, plane, startArr, arcRes, relative, cancellationToken))
+                            {
+                                AddCutSegment(executed, ref cutCount, last, p, minDistanceSquared);
+                                last = p;
+                            }
+                        }
+                        point0 = cmd.End;
+                    }
+                    break;
+
+                case Commands.G5:
+                    if (cmd.Token is GCCubicSpline cubic)
+                    {
+                        if (isCompleted)
+                        {
+                            var last = point0;
+                            foreach (var p in LimitCurvePoints(
+                                         cubic.GeneratePoints(ToArray(point0), arcRes, emu.DistanceMode == DistanceMode.Incremental),
+                                         cancellationToken))
+                            {
+                                AddCutSegment(executed, ref cutCount, last, p, minDistanceSquared);
+                                last = p;
+                            }
+                        }
+                        point0 = cmd.End;
+                    }
+                    break;
+
+                case Commands.G5_1:
+                    if (cmd.Token is GCQuadraticSpline quad)
+                    {
+                        if (isCompleted)
+                        {
+                            var last = point0;
+                            foreach (var p in LimitCurvePoints(
+                                         quad.GeneratePoints(ToArray(point0), arcRes, emu.DistanceMode == DistanceMode.Incremental),
+                                         cancellationToken))
+                            {
+                                AddCutSegment(executed, ref cutCount, last, p, minDistanceSquared);
+                                last = p;
+                            }
+                        }
+                        point0 = cmd.End;
+                    }
+                    break;
+
+                case Commands.G0:
+                    point0 = cmd.End;
+                    cutCount = 0;
+                    break;
+            }
+        }
+
+        DecimateInPlace(executed);
+        return executed;
+    }
+
     static IEnumerable<Point3D> GenerateArcPreviewPoints(
         GCArc arc,
         GCPlane plane,

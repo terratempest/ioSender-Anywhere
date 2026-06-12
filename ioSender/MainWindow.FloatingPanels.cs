@@ -43,7 +43,8 @@ public partial class MainWindow : Window
             Session = new GCodeViewerSession(
                 _session.AppConfig,
                 _viewModel.Grbl,
-                () => _session.Program.Tokens),
+                () => _session.Program.Tokens,
+                () => _session.Program.Data),
             HorizontalAlignment = Avalonia.Layout.HorizontalAlignment.Stretch,
             VerticalAlignment = Avalonia.Layout.VerticalAlignment.Stretch,
         };

@@ -600,6 +600,7 @@ namespace CNC.Core
         public Position MachinePosition { get; private set; } = new Position();
         public Position WorkPosition { get; private set; } = new Position();
         public Position Position { get; private set; } = new Position();
+        public GCodeExecutionProgress ExecutionProgress { get; } = new();
         public bool IsMachinePosition { get { return _isMPos; } private set { _isMPos = value; OnPropertyChanged(); } }
         public bool IsMachinePositionKnown { get { return MachinePosition.IsSet(GrblInfo.AxisFlags); } }
         public bool IsDroPositionKnown { get { return Position.IsSet(GrblInfo.AxisFlags); } }
@@ -1264,6 +1265,8 @@ namespace CNC.Core
 
                 case "Ln":
                     LineNumber = int.Parse(value);
+                    if (LineNumber > 0)
+                        ExecutionProgress.AdvanceTo((uint)LineNumber);
                     break;
 
                 case "FS":

@@ -34,7 +34,8 @@ public sealed class WorkspaceEditorControlFactory
         _viewerSession = new GCodeViewerSession(
             _session.AppConfig,
             (GrblViewModel)_grblContext,
-            () => program.Tokens);
+            () => program.Tokens,
+            () => program.Data);
     }
 
     public Control Create(WorkspaceEditorId id)

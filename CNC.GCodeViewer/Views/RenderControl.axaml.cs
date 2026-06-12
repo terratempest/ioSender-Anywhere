@@ -73,6 +73,7 @@ public partial class RenderControl : UserControl
 
     public void Close()
     {
+        UnsubscribeExecutionProgress();
         _tokens = null;
         _segments = null;
         _bounds = default;
@@ -88,6 +89,7 @@ public partial class RenderControl : UserControl
     {
         _tokens = tokens;
         _programStart = start;
+        SubscribeExecutionProgress();
         RequestRender(start);
     }
 
@@ -129,6 +131,7 @@ public partial class RenderControl : UserControl
         AppThemeKeys.ThemeApplied -= OnAppThemeApplied;
         UnsubscribeConfig();
         UnsubscribeGrbl();
+        UnsubscribeExecutionProgress();
         base.OnDetachedFromVisualTree(e);
     }
 
@@ -308,25 +311,23 @@ public partial class RenderControl : UserControl
         if (_segments == null || _tokens == null || !cfg.RenderExecuted)
             return null;
 
-        var highlight = ViewerColors.ResolveHighlightColor(cfg, _themeColors);
         var cut = ViewerColors.ResolveCutColor(cfg, _themeColors);
-        if (highlight.R == cut.R && highlight.G == cut.G && highlight.B == cut.B)
-            return null;
-
-        var grbl = Session?.Grbl;
-        var block = grbl?.BlockExecuting ?? 0;
-        if (block <= 0)
+        var completedLines = ViewerSession.ExecutionProgress.SnapshotCompletedLineNumbers();
+        if (completedLines.Count == 0)
             return null;
 
         var start = _programStart ?? ViewerToolMarker.GetToolPosition(ViewerSession.Grbl);
-        var points = GCodePathBuilder.BuildExecutedCut(
+        var points = GCodePathBuilder.BuildCompletedCut(
             _tokens,
             start,
-            block,
+            completedLines,
             cfg.ArcResolution,
             cfg.MinDistance);
-        return ViewerLineLayerBuilder.FromPoints(points, highlight, 2f);
+        return ViewerLineLayerBuilder.FromPoints(points, Dim(cut), 2f);
     }
+
+    static Color Dim(Color color) =>
+        Color.FromArgb(color.A, (byte)(color.R / 2), (byte)(color.G / 2), (byte)(color.B / 2));
 
     ViewerLineLayer? BuildToolMarker(GCodeViewerConfig cfg)
     {
@@ -482,6 +483,28 @@ public partial class RenderControl : UserControl
         grbl.PropertyChanged -= OnGrblPropertyChanged;
     }
 
+    void SubscribeExecutionProgress()
+    {
+        if (Session == null)
+            return;
+
+        ViewerSession.ExecutionProgress.Changed -= OnExecutionProgressChanged;
+        ViewerSession.ExecutionProgress.Changed += OnExecutionProgressChanged;
+    }
+
+    void UnsubscribeExecutionProgress()
+    {
+        if (Session == null)
+            return;
+
+        ViewerSession.ExecutionProgress.Changed -= OnExecutionProgressChanged;
+    }
+
+    void OnExecutionProgressChanged(object? sender, EventArgs e)
+    {
+        UpdateDynamicLayers();
+    }
+
     void OnViewerConfigChanged(object? sender, PropertyChangedEventArgs e)
     {
         var cfg = ViewerSession.Settings;
@@ -547,9 +570,10 @@ public partial class RenderControl : UserControl
 
     void OnGrblPropertyChanged(object? sender, PropertyChangedEventArgs e)
     {
-        if (e.PropertyName is nameof(GrblViewModel.Position) or nameof(GrblViewModel.WorkPositionOffset))
-            UpdateDynamicLayers();
-        else if (e.PropertyName is nameof(GrblViewModel.BlockExecuting))
+        if (e.PropertyName is nameof(GrblViewModel.Position)
+            or nameof(GrblViewModel.MachinePosition)
+            or nameof(GrblViewModel.WorkPositionOffset)
+            or nameof(GrblViewModel.BlockExecuting))
             UpdateDynamicLayers();
         else if (e.PropertyName is nameof(GrblViewModel.HomedState))
             RebuildStaticLayers();

@@ -169,6 +169,7 @@ namespace CNC.Core
                 try
                 {
                     block = block.Trim();
+                    var tokenStart = Parser.Tokens.Count;
                     if (Parser.ParseBlock(ref block, false, out ln, out isComment))
                     {
                         if (ln > 0)
@@ -184,6 +185,7 @@ namespace CNC.Core
                         else
                             LineNumber++;
 
+                        SetParsedTokenLineNumbers(tokenStart, LineNumber);
                         staged.Add(new GCodeBlock(LineNumber, block, block.Length + 1, isComment, Parser.ProgramEnd, staged.Count + 1));
                         while (commands.Count > 0)
                         {
@@ -290,6 +292,7 @@ namespace CNC.Core
                 uint ln;
 
                 block = block.Trim();
+                var tokenStart = Parser.Tokens.Count;
                 if (Parser.ParseBlock(ref block, false, out ln, out isComment))
                 {
                     if(GrblInfo.UseLinenumbers)
@@ -299,6 +302,7 @@ namespace CNC.Core
                     } else
                         LineNumber++;
  
+                    SetParsedTokenLineNumbers(tokenStart, LineNumber);
                     blocks.Add(new GCodeBlock(LineNumber, block, block.Length + 1, isComment, Parser.ProgramEnd, blocks.Count + 1));
                     while (commands.Count > 0)
                     {
@@ -322,6 +326,12 @@ namespace CNC.Core
         public void AddBlock(string block)
         {
             AddBlock(block, Action.Add);
+        }
+
+        void SetParsedTokenLineNumbers(int tokenStart, uint lineNumber)
+        {
+            for (var i = tokenStart; i < Parser.Tokens.Count; i++)
+                Parser.Tokens[i].LineNumber = lineNumber;
         }
 
         public void CloseFile()

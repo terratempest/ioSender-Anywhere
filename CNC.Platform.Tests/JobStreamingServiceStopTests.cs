@@ -46,6 +46,18 @@ public sealed class JobStreamingServiceStopTests : IDisposable
         Assert.DoesNotContain(GrblConstants.CMD_RESET, _comms.Bytes);
     }
 
+    [Fact]
+    public void Streaming_ack_does_not_mark_program_row_completed()
+    {
+        _streaming.CycleStart(0);
+
+        var sentRow = Assert.Single(GCodeFileService.Instance.Data.Where(row => row.Sent == "*"));
+
+        _model.OnCommandResponseReceived?.Invoke("ok");
+
+        Assert.Equal("*", sentRow.Sent);
+    }
+
     sealed record GrblInfoSnapshot(bool IsGrblHAL)
     {
         public static GrblInfoSnapshot Capture() => new(GrblInfo.IsGrblHAL);

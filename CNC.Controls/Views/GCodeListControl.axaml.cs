@@ -166,11 +166,11 @@ public partial class GCodeListControl : UserControl
         row.Classes.Remove("gcode-done");
 
         var sent = block.Sent?.Replace("BRK ", string.Empty, StringComparison.Ordinal) ?? string.Empty;
-        if (sent == "*")
+        if (sent == "@")
             row.Classes.Add("gcode-current");
         else if (sent == "pending")
             row.Classes.Add("gcode-pending");
-        else if (sent is "ok" or "@" || sent.StartsWith("ok", StringComparison.Ordinal))
+        else if (sent == "ok" || sent.StartsWith("ok", StringComparison.Ordinal))
             row.Classes.Add("gcode-done");
     }
 

@@ -3359,10 +3359,13 @@ namespace CNC.Core
             //  this.pollTimer.SynchronizingObject = this;
         }
 
-        public bool IsEnabled { get { return pollTimer.Enabled; } }
+        public bool IsEnabled { get { return pollTimer?.Enabled == true; } }
 
         public void SetState(int PollInterval)
         {
+            if (pollTimer == null)
+                Run();
+
             if (PollInterval != 0)
             {
                 suspend = false;
