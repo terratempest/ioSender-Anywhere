@@ -1,5 +1,6 @@
 using Avalonia;
 using Avalonia.Controls;
+using Avalonia.Controls.Chrome;
 using Avalonia.Input;
 using Avalonia.Interactivity;
 using Avalonia.Media;
@@ -90,6 +91,10 @@ public partial class MainWindow : Window
     {
         var isFullscreen = WindowState == WindowState.FullScreen;
         var isMaximized = WindowState == WindowState.Maximized;
+
+        WindowDecorationProperties.SetElementRole(
+            TitleBar,
+            isFullscreen ? WindowDecorationsElementRole.User : WindowDecorationsElementRole.TitleBar);
 
         BtnWindowMaximize.IsEnabled = !isFullscreen;
         IconWindowMaximize.Data = Geometry.Parse(isMaximized

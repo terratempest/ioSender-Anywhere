@@ -260,7 +260,6 @@
       <Grid Grid.Column="1" RowDefinitions="Auto,*,Auto">
 
           <StackPanel Spacing="2" Margin="4">
-            <TextBlock Text="PROBING ACTIONS" FontWeight="SemiBold"/>
             <Grid ColumnDefinitions="Auto,Auto,Auto,Auto,Auto,Auto">
               <Button x:Name="ToolLengthActionButton"
                       Grid.Column="0"
