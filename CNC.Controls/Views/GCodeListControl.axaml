@@ -4,6 +4,8 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              xmlns:loc="using:CNC.Localization.Avalonia"
              xmlns:core="using:CNC.Core"
+             xmlns:controls="using:CNC.Controls.Avalonia.Controls"
+             xmlns:converters="using:CNC.Controls.Avalonia.Converters"
              mc:Ignorable="d" d:DesignWidth="400" d:DesignHeight="335"
              x:Class="CNC.Controls.Avalonia.Views.GCodeListControl"
              x:Name="root"
@@ -13,16 +15,22 @@
              HorizontalAlignment="Stretch"
              VerticalAlignment="Stretch">
 
+  <UserControl.Resources>
+    <converters:GCodeLineStatusBrushConverter x:Key="GCodeLineStatusBrushConverter"/>
+    <converters:GCodeLineNumberForegroundConverter x:Key="GCodeLineNumberForegroundConverter"/>
+    <converters:GCodeCompletedConverter x:Key="GCodeCompletedConverter"/>
+  </UserControl.Resources>
+
   <DataGrid x:Name="GCodeGrid"
             Classes="gcode-program-grid"
             HorizontalAlignment="Stretch"
             VerticalAlignment="Stretch"
+            Margin="2"
             AutoGenerateColumns="False"
             CanUserReorderColumns="False"
-            CanUserResizeColumns="True"
+            CanUserResizeColumns="False"
             CanUserSortColumns="False"
             Padding="0"
-            RowHeight="22"
             IsReadOnly="True"
             SelectionMode="Extended"
             SelectionChanged="OnSelectionChanged"
@@ -39,21 +47,78 @@
             <Setter Property="UseLayoutRounding" Value="False" />
         </Style>
 
+        <Style Selector="DataGridRow">
+            <Setter Property="MinHeight" Value="14.52" />
+        </Style>
+
         <Style Selector="DataGridCell">
             <Setter Property="FontSize" Value="12" />
+            <Setter Property="BorderThickness" Value="0" />
+            <Setter Property="BorderBrush" Value="Transparent" />
+            <Setter Property="MinHeight" Value="14.52" />
+            <Setter Property="Padding" Value="0" />
+        </Style>
+
+        <Style Selector="DataGridCell:focus">
+            <Setter Property="BorderThickness" Value="0" />
+            <Setter Property="BorderBrush" Value="Transparent" />
+        </Style>
+
+        <Style Selector="DataGridCell:selected">
+            <Setter Property="BorderThickness" Value="0" />
+            <Setter Property="BorderBrush" Value="Transparent" />
+        </Style>
+
+        <Style Selector="DataGridCell:current">
+            <Setter Property="BorderThickness" Value="0" />
+            <Setter Property="BorderBrush" Value="Transparent" />
+        </Style>
+
+        <Style Selector="DataGridCell:current /template/ Grid#FocusVisual">
+            <Setter Property="IsVisible" Value="False" />
+        </Style>
+
+        <Style Selector="DataGrid:focus DataGridCell:current /template/ Grid#FocusVisual">
+            <Setter Property="IsVisible" Value="False" />
         </Style>
 
         <Style Selector="DataGridCell TextBlock">
             <Setter Property="FontSize" Value="12" />
+            <Setter Property="FontFamily" Value="Consolas" />
         </Style>
     </DataGrid.Styles>
 
     <DataGrid.Columns>
-      <DataGridTextColumn Header="Block" Binding="{Binding Row}" Width="64"
-                          loc:Localize.Key="CNC.Controls.Avalonia.gcodelistcontrol.hdr_block" loc:Localize.Fallback="Block"/>
-      <DataGridTextColumn Header="Sts"  Binding="{Binding Sent}" Width="64"/>
-      <DataGridTextColumn Header="Data" Binding="{Binding DisplayData}" Width="Auto"
-                          loc:Localize.Key="CNC.Controls.Avalonia.gcodelistcontrol.hdr_data" loc:Localize.Fallback="Data"/>
+      <DataGridTemplateColumn Header="Block" Width="Auto"
+                              loc:Localize.Key="CNC.Controls.Avalonia.gcodelistcontrol.hdr_block" loc:Localize.Fallback="Block">
+        <DataGridTemplateColumn.CellTemplate>
+          <DataTemplate>
+            <Border Background="{Binding Sent, Converter={StaticResource GCodeLineStatusBrushConverter}}"
+                    MinHeight="14.52"
+                    MinWidth="24"
+                    Padding="4,1,8,1">
+              <TextBlock Text="{Binding Row}"
+                         Foreground="{Binding Sent, Converter={StaticResource GCodeLineNumberForegroundConverter}}"
+                         HorizontalAlignment="Stretch"
+                         VerticalAlignment="Center"
+                         TextAlignment="Right"/>
+            </Border>
+          </DataTemplate>
+        </DataGridTemplateColumn.CellTemplate>
+      </DataGridTemplateColumn>
+      <DataGridTemplateColumn Header="Data" Width="*"
+                              loc:Localize.Key="CNC.Controls.Avalonia.gcodelistcontrol.hdr_data" loc:Localize.Fallback="Data">
+        <DataGridTemplateColumn.CellTemplate>
+          <DataTemplate>
+            <controls:GCodeTextBlock SourceText="{Binding DisplayData}"
+                                     IsCompleted="{Binding Sent, Converter={StaticResource GCodeCompletedConverter}}"
+                                     TextWrapping="Wrap"
+                                     HorizontalAlignment="Stretch"
+                                     VerticalAlignment="Center"
+                                     Padding="8,1,0,1"/>
+          </DataTemplate>
+        </DataGridTemplateColumn.CellTemplate>
+      </DataGridTemplateColumn>
     </DataGrid.Columns>
     <DataGrid.ContextMenu>
       <ContextMenu>

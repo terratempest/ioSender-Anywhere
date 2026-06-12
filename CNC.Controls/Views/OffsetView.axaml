@@ -54,6 +54,12 @@
             <Setter Property="Grid.ColumnSpan" Value="2"/>
             <Setter Property="Padding" Value="0,0,10,0"/>
           </Style>
+          <Style Selector="DataGridCell:current /template/ Grid#FocusVisual">
+            <Setter Property="IsVisible" Value="False"/>
+          </Style>
+          <Style Selector="DataGrid:focus DataGridCell:current /template/ Grid#FocusVisual">
+            <Setter Property="IsVisible" Value="False"/>
+          </Style>
         </DataGrid.Styles>
       </DataGrid>
     </Border>

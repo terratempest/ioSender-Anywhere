@@ -128,7 +128,6 @@ public partial class GCodeListControl : UserControl
             return;
 
         var block = _viewModel.Data[index];
-        GCodeGrid.SelectedItem = block;
         GCodeGrid.ScrollIntoView(block, null);
     }
 
@@ -163,11 +162,14 @@ public partial class GCodeListControl : UserControl
     static void ApplyRowState(DataGridRow row, GCodeBlock block)
     {
         row.Classes.Remove("gcode-current");
+        row.Classes.Remove("gcode-pending");
         row.Classes.Remove("gcode-done");
 
         var sent = block.Sent?.Replace("BRK ", string.Empty, StringComparison.Ordinal) ?? string.Empty;
         if (sent == "*")
             row.Classes.Add("gcode-current");
+        else if (sent == "pending")
+            row.Classes.Add("gcode-pending");
         else if (sent is "ok" or "@" || sent.StartsWith("ok", StringComparison.Ordinal))
             row.Classes.Add("gcode-done");
     }
