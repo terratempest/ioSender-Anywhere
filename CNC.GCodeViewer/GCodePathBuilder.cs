@@ -15,8 +15,148 @@ public sealed class GCodePathSegments
 public sealed class GCodePathBuildResult
 {
     public required GCodePathSegments Segments { get; init; }
+    public required GCodeExecutedPathCache ExecutedPathCache { get; init; }
     public int MotionCount { get; init; }
 }
+
+public sealed class GCodeExecutedPathCache
+{
+    readonly List<ExecutedPathEntry> _entries;
+    readonly Dictionary<uint, int> _lastEntryByLine;
+    readonly double _minDistanceSquared;
+
+    internal GCodeExecutedPathCache(List<ExecutedPathEntry> entries, double minDistanceSquared)
+    {
+        _entries = entries;
+        _minDistanceSquared = minDistanceSquared;
+        _lastEntryByLine = [];
+
+        for (var i = 0; i < entries.Count; i++)
+        {
+            var line = entries[i].LineNumber;
+            if (line != 0)
+                _lastEntryByLine[line] = i;
+        }
+    }
+
+    public static GCodeExecutedPathCache Empty { get; } = new([], 0d);
+
+    public GCodeExecutedPathAccumulator CreateAccumulator() => new(this);
+
+    public List<NumericVector3> BuildCompletedCut(IReadOnlySet<uint> completedLineNumbers)
+    {
+        if (completedLineNumbers.Count == 0 || _entries.Count == 0)
+            return [];
+
+        var accumulator = CreateAccumulator();
+        accumulator.Rebuild(completedLineNumbers);
+        return accumulator.GetDecimatedPoints();
+    }
+
+    internal bool TryGetLastEntryIndex(uint lineNumber, out int index) =>
+        _lastEntryByLine.TryGetValue(lineNumber, out index);
+
+    internal bool ProcessRange(
+        int startIndex,
+        int endIndex,
+        IReadOnlySet<uint> completedLineNumbers,
+        List<NumericVector3> points,
+        ref int cutCount)
+    {
+        if (startIndex < 0 || endIndex >= _entries.Count || startIndex > endIndex)
+            return false;
+
+        for (var i = startIndex; i <= endIndex; i++)
+        {
+            var entry = _entries[i];
+            if (entry.Kind == ExecutedPathEntryKind.Reset)
+            {
+                cutCount = 0;
+                continue;
+            }
+
+            if (completedLineNumbers.Contains(entry.LineNumber))
+                AddSegment(points, ref cutCount, entry.From, entry.To, _minDistanceSquared);
+        }
+
+        return true;
+    }
+
+    internal int Count => _entries.Count;
+
+    static void AddSegment(List<NumericVector3> target, ref int cutCount, NumericVector3 from, NumericVector3 to, double minDistanceSquared)
+    {
+        if (minDistanceSquared > 0d && cutCount > 0)
+        {
+            var dx = to.X - from.X;
+            var dy = to.Y - from.Y;
+            var dz = to.Z - from.Z;
+            if (dx * dx + dy * dy + dz * dz < minDistanceSquared)
+                return;
+        }
+
+        if (cutCount == 0 || target[^1] != to)
+        {
+            target.Add(from);
+            target.Add(to);
+        }
+
+        cutCount++;
+    }
+}
+
+public sealed class GCodeExecutedPathAccumulator
+{
+    readonly GCodeExecutedPathCache _cache;
+    readonly HashSet<uint> _completedLineNumbers = [];
+    readonly List<NumericVector3> _points = [];
+    int _nextEntryIndex;
+    int _cutCount;
+
+    internal GCodeExecutedPathAccumulator(GCodeExecutedPathCache cache) => _cache = cache;
+
+    public bool AppendCompletedLine(uint lineNumber)
+    {
+        if (!_completedLineNumbers.Add(lineNumber))
+            return true;
+
+        if (!_cache.TryGetLastEntryIndex(lineNumber, out var lastEntryIndex))
+            return true;
+
+        if (lastEntryIndex < _nextEntryIndex)
+            return false;
+
+        _cache.ProcessRange(_nextEntryIndex, lastEntryIndex, _completedLineNumbers, _points, ref _cutCount);
+        _nextEntryIndex = lastEntryIndex + 1;
+        return true;
+    }
+
+    public void Rebuild(IReadOnlySet<uint> completedLineNumbers)
+    {
+        _completedLineNumbers.Clear();
+        _completedLineNumbers.UnionWith(completedLineNumbers);
+        _points.Clear();
+        _nextEntryIndex = _cache.Count;
+        _cutCount = 0;
+
+        if (_cache.Count > 0)
+            _cache.ProcessRange(0, _cache.Count - 1, _completedLineNumbers, _points, ref _cutCount);
+    }
+
+    public List<NumericVector3> GetDecimatedPoints() => PathDecimator.DecimateSegmentPairs(_points);
+}
+
+internal enum ExecutedPathEntryKind
+{
+    Cut,
+    Reset
+}
+
+internal readonly record struct ExecutedPathEntry(
+    uint LineNumber,
+    ExecutedPathEntryKind Kind,
+    NumericVector3 From,
+    NumericVector3 To);
 
 /// <summary>Builds line segments for 3D preview from parsed G-code tokens.</summary>
 public static class GCodePathBuilder
@@ -33,8 +173,16 @@ public static class GCodePathBuilder
         CancellationToken cancellationToken = default)
     {
         var result = new GCodePathSegments();
+        var executedEntries = new List<ExecutedPathEntry>();
         if (tokens.Count == 0)
-            return new GCodePathBuildResult { Segments = result, MotionCount = 0 };
+        {
+            return new GCodePathBuildResult
+            {
+                Segments = result,
+                ExecutedPathCache = GCodeExecutedPathCache.Empty,
+                MotionCount = 0
+            };
+        }
 
         var tokenList = tokens as List<GCodeToken> ?? tokens.ToList();
         var arcRes = ResolveArcResolution(tokenList.Count, arcResolution);
@@ -73,10 +221,12 @@ public static class GCodePathBuilder
                         AddSegment(result.Retract, point0, cmd.End);
                     else
                         AddRapidSegment(result, ref cutCount, ref point0, cmd.End);
+                    executedEntries.Add(new ExecutedPathEntry(cmd.Token.LineNumber, ExecutedPathEntryKind.Reset, default, default));
                     point0 = cmd.End;
                     break;
 
                 case Commands.G1:
+                    AddExecutedSegment(executedEntries, cmd.Token.LineNumber, point0, cmd.End);
                     AddCutSegment(result.Cut, ref cutCount, point0, cmd.End, minDistanceSquared);
                     point0 = cmd.End;
                     break;
@@ -91,6 +241,7 @@ public static class GCodePathBuilder
                         var last = point0;
                         foreach (var p in GenerateArcPreviewPoints(arc, plane, startArr, arcRes, relative, cancellationToken))
                         {
+                            AddExecutedSegment(executedEntries, cmd.Token.LineNumber, last, p);
                             AddCutSegment(result.Cut, ref cutCount, last, p, minDistanceSquared);
                             last = p;
                         }
@@ -106,6 +257,7 @@ public static class GCodePathBuilder
                                      cubic.GeneratePoints(ToArray(point0), arcRes, emu.DistanceMode == DistanceMode.Incremental),
                                      cancellationToken))
                         {
+                            AddExecutedSegment(executedEntries, cmd.Token.LineNumber, last, p);
                             AddCutSegment(result.Cut, ref cutCount, last, p, minDistanceSquared);
                             last = p;
                         }
@@ -121,6 +273,7 @@ public static class GCodePathBuilder
                                      quad.GeneratePoints(ToArray(point0), arcRes, emu.DistanceMode == DistanceMode.Incremental),
                                      cancellationToken))
                         {
+                            AddExecutedSegment(executedEntries, cmd.Token.LineNumber, last, p);
                             AddCutSegment(result.Cut, ref cutCount, last, p, minDistanceSquared);
                             last = p;
                         }
@@ -134,7 +287,12 @@ public static class GCodePathBuilder
         DecimateInPlace(result.Rapid);
         DecimateInPlace(result.Retract);
 
-        return new GCodePathBuildResult { Segments = result, MotionCount = motionCount };
+        return new GCodePathBuildResult
+        {
+            Segments = result,
+            ExecutedPathCache = new GCodeExecutedPathCache(executedEntries, minDistanceSquared),
+            MotionCount = motionCount
+        };
     }
 
     /// <summary>Cut moves executed up to the given source line number (job progress highlight).</summary>
@@ -473,6 +631,11 @@ public static class GCodePathBuilder
 
     static void AddCutSegment(List<NumericVector3> cut, ref int cutCount, Point3D from, Point3D to, double minDistanceSquared)
     {
+        AddCutSegment(cut, ref cutCount, ToVector3(from), ToVector3(to), minDistanceSquared);
+    }
+
+    static void AddCutSegment(List<NumericVector3> cut, ref int cutCount, NumericVector3 from, NumericVector3 to, double minDistanceSquared)
+    {
         if (minDistanceSquared > 0d && cutCount > 0)
         {
             var dx = to.X - from.X;
@@ -482,9 +645,19 @@ public static class GCodePathBuilder
                 return;
         }
 
-        if (cutCount == 0 || cut[^1] != ToVector3(to))
+        if (cutCount == 0 || cut[^1] != to)
             AddSegment(cut, from, to);
         cutCount++;
+    }
+
+    static void AddExecutedSegment(List<ExecutedPathEntry> entries, uint lineNumber, Point3D from, Point3D to)
+    {
+        var fromVector = ToVector3(from);
+        var toVector = ToVector3(to);
+        if (fromVector == toVector)
+            return;
+
+        entries.Add(new ExecutedPathEntry(lineNumber, ExecutedPathEntryKind.Cut, fromVector, toVector));
     }
 
     static void AddSegment(List<NumericVector3> target, Point3D from, Point3D to) =>

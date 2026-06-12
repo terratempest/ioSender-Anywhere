@@ -18,8 +18,12 @@ public partial class RenderControl : UserControl
 {
     const float ToolThickness = 1.25f;
     const int MaxGlReadyWaitTicks = 80;
+    static readonly TimeSpan DynamicLayerInterval = TimeSpan.FromMilliseconds(33);
 
     GCodePathSegments? _segments;
+    GCodeExecutedPathCache? _executedPathCache;
+    GCodeExecutedPathAccumulator? _executedPathAccumulator;
+    readonly HashSet<uint> _executedLayerLines = [];
     PathBounds _bounds;
     IReadOnlyList<GCodeToken>? _tokens;
     GCodeViewerConfig? _subscribedConfig;
@@ -30,6 +34,10 @@ public partial class RenderControl : UserControl
     int _buildVersion;
     string _statusText = "";
     DispatcherTimer? _renderWaitTimer;
+    DispatcherTimer? _dynamicLayerTimer;
+    bool _dynamicLayerPending;
+    bool _dynamicLayerImmediate;
+    int _executedLayerVersion = -1;
     int _renderWaitTicks;
     Point3D? _renderStartOverride;
     Point3D? _programStart;
@@ -76,9 +84,12 @@ public partial class RenderControl : UserControl
         UnsubscribeExecutionProgress();
         _tokens = null;
         _segments = null;
+        _executedPathCache = null;
+        ResetExecutedLayerCache();
         _bounds = default;
         _programStart = null;
         _renderPending = false;
+        StopDynamicLayerTimer();
         CancelPathBuild();
         GlViewport.SetAnimationActive(false);
         GlViewport.ClearScene();
@@ -203,7 +214,7 @@ public partial class RenderControl : UserControl
                             return;
 
                         _renderPending = false;
-                        ApplyScene(built.Segments, bounds, built.MotionCount, scene);
+                        ApplyScene(built.Segments, built.ExecutedPathCache, bounds, built.MotionCount, scene);
                     }
                     catch (OperationCanceledException)
                     {
@@ -263,9 +274,16 @@ public partial class RenderControl : UserControl
 
     bool IsCurrentBuild(int buildVersion) => buildVersion == _buildVersion;
 
-    void ApplyScene(GCodePathSegments segments, PathBounds bounds, int motionCount, ViewerScene scene)
+    void ApplyScene(
+        GCodePathSegments segments,
+        GCodeExecutedPathCache executedPathCache,
+        PathBounds bounds,
+        int motionCount,
+        ViewerScene scene)
     {
         _segments = segments;
+        _executedPathCache = executedPathCache;
+        ResetExecutedLayerCache();
         _bounds = bounds;
         EnrichScene(scene);
         PushSceneToViewport(scene, bounds, resetView: true);
@@ -306,24 +324,121 @@ public partial class RenderControl : UserControl
         GlViewport.UpdateDynamicLayers(BuildToolMarker(cfg), BuildExecutedLayer(cfg));
     }
 
+    void QueueDynamicLayerUpdate(bool immediate = false)
+    {
+        if (_segments == null)
+            return;
+
+        _dynamicLayerPending = true;
+        _dynamicLayerImmediate |= immediate;
+
+        if (immediate)
+        {
+            FlushDynamicLayerUpdate();
+            return;
+        }
+
+        _dynamicLayerTimer ??= new DispatcherTimer(DynamicLayerInterval, DispatcherPriority.Background, OnDynamicLayerTimerTick);
+        if (!_dynamicLayerTimer.IsEnabled)
+            _dynamicLayerTimer.Start();
+    }
+
+    void OnDynamicLayerTimerTick(object? sender, EventArgs e)
+    {
+        if (!_dynamicLayerPending)
+        {
+            StopDynamicLayerTimer();
+            return;
+        }
+
+        FlushDynamicLayerUpdate();
+    }
+
+    void FlushDynamicLayerUpdate()
+    {
+        if (!_dynamicLayerPending && !_dynamicLayerImmediate)
+            return;
+
+        _dynamicLayerPending = false;
+        _dynamicLayerImmediate = false;
+        UpdateDynamicLayers();
+    }
+
+    void StopDynamicLayerTimer()
+    {
+        if (_dynamicLayerTimer == null)
+            return;
+
+        _dynamicLayerTimer.Stop();
+    }
+
     ViewerLineLayer? BuildExecutedLayer(GCodeViewerConfig cfg)
     {
-        if (_segments == null || _tokens == null || !cfg.RenderExecuted)
+        if (_segments == null || _tokens == null || _executedPathCache == null || !cfg.RenderExecuted)
             return null;
 
         var cut = ViewerColors.ResolveCutColor(cfg, _themeColors);
-        var completedLines = ViewerSession.ExecutionProgress.SnapshotCompletedLineNumbers();
-        if (completedLines.Count == 0)
+        var progress = ViewerSession.ExecutionProgress;
+        if (!progress.HasCompletedLines)
             return null;
 
-        var start = _programStart ?? ViewerToolMarker.GetToolPosition(ViewerSession.Grbl);
-        var points = GCodePathBuilder.BuildCompletedCut(
-            _tokens,
-            start,
-            completedLines,
-            cfg.ArcResolution,
-            cfg.MinDistance);
+        if (_executedPathAccumulator == null || _executedLayerVersion != progress.CompletedVersion)
+            RefreshExecutedLayerCache(progress);
+
+        var points = _executedPathAccumulator?.GetDecimatedPoints() ?? [];
         return ViewerLineLayerBuilder.FromPoints(points, Dim(cut), 2f);
+    }
+
+    void RefreshExecutedLayerCache(GCodeExecutionProgress progress)
+    {
+        if (_executedPathCache == null)
+            return;
+
+        _executedPathAccumulator ??= _executedPathCache.CreateAccumulator();
+
+        var completedLines = progress.SnapshotCompletedLineNumbers();
+        var appended = completedLines.Count >= _executedLayerLines.Count;
+        if (appended)
+        {
+            var newLines = completedLines
+                .Where(line => !_executedLayerLines.Contains(line))
+                .OrderBy(GetExecutedEntryIndex)
+                .ToArray();
+
+            foreach (var line in newLines)
+            {
+                if (!_executedPathAccumulator.AppendCompletedLine(line))
+                {
+                    appended = false;
+                    break;
+                }
+
+                _executedLayerLines.Add(line);
+            }
+        }
+
+        if (!appended)
+        {
+            _executedPathAccumulator.Rebuild(completedLines);
+            _executedLayerLines.Clear();
+            _executedLayerLines.UnionWith(completedLines);
+        }
+
+        _executedLayerVersion = progress.CompletedVersion;
+    }
+
+    int GetExecutedEntryIndex(uint lineNumber) =>
+        _executedPathCache != null && _executedPathCache.TryGetLastEntryIndex(lineNumber, out var index)
+            ? index
+            : int.MaxValue;
+
+    void ResetExecutedLayerCache()
+    {
+        _executedPathAccumulator = _executedPathCache?.CreateAccumulator();
+        _executedLayerLines.Clear();
+        _executedLayerVersion = -1;
+        _dynamicLayerPending = false;
+        _dynamicLayerImmediate = false;
     }
 
     static Color Dim(Color color) =>
@@ -502,7 +617,8 @@ public partial class RenderControl : UserControl
 
     void OnExecutionProgressChanged(object? sender, EventArgs e)
     {
-        UpdateDynamicLayers();
+        var progress = ViewerSession.ExecutionProgress;
+        QueueDynamicLayerUpdate(!progress.HasCompletedLines || progress.CompletedVersion == 0);
     }
 
     void OnViewerConfigChanged(object? sender, PropertyChangedEventArgs e)
@@ -538,7 +654,7 @@ public partial class RenderControl : UserControl
             or nameof(GCodeViewerConfig.ToolOriginColor)
             or nameof(GCodeViewerConfig.ToolAutoScale))
         {
-            UpdateDynamicLayers();
+            QueueDynamicLayerUpdate();
             return;
         }
 
@@ -565,7 +681,7 @@ public partial class RenderControl : UserControl
         if (rebuild)
             RebuildStaticLayers();
         else
-            UpdateDynamicLayers();
+            QueueDynamicLayerUpdate();
     }
 
     void OnGrblPropertyChanged(object? sender, PropertyChangedEventArgs e)
@@ -574,7 +690,7 @@ public partial class RenderControl : UserControl
             or nameof(GrblViewModel.MachinePosition)
             or nameof(GrblViewModel.WorkPositionOffset)
             or nameof(GrblViewModel.BlockExecuting))
-            UpdateDynamicLayers();
+            QueueDynamicLayerUpdate();
         else if (e.PropertyName is nameof(GrblViewModel.HomedState))
             RebuildStaticLayers();
     }

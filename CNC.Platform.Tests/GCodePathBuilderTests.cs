@@ -76,6 +76,18 @@ public sealed class GCodePathBuilderTests
     }
 
     [Fact]
+    public void ExecutedPathCache_MatchesCompletedCut()
+    {
+        var tokens = Parse("G21 G90 F100", "G1 X1 Y0", "G1 X2 Y0", "G1 X3 Y0");
+        var completedLines = new HashSet<uint> { 2, 4 };
+
+        var expected = GCodePathBuilder.BuildCompletedCut(tokens, new Point3D(), completedLines);
+        var actual = GCodePathBuilder.Build(tokens, new Point3D()).ExecutedPathCache.BuildCompletedCut(completedLines);
+
+        Assert.Equal(expected, actual);
+    }
+
+    [Fact]
     public void CompletedCut_SkippedMotionsStillAdvanceInterpreterPosition()
     {
         var tokens = Parse("G21 G90 F100", "G1 X1 Y0", "G1 X2 Y0");
@@ -93,6 +105,18 @@ public sealed class GCodePathBuilderTests
         var points = GCodePathBuilder.BuildCompletedCut(tokens, new Point3D(), new HashSet<uint> { 3 });
 
         Assert.Equal([new NumericVector3(5f, 0f, 0f), new NumericVector3(6f, 0f, 0f)], points);
+    }
+
+    [Fact]
+    public void ExecutedPathCache_SkippedRapidStillAdvancesInterpreterPosition()
+    {
+        var tokens = Parse("G21 G90 F100", "G0 X5 Y0", "G1 X6 Y0");
+        var completedLines = new HashSet<uint> { 3 };
+
+        var expected = GCodePathBuilder.BuildCompletedCut(tokens, new Point3D(), completedLines);
+        var actual = GCodePathBuilder.Build(tokens, new Point3D()).ExecutedPathCache.BuildCompletedCut(completedLines);
+
+        Assert.Equal(expected, actual);
     }
 
     [Fact]
@@ -115,6 +139,38 @@ public sealed class GCodePathBuilderTests
 
             Assert.Equal(20u, completedLine);
             Assert.Equal([new NumericVector3(0f, 0f, 0f), new NumericVector3(1f, 0f, 0f)], points);
+        }
+        finally
+        {
+            GCodeFileService.Instance.Close();
+            SetUseLinenumbers(original);
+        }
+    }
+
+    [Fact]
+    public void ExecutedPathCache_UsesGeneratedProgramLineNumbers()
+    {
+        var original = GrblInfo.UseLinenumbers;
+        SetUseLinenumbers(true);
+
+        try
+        {
+            GCodeFileService.Instance.LoadFromLines(
+                ["G21 G90 F100", "G1 X1 Y0", "G1 X2 Y0"],
+                @"C:\tmp\viewer-line-number-cache-test.nc");
+
+            var completedLine = GCodeFileService.Instance.Data.Single(block => block.DisplayData == "G1X1Y0").LineNum;
+            var completedLines = new HashSet<uint> { completedLine };
+            var expected = GCodePathBuilder.BuildCompletedCut(
+                GCodeFileService.Instance.Tokens,
+                new Point3D(),
+                completedLines);
+            var actual = GCodePathBuilder.Build(GCodeFileService.Instance.Tokens, new Point3D())
+                .ExecutedPathCache
+                .BuildCompletedCut(completedLines);
+
+            Assert.Equal(20u, completedLine);
+            Assert.Equal(expected, actual);
         }
         finally
         {

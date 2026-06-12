@@ -24,7 +24,8 @@ internal sealed class OpenGlLineRenderer : IDisposable
     int _aPosition;
     bool _initialized;
     GlLineWidth? _lineWidth;
-    readonly List<LayerGpu> _layers = [];
+    readonly List<LayerGpu> _staticLayers = [];
+    readonly List<LayerGpu> _dynamicLayers = [];
 
     [UnmanagedFunctionPointer(CallingConvention.Winapi)]
     delegate void GlLineWidth(float width);
@@ -67,7 +68,8 @@ internal sealed class OpenGlLineRenderer : IDisposable
 
     public void Dispose()
     {
-        _layers.Clear();
+        _staticLayers.Clear();
+        _dynamicLayers.Clear();
         _initialized = false;
         _program = 0;
         _lineWidth = null;
@@ -79,33 +81,71 @@ internal sealed class OpenGlLineRenderer : IDisposable
             return;
 
         gl.DeleteProgram(_program);
-        foreach (var layer in _layers)
-        {
-            if (layer.Vao != 0)
-                gl.DeleteVertexArray(layer.Vao);
-            gl.DeleteBuffer(layer.Vbo);
-        }
-        _layers.Clear();
+        DeleteLayers(gl, _staticLayers);
+        DeleteLayers(gl, _dynamicLayers);
         _initialized = false;
         _program = 0;
         _lineWidth = null;
     }
 
-    public bool SetScene(GlInterface gl, IEnumerable<ViewerLineLayer> layers)
+    public bool SetScene(
+        GlInterface gl,
+        IEnumerable<ViewerLineLayer> staticLayers,
+        IEnumerable<ViewerLineLayer> dynamicLayers)
     {
         if (!_initialized)
             return false;
 
         LastError = null;
-        foreach (var layer in _layers)
-        {
-            if (layer.Vao != 0)
-                gl.DeleteVertexArray(layer.Vao);
-            gl.DeleteBuffer(layer.Vbo);
-        }
-        _layers.Clear();
+        DeleteLayers(gl, _staticLayers);
+        DeleteLayers(gl, _dynamicLayers);
 
-        foreach (var layer in layers)
+        if (!UploadLayers(gl, staticLayers, _staticLayers))
+            return false;
+        if (!UploadLayers(gl, dynamicLayers, _dynamicLayers))
+            return false;
+
+        gl.BindBuffer(GlConsts.GL_ARRAY_BUFFER, 0);
+        gl.BindVertexArray(0);
+
+        return true;
+    }
+
+    public bool SetDynamicLayers(GlInterface gl, IEnumerable<ViewerLineLayer> dynamicLayers)
+    {
+        if (!_initialized)
+            return false;
+
+        LastError = null;
+        DeleteLayers(gl, _dynamicLayers);
+        var uploaded = UploadLayers(gl, dynamicLayers, _dynamicLayers);
+        gl.BindBuffer(GlConsts.GL_ARRAY_BUFFER, 0);
+        gl.BindVertexArray(0);
+        return uploaded;
+    }
+
+    public bool Draw(GlInterface gl, Matrix4x4 mvp)
+    {
+        if (!_initialized || (_staticLayers.Count == 0 && _dynamicLayers.Count == 0))
+            return true;
+
+        LastError = null;
+        gl.UseProgram(_program);
+        UploadMvpForRowVectorCamera(gl, mvp);
+
+        DrawLayers(gl, _staticLayers);
+        DrawLayers(gl, _dynamicLayers);
+
+        _lineWidth?.Invoke(1f);
+        gl.BindVertexArray(0);
+        gl.BindBuffer(GlConsts.GL_ARRAY_BUFFER, 0);
+        gl.UseProgram(0);
+        return LastError == null;
+    }
+
+    bool UploadLayers(GlInterface gl, IEnumerable<ViewerLineLayer> source, List<LayerGpu> target)
+    {
+        foreach (var layer in source)
         {
             var vertices = LayerVertices(layer.Points);
             var primitiveKind = layer.PrimitiveKind;
@@ -134,7 +174,7 @@ internal sealed class OpenGlLineRenderer : IDisposable
             gl.VertexAttribPointer(PositionAttrib, 3, GlConsts.GL_FLOAT, 0, 0, IntPtr.Zero);
             gl.EnableVertexAttribArray(PositionAttrib);
 
-            _layers.Add(new LayerGpu
+            target.Add(new LayerGpu
             {
                 Vbo = vbo,
                 Vao = vao,
@@ -145,24 +185,12 @@ internal sealed class OpenGlLineRenderer : IDisposable
             });
         }
 
-        gl.BindBuffer(GlConsts.GL_ARRAY_BUFFER, 0);
-        gl.BindVertexArray(0);
-        if (_layers.Count == 0 && LastError != null)
-            return false;
-
         return true;
     }
 
-    public bool Draw(GlInterface gl, Matrix4x4 mvp)
+    void DrawLayers(GlInterface gl, List<LayerGpu> layers)
     {
-        if (!_initialized || _layers.Count == 0)
-            return true;
-
-        LastError = null;
-        gl.UseProgram(_program);
-        UploadMvpForRowVectorCamera(gl, mvp);
-
-        foreach (var layer in _layers)
+        foreach (var layer in layers)
         {
             var rgba = layer.Color;
             SetColor(gl, rgba.R / 255f, rgba.G / 255f, rgba.B / 255f, rgba.A / 255f);
@@ -171,12 +199,18 @@ internal sealed class OpenGlLineRenderer : IDisposable
             gl.BindVertexArray(layer.Vao);
             gl.DrawArrays(ToGlPrimitive(layer.PrimitiveKind), 0, new IntPtr(layer.VertexCount));
         }
+    }
 
-        _lineWidth?.Invoke(1f);
-        gl.BindVertexArray(0);
-        gl.BindBuffer(GlConsts.GL_ARRAY_BUFFER, 0);
-        gl.UseProgram(0);
-        return LastError == null;
+    static void DeleteLayers(GlInterface gl, List<LayerGpu> layers)
+    {
+        foreach (var layer in layers)
+        {
+            if (layer.Vao != 0)
+                gl.DeleteVertexArray(layer.Vao);
+            gl.DeleteBuffer(layer.Vbo);
+        }
+
+        layers.Clear();
     }
 
     static bool IsDrawable(ViewerPrimitiveKind primitiveKind, int vertexFloatCount) =>

@@ -25,6 +25,7 @@ public class ToolpathGlControl : OpenGlControlBase
     readonly Dictionary<IPointer, Point> _activeTouches = [];
     ViewerScene? _scene;
     bool _sceneGpuDirty = true;
+    bool _dynamicGpuDirty = true;
     Color _backgroundColor = Color.FromRgb(16, 16, 16);
     bool _initFailed;
     string? _initFailureMessage;
@@ -36,8 +37,6 @@ public class ToolpathGlControl : OpenGlControlBase
     Point? _lastTouchMidpoint;
     double? _lastTouchDistance;
     PathBounds _bounds;
-
-    DispatcherTimer? _animationTimer;
 
     public event EventHandler? InitializationFailed;
     public event EventHandler? RenderingFailed;
@@ -54,8 +53,6 @@ public class ToolpathGlControl : OpenGlControlBase
     {
         Focusable = true;
         IsHitTestVisible = false;
-        AttachedToVisualTree += OnAttachedToVisualTreeHandler;
-        DetachedFromVisualTree += OnDetachedFromVisualTreeHandler;
     }
 
     public void HandlePointerPressed(PointerPressedEventArgs e, Visual? inputElement = null) =>
@@ -82,9 +79,7 @@ public class ToolpathGlControl : OpenGlControlBase
     public void SetAnimationActive(bool active)
     {
         if (active)
-            StartAnimationTimer();
-        else
-            StopAnimationTimer();
+            RequestNextFrameRendering();
     }
 
     public void SetScene(ViewerScene? scene, PathBounds bounds, bool resetView = false)
@@ -92,6 +87,7 @@ public class ToolpathGlControl : OpenGlControlBase
         _scene = scene;
         _bounds = bounds;
         _sceneGpuDirty = true;
+        _dynamicGpuDirty = true;
 
         if (resetView && !bounds.IsEmpty)
         {
@@ -113,7 +109,7 @@ public class ToolpathGlControl : OpenGlControlBase
         _scene.ToolMarker = toolMarker;
         _scene.Executed = executed;
         if (markerChanged || executedChanged)
-            _sceneGpuDirty = true;
+            _dynamicGpuDirty = true;
         RequestNextFrameRendering();
     }
 
@@ -122,6 +118,7 @@ public class ToolpathGlControl : OpenGlControlBase
         _scene = null;
         _bounds = default;
         _sceneGpuDirty = true;
+        _dynamicGpuDirty = true;
         RequestNextFrameRendering();
     }
 
@@ -158,6 +155,7 @@ public class ToolpathGlControl : OpenGlControlBase
             _renderFailureMessage = null;
             _renderer.Initialize(gl, GlVersion);
             _sceneGpuDirty = true;
+            _dynamicGpuDirty = true;
             gl.ClearColor(ToGl(_backgroundColor.R), ToGl(_backgroundColor.G), ToGl(_backgroundColor.B), ToGl(_backgroundColor.A));
             gl.Disable(GlConsts.GL_DEPTH_TEST);
             gl.Disable(GlConsts.GL_CULL_FACE);
@@ -176,11 +174,13 @@ public class ToolpathGlControl : OpenGlControlBase
         _renderer.Deinitialize(gl);
         _renderer.Dispose();
         _sceneGpuDirty = true;
+        _dynamicGpuDirty = true;
     }
 
     protected override void OnOpenGlLost()
     {
         _sceneGpuDirty = true;
+        _dynamicGpuDirty = true;
         base.OnOpenGlLost();
     }
 
@@ -201,19 +201,33 @@ public class ToolpathGlControl : OpenGlControlBase
         if (_scene == null)
             return;
 
-        var layers = _scene.AllLayers().ToList();
-        if (layers.Count == 0)
+        var staticLayers = StaticLayers(_scene).ToList();
+        var dynamicLayers = DynamicLayers(_scene).ToList();
+        if (staticLayers.Count == 0 && dynamicLayers.Count == 0)
             return;
 
         if (_sceneGpuDirty)
         {
-            if (_renderer.SetScene(gl, layers))
+            if (_renderer.SetScene(gl, staticLayers, dynamicLayers))
             {
                 _sceneGpuDirty = false;
+                _dynamicGpuDirty = false;
             }
             else
             {
                 MarkRenderFailure(_renderer.LastError ?? "OpenGL scene upload failed");
+                return;
+            }
+        }
+        else if (_dynamicGpuDirty)
+        {
+            if (_renderer.SetDynamicLayers(gl, dynamicLayers))
+            {
+                _dynamicGpuDirty = false;
+            }
+            else
+            {
+                MarkRenderFailure(_renderer.LastError ?? "OpenGL dynamic layer upload failed");
                 return;
             }
         }
@@ -239,6 +253,28 @@ public class ToolpathGlControl : OpenGlControlBase
         gl.Disable(GlSampleCoverage);
     }
 
+    static IEnumerable<ViewerLineLayer> StaticLayers(ViewerScene scene)
+    {
+        if (scene.Grid != null) yield return scene.Grid;
+        if (scene.GridMajor != null) yield return scene.GridMajor;
+        if (scene.Cut != null) yield return scene.Cut;
+        if (scene.Rapid != null) yield return scene.Rapid;
+        if (scene.Retract != null) yield return scene.Retract;
+        if (scene.JobBox != null) yield return scene.JobBox;
+        if (scene.WorkBox != null) yield return scene.WorkBox;
+        if (scene.ViewCube != null) yield return scene.ViewCube;
+        foreach (var axis in scene.OriginAxes)
+            yield return axis;
+        foreach (var extra in scene.ExtraLayers)
+            yield return extra;
+    }
+
+    static IEnumerable<ViewerLineLayer> DynamicLayers(ViewerScene scene)
+    {
+        if (scene.Executed != null) yield return scene.Executed;
+        if (scene.ToolMarker != null) yield return scene.ToolMarker;
+    }
+
     static float ToGl(byte channel) => channel / 255f;
 
     void MarkRenderFailure(string message)
@@ -248,38 +284,6 @@ public class ToolpathGlControl : OpenGlControlBase
 
         _renderFailureMessage = message;
         Dispatcher.UIThread.Post(() => RenderingFailed?.Invoke(this, EventArgs.Empty));
-    }
-
-    void OnAttachedToVisualTreeHandler(object? sender, VisualTreeAttachmentEventArgs e) =>
-        StartAnimationTimer();
-
-    void OnDetachedFromVisualTreeHandler(object? sender, VisualTreeAttachmentEventArgs e) =>
-        StopAnimationTimer();
-
-    void StartAnimationTimer()
-    {
-        _animationTimer ??= new DispatcherTimer { Interval = TimeSpan.FromMilliseconds(50) };
-        _animationTimer.Tick -= OnAnimationTick;
-        _animationTimer.Tick += OnAnimationTick;
-        if (!_animationTimer.IsEnabled)
-            _animationTimer.Start();
-    }
-
-    void StopAnimationTimer()
-    {
-        if (_animationTimer == null)
-            return;
-        _animationTimer.Stop();
-        _animationTimer.Tick -= OnAnimationTick;
-    }
-
-    void OnAnimationTick(object? sender, EventArgs e)
-    {
-        if (_initFailed)
-            return;
-
-        if (_scene != null)
-            RequestNextFrameRendering();
     }
 
     void OnPointerPressed(object? sender, PointerPressedEventArgs e)
