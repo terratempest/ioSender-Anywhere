@@ -163,7 +163,7 @@ public partial class RenderControl : UserControl
         StopRenderWaitTimer();
         var tokens = _tokens;
         var tokenCount = tokens.Count;
-        var start = _renderStartOverride ?? ViewerToolMarker.GetToolPosition(ViewerSession.Grbl);
+        var start = _renderStartOverride ?? new Point3D();
         _renderStartOverride = null;
         _programStart ??= start;
         CancelPathBuild();
