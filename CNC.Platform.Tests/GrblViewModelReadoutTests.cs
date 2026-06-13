@@ -1,5 +1,6 @@
 using System.ComponentModel;
 using CNC.Core;
+using CNC.Core.Geometry;
 using CNC.GCode;
 using CNC.GCodeViewer.Avalonia;
 
@@ -185,6 +186,35 @@ public sealed class GrblViewModelReadoutTests
         Assert.Equal(9d, toolPosition.X, 3);
         Assert.Equal(18d, toolPosition.Y, 3);
         Assert.Equal(27d, toolPosition.Z, 3);
+    }
+
+    [Fact]
+    public void BuildCone_splits_sides_and_base_faces()
+    {
+        var cone = ViewerToolMarker.BuildCone(new Point3D(), toolDiameter: 1d);
+
+        Assert.Equal(72, cone.Sides.Count);
+        Assert.Equal(72, cone.Base.Count);
+        Assert.All(cone.Base, point => Assert.Equal(54f, point.Z));
+    }
+
+    [Fact]
+    public void Build_crosshair_geometry_is_unchanged()
+    {
+        var bounds = new PathBounds
+        {
+            MinX = 0,
+            MinY = 0,
+            MinZ = 0,
+            MaxX = 10,
+            MaxY = 10,
+            MaxZ = 10,
+            HasValue = true,
+        };
+
+        var points = ViewerToolMarker.Build(bounds, new Point3D(), ToolVisualizerMode.Crosshair, toolDiameter: 1d);
+
+        Assert.Equal(6, points.Count);
     }
 
     [Fact]

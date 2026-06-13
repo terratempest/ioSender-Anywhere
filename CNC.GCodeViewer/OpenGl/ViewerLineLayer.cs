@@ -33,6 +33,7 @@ public sealed class ViewerScene
     public ViewerLineLayer? Executed { get; set; }
     public ViewerLineLayer? ViewCube { get; set; }
     public ViewerLineLayer? ToolMarker { get; set; }
+    public IReadOnlyList<ViewerLineLayer> ToolMarkerLayers { get; set; } = [];
     public IReadOnlyList<ViewerLineLayer> OriginAxes { get; set; } = [];
     /// <summary>Additional layers (e.g. height-map preview) beyond the standard slots.</summary>
     public IReadOnlyList<ViewerLineLayer> ExtraLayers { get; set; } = [];
@@ -52,6 +53,7 @@ public sealed class ViewerScene
             if (Executed != null) n++;
             if (ViewCube != null) n++;
             if (ToolMarker != null) n++;
+            n += ToolMarkerLayers.Count;
             n += OriginAxes.Count;
             n += ExtraLayers.Count;
             return n;
@@ -72,6 +74,9 @@ public sealed class ViewerScene
         foreach (var axis in OriginAxes)
             yield return axis;
         if (includeToolMarker && ToolMarker != null) yield return ToolMarker;
+        if (includeToolMarker)
+            foreach (var marker in ToolMarkerLayers)
+                yield return marker;
         foreach (var extra in ExtraLayers)
             yield return extra;
     }

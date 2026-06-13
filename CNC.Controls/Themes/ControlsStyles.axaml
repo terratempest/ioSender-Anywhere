@@ -27,6 +27,10 @@
     <Setter Property="Background" Value="#2E7D32"/>
   </Style>
 
+  <Style Selector="DataGridRow.gcode-pending">
+    <Setter Property="Background" Value="#C76B00"/>
+  </Style>
+
   <Style Selector="controls|NumericTextBox">
     <Setter Property="MinHeight" Value="0"/>
     <Setter Property="TextAlignment" Value="Right"/>

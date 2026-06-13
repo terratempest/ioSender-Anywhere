@@ -16,6 +16,11 @@ internal static class ViewerToolMarker
     const double ConeScale = 9d;
     const double ConeBaseRadius = 0.5d;
     const double ConeBaseHeight = 6d;
+    const int ConeSegments = 24;
+
+    public sealed record ConeGeometry(
+        IReadOnlyList<NumericVector3> Sides,
+        IReadOnlyList<NumericVector3> Base);
 
     public static List<NumericVector3> Build(
         PathBounds bounds,
@@ -51,9 +56,29 @@ internal static class ViewerToolMarker
         return mode switch
         {
             ToolVisualizerMode.Crosshair => Crosshair(toolPosition, arm),
-            ToolVisualizerMode.Cone => Cone(toolPosition, radius, height),
+            ToolVisualizerMode.Cone => Cone(toolPosition, radius, height).All(),
             _ => []
         };
+    }
+
+    public static ConeGeometry BuildCone(
+        Point3D toolPosition,
+        double toolDiameter,
+        bool autoScale = false,
+        double cameraDistance = 100d)
+    {
+        var radius = Math.Max(toolDiameter / 2d, ConeBaseRadius);
+        var height = ConeBaseHeight;
+        if (autoScale)
+        {
+            var scale = Math.Max(cameraDistance / 1250d, 0.05d);
+            height = Math.Max(height * scale, 0.5d);
+            radius = Math.Max(radius * scale, 0.25d);
+        }
+
+        radius *= ConeScale;
+        height *= ConeScale;
+        return Cone(toolPosition, radius, height);
     }
 
     public static Point3D GetToolPosition(GrblViewModel? grbl)
@@ -76,18 +101,18 @@ internal static class ViewerToolMarker
         ];
     }
 
-    static List<NumericVector3> Cone(Point3D tip, double radius, double height)
+    static ConeGeometry Cone(Point3D tip, double radius, double height)
     {
         var baseZ = tip.Z + height;
-        var triangles = new List<NumericVector3>();
+        var sides = new List<NumericVector3>(ConeSegments * 3);
+        var baseFace = new List<NumericVector3>(ConeSegments * 3);
         var baseCenter = V(tip.X, tip.Y, baseZ);
         var tipPoint = V(tip.X, tip.Y, tip.Z);
 
-        const int segments = 24;
-        for (var i = 0; i < segments; i++)
+        for (var i = 0; i < ConeSegments; i++)
         {
-            var a0 = i * 2d * Math.PI / segments;
-            var a1 = (i + 1) * 2d * Math.PI / segments;
+            var a0 = i * 2d * Math.PI / ConeSegments;
+            var a1 = (i + 1) * 2d * Math.PI / ConeSegments;
             var x0 = tip.X + radius * Math.Cos(a0);
             var y0 = tip.Y + radius * Math.Sin(a0);
             var x1 = tip.X + radius * Math.Cos(a1);
@@ -95,17 +120,25 @@ internal static class ViewerToolMarker
             var p0 = V(x0, y0, baseZ);
             var p1 = V(x1, y1, baseZ);
 
-            triangles.Add(tipPoint);
-            triangles.Add(p0);
-            triangles.Add(p1);
+            sides.Add(tipPoint);
+            sides.Add(p0);
+            sides.Add(p1);
 
-            triangles.Add(baseCenter);
-            triangles.Add(p1);
-            triangles.Add(p0);
+            baseFace.Add(baseCenter);
+            baseFace.Add(p1);
+            baseFace.Add(p0);
         }
 
-        return triangles;
+        return new ConeGeometry(sides, baseFace);
     }
 
     static NumericVector3 V(double x, double y, double z) => new((float)x, (float)y, (float)z);
+
+    static List<NumericVector3> All(this ConeGeometry cone)
+    {
+        var all = new List<NumericVector3>(cone.Sides.Count + cone.Base.Count);
+        all.AddRange(cone.Sides);
+        all.AddRange(cone.Base);
+        return all;
+    }
 }

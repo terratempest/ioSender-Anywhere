@@ -305,7 +305,7 @@ public partial class RenderControl : UserControl
         scene.ViewCube = null;
         scene.Executed = BuildExecutedLayer(cfg);
         ViewCube.IsVisible = cfg.ShowViewCube;
-        scene.ToolMarker = BuildToolMarker(cfg);
+        scene.ToolMarkerLayers = BuildToolMarker(cfg);
         GlViewport.SetBackground(_themeColors.Background);
         OverlayPanel.IsVisible = cfg.ShowTextOverlay;
     }
@@ -444,27 +444,49 @@ public partial class RenderControl : UserControl
     static Color Dim(Color color) =>
         Color.FromArgb(color.A, (byte)(color.R / 2), (byte)(color.G / 2), (byte)(color.B / 2));
 
-    ViewerLineLayer? BuildToolMarker(GCodeViewerConfig cfg)
+    static Color Lighten(Color color)
+    {
+        const double amount = 0.2d;
+        return Color.FromArgb(
+            color.A,
+            LightenChannel(color.R),
+            LightenChannel(color.G),
+            LightenChannel(color.B));
+
+        static byte LightenChannel(byte channel) =>
+            (byte)Math.Clamp(Math.Round(channel + (255 - channel) * amount), 0, 255);
+    }
+
+    IReadOnlyList<ViewerLineLayer> BuildToolMarker(GCodeViewerConfig cfg)
     {
         if (_segments == null || _bounds.IsEmpty)
-            return null;
+            return [];
 
         var mode = (ToolVisualizerMode)Math.Clamp(cfg.ToolVisualizer, 0, 2);
         if (mode == ToolVisualizerMode.None)
-            return null;
+            return [];
 
         var toolPos = ResolveToolMarkerPosition();
         var camDist = GlViewport.Camera.DistanceTo(new NumericVector3(
             (float)toolPos.X, (float)toolPos.Y, (float)toolPos.Z));
         var markerBounds = BoundsIncluding(toolPos);
-        var points = ViewerToolMarker.Build(markerBounds, toolPos, mode, cfg.ToolDiameter, cfg.ToolAutoScale, camDist);
-        if (points.Count < 2)
-            return null;
-
         var color = ViewerColors.ResolveToolColor(cfg, _themeColors);
-        return mode == ToolVisualizerMode.Cone
-            ? ViewerLineLayerBuilder.FromTriangles(points, color, tag: "tool-marker")
-            : ViewerLineLayerBuilder.FromPoints(points, color, ToolThickness, tag: "tool-marker");
+        if (mode == ToolVisualizerMode.Cone)
+        {
+            var cone = ViewerToolMarker.BuildCone(toolPos, cfg.ToolDiameter, cfg.ToolAutoScale, camDist);
+            var sideLayer = ViewerLineLayerBuilder.FromTriangles(cone.Sides, color, tag: "tool-marker");
+            var baseLayer = ViewerLineLayerBuilder.FromTriangles(cone.Base, Lighten(color), tag: "tool-marker-base");
+            var layers = new List<ViewerLineLayer>(2);
+            if (sideLayer != null)
+                layers.Add(sideLayer);
+            if (baseLayer != null)
+                layers.Add(baseLayer);
+            return layers;
+        }
+
+        var points = ViewerToolMarker.Build(markerBounds, toolPos, mode, cfg.ToolDiameter, cfg.ToolAutoScale, camDist);
+        var layer = ViewerLineLayerBuilder.FromPoints(points, color, ToolThickness, tag: "tool-marker");
+        return layer == null ? [] : [layer];
     }
 
     Point3D ResolveToolMarkerPosition()

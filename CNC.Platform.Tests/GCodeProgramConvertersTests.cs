@@ -2,27 +2,36 @@ using System.Globalization;
 using Avalonia.Data.Converters;
 using Avalonia.Media;
 using CNC.Controls.Avalonia.Converters;
+using CNC.Controls.Avalonia.Views;
 
 namespace CNC.Platform.Tests;
 
 public sealed class GCodeProgramConvertersTests
 {
     [Theory]
-    [InlineData("*", null)]
-    [InlineData("BRK *", null)]
-    [InlineData("@", "#FF2E7D32")]
-    [InlineData("pending", "#FFC76B00")]
-    public void Status_background_distinguishes_transport_current_and_pending(string sent, string? expected)
+    [MemberData(nameof(NullStatusRows))]
+    [InlineData("@")]
+    [InlineData("pending")]
+    public void Status_cell_background_remains_transparent_for_row_highlight_statuses(string? sent)
     {
         var brush = ConvertBrush(new GCodeLineStatusBrushConverter(), sent);
 
-        if (expected == null)
-        {
-            Assert.Same(Brushes.Transparent, brush);
-            return;
-        }
+        Assert.Same(Brushes.Transparent, brush);
+    }
 
-        Assert.Equal(Color.Parse(expected), SolidColor(brush));
+    [Theory]
+    [InlineData("@", "gcode-current")]
+    [InlineData("pending", "gcode-pending")]
+    [InlineData("BRK pending", "gcode-pending")]
+    [InlineData("ok", "gcode-done")]
+    [InlineData("ok foo", "gcode-done")]
+    [InlineData("BRK ok", "gcode-done")]
+    [InlineData("*", null)]
+    public void Row_status_class_tracks_program_status(string sent, string? expected)
+    {
+        var actual = GCodeListControl.GetRowStatusClass(sent);
+
+        Assert.Equal(expected, actual);
     }
 
     [Theory]
@@ -43,9 +52,12 @@ public sealed class GCodeProgramConvertersTests
         Assert.Equal(expected, actual);
     }
 
-    static IBrush ConvertBrush(IValueConverter converter, string sent) =>
+    static IBrush ConvertBrush(IValueConverter converter, string? sent) =>
         Assert.IsAssignableFrom<IBrush>(converter.Convert(sent, typeof(IBrush), null, CultureInfo.InvariantCulture));
 
-    static Color SolidColor(IBrush brush) =>
-        Assert.IsAssignableFrom<ISolidColorBrush>(brush).Color;
+    public static IEnumerable<object?[]> NullStatusRows =>
+    [
+        [null],
+        ["BRK *"],
+    ];
 }

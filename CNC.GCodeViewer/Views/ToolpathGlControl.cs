@@ -99,14 +99,15 @@ public class ToolpathGlControl : OpenGlControlBase
         SceneApplied?.Invoke(this, EventArgs.Empty);
     }
 
-    public void UpdateDynamicLayers(ViewerLineLayer? toolMarker, ViewerLineLayer? executed)
+    public void UpdateDynamicLayers(IReadOnlyList<ViewerLineLayer> toolMarkerLayers, ViewerLineLayer? executed)
     {
         if (_scene == null)
             return;
 
-        var markerChanged = !ReferenceEquals(_scene.ToolMarker, toolMarker);
+        var markerChanged = !ReferenceEquals(_scene.ToolMarkerLayers, toolMarkerLayers);
         var executedChanged = !ReferenceEquals(_scene.Executed, executed);
-        _scene.ToolMarker = toolMarker;
+        _scene.ToolMarker = null;
+        _scene.ToolMarkerLayers = toolMarkerLayers;
         _scene.Executed = executed;
         if (markerChanged || executedChanged)
             _dynamicGpuDirty = true;
@@ -273,6 +274,8 @@ public class ToolpathGlControl : OpenGlControlBase
     {
         if (scene.Executed != null) yield return scene.Executed;
         if (scene.ToolMarker != null) yield return scene.ToolMarker;
+        foreach (var marker in scene.ToolMarkerLayers)
+            yield return marker;
     }
 
     static float ToGl(byte channel) => channel / 255f;

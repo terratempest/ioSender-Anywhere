@@ -39,7 +39,11 @@ public partial class GCodeListControl : UserControl
             ApplyLocalization();
             BindProgram();
         };
-        Unloaded += (_, _) => DetachModel();
+        Unloaded += (_, _) =>
+        {
+            DetachModel();
+            DetachBlockHandlers();
+        };
     }
 
     public GCodeListControl() : this(null, null)
@@ -165,13 +169,22 @@ public partial class GCodeListControl : UserControl
         row.Classes.Remove("gcode-pending");
         row.Classes.Remove("gcode-done");
 
-        var sent = block.Sent?.Replace("BRK ", string.Empty, StringComparison.Ordinal) ?? string.Empty;
-        if (sent == "@")
-            row.Classes.Add("gcode-current");
-        else if (sent == "pending")
-            row.Classes.Add("gcode-pending");
-        else if (sent == "ok" || sent.StartsWith("ok", StringComparison.Ordinal))
-            row.Classes.Add("gcode-done");
+        var statusClass = GetRowStatusClass(block.Sent);
+        if (statusClass != null)
+            row.Classes.Add(statusClass);
+    }
+
+    internal static string? GetRowStatusClass(string? sent)
+    {
+        sent = sent?.Replace("BRK ", string.Empty, StringComparison.Ordinal) ?? string.Empty;
+        return sent switch
+        {
+            "@" => "gcode-current",
+            "pending" => "gcode-pending",
+            "ok" => "gcode-done",
+            _ when sent.StartsWith("ok", StringComparison.Ordinal) => "gcode-done",
+            _ => null
+        };
     }
 
     void OnSelectionChanged(object? sender, SelectionChangedEventArgs e)

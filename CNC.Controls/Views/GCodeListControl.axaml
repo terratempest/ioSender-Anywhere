@@ -16,7 +16,6 @@
              VerticalAlignment="Stretch">
 
   <UserControl.Resources>
-    <converters:GCodeLineStatusBrushConverter x:Key="GCodeLineStatusBrushConverter"/>
     <converters:GCodeLineNumberForegroundConverter x:Key="GCodeLineNumberForegroundConverter"/>
     <converters:GCodeCompletedConverter x:Key="GCodeCompletedConverter"/>
   </UserControl.Resources>
@@ -93,8 +92,7 @@
                               loc:Localize.Key="CNC.Controls.Avalonia.gcodelistcontrol.hdr_block" loc:Localize.Fallback="Block">
         <DataGridTemplateColumn.CellTemplate>
           <DataTemplate>
-            <Border Background="{Binding Sent, Converter={StaticResource GCodeLineStatusBrushConverter}}"
-                    MinHeight="14.52"
+            <Border MinHeight="14.52"
                     MinWidth="24"
                     Padding="4,1,8,1">
               <TextBlock Text="{Binding Row}"

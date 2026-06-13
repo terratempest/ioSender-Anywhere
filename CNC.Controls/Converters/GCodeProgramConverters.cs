@@ -8,25 +8,13 @@ namespace CNC.Controls.Avalonia.Converters;
 public sealed class GCodeLineStatusBrushConverter : IValueConverter
 {
     static readonly IBrush Transparent = Brushes.Transparent;
-    static readonly IBrush CurrentBrush = Brush.Parse("#2E7D32");
-    static readonly IBrush PendingBrush = Brush.Parse("#C76B00");
 
     public object Convert(object? value, Type targetType, object? parameter, CultureInfo culture)
-    {
-        var sent = Normalize(value);
-        return sent switch
-        {
-            "@" => CurrentBrush,
-            "pending" => PendingBrush,
-            _ => Transparent
-        };
-    }
+        => Transparent;
 
     public object ConvertBack(object? value, Type targetType, object? parameter, CultureInfo culture) =>
         BindingOperations.DoNothing;
 
-    static string Normalize(object? value) =>
-        value?.ToString()?.Replace("BRK ", string.Empty, StringComparison.Ordinal) ?? string.Empty;
 }
 
 public sealed class GCodeLineNumberForegroundConverter : IValueConverter
