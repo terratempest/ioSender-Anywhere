@@ -4,7 +4,6 @@ using Avalonia.Input;
 using Avalonia.Interactivity;
 using Avalonia.Media;
 using Avalonia.Platform.Storage;
-using Avalonia.Threading;
 using System.Diagnostics;
 using CNC.App;
 using CNC.Converters;
@@ -82,7 +81,7 @@ public partial class MainWindow : Window
         UpdateProgramFileButtons();
     }
 
-    public void HandleIpcMessage(string message) => StartupFileHandler.TryLoadFromIpcMessage(message);
+    public async void HandleIpcMessage(string message) => await StartupFileHandler.TryLoadFromIpcMessageAsync(message);
 
     void UpdateCheckModeMenu()
     {
@@ -120,7 +119,7 @@ public partial class MainWindow : Window
     private void UpdateConnectionUi()
     {
         var connected = _connectionService.IsConnected;
-        var busy = IsMachineBusy();
+        var busy = IsMachineBusy() || _viewModel.IsProgramLoading;
         BtnServerStatus.IsEnabled = !busy;
         MnuFileConnect.IsEnabled = !busy;
         MnuFileExit.IsEnabled = !busy;
@@ -146,15 +145,28 @@ public partial class MainWindow : Window
 
     bool IsMachineBusy() => _viewModel.Grbl.IsJobRunning || _viewModel.Grbl.IsToolChanging;
 
-    bool CanMutateProgram() => !IsMachineBusy();
+    bool CanMutateProgram() => CanMutateProgramState(
+        _viewModel.Grbl.IsJobRunning,
+        _viewModel.Grbl.IsToolChanging,
+        _viewModel.IsProgramLoading);
 
-    bool CanDisconnectOrExit() => !IsMachineBusy();
+    public static bool CanMutateProgramState(bool isJobRunning, bool isToolChanging, bool isProgramLoading) =>
+        !isJobRunning && !isToolChanging && !isProgramLoading;
+
+    bool CanDisconnectOrExit() => !IsMachineBusy() && !_viewModel.IsProgramLoading;
 
     void ShowBusyMessage() =>
-        MessageDialogs.ShowError("Stop the active job or tool change before changing the program, disconnecting, or exiting.", "ioSender");
+        MessageDialogs.ShowError(
+            _viewModel.IsProgramLoading
+                ? "Wait for the active program load to finish."
+                : "Stop the active job or tool change before changing the program, disconnecting, or exiting.",
+            "ioSender");
 
     private async void OnOpenGCodeClick(object? sender, RoutedEventArgs e)
     {
+#if DEBUG
+        var clickWatch = Stopwatch.StartNew();
+#endif
         if (!CanMutateProgram())
         {
             ShowBusyMessage();
@@ -164,12 +176,21 @@ public partial class MainWindow : Window
         if (StorageProvider is not { } storage)
             return;
 
+        CancelActivePreviewBuilds();
+#if DEBUG
+        Trace.WriteLine($"Open program click reached file picker call in {clickWatch.ElapsedMilliseconds} ms");
+        var pickerWatch = Stopwatch.StartNew();
+#endif
         var path = await PickGCodeOrConvertedPathAsync(storage);
+#if DEBUG
+        pickerWatch.Stop();
+        Trace.WriteLine($"Open program file picker returned in {pickerWatch.ElapsedMilliseconds} ms");
+#endif
         if (string.IsNullOrEmpty(path))
             return;
 
         if (!GCodeConverterRegistry.TryLoad(path, GCodeFileTarget.Current, this))
-            _programService.Load(path);
+            await LoadNativeProgramAsync(path);
     }
 
     void OnSaveProgramClick(object? sender, RoutedEventArgs e)
@@ -215,7 +236,7 @@ public partial class MainWindow : Window
         new DragKnifeViewModel().Apply(this);
     }
 
-    void OnReloadProgramClick(object? sender, RoutedEventArgs e)
+    async void OnReloadProgramClick(object? sender, RoutedEventArgs e)
     {
         if (!CanMutateProgram())
         {
@@ -225,7 +246,32 @@ public partial class MainWindow : Window
 
         var filename = _viewModel.Grbl.FileName;
         if (!string.IsNullOrWhiteSpace(filename) && _viewModel.Grbl.IsPhysicalFileLoaded)
-            _programService.Load(filename);
+        {
+            CancelActivePreviewBuilds();
+            await LoadNativeProgramAsync(filename);
+        }
+    }
+
+    async Task LoadNativeProgramAsync(string filename)
+    {
+        var previousMessage = _viewModel.Grbl.Message;
+        _viewModel.IsProgramLoading = true;
+        _viewModel.Grbl.Message = "Loading program...";
+        UpdateProgramFileButtons();
+        UpdateConnectionUi();
+
+        try
+        {
+            await _programService.LoadAsync(filename);
+        }
+        finally
+        {
+            _viewModel.IsProgramLoading = false;
+            if (_viewModel.Grbl.Message == "Loading program...")
+                _viewModel.Grbl.Message = previousMessage;
+            UpdateProgramFileButtons();
+            UpdateConnectionUi();
+        }
     }
 
     void OnCloseProgramClick(object? sender, RoutedEventArgs e)
@@ -236,7 +282,22 @@ public partial class MainWindow : Window
             return;
         }
 
+        CancelActivePreviewBuilds();
         _programService.Close();
+    }
+
+    void CancelActivePreviewBuilds()
+    {
+#if DEBUG
+        var watch = Stopwatch.StartNew();
+#endif
+        JobViewControl.WorkspaceHost.CancelToolpathViews();
+        if (_viewerPreviewWindow?.Content is RenderControl viewer)
+            viewer.CancelPreviewBuild();
+#if DEBUG
+        watch.Stop();
+        Trace.WriteLine($"Active preview cancellation fanout completed in {watch.ElapsedMilliseconds} ms");
+#endif
     }
 
     private async void OnConnectClick(object? sender, RoutedEventArgs e) => await ShowPortDialogAsync();

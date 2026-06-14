@@ -1,4 +1,5 @@
 using Avalonia;
+using System.Diagnostics;
 using Avalonia.Input;
 using Avalonia.Interactivity;
 using Avalonia.Media;
@@ -151,6 +152,9 @@ public class ToolpathGlControl : OpenGlControlBase
     {
         try
         {
+#if DEBUG
+            var watch = Stopwatch.StartNew();
+#endif
             _initFailed = false;
             _initFailureMessage = null;
             _renderFailureMessage = null;
@@ -161,6 +165,10 @@ public class ToolpathGlControl : OpenGlControlBase
             gl.Disable(GlConsts.GL_DEPTH_TEST);
             gl.Disable(GlConsts.GL_CULL_FACE);
             gl.Disable(GlConsts.GL_SCISSOR_TEST);
+#if DEBUG
+            watch.Stop();
+            Trace.WriteLine($"G-code GL init completed in {watch.ElapsedMilliseconds} ms");
+#endif
         }
         catch (Exception ex)
         {
@@ -209,10 +217,17 @@ public class ToolpathGlControl : OpenGlControlBase
 
         if (_sceneGpuDirty)
         {
+#if DEBUG
+            var uploadWatch = Stopwatch.StartNew();
+#endif
             if (_renderer.SetScene(gl, staticLayers, dynamicLayers))
             {
                 _sceneGpuDirty = false;
                 _dynamicGpuDirty = false;
+#if DEBUG
+                uploadWatch.Stop();
+                Trace.WriteLine($"G-code GL scene upload completed in {uploadWatch.ElapsedMilliseconds} ms; staticLayers={staticLayers.Count}; dynamicLayers={dynamicLayers.Count}; vertices={CountVertices(staticLayers) + CountVertices(dynamicLayers)}");
+#endif
             }
             else
             {
@@ -222,9 +237,16 @@ public class ToolpathGlControl : OpenGlControlBase
         }
         else if (_dynamicGpuDirty)
         {
+#if DEBUG
+            var uploadWatch = Stopwatch.StartNew();
+#endif
             if (_renderer.SetDynamicLayers(gl, dynamicLayers))
             {
                 _dynamicGpuDirty = false;
+#if DEBUG
+                uploadWatch.Stop();
+                Trace.WriteLine($"G-code GL dynamic upload completed in {uploadWatch.ElapsedMilliseconds} ms; layers={dynamicLayers.Count}; vertices={CountVertices(dynamicLayers)}");
+#endif
             }
             else
             {
@@ -269,6 +291,16 @@ public class ToolpathGlControl : OpenGlControlBase
         foreach (var extra in scene.ExtraLayers)
             yield return extra;
     }
+
+#if DEBUG
+    static int CountVertices(IEnumerable<ViewerLineLayer> layers)
+    {
+        var count = 0;
+        foreach (var layer in layers)
+            count += layer.Points.Count;
+        return count;
+    }
+#endif
 
     static IEnumerable<ViewerLineLayer> DynamicLayers(ViewerScene scene)
     {

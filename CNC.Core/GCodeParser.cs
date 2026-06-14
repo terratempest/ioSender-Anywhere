@@ -356,7 +356,7 @@ namespace CNC.GCode
 
         public new void Reset()
         {
-            base.Reset();
+            base.Reset(syncWithController: false);
 
             // TODO: set defaults from grbl parser state? 
             gcValues.Clear();

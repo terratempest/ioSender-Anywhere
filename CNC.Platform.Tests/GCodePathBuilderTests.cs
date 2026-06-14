@@ -4,6 +4,7 @@ using CNC.Core;
 using CNC.Core.Geometry;
 using CNC.GCode;
 using CNC.GCodeViewer.Avalonia;
+using CNC.GCodeViewer.Avalonia.OpenGl;
 using NumericVector3 = System.Numerics.Vector3;
 
 namespace CNC.Platform.Tests;
@@ -43,6 +44,80 @@ public sealed class GCodePathBuilderTests
         Assert.Equal([new NumericVector3(0f, 0f, 0f), new NumericVector3(1f, 0f, 0f)], result.Segments.Cut);
         Assert.Empty(result.Segments.Rapid);
         Assert.Empty(result.Segments.Retract);
+    }
+
+    [Fact]
+    public void Build_LargeLinearPreview_PreservesSegmentsBeyondOldLayerCap()
+    {
+        const int moves = PathDecimator.MaxVerticesPerLayer / 2 + 1;
+        var blocks = new string[moves + 1];
+        blocks[0] = "G21 G90 F100";
+        for (var i = 1; i <= moves; i++)
+            blocks[i] = $"G1 X{i} Y0";
+
+        var result = GCodePathBuilder.Build(Parse(blocks), new Point3D());
+
+        Assert.Equal(moves, result.MotionCount);
+        Assert.Equal(moves * 2, result.Segments.Cut.Count);
+        Assert.Equal(new NumericVector3(0f, 0f, 0f), result.Segments.Cut[0]);
+        Assert.Equal(new NumericVector3(moves, 0f, 0f), result.Segments.Cut[^1]);
+    }
+
+    [Fact]
+    public void Build_LargeArcPreview_PreservesArcSegmentsBeyondOldLayerCap()
+    {
+        const int arcMoves = 20_000;
+        var blocks = new string[arcMoves + 2];
+        blocks[0] = "G21 G90 G17 F100";
+        blocks[1] = "G0 X0 Y0";
+        for (var i = 0; i < arcMoves; i++)
+        {
+            var even = (i & 1) == 0;
+            blocks[i + 2] = even
+                ? "G2 X1 Y0 I0.5 J0"
+                : "G2 X0 Y0 I-0.5 J0";
+        }
+
+        var result = GCodePathBuilder.Build(Parse(blocks), new Point3D(), arcResolution: 1d);
+
+        Assert.Equal(arcMoves + 1, result.MotionCount);
+        Assert.True(result.Segments.Cut.Count > PathDecimator.MaxVerticesPerLayer);
+        Assert.True(result.Segments.Cut.Count >= arcMoves * 2);
+        Assert.Equal(new NumericVector3(0f, 0f, 0f), result.Segments.Cut[0]);
+        Assert.Equal(new NumericVector3(0f, 0f, 0f), result.Segments.Cut[^1]);
+    }
+
+    [Fact]
+    public void OpenGlLineRenderer_ChunksLinesOnSegmentBoundaries()
+    {
+        var exact = OpenGlLineRenderer.ChunkVertices(
+            OpenGlLineRenderer.MaxVerticesPerUploadChunk,
+            ViewerPrimitiveKind.Lines);
+        var plusSegment = OpenGlLineRenderer.ChunkVertices(
+            OpenGlLineRenderer.MaxVerticesPerUploadChunk + 2,
+            ViewerPrimitiveKind.Lines);
+        var oddInvalid = OpenGlLineRenderer.ChunkVertices(
+            OpenGlLineRenderer.MaxVerticesPerUploadChunk + 1,
+            ViewerPrimitiveKind.Lines);
+
+        Assert.Equal([(0, OpenGlLineRenderer.MaxVerticesPerUploadChunk)], exact);
+        Assert.Equal(
+            [(0, OpenGlLineRenderer.MaxVerticesPerUploadChunk), (OpenGlLineRenderer.MaxVerticesPerUploadChunk, 2)],
+            plusSegment);
+        Assert.Equal([(0, OpenGlLineRenderer.MaxVerticesPerUploadChunk)], oddInvalid);
+    }
+
+    [Fact]
+    public void OpenGlLineRenderer_ChunksTrianglesOnTriangleBoundaries()
+    {
+        var chunkSize = OpenGlLineRenderer.MaxVerticesPerUploadChunk - OpenGlLineRenderer.MaxVerticesPerUploadChunk % 3;
+        var exact = OpenGlLineRenderer.ChunkVertices(chunkSize, ViewerPrimitiveKind.Triangles);
+        var plusTriangle = OpenGlLineRenderer.ChunkVertices(chunkSize + 3, ViewerPrimitiveKind.Triangles);
+        var invalidRemainder = OpenGlLineRenderer.ChunkVertices(chunkSize + 1, ViewerPrimitiveKind.Triangles);
+
+        Assert.Equal([(0, chunkSize)], exact);
+        Assert.Equal([(0, chunkSize), (chunkSize, 3)], plusTriangle);
+        Assert.Equal([(0, chunkSize)], invalidRemainder);
     }
 
     [Fact]

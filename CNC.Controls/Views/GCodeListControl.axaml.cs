@@ -1,4 +1,5 @@
 using System.ComponentModel;
+using System.Diagnostics;
 using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Input;
@@ -112,10 +113,17 @@ public partial class GCodeListControl : UserControl
 
     void BindProgram()
     {
+#if DEBUG
+        var watch = Stopwatch.StartNew();
+#endif
         DetachBlockHandlers();
         GCodeGrid.ItemsSource = _viewModel.Data;
         if (_model != null && _model.ScrollPosition >= 0)
             ScrollToBlock(_model.ScrollPosition);
+#if DEBUG
+        watch.Stop();
+        Trace.WriteLine($"G-code grid bind completed in {watch.ElapsedMilliseconds} ms; rows={_viewModel.Data.Count}");
+#endif
     }
 
     void OnViewModelPropertyChanged(object? sender, PropertyChangedEventArgs e)

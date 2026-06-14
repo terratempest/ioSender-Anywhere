@@ -161,7 +161,7 @@ internal readonly record struct ExecutedPathEntry(
 /// <summary>Builds line segments for 3D preview from parsed G-code tokens.</summary>
 public static class GCodePathBuilder
 {
-    const int MaxPreviewActions = 500_000;
+    const int MaxPreviewActions = 5_000_000;
     const int MaxPreviewPointsPerCurve = 4_096;
     const double PreviewCurveDensityMultiplier = 2d;
 
@@ -282,10 +282,6 @@ public static class GCodePathBuilder
                     break;
             }
         }
-
-        DecimateInPlace(result.Cut);
-        DecimateInPlace(result.Rapid);
-        DecimateInPlace(result.Retract);
 
         return new GCodePathBuildResult
         {

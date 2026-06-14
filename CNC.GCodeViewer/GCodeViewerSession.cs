@@ -11,12 +11,14 @@ public sealed class GCodeViewerSession
         AppConfigService appConfig,
         GrblViewModel grbl,
         Func<IReadOnlyList<GCodeToken>> getProgramTokens,
-        Func<IReadOnlyList<GCodeBlock>> getProgramBlocks)
+        Func<IReadOnlyList<GCodeBlock>> getProgramBlocks,
+        Action<bool>? setPreviewBuilding = null)
     {
         AppConfig = appConfig ?? throw new ArgumentNullException(nameof(appConfig));
         Grbl = grbl ?? throw new ArgumentNullException(nameof(grbl));
         GetProgramTokens = getProgramTokens ?? throw new ArgumentNullException(nameof(getProgramTokens));
         GetProgramBlocks = getProgramBlocks ?? throw new ArgumentNullException(nameof(getProgramBlocks));
+        SetPreviewBuilding = setPreviewBuilding;
     }
 
     public AppConfigService AppConfig { get; }
@@ -26,6 +28,8 @@ public sealed class GCodeViewerSession
     public Func<IReadOnlyList<GCodeToken>> GetProgramTokens { get; }
 
     public Func<IReadOnlyList<GCodeBlock>> GetProgramBlocks { get; }
+
+    public Action<bool>? SetPreviewBuilding { get; }
 
     public GCodeExecutionProgress ExecutionProgress => Grbl.ExecutionProgress;
 

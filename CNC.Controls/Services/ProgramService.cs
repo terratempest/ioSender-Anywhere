@@ -63,6 +63,8 @@ public sealed class ProgramService
 
     public void Load(string filename) => Files.Load(filename);
 
+    public Task LoadAsync(string filename) => Files.LoadAsync(filename);
+
     public void LoadFromLines(IEnumerable<string> lines, string displayName) =>
         Files.LoadFromLines(lines, displayName);
 

@@ -54,6 +54,8 @@ public partial class MainWindow : Window
     private bool _suppressSidebarMenuSync;
     private bool _suppressCheckModeMenuSync;
     private WindowState _preFullscreenWindowState = WindowState.Normal;
+    private readonly DispatcherTimer _programBusySpinnerTimer = new() { Interval = TimeSpan.FromMilliseconds(40) };
+    private double _programBusySpinnerAngle;
 
     public MainWindow()
     {
@@ -79,9 +81,11 @@ public partial class MainWindow : Window
         _connectionInitializer = _session.ConnectionInitializer;
         _programService = _session.Program;
         _viewModel = _session.MainWindow;
+        _viewModel.PropertyChanged += OnMainViewModelPropertyChanged;
         _viewModel.ConnectionChanged += OnConnectionChanged;
         _viewModel.Grbl.PropertyChanged += OnGrblPropertyChanged;
         DataContext = _viewModel;
+        InitializeProgramBusySpinner();
 
         UpdateConnectionUi();
         UpdateProgramFileButtons();
@@ -121,7 +125,7 @@ public partial class MainWindow : Window
             JobViewControl.SetLayoutReady(true);
         }, DispatcherPriority.Background);
         if (AppHostContext.StartupArgs.Length > 0)
-            StartupFileHandler.TryLoadFromArgs(AppHostContext.StartupArgs);
+            await StartupFileHandler.TryLoadFromArgsAsync(AppHostContext.StartupArgs);
 
         if (!TryStartupReconnect() && ShouldAutoConnectOnStartup())
             await ShowPortDialogAsync();
@@ -137,6 +141,8 @@ public partial class MainWindow : Window
         }
 
         SaveWindowPlacement();
+        _programBusySpinnerTimer.Stop();
+        _viewModel.PropertyChanged -= OnMainViewModelPropertyChanged;
         CloseFloatingPanelWindows();
         DisconnectMachine();
     }
@@ -183,6 +189,38 @@ public partial class MainWindow : Window
     {
         UpdateConnectionUi();
         UpdateFloatingPanelMenuEnabled();
+    }
+
+    void InitializeProgramBusySpinner()
+    {
+        _programBusySpinnerTimer.Tick += (_, _) =>
+        {
+            _programBusySpinnerAngle = (_programBusySpinnerAngle + 12d) % 360d;
+            if (ProgramBusySpinnerIcon.RenderTransform is RotateTransform transform)
+                transform.Angle = _programBusySpinnerAngle;
+        };
+        UpdateProgramBusySpinner();
+    }
+
+    void OnMainViewModelPropertyChanged(object? sender, System.ComponentModel.PropertyChangedEventArgs e)
+    {
+        if (e.PropertyName == nameof(MainWindowViewModel.IsProgramBusy))
+            UpdateProgramBusySpinner();
+    }
+
+    void UpdateProgramBusySpinner()
+    {
+        if (_viewModel.IsProgramBusy)
+        {
+            if (!_programBusySpinnerTimer.IsEnabled)
+                _programBusySpinnerTimer.Start();
+            return;
+        }
+
+        _programBusySpinnerTimer.Stop();
+        _programBusySpinnerAngle = 0d;
+        if (ProgramBusySpinnerIcon.RenderTransform is RotateTransform transform)
+            transform.Angle = 0d;
     }
 
     void OnGrblPropertyChanged(object? sender, System.ComponentModel.PropertyChangedEventArgs e)

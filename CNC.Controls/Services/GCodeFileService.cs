@@ -1,4 +1,5 @@
 using System.Collections.ObjectModel;
+using System.Diagnostics;
 using CNC.Core;
 using CNC.GCode;
 
@@ -66,7 +67,35 @@ public sealed class GCodeFileService
             Model.Blocks = Blocks;
         }
 
-        ProgramChanged?.Invoke();
+        NotifyProgramChanged();
+    }
+
+    public async Task LoadAsync(string filename)
+    {
+        if (!CanMutateProgram())
+            return;
+
+        var ok = false;
+        BeginProgramMutation();
+        try
+        {
+            ok = await Task.Run(() => RunWithLoadDialect(() =>
+                _program.LoadFile(filename, GrblInfo.UseLinenumbers, raiseFileChanged: false)));
+        }
+        catch (Exception ex)
+        {
+            GrblUi.ShowError(ex.Message, "ioSender");
+            return;
+        }
+
+        if (Model != null)
+        {
+            OnProgramFileChanged(ok ? filename : string.Empty);
+            Model.FileName = ok ? filename : string.Empty;
+            Model.Blocks = Blocks;
+        }
+
+        NotifyProgramChanged();
     }
 
     /// <summary>Load generated or pasted G-code into the active program.</summary>
@@ -96,7 +125,7 @@ public sealed class GCodeFileService
             Model.Blocks = Blocks;
         }
 
-        ProgramChanged?.Invoke();
+        NotifyProgramChanged();
     }
 
     public void Save()
@@ -131,7 +160,7 @@ public sealed class GCodeFileService
             Model.FileName = string.Empty;
             Model.Blocks = Blocks;
         }
-        ProgramChanged?.Invoke();
+        NotifyProgramChanged();
     }
 
     public void AddBlock(string block) => _program.AddBlock(block);
@@ -157,7 +186,14 @@ public sealed class GCodeFileService
     {
         if (Model != null)
             Model.Blocks = Blocks;
+#if DEBUG
+        var watch = Stopwatch.StartNew();
+#endif
         ProgramChanged?.Invoke();
+#if DEBUG
+        watch.Stop();
+        Trace.WriteLine($"G-code ProgramChanged fanout completed in {watch.ElapsedMilliseconds} ms; blocks={Blocks}; tokens={Tokens.Count}");
+#endif
     }
 
     public void ReplaceFromTokens(IReadOnlyList<GCodeToken> tokens, string headerComment, bool compress)

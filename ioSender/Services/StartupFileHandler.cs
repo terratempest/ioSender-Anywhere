@@ -31,10 +31,52 @@ public static class StartupFileHandler
         return true;
     }
 
+    public static async Task<bool> TryLoadAsync(string? path, bool allowWhileJobRunning = false)
+    {
+        if (string.IsNullOrWhiteSpace(path))
+            return false;
+
+        path = path.Trim().Trim('"');
+        if (!File.Exists(path))
+            return false;
+
+        var ext = Path.GetExtension(path).TrimStart('.');
+        if (ext.Length == 0 || (!Extensions.Contains(ext) && !ext.Equals("txt", StringComparison.OrdinalIgnoreCase)))
+            return false;
+
+        var session = AppHostContext.Session;
+        var program = session.Program;
+        var model = program.Model;
+        if (!allowWhileJobRunning && model is { IsJobRunning: true } or { IsToolChanging: true })
+            return false;
+
+        var previousMessage = session.Grbl.Message;
+        session.MainWindow.IsProgramLoading = true;
+        session.Grbl.Message = "Loading program...";
+        try
+        {
+            await program.LoadAsync(path);
+        }
+        finally
+        {
+            session.MainWindow.IsProgramLoading = false;
+            if (session.Grbl.Message == "Loading program...")
+                session.Grbl.Message = previousMessage;
+        }
+
+        return true;
+    }
+
     public static void TryLoadFromArgs(IEnumerable<string> args, bool allowWhileJobRunning = false)
     {
         foreach (var arg in args)
             TryLoad(arg, allowWhileJobRunning);
+    }
+
+    public static async Task TryLoadFromArgsAsync(IEnumerable<string> args, bool allowWhileJobRunning = false)
+    {
+        foreach (var arg in args)
+            await TryLoadAsync(arg, allowWhileJobRunning);
     }
 
     public static void TryLoadFromIpcMessage(string message, bool allowWhileJobRunning = false)
@@ -49,6 +91,22 @@ public static class StartupFileHandler
         foreach (var line in message.Split(new[] { '\r', '\n' }, StringSplitOptions.RemoveEmptyEntries))
         {
             if (TryLoad(line, allowWhileJobRunning))
+                return;
+        }
+    }
+
+    public static async Task TryLoadFromIpcMessageAsync(string message, bool allowWhileJobRunning = false)
+    {
+        if (string.IsNullOrWhiteSpace(message))
+            return;
+
+        message = message.Trim();
+        if (await TryLoadAsync(message, allowWhileJobRunning))
+            return;
+
+        foreach (var line in message.Split(new[] { '\r', '\n' }, StringSplitOptions.RemoveEmptyEntries))
+        {
+            if (await TryLoadAsync(line, allowWhileJobRunning))
                 return;
         }
     }

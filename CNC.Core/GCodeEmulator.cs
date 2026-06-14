@@ -200,7 +200,7 @@ namespace CNC.Core
                             continue;
 
                         case NGCExpr.FlowControl.CALL:
-                            var sub = Sub.Where(s => s.Label == fc.O).FirstOrDefault();
+                            var sub = FindSub((int)fc.O);
                             if(sub != null) foreach (var cmd in run(sub.Tokens))
                                 yield return cmd;
                             continue;
@@ -245,7 +245,7 @@ namespace CNC.Core
                     case Commands.G3:
                         {
                             var arc = token as GCArc;
-                            if (coordinateSystem.Rotation != 0d)
+                            if (coordinateSystem is { Rotation: not 0d })
                             {
                                 var move = arc.Values.ToArray();
                                 var ijk = arc.IJKvalues.ToArray();
@@ -301,7 +301,7 @@ namespace CNC.Core
                             if (gcsys.P == 0)
                                 csys = coordinateSystem;
                             else
-                                csys = coordinateSystems.Where(x => x.Code == gcsys.Code).FirstOrDefault();
+                                csys = FindCoordinateSystem(gcsys.Code);
                             foreach (int i in gcsys.AxisFlags.ToIndices())
                             {
                                 csys.Values[i] = gcsys.Values[i];
@@ -518,7 +518,7 @@ namespace CNC.Core
                     case Commands.G59_3:
                         {
                             string cs = token.Command.ToString().Replace('_', '.');
-                            coordinateSystem = coordinateSystems.Where(x => x.Code == cs).FirstOrDefault();
+                            coordinateSystem = FindCoordinateSystem(cs);
                             if (coordinateSystem != null)
                             {
                                 foreach (int i in AxisFlags.All.ToIndices()) // GrblInfo.AxisFlags?
@@ -846,6 +846,28 @@ namespace CNC.Core
             action.End = machinePos.Point3D;
 
             return action.End;
+        }
+
+        private GCodeSub FindSub(int label)
+        {
+            for (var i = 0; i < Sub.Count; i++)
+            {
+                if (Sub[i].Label == label)
+                    return Sub[i];
+            }
+
+            return null;
+        }
+
+        private CoordinateSystem FindCoordinateSystem(string code)
+        {
+            for (var i = 0; i < coordinateSystems.Count; i++)
+            {
+                if (coordinateSystems[i].Code == code)
+                    return coordinateSystems[i];
+            }
+
+            return null;
         }
     }
 }

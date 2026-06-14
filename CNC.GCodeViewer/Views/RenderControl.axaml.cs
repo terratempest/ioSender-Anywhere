@@ -1,4 +1,5 @@
 using System.ComponentModel;
+using System.Diagnostics;
 using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Input;
@@ -104,8 +105,24 @@ public partial class RenderControl : UserControl
         RequestRender(start);
     }
 
+    public void CancelPreviewBuild()
+    {
+#if DEBUG
+        var watch = Stopwatch.StartNew();
+#endif
+        _renderPending = false;
+        CancelPathBuild();
+#if DEBUG
+        watch.Stop();
+        Trace.WriteLine($"G-code preview cancel requested in {watch.ElapsedMilliseconds} ms");
+#endif
+    }
+
     public void TryLoadProgram()
     {
+#if DEBUG
+        var watch = Stopwatch.StartNew();
+#endif
         if (!ViewerSession.Settings.IsEnabled)
         {
             Close();
@@ -118,7 +135,27 @@ public partial class RenderControl : UserControl
             Open(tokens);
         else
             Close();
+#if DEBUG
+        watch.Stop();
+        Trace.WriteLine($"G-code viewer TryLoadProgram completed in {watch.ElapsedMilliseconds} ms; tokens={tokens.Count}");
+#endif
     }
+
+    public bool TryLoadProgramIfVisible()
+    {
+        if (!IsPreviewEligible)
+            return false;
+
+        TryLoadProgram();
+        return true;
+    }
+
+    bool IsPreviewEligible =>
+        IsVisible
+        && IsEffectivelyVisible
+        && VisualRoot is not null
+        && Bounds.Width >= 4
+        && Bounds.Height >= 4;
 
     protected override void OnAttachedToVisualTree(VisualTreeAttachmentEventArgs e)
     {
@@ -130,7 +167,7 @@ public partial class RenderControl : UserControl
         GlViewport.ViewerConfig = ViewerSession.Settings;
         GlViewport.SetAnimationActive(true);
         SetStatus(_glInitFailed ? "3D view unavailable — OpenGL" : "3D view — ready");
-        TryLoadProgram();
+        TryLoadProgramIfVisible();
     }
 
     protected override void OnDetachedFromVisualTree(VisualTreeAttachmentEventArgs e)
@@ -189,14 +226,27 @@ public partial class RenderControl : UserControl
         var theme = _themeColors;
         SetStatus($"3D view — building toolpath ({tokenCount:N0} tokens)…");
 
+        ViewerSession.SetPreviewBuilding?.Invoke(true);
+
         var buildTask = Task.Run(() =>
         {
             try
             {
+#if DEBUG
+                var buildWatch = Stopwatch.StartNew();
+#endif
                 var cfg = ViewerSession.Settings;
                 var built = GCodePathBuilder.Build(tokens, start, cfg.ArcResolution, cfg.MinDistance, ct);
+#if DEBUG
+                var pathBuildMs = buildWatch.ElapsedMilliseconds;
+#endif
                 var bounds = PathBounds.FromSegments(built.Segments);
                 var scene = ToolpathSceneBuilder.Build(built.Segments, bounds, cfg, theme, ViewerSession.Grbl, ct);
+#if DEBUG
+                var sceneBuildMs = buildWatch.ElapsedMilliseconds - pathBuildMs;
+                buildWatch.Stop();
+                Trace.WriteLine($"G-code preview build completed in {buildWatch.ElapsedMilliseconds} ms; path={pathBuildMs} ms; scene={sceneBuildMs} ms; tokens={tokenCount}; motions={built.MotionCount}");
+#endif
                 Dispatcher.UIThread.Post(() =>
                 {
                     if (ReferenceEquals(_buildCts, cts))
@@ -206,25 +256,41 @@ public partial class RenderControl : UserControl
                     }
 
                     if (!IsCurrentBuild(buildVersion))
+                    {
+                        ViewerSession.SetPreviewBuilding?.Invoke(false);
                         return;
+                    }
 
                     try
                     {
                         if (!_renderPending)
+                        {
+                            ViewerSession.SetPreviewBuilding?.Invoke(false);
                             return;
+                        }
 
                         _renderPending = false;
+#if DEBUG
+                        var applyWatch = Stopwatch.StartNew();
+#endif
                         ApplyScene(built.Segments, built.ExecutedPathCache, bounds, built.MotionCount, scene);
+#if DEBUG
+                        applyWatch.Stop();
+                        Trace.WriteLine($"G-code preview UI apply completed in {applyWatch.ElapsedMilliseconds} ms; tokens={tokenCount}; motions={built.MotionCount}");
+#endif
+                        ViewerSession.SetPreviewBuilding?.Invoke(false);
                     }
                     catch (OperationCanceledException)
                     {
+                        ViewerSession.SetPreviewBuilding?.Invoke(false);
                     }
                     catch (Exception)
                     {
                         _renderPending = false;
+                        ViewerSession.SetPreviewBuilding?.Invoke(false);
                         SetStatus("3D view — build failed");
                     }
-                }, DispatcherPriority.Background);
+                }, DispatcherPriority.ApplicationIdle);
             }
             catch (OperationCanceledException)
             {
@@ -235,6 +301,7 @@ public partial class RenderControl : UserControl
                         _pathBuildInProgress = false;
                         _buildCts = null;
                     }
+                    ViewerSession.SetPreviewBuilding?.Invoke(false);
                 });
             }
             catch (Exception ex)
@@ -248,9 +315,13 @@ public partial class RenderControl : UserControl
                     }
 
                     if (!IsCurrentBuild(buildVersion))
+                    {
+                        ViewerSession.SetPreviewBuilding?.Invoke(false);
                         return;
+                    }
 
                     _renderPending = false;
+                    ViewerSession.SetPreviewBuilding?.Invoke(false);
                     SetStatus($"3D view — build failed: {ex.GetType().Name}");
                 });
             }
@@ -281,6 +352,9 @@ public partial class RenderControl : UserControl
         int motionCount,
         ViewerScene scene)
     {
+#if DEBUG
+        var watch = Stopwatch.StartNew();
+#endif
         _segments = segments;
         _executedPathCache = executedPathCache;
         ResetExecutedLayerCache();
@@ -296,6 +370,10 @@ public partial class RenderControl : UserControl
             SetStatus($"3D view — {motionCount:N0} motions, {pointCount:N0} preview points, {scene.LayerCount} layers");
             OverlayText.Text = $"Program: {motionCount:N0} motion commands";
         }
+#if DEBUG
+        watch.Stop();
+        Trace.WriteLine($"G-code viewer ApplyScene completed in {watch.ElapsedMilliseconds} ms; motions={motionCount}; points={pointCount}");
+#endif
     }
 
     void EnrichScene(ViewerScene scene)
@@ -652,7 +730,7 @@ public partial class RenderControl : UserControl
 
         if (e.PropertyName is nameof(GCodeViewerConfig.IsEnabled))
         {
-            TryLoadProgram();
+            TryLoadProgramIfVisible();
             return;
         }
 

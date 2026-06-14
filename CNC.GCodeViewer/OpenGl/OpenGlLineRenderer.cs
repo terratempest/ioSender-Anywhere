@@ -9,6 +9,7 @@ namespace CNC.GCodeViewer.Avalonia.OpenGl;
 /// <summary>Uploads and draws line layers with a simple MVP shader.</summary>
 internal sealed class OpenGlLineRenderer : IDisposable
 {
+    internal const int MaxVerticesPerUploadChunk = 250_000;
     const int FloatsPerVertex = 3;
     const int GlLines = 0x0001;
     const int GlTriangles = 0x0004;
@@ -147,81 +148,105 @@ internal sealed class OpenGlLineRenderer : IDisposable
     {
         foreach (var layer in source)
         {
-            var vertices = LayerVertices(layer.Points);
             var primitiveKind = layer.PrimitiveKind;
-
-            if (!IsDrawable(primitiveKind, vertices.Length))
+            if (!IsDrawable(primitiveKind, layer.Points.Count))
                 continue;
 
-            var vbo = gl.GenBuffer();
-            if (vbo == 0)
+            foreach (var (start, count) in ChunkVertices(layer.Points.Count, primitiveKind))
             {
-                LastError = "OpenGL VBO unavailable";
-                return false;
+                var vbo = gl.GenBuffer();
+                if (vbo == 0)
+                {
+                    LastError = "OpenGL VBO unavailable";
+                    return false;
+                }
+
+                var vao = gl.GenVertexArray();
+                if (vao == 0)
+                {
+                    gl.DeleteBuffer(vbo);
+                    LastError = "OpenGL VAO unavailable";
+                    return false;
+                }
+
+                gl.BindVertexArray(vao);
+                gl.BindBuffer(GlConsts.GL_ARRAY_BUFFER, vbo);
+                UploadVertices(gl, layer.Points, start, count);
+                gl.VertexAttribPointer(PositionAttrib, 3, GlConsts.GL_FLOAT, 0, 0, IntPtr.Zero);
+                gl.EnableVertexAttribArray(PositionAttrib);
+
+                target.Add(new LayerGpu
+                {
+                    Vbo = vbo,
+                    Vao = vao,
+                    VertexCount = count,
+                    Color = layer.Color,
+                    PrimitiveKind = primitiveKind,
+                    LineWidth = Math.Max(1f, layer.LineWidth),
+                });
             }
-
-            var vao = gl.GenVertexArray();
-            if (vao == 0)
-            {
-                gl.DeleteBuffer(vbo);
-                LastError = "OpenGL VAO unavailable";
-                return false;
-            }
-
-            gl.BindVertexArray(vao);
-            gl.BindBuffer(GlConsts.GL_ARRAY_BUFFER, vbo);
-            UploadVertices(gl, vertices);
-            gl.VertexAttribPointer(PositionAttrib, 3, GlConsts.GL_FLOAT, 0, 0, IntPtr.Zero);
-            gl.EnableVertexAttribArray(PositionAttrib);
-
-            target.Add(new LayerGpu
-            {
-                Vbo = vbo,
-                Vao = vao,
-                VertexCount = vertices.Length / FloatsPerVertex,
-                Color = layer.Color,
-                PrimitiveKind = primitiveKind,
-                LineWidth = Math.Max(1f, layer.LineWidth),
-            });
         }
 
         return true;
     }
 
-    void DrawLayers(GlInterface gl, List<LayerGpu> layers)
+    internal static List<(int Start, int Count)> ChunkVertices(int vertexCount, ViewerPrimitiveKind primitiveKind)
     {
-        foreach (var layer in layers)
-        {
-            var rgba = layer.Color;
-            SetColor(gl, rgba.R / 255f, rgba.G / 255f, rgba.B / 255f, rgba.A / 255f);
-            _lineWidth?.Invoke(layer.LineWidth);
+        var primitiveVertexCount = PrimitiveVertexCount(primitiveKind);
+        var drawableVertexCount = vertexCount - vertexCount % primitiveVertexCount;
+        if (drawableVertexCount < primitiveVertexCount)
+            return [];
 
-            gl.BindVertexArray(layer.Vao);
-            gl.DrawArrays(ToGlPrimitive(layer.PrimitiveKind), 0, new IntPtr(layer.VertexCount));
-        }
-    }
+        var maxChunkVertices = MaxVerticesPerUploadChunk - MaxVerticesPerUploadChunk % primitiveVertexCount;
+        if (maxChunkVertices < primitiveVertexCount)
+            maxChunkVertices = primitiveVertexCount;
 
-    static void DeleteLayers(GlInterface gl, List<LayerGpu> layers)
-    {
-        foreach (var layer in layers)
+        var chunks = new List<(int Start, int Count)>((drawableVertexCount + maxChunkVertices - 1) / maxChunkVertices);
+        for (var start = 0; start < drawableVertexCount; start += maxChunkVertices)
         {
-            if (layer.Vao != 0)
-                gl.DeleteVertexArray(layer.Vao);
-            gl.DeleteBuffer(layer.Vbo);
+            var count = Math.Min(maxChunkVertices, drawableVertexCount - start);
+            count -= count % primitiveVertexCount;
+            if (count >= primitiveVertexCount)
+                chunks.Add((start, count));
         }
 
-        layers.Clear();
+        return chunks;
     }
 
-    static bool IsDrawable(ViewerPrimitiveKind primitiveKind, int vertexFloatCount) =>
-        primitiveKind switch
-        {
-            ViewerPrimitiveKind.Triangles => vertexFloatCount >= FloatsPerVertex * 3,
-            _ => vertexFloatCount >= FloatsPerVertex * 2,
-        };
+    static int PrimitiveVertexCount(ViewerPrimitiveKind primitiveKind) =>
+        primitiveKind == ViewerPrimitiveKind.Triangles ? 3 : 2;
+
+    static bool IsDrawable(ViewerPrimitiveKind primitiveKind, int vertexCount) =>
+        vertexCount >= PrimitiveVertexCount(primitiveKind);
 
     static int ToGlPrimitive(ViewerPrimitiveKind primitiveKind) =>
         primitiveKind == ViewerPrimitiveKind.Triangles ? GlTriangles : GlLines;
+
+    static void UploadVertices(
+        GlInterface gl,
+        IReadOnlyList<NumericVector3> points,
+        int start,
+        int count)
+    {
+        var vertices = new float[count * FloatsPerVertex];
+        for (var i = 0; i < count; i++)
+        {
+            var point = points[start + i];
+            var offset = i * FloatsPerVertex;
+            vertices[offset] = point.X;
+            vertices[offset + 1] = point.Y;
+            vertices[offset + 2] = point.Z;
+        }
+
+        unsafe
+        {
+            fixed (float* ptr = vertices)
+            {
+                var byteLen = new IntPtr(vertices.Length * sizeof(float));
+                gl.BufferData(GlConsts.GL_ARRAY_BUFFER, byteLen, new IntPtr(ptr), GlConsts.GL_STATIC_DRAW);
+            }
+        }
+    }
 
     static void UploadVertices(GlInterface gl, float[] vertices)
     {
@@ -254,19 +279,6 @@ internal sealed class OpenGlLineRenderer : IDisposable
         if (_uColorG >= 0) gl.Uniform1f(_uColorG, g);
         if (_uColorB >= 0) gl.Uniform1f(_uColorB, b);
         if (_uColorA >= 0) gl.Uniform1f(_uColorA, a);
-    }
-
-    static float[] LayerVertices(IReadOnlyList<NumericVector3> points)
-    {
-        var verts = new float[points.Count * FloatsPerVertex];
-        for (var i = 0; i < points.Count; i++)
-        {
-            verts[i * FloatsPerVertex] = points[i].X;
-            verts[i * FloatsPerVertex + 1] = points[i].Y;
-            verts[i * FloatsPerVertex + 2] = points[i].Z;
-        }
-
-        return verts;
     }
 
     static int CreateProgram(GlInterface gl, bool useOpenGlEs)
@@ -320,6 +332,31 @@ internal sealed class OpenGlLineRenderer : IDisposable
         }
 
         return null;
+    }
+
+    void DrawLayers(GlInterface gl, List<LayerGpu> layers)
+    {
+        foreach (var layer in layers)
+        {
+            var rgba = layer.Color;
+            SetColor(gl, rgba.R / 255f, rgba.G / 255f, rgba.B / 255f, rgba.A / 255f);
+            _lineWidth?.Invoke(layer.LineWidth);
+
+            gl.BindVertexArray(layer.Vao);
+            gl.DrawArrays(ToGlPrimitive(layer.PrimitiveKind), 0, new IntPtr(layer.VertexCount));
+        }
+    }
+
+    static void DeleteLayers(GlInterface gl, List<LayerGpu> layers)
+    {
+        foreach (var layer in layers)
+        {
+            if (layer.Vao != 0)
+                gl.DeleteVertexArray(layer.Vao);
+            gl.DeleteBuffer(layer.Vbo);
+        }
+
+        layers.Clear();
     }
 
     static (string Vertex, string Fragment) OpenGlEsShaders() => (

@@ -43,6 +43,8 @@ using System.Collections.Generic;
 using System.IO;
 using System.ComponentModel;
 using System.Collections.ObjectModel;
+using System.Globalization;
+using System.Diagnostics;
 using CNC.GCode;
 
 namespace CNC.Core
@@ -149,20 +151,48 @@ namespace CNC.Core
         public double min_feed { get; private set; }
         public double max_feed { get; private set; }
 
-        public bool LoadFile(string filename, bool addLineNumber = false)
+        public bool LoadFile(string filename, bool addLineNumber = false, bool raiseFileChanged = true)
         {
             bool ok = true, isComment;
             uint ln;
 
             FileInfo file = new FileInfo(filename);
-            using StreamReader sr = file.OpenText();
-
-            string? block = sr.ReadLine();
-            var staged = new List<GCodeBlock>();
+            var staged = new List<GCodeBlock>(EstimateBlockCapacity(file.Length));
 
             Reset();
             commands.Clear();
             this.filename = filename;
+
+            var loadWatch = Stopwatch.StartNew();
+            if (TryLoadFast(file, staged, addLineNumber))
+            {
+#if DEBUG
+                var swapWatch = Stopwatch.StartNew();
+#endif
+                ReplaceBlocks(staged);
+                BoundingBox.Conclude();
+#if DEBUG
+                swapWatch.Stop();
+#endif
+                NotifyFileChanged(filename, raiseFileChanged);
+#if DEBUG
+                Trace.WriteLine($"G-code fast load completed in {loadWatch.ElapsedMilliseconds} ms; swap={swapWatch.ElapsedMilliseconds} ms: {filename}");
+#endif
+                return true;
+            }
+
+#if DEBUG
+            Trace.WriteLine($"G-code fast load rejected after {loadWatch.ElapsedMilliseconds} ms: {filename}");
+            var fallbackWatch = Stopwatch.StartNew();
+#endif
+            Reset();
+            commands.Clear();
+            staged.Clear();
+            this.filename = filename;
+
+            using StreamReader sr = file.OpenText();
+
+            string? block = sr.ReadLine();
 
             while (block != null)
             {
@@ -210,8 +240,16 @@ namespace CNC.Core
 
             if (ok)
             {
+#if DEBUG
+                fallbackWatch.Stop();
+                var swapWatch = Stopwatch.StartNew();
+#endif
                 ReplaceBlocks(staged);
-                FinalizeLoadedProgram(filename);
+#if DEBUG
+                swapWatch.Stop();
+                Trace.WriteLine($"G-code fallback parse completed in {fallbackWatch.ElapsedMilliseconds} ms; swap={swapWatch.ElapsedMilliseconds} ms: {filename}");
+#endif
+                FinalizeLoadedProgram(filename, raiseFileChanged);
             }
             else
             {
@@ -221,26 +259,58 @@ namespace CNC.Core
             return ok;
         }
 
-        void ReplaceBlocks(IReadOnlyList<GCodeBlock> staged)
+        bool TryLoadFast(FileInfo file, List<GCodeBlock> staged, bool addLineNumber)
         {
-            blocks.Clear();
-            foreach (var item in staged)
-                blocks.Add(item);
+            if (GrblInfo.LatheUVWModeEnabled)
+                return false;
+
+            using var sr = file.OpenText();
+            var fast = new NativeFastLoad(Parser, BoundingBox);
+            string? block;
+
+            while ((block = sr.ReadLine()) != null)
+            {
+                block = block.Trim();
+                if (!fast.TryParseBlock(block, staged.Count + 1, ref LineNumber, ref addLineNumber, out var parsed))
+                    return false;
+
+                if (parsed != null)
+                    staged.Add(parsed);
+
+                if (fast.ProgramEnd)
+                    break;
+            }
+
+            return true;
         }
 
-        void FinalizeLoadedProgram(string filename)
+        void ReplaceBlocks(IReadOnlyList<GCodeBlock> staged)
         {
-#if DEBUG
-            System.Diagnostics.Stopwatch stopWatch = new System.Diagnostics.Stopwatch();
-            stopWatch.Start();
-#endif
+            blocks = staged is List<GCodeBlock> list
+                ? new ObservableCollection<GCodeBlock>(list)
+                : new ObservableCollection<GCodeBlock>(staged);
+        }
 
+        static int EstimateBlockCapacity(long fileLength)
+        {
+            if (fileLength <= 0)
+                return 0;
+
+            var estimate = fileLength / 32;
+            if (estimate > int.MaxValue)
+                return int.MaxValue;
+            return Math.Max(1024, (int)estimate);
+        }
+
+        void FinalizeLoadedProgram(string filename, bool raiseFileChanged)
+        {
             try
             {
+#if DEBUG
+                var boundsWatch = Stopwatch.StartNew();
+#endif
                 BoundingBox.Reset();
-
-                var syncWithController = Comms.com is { IsOpen: true };
-                GCodeEmulator emu = new GCodeEmulator(true, syncMachineState: syncWithController);
+                GCodeEmulator emu = new GCodeEmulator(true, syncMachineState: false);
 
                 foreach (var cmd in emu.Execute(Tokens))
                 {
@@ -260,17 +330,23 @@ namespace CNC.Core
                 }
 
                 BoundingBox.Conclude();
+#if DEBUG
+                boundsWatch.Stop();
+                Trace.WriteLine($"G-code bounds completed in {boundsWatch.ElapsedMilliseconds} ms; tokens={Tokens.Count}: {filename}");
+#endif
             }
             catch (Exception ex)
             {
                 GrblUi.ShowError($"Could not compute program bounds: {ex.Message}", "ioSender");
             }
 
-#if DEBUG
-            stopWatch.Stop();
-#endif
+            NotifyFileChanged(filename, raiseFileChanged);
+        }
 
-            FileChanged?.Invoke(filename);
+        void NotifyFileChanged(string filename, bool raiseFileChanged)
+        {
+            if (raiseFileChanged)
+                FileChanged?.Invoke(filename);
         }
 
         public void AddBlock(string block, Action action)
@@ -320,7 +396,7 @@ namespace CNC.Core
             }
 
             if (action == Action.End)
-                FinalizeLoadedProgram(filename);
+                FinalizeLoadedProgram(filename, true);
         }
 
         public void AddBlock(string block)
@@ -357,6 +433,396 @@ namespace CNC.Core
             HeightMapApplied = false;
             Parser.Reset();
         }
+    }
+
+    sealed class NativeFastLoad
+    {
+        readonly GCodeParser parser;
+        readonly GcodeBoundingBox bounds;
+        readonly double[] machine = new double[9];
+        readonly GCPlane[] planes =
+        [
+            new GCPlane(Commands.G17, 0, false),
+            new GCPlane(Commands.G18, 0, false),
+            new GCPlane(Commands.G19, 0, false)
+        ];
+
+        Commands motion = Commands.Undefined;
+        GCPlane plane;
+        DistanceMode distanceMode = DistanceMode.Absolute;
+        IJKMode ijkMode = IJKMode.Incremental;
+        bool imperial;
+        double feedrate;
+
+        public NativeFastLoad(GCodeParser parser, GcodeBoundingBox bounds)
+        {
+            this.parser = parser;
+            this.bounds = bounds;
+            plane = planes[0];
+        }
+
+        public bool ProgramEnd { get; private set; }
+
+        public bool TryParseBlock(string raw, int row, ref uint lineNumber, ref bool addLineNumber, out GCodeBlock? parsed)
+        {
+            parsed = null;
+            if (ProgramEnd)
+                return true;
+
+            var block = NormalizeBlock(raw);
+            if (block.Length == 0)
+                return true;
+
+            var isComment = IsComment(block);
+            if (isComment)
+            {
+                AdvanceLineNumber(block, 0, ref lineNumber, ref addLineNumber, out var display);
+                parsed = new GCodeBlock(lineNumber, display, display.Length + 1, true, false, row);
+                return true;
+            }
+
+            if (block.IndexOfAny(['#', '[', ']', '=', ':']) >= 0)
+                return false;
+            if (block.Contains('(') || block.Contains(';'))
+                return false;
+
+            var pos = 0;
+            var explicitLine = 0u;
+            var axis = AxisFlags.None;
+            var ijk = IJKFlags.None;
+            var values = new double[9];
+            var ijkValues = new double[3];
+            var r = 0d;
+            var hasR = false;
+            var hasMotionWord = false;
+            var sawSupportedWord = false;
+            var tokensStart = parser.Tokens.Count;
+
+            while (pos < block.Length)
+            {
+                var letter = char.ToUpperInvariant(block[pos++]);
+                if (!TryReadNumber(block, ref pos, out var value))
+                    return false;
+
+                switch (letter)
+                {
+                    case 'N':
+                        if (explicitLine != 0 || value < 0d || value > uint.MaxValue)
+                            return false;
+                        explicitLine = (uint)value;
+                        sawSupportedWord = true;
+                        break;
+
+                    case 'G':
+                        if (!TryApplyG(value, lineNumber, out var motionChanged, out var token))
+                            return false;
+                        if (token != null)
+                            parser.Tokens.Add(token);
+                        hasMotionWord |= motionChanged;
+                        sawSupportedWord = true;
+                        break;
+
+                    case 'M':
+                        if (value is 2d or 30d)
+                        {
+                            ProgramEnd = true;
+                            sawSupportedWord = true;
+                            break;
+                        }
+                        return false;
+
+                    case 'F':
+                        feedrate = imperial ? value * 25.4d : value;
+                        parser.Tokens.Add(new GCFeedrate(Commands.Feedrate, lineNumber, feedrate, false));
+                        sawSupportedWord = true;
+                        break;
+
+                    case 'X':
+                    case 'Y':
+                    case 'Z':
+                    case 'A':
+                    case 'B':
+                    case 'C':
+                    case 'U':
+                    case 'V':
+                    case 'W':
+                        var axisIndex = AxisIndex(letter);
+                        if (axisIndex < 0)
+                            return false;
+                        axis |= GCodeParser.AxisFlag[axisIndex];
+                        values[axisIndex] = imperial ? value * 25.4d : value;
+                        sawSupportedWord = true;
+                        break;
+
+                    case 'I':
+                    case 'J':
+                    case 'K':
+                        var ijkIndex = letter - 'I';
+                        ijk |= GCodeParser.IjkFlag[ijkIndex];
+                        ijkValues[ijkIndex] = imperial ? value * 25.4d : value;
+                        sawSupportedWord = true;
+                        break;
+
+                    case 'R':
+                        r = imperial ? value * 25.4d : value;
+                        hasR = true;
+                        sawSupportedWord = true;
+                        break;
+
+                    case 'P':
+                        return false;
+
+                    default:
+                        return false;
+                }
+            }
+
+            if (!sawSupportedWord)
+                return false;
+
+            AdvanceLineNumber(block, explicitLine, ref lineNumber, ref addLineNumber, out var displayBlock);
+            SetTokenLineNumbers(tokensStart, lineNumber);
+
+            if (!TryEmitMotion(lineNumber, axis, values, ijk, ijkValues, hasR, r, hasMotionWord))
+                return false;
+
+            parsed = new GCodeBlock(lineNumber, displayBlock, displayBlock.Length + 1, false, ProgramEnd, row);
+            return true;
+        }
+
+        static string NormalizeBlock(string block)
+        {
+            if (block.Length == 0)
+                return block;
+
+            var buffer = new char[block.Length];
+            var count = 0;
+            var inComment = false;
+            var keep = false;
+
+            foreach (var c in block)
+            {
+                switch (c)
+                {
+                    case '\t':
+                    case ' ':
+                        if (inComment || keep)
+                            buffer[count++] = ' ';
+                        break;
+                    case '(':
+                        inComment = true;
+                        buffer[count++] = c;
+                        break;
+                    case ')':
+                        inComment = false;
+                        buffer[count++] = c;
+                        break;
+                    case ';':
+                        keep = true;
+                        buffer[count++] = c;
+                        break;
+                    default:
+                        buffer[count++] = char.ToUpperInvariant(c);
+                        break;
+                }
+            }
+
+            return new string(buffer[..count]);
+        }
+
+        static bool IsComment(string block) =>
+            block[0] == ';' || block[0] == '(' && block.LastIndexOf(')') == block.Length - 1;
+
+        static bool TryReadNumber(string block, ref int pos, out double value)
+        {
+            value = default;
+            var start = pos;
+            while (pos < block.Length)
+            {
+                var c = block[pos];
+                if (char.IsLetter(c) || c == '(' || c == ';')
+                    break;
+                if (c is '[' or ']' or '#')
+                    break;
+                pos++;
+            }
+
+            return pos > start
+                && double.TryParse(block.AsSpan(start, pos - start), NumberStyles.Float, CultureInfo.InvariantCulture, out value);
+        }
+
+        bool TryApplyG(double value, uint lineNumber, out bool motionChanged, out GCodeToken? token)
+        {
+            motionChanged = false;
+            token = null;
+            var iv = (int)Math.Floor(value);
+            var fv = (int)Math.Round((value - iv) * 10d, 0);
+
+            switch (iv)
+            {
+                case 0 when fv == 0:
+                    motion = Commands.G0;
+                    motionChanged = true;
+                    return true;
+                case 1 when fv == 0:
+                    motion = Commands.G1;
+                    motionChanged = true;
+                    return true;
+                case 2 when fv == 0:
+                    motion = Commands.G2;
+                    motionChanged = true;
+                    return true;
+                case 3 when fv == 0:
+                    motion = Commands.G3;
+                    motionChanged = true;
+                    return true;
+                case 17 when fv == 0:
+                    plane = planes[0];
+                    token = new GCPlane(Commands.G17, lineNumber, false);
+                    return true;
+                case 18 when fv == 0:
+                    plane = planes[1];
+                    token = new GCPlane(Commands.G18, lineNumber, false);
+                    return true;
+                case 19 when fv == 0:
+                    plane = planes[2];
+                    token = new GCPlane(Commands.G19, lineNumber, false);
+                    return true;
+                case 20 when fv == 0:
+                    imperial = true;
+                    token = new GCUnits(Commands.G20, lineNumber, false);
+                    return true;
+                case 21 when fv == 0:
+                    imperial = false;
+                    token = new GCUnits(Commands.G21, lineNumber, false);
+                    return true;
+                case 90 when fv == 0:
+                    distanceMode = DistanceMode.Absolute;
+                    token = new GCDistanceMode(Commands.G90, lineNumber, false);
+                    return true;
+                case 91 when fv == 0:
+                    distanceMode = DistanceMode.Incremental;
+                    token = new GCDistanceMode(Commands.G91, lineNumber, false);
+                    return true;
+                case 90 when fv == 1:
+                    ijkMode = IJKMode.Absolute;
+                    token = new GCIJKMode(Commands.G90_1, lineNumber, false);
+                    return true;
+                case 91 when fv == 1:
+                    ijkMode = IJKMode.Incremental;
+                    token = new GCIJKMode(Commands.G91_1, lineNumber, false);
+                    return true;
+                default:
+                    return false;
+            }
+        }
+
+        bool TryEmitMotion(uint lineNumber, AxisFlags axis, double[] values, IJKFlags ijk, double[] ijkValues, bool hasR, double r, bool hasMotionWord)
+        {
+            if (axis == AxisFlags.None && ijk == IJKFlags.None && !hasR)
+                return true;
+
+            if (motion == Commands.Undefined)
+                return false;
+
+            if (motion == Commands.G1 && feedrate == 0d)
+                return false;
+
+            if (motion is Commands.G0 or Commands.G1)
+            {
+                if (ijk != IJKFlags.None || hasR)
+                    return false;
+
+                var token = new GCLinearMotion(motion, lineNumber, values, axis, false);
+                parser.Tokens.Add(token);
+                ApplyLinearBounds(values, axis);
+                return true;
+            }
+
+            if (motion is Commands.G2 or Commands.G3)
+            {
+                if (axis == AxisFlags.None || (ijk == IJKFlags.None) == !hasR)
+                    return false;
+
+                if (hasR)
+                {
+                    ijkValues[0] = ijkValues[1] = ijkValues[2] = double.NaN;
+                    ijk = IJKFlags.None;
+                }
+                else
+                {
+                    for (var i = 0; i < 3; i++)
+                    {
+                        if (!ijk.HasFlag(GCodeParser.IjkFlag[i]))
+                            ijkValues[i] = 0d;
+                    }
+                }
+
+                var start = new[] { machine[0], machine[1], machine[2] };
+                var token = new GCArc(motion, lineNumber, values, axis, ijkValues, ijk, r, 0, ijkMode, false);
+                parser.Tokens.Add(token);
+                bounds.AddBoundingBox(token.GetBoundingBox(plane, start, distanceMode == DistanceMode.Incremental));
+                ApplyEnd(values, axis);
+                return true;
+            }
+
+            return hasMotionWord;
+        }
+
+        void ApplyLinearBounds(double[] values, AxisFlags axis)
+        {
+            ApplyEnd(values, axis);
+            bounds.AddPoint(new Point3D(machine[0], machine[1], machine[2]), axis);
+        }
+
+        void ApplyEnd(double[] values, AxisFlags axis)
+        {
+            foreach (var i in axis.ToIndices())
+            {
+                machine[i] = distanceMode == DistanceMode.Incremental
+                    ? machine[i] + values[i]
+                    : values[i];
+            }
+        }
+
+        static void AdvanceLineNumber(string block, uint explicitLine, ref uint lineNumber, ref bool addLineNumber, out string displayBlock)
+        {
+            displayBlock = block;
+            if (explicitLine > 0)
+            {
+                lineNumber = explicitLine;
+                addLineNumber = false;
+            }
+            else if (addLineNumber)
+            {
+                lineNumber += 10;
+                displayBlock = "N" + lineNumber.ToString(CultureInfo.InvariantCulture) + block;
+            }
+            else
+            {
+                lineNumber++;
+            }
+        }
+
+        void SetTokenLineNumbers(int tokenStart, uint lineNumber)
+        {
+            for (var i = tokenStart; i < parser.Tokens.Count; i++)
+                parser.Tokens[i].LineNumber = lineNumber;
+        }
+
+        static int AxisIndex(char axis) => axis switch
+        {
+            'X' => 0,
+            'Y' => 1,
+            'Z' => 2,
+            'A' => 3,
+            'B' => 4,
+            'C' => 5,
+            'U' => 6,
+            'V' => 7,
+            'W' => 8,
+            _ => -1
+        };
     }
 
     public class ProgramLimits : ViewModelBase

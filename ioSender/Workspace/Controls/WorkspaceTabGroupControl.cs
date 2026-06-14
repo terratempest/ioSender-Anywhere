@@ -327,7 +327,7 @@ public sealed class WorkspaceTabGroupControl : UserControl
         WorkspaceEditorFactory.SetActivation(editor, true);
 
         if (editor is RenderControl viewer)
-            viewer.TryLoadProgram();
+            viewer.TryLoadProgramIfVisible();
     }
 
     void UpdateTitle()

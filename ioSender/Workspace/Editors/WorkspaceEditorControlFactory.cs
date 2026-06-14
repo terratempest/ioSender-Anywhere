@@ -35,7 +35,8 @@ public sealed class WorkspaceEditorControlFactory
             _session.AppConfig,
             (GrblViewModel)_grblContext,
             () => program.Tokens,
-            () => program.Data);
+            () => program.Data,
+            _session.MainWindow.SetPreviewBuilding);
     }
 
     public Control Create(WorkspaceEditorId id)

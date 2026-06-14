@@ -44,7 +44,8 @@ public partial class MainWindow : Window
                 _session.AppConfig,
                 _viewModel.Grbl,
                 () => _session.Program.Tokens,
-                () => _session.Program.Data),
+                () => _session.Program.Data,
+                _viewModel.SetPreviewBuilding),
             HorizontalAlignment = Avalonia.Layout.HorizontalAlignment.Stretch,
             VerticalAlignment = Avalonia.Layout.VerticalAlignment.Stretch,
         };

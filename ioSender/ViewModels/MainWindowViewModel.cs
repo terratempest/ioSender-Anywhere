@@ -8,7 +8,7 @@ using ioSender.Services;
 
 namespace ioSender.ViewModels;
 
-public sealed class MainWindowViewModel
+public sealed class MainWindowViewModel : ViewModelBase
 {
     private static MainWindowViewModel? _current;
     private readonly ConnectionService? _connectionService;
@@ -60,6 +60,46 @@ public sealed class MainWindowViewModel
     public ObservableCollection<SerialPortInfo> SerialPorts { get; } = new();
 
     public string StatusMessage { get; set; } = "ioSender";
+
+    bool _isProgramLoading;
+    bool _isPreviewBuilding;
+    int _previewBuilds;
+
+    public bool IsProgramLoading
+    {
+        get => _isProgramLoading;
+        set
+        {
+            if (_isProgramLoading == value)
+                return;
+            _isProgramLoading = value;
+            OnPropertyChanged();
+            OnPropertyChanged(nameof(IsProgramBusy));
+        }
+    }
+
+    public bool IsPreviewBuilding
+    {
+        get => _isPreviewBuilding;
+        set
+        {
+            if (_isPreviewBuilding == value)
+                return;
+            _isPreviewBuilding = value;
+            OnPropertyChanged();
+            OnPropertyChanged(nameof(IsProgramBusy));
+        }
+    }
+
+    public bool IsProgramBusy => IsProgramLoading || IsPreviewBuilding;
+
+    public void SetPreviewBuilding(bool isBuilding)
+    {
+        _previewBuilds = isBuilding
+            ? _previewBuilds + 1
+            : Math.Max(0, _previewBuilds - 1);
+        IsPreviewBuilding = _previewBuilds > 0;
+    }
 
     public void NotifyConnectionChanged() => ConnectionChanged?.Invoke();
 

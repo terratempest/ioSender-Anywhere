@@ -4,6 +4,7 @@ using Avalonia.Input;
 using Avalonia.Interactivity;
 using Avalonia.Threading;
 using Avalonia.VisualTree;
+using System.Diagnostics;
 using CNC.App.Workspace;
 using CNC.Controls.Avalonia.Services;
 using CNC.Core;
@@ -31,6 +32,7 @@ public partial class WorkspaceHost : UserControl
     WorkspaceSplitIntent? _activeSplitIntent;
     WorkspaceRegionChrome? _splitTarget;
     double _splitRatio = 0.5;
+    int _toolpathRefreshVersion;
     const double SplitPreviewThickness = 2;
 
     public event EventHandler? LayoutChanged;
@@ -92,7 +94,10 @@ public partial class WorkspaceHost : UserControl
         base.OnDetachedFromVisualTree(e);
     }
 
-    void OnProgramChanged() => RefreshToolpathViews();
+    void OnProgramChanged()
+    {
+        QueueToolpathRefresh();
+    }
 
     public void ApplyPreset(string presetName)
     {
@@ -134,7 +139,7 @@ public partial class WorkspaceHost : UserControl
         });
         RootPanel.Children.Add(content);
         SyncActiveEditors();
-        RefreshToolpathViews();
+        QueueToolpathRefresh();
         LayoutChanged?.Invoke(this, EventArgs.Empty);
     }
 
@@ -381,7 +386,7 @@ public partial class WorkspaceHost : UserControl
         var content = _factory!.GetOrCreate(leaf);
         chrome.SetEditorContent(content);
         if (content is RenderControl viewerControl)
-            viewerControl.TryLoadProgram();
+            viewerControl.TryLoadProgramIfVisible();
         chrome.RefreshTitle();
     }
 
@@ -419,7 +424,39 @@ public partial class WorkspaceHost : UserControl
         foreach (var control in _factory.AllCached)
         {
             if (control is RenderControl viewer)
-                viewer.TryLoadProgram();
+                viewer.TryLoadProgramIfVisible();
+        }
+    }
+
+    void QueueToolpathRefresh()
+    {
+        var version = ++_toolpathRefreshVersion;
+        Dispatcher.UIThread.Post(() =>
+        {
+            if (version != _toolpathRefreshVersion)
+                return;
+
+#if DEBUG
+            var watch = Stopwatch.StartNew();
+#endif
+            RefreshToolpathViews();
+#if DEBUG
+            watch.Stop();
+            Trace.WriteLine($"Workspace queued toolpath refresh completed in {watch.ElapsedMilliseconds} ms");
+#endif
+        }, DispatcherPriority.ApplicationIdle);
+    }
+
+    public void CancelToolpathViews()
+    {
+        _toolpathRefreshVersion++;
+        if (_factory is null)
+            return;
+
+        foreach (var control in _factory.AllCached)
+        {
+            if (control is RenderControl viewer)
+                viewer.CancelPreviewBuild();
         }
     }
 

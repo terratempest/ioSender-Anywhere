@@ -258,14 +258,14 @@
     </Border>
 
     <Grid x:Name="TabControlBar" RowDefinitions="Auto,*">
-      <Grid Grid.Row="0" ColumnDefinitions="Auto,*,Auto"
+      <Grid Grid.Row="0" ColumnDefinitions="Auto,*,Auto,Auto"
         Background="{DynamicResource ThemeControlLowBrush}">
 
         <StackPanel x:Name="QuickActions" Grid.Column="0" 
           Orientation="Horizontal" Spacing="4" Margin="4,3,6,3"
           VerticalAlignment="Center">
-          
-          <Button x:Name="BtnOpenProgram" 
+
+          <Button x:Name="BtnOpenProgram"
             Width="30" Height="30" Padding="5"
             ToolTip.Tip="Open program" Click="OnOpenGCodeClick">
             <Viewbox Width="20" Height="20">
@@ -335,7 +335,28 @@
 
         </TabControl>
 
-        <cnc:StatusControl Grid.Column="2"
+        <Border x:Name="ProgramBusySpinner"
+          Grid.Column="2"
+          Width="30" Height="30"
+          HorizontalAlignment="Right"
+          VerticalAlignment="Center"
+          Margin="4,3,4,3"
+          IsVisible="{Binding IsProgramBusy}"
+          ToolTip.Tip="Program load or preview build in progress">
+          <Viewbox Width="18" Height="18">
+            <Canvas x:Name="ProgramBusySpinnerIcon"
+              Width="24" Height="24"
+              RenderTransformOrigin="50%,50%">
+              <Canvas.RenderTransform>
+                <RotateTransform/>
+              </Canvas.RenderTransform>
+              <Path Fill="{DynamicResource ThemeForegroundBrush}"
+                    Data="M12,3 C7.0,3 3,7.0 3,12 L5.2,12 C5.2,8.2 8.2,5.2 12,5.2 C15.8,5.2 18.8,8.2 18.8,12 L21,12 C21,7.0 17.0,3 12,3 Z M18.8,12 L22,12 L19.9,15.1 Z"/>
+            </Canvas>
+          </Viewbox>
+        </Border>
+
+        <cnc:StatusControl Grid.Column="3"
           DataContext="{Binding Grbl}"
           HorizontalAlignment="Right"
           VerticalAlignment="Center"
