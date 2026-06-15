@@ -236,6 +236,21 @@ public sealed class GrblViewModelReadoutTests
     }
 
     [Fact]
+    public void ExecutionProgress_start_boundary_marks_skipped_range_available()
+    {
+        var progress = new GCodeExecutionProgress();
+
+        progress.Reset(10);
+        progress.AdvanceTo(500);
+
+        Assert.True(progress.HasLineNumberReports);
+        Assert.True(progress.HasCompletedLines);
+        Assert.Equal(10u, progress.StartLineNumber);
+        Assert.Equal(500u, progress.CurrentLineNumber);
+        Assert.Empty(progress.CompletedLineNumbers);
+    }
+
+    [Fact]
     public void DataReceived_status_report_notifies_machine_position_axes()
     {
         var vm = new GrblViewModel();

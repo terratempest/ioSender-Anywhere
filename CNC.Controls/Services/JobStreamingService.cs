@@ -203,7 +203,7 @@ public sealed class JobStreamingService
                 _job.ToolChangeLine = -1;
                 _model.BlockExecuting = fromBlock;
                 _job.CurrBlock = _job.AckPending = _job.PendingLine = fromBlock;
-                _model.ExecutionProgress.Reset();
+                _model.ExecutionProgress.Reset(GCode.Data[fromBlock].LineNum);
                 _job.SerialUsed = _missed = 0;
                 _job.Started = _job.Transferred = _job.HasError = _job.ToolChanged = false;
                 _job.NextRow = GCode.Data[fromBlock];

@@ -28,20 +28,28 @@ public sealed class GCodeCutPathSplit
 public sealed class GCodeExecutedPathCache
 {
     readonly List<ExecutedPathEntry> _entries;
+    readonly Dictionary<uint, int> _firstEntryByLine;
     readonly Dictionary<uint, int> _lastEntryByLine;
+    readonly List<(uint LineNumber, int FirstEntryIndex)> _lineEntryStarts;
     readonly double _minDistanceSquared;
 
     internal GCodeExecutedPathCache(List<ExecutedPathEntry> entries, double minDistanceSquared)
     {
         _entries = entries;
         _minDistanceSquared = minDistanceSquared;
+        _firstEntryByLine = [];
         _lastEntryByLine = [];
+        _lineEntryStarts = [];
 
         for (var i = 0; i < entries.Count; i++)
         {
             var line = entries[i].LineNumber;
             if (line != 0)
+            {
+                if (_firstEntryByLine.TryAdd(line, i))
+                    _lineEntryStarts.Add((line, i));
                 _lastEntryByLine[line] = i;
+            }
         }
     }
 
@@ -59,16 +67,25 @@ public sealed class GCodeExecutedPathCache
         return accumulator.GetPoints();
     }
 
-    public GCodeCutPathSplit BuildCutSplit(IReadOnlySet<uint> completedLineNumbers)
+    public GCodeCutPathSplit BuildCutSplit(int completedThroughEntryIndex, IReadOnlySet<uint> completedLineNumbers)
+        => BuildCutSplit(completedStartEntryIndex: 0, completedThroughEntryIndex, completedLineNumbers);
+
+    public GCodeCutPathSplit BuildCutSplit(
+        int completedStartEntryIndex,
+        int completedThroughEntryIndex,
+        IReadOnlySet<uint> completedLineNumbers)
     {
         var split = new GCodeCutPathSplit();
         if (_entries.Count == 0)
             return split;
 
+        completedStartEntryIndex = Math.Clamp(completedStartEntryIndex, 0, _entries.Count);
+        completedThroughEntryIndex = Math.Clamp(completedThroughEntryIndex, -1, _entries.Count - 1);
         var pendingCutCount = 0;
         var completedCutCount = 0;
-        foreach (var entry in _entries)
+        for (var i = 0; i < _entries.Count; i++)
         {
+            var entry = _entries[i];
             if (entry.Kind == ExecutedPathEntryKind.Reset)
             {
                 pendingCutCount = 0;
@@ -76,7 +93,8 @@ public sealed class GCodeExecutedPathCache
                 continue;
             }
 
-            if (completedLineNumbers.Contains(entry.LineNumber))
+            if ((i >= completedStartEntryIndex && i <= completedThroughEntryIndex) ||
+                completedLineNumbers.Contains(entry.LineNumber))
                 AddSegment(split.Completed, ref completedCutCount, entry.From, entry.To, _minDistanceSquared);
             else
                 AddSegment(split.Pending, ref pendingCutCount, entry.From, entry.To, _minDistanceSquared);
@@ -87,6 +105,24 @@ public sealed class GCodeExecutedPathCache
 
     internal bool TryGetLastEntryIndex(uint lineNumber, out int index) =>
         _lastEntryByLine.TryGetValue(lineNumber, out index);
+
+    public bool TryGetFirstEntryIndex(uint lineNumber, out int index) =>
+        _firstEntryByLine.TryGetValue(lineNumber, out index);
+
+    public bool TryGetFirstEntryIndexAtOrAfterLine(uint lineNumber, out int index)
+    {
+        foreach (var entryStart in _lineEntryStarts)
+        {
+            if (entryStart.LineNumber >= lineNumber)
+            {
+                index = entryStart.FirstEntryIndex;
+                return true;
+            }
+        }
+
+        index = _entries.Count;
+        return _entries.Count > 0 && _lineEntryStarts.Count > 0;
+    }
 
     internal bool ProcessRange(
         int startIndex,

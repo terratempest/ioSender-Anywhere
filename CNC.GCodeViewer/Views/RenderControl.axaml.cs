@@ -471,12 +471,41 @@ public partial class RenderControl : UserControl
         if (_executedLayerVersion == progress.CompletedVersion)
             return;
 
+        var completedStartEntryIndex = ResolveCompletedStartEntryIndex(progress);
+        var completedEntryIndex = ResolveCompletedEntryIndex(progress);
+        if (completedEntryIndex > progress.CompletedEntryIndex)
+            progress.SetCompletedEntryBoundary(completedEntryIndex);
+
         var cut = ViewerColors.ResolveCutColor(cfg, _themeColors);
         var completedLines = progress.SnapshotCompletedLineNumbers();
-        var split = _executedPathCache.BuildCutSplit(completedLines);
+        var split = _executedPathCache.BuildCutSplit(completedStartEntryIndex, progress.CompletedEntryIndex, completedLines);
         _pendingCutLayer = ViewerLineLayerBuilder.FromPoints(split.Pending, cut, 1.5f);
         _completedCutLayer = ViewerLineLayerBuilder.FromPoints(split.Completed, Dim(cut), 1.5f);
         _executedLayerVersion = progress.CompletedVersion;
+    }
+
+    int ResolveCompletedStartEntryIndex(GCodeExecutionProgress progress)
+    {
+        if (_executedPathCache == null || progress.StartLineNumber == 0)
+            return 0;
+
+        return _executedPathCache.TryGetFirstEntryIndexAtOrAfterLine(progress.StartLineNumber, out var startEntryIndex)
+            ? startEntryIndex
+            : 0;
+    }
+
+    int ResolveCompletedEntryIndex(GCodeExecutionProgress progress)
+    {
+        if (_executedPathCache == null || progress.CurrentExecutingLineNumber == 0)
+            return progress.CompletedEntryIndex;
+
+        var currentLine = progress.CurrentExecutingLineNumber;
+        if (!_executedPathCache.TryGetFirstEntryIndex(currentLine, out var currentEntryIndex) &&
+            !_executedPathCache.TryGetFirstEntryIndexAtOrAfterLine(currentLine, out currentEntryIndex))
+            return progress.CompletedEntryIndex;
+
+        var boundary = currentEntryIndex - 1;
+        return Math.Max(progress.CompletedEntryIndex, boundary);
     }
 
     void ClearCutColorLayers()

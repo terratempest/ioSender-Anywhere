@@ -186,11 +186,83 @@ public sealed class GCodePathBuilderTests
         var tokens = Parse("G21 G90 F100", "G1 X1 Y0", "G1 X2 Y0", "G1 X3 Y0");
         var split = GCodePathBuilder.Build(tokens, new Point3D())
             .ExecutedPathCache
-            .BuildCutSplit(new HashSet<uint> { 2, 4 });
+            .BuildCutSplit(completedThroughEntryIndex: -1, new HashSet<uint> { 2, 4 });
 
         Assert.Equal(
             [new NumericVector3(0f, 0f, 0f), new NumericVector3(1f, 0f, 0f),
              new NumericVector3(2f, 0f, 0f), new NumericVector3(3f, 0f, 0f)],
+            split.Completed);
+        Assert.Equal(
+            [new NumericVector3(1f, 0f, 0f), new NumericVector3(2f, 0f, 0f)],
+            split.Pending);
+    }
+
+    [Fact]
+    public void ExecutedPathCache_CutSplit_InfersCompletedSegmentsBetweenReportedLines()
+    {
+        var tokens = Parse("G21 G90 F100", "G1 X1 Y0", "G1 X2 Y0", "G1 X3 Y0");
+        var cache = GCodePathBuilder.Build(tokens, new Point3D()).ExecutedPathCache;
+        Assert.True(cache.TryGetFirstEntryIndex(4, out var currentEntryIndex));
+
+        var split = cache.BuildCutSplit(currentEntryIndex - 1, new HashSet<uint>());
+
+        Assert.Equal(
+            [new NumericVector3(0f, 0f, 0f), new NumericVector3(1f, 0f, 0f),
+             new NumericVector3(1f, 0f, 0f), new NumericVector3(2f, 0f, 0f)],
+            split.Completed);
+        Assert.Equal(
+            [new NumericVector3(2f, 0f, 0f), new NumericVector3(3f, 0f, 0f)],
+            split.Pending);
+    }
+
+    [Fact]
+    public void ExecutedPathCache_CutSplit_StartBoundaryKeepsEarlierSegmentsPending()
+    {
+        var tokens = Parse("G21 G90 F100", "G1 X1 Y0", "G1 X2 Y0", "G1 X3 Y0");
+        var cache = GCodePathBuilder.Build(tokens, new Point3D()).ExecutedPathCache;
+        Assert.True(cache.TryGetFirstEntryIndex(3, out var startEntryIndex));
+        Assert.True(cache.TryGetFirstEntryIndex(4, out var currentEntryIndex));
+
+        var split = cache.BuildCutSplit(startEntryIndex, currentEntryIndex - 1, new HashSet<uint>());
+
+        Assert.Equal(
+            [new NumericVector3(1f, 0f, 0f), new NumericVector3(2f, 0f, 0f)],
+            split.Completed);
+        Assert.Equal(
+            [new NumericVector3(0f, 0f, 0f), new NumericVector3(1f, 0f, 0f),
+             new NumericVector3(2f, 0f, 0f), new NumericVector3(3f, 0f, 0f)],
+            split.Pending);
+    }
+
+    [Fact]
+    public void ExecutedPathCache_LargeCutSplit_InfersSkippedReportedLines()
+    {
+        const int moves = 600;
+        var blocks = BuildLinearMoveBlocks(moves);
+        var cache = GCodePathBuilder.Build(Parse(blocks), new Point3D()).ExecutedPathCache;
+        Assert.True(cache.TryGetFirstEntryIndex(10, out var startEntryIndex));
+        Assert.True(cache.TryGetFirstEntryIndex(500, out var currentEntryIndex));
+
+        var split = cache.BuildCutSplit(startEntryIndex, currentEntryIndex - 1, new HashSet<uint>());
+
+        Assert.Equal(490 * 2, split.Completed.Count);
+        Assert.Equal(new NumericVector3(8f, 0f, 0f), split.Completed[0]);
+        Assert.Equal(new NumericVector3(498f, 0f, 0f), split.Completed[^1]);
+        Assert.Contains(new NumericVector3(0f, 0f, 0f), split.Pending);
+        Assert.Contains(new NumericVector3(499f, 0f, 0f), split.Pending);
+    }
+
+    [Fact]
+    public void ExecutedPathCache_FirstEntryAtOrAfterLine_UsesNextGeometryBoundary()
+    {
+        var tokens = Parse("G21 G90 F100", "G1 X1 Y0", "F200", "G1 X2 Y0");
+        var cache = GCodePathBuilder.Build(tokens, new Point3D()).ExecutedPathCache;
+
+        Assert.True(cache.TryGetFirstEntryIndexAtOrAfterLine(3, out var currentEntryIndex));
+        var split = cache.BuildCutSplit(currentEntryIndex - 1, new HashSet<uint>());
+
+        Assert.Equal(
+            [new NumericVector3(0f, 0f, 0f), new NumericVector3(1f, 0f, 0f)],
             split.Completed);
         Assert.Equal(
             [new NumericVector3(1f, 0f, 0f), new NumericVector3(2f, 0f, 0f)],
@@ -206,7 +278,7 @@ public sealed class GCodePathBuilderTests
 
         var split = GCodePathBuilder.Build(Parse(blocks), new Point3D())
             .ExecutedPathCache
-            .BuildCutSplit(completedLines);
+            .BuildCutSplit(completedThroughEntryIndex: -1, completedLines);
 
         Assert.Empty(split.Pending);
         Assert.True(split.Completed.Count > PathDecimator.MaxVerticesPerLayer);
