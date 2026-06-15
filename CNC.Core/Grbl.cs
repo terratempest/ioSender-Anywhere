@@ -1129,6 +1129,13 @@ namespace CNC.Core
 
         #endregion
 
+        internal static void ResetOptionalControllerFeatures()
+        {
+            NewOptions = string.Empty;
+            TrinamicDrivers = string.Empty;
+            HasPIDLog = false;
+        }
+
         public static string AxisIndexToLetter(int index)
         {
             return AxisLetters.Substring(index, 1);
@@ -1167,6 +1174,7 @@ namespace CNC.Core
             CancellationToken cancellationToken = new CancellationToken();
 
             PollGrbl.Suspend();
+            ResetOptionalControllerFeatures();
             SystemInfo.Clear();
 
             model.Silent = true;
@@ -1446,6 +1454,7 @@ namespace CNC.Core
                         break;
 
                     case "NEWOPT":
+                        ResetOptionalControllerFeatures();
                         NewOptions = valuepair[1];
                         string[] s2 = valuepair[1].Split(',');
                         foreach (string value in s2)

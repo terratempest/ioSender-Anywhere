@@ -17,6 +17,7 @@ public partial class GrblConfigView : UserControl
     {
         InitializeComponent();
         Configure(appBase);
+        SyncOptionalTabs();
     }
 
     public void Configure(BaseConfig? appBase)
@@ -28,6 +29,9 @@ public partial class GrblConfigView : UserControl
 
     public void Activate(bool activate)
     {
+        if (activate)
+            SyncOptionalTabs();
+
         if (activate == _activated)
             return;
 
@@ -38,10 +42,7 @@ public partial class GrblConfigView : UserControl
     protected override void OnLoaded(RoutedEventArgs e)
     {
         base.OnLoaded(e);
-        if (string.IsNullOrEmpty(GrblInfo.TrinamicDrivers))
-            RemoveTab(GrblConfigType.Trinamic);
-        if (!GrblInfo.HasPIDLog)
-            RemoveTab(GrblConfigType.PidTuning);
+        SyncOptionalTabs();
     }
 
     void OnTabSelectionChanged(object? sender, SelectionChangedEventArgs e)
@@ -73,15 +74,45 @@ public partial class GrblConfigView : UserControl
         return null;
     }
 
-    void RemoveTab(GrblConfigType type)
+    void SyncOptionalTabs()
     {
-        foreach (var tab in UIUtils.FindLogicalChildren<TabItem>(tabConfig))
+        var selectedTab = tabConfig.SelectedItem as TabItem;
+
+        PlaceTab(tabTrinamic, !string.IsNullOrEmpty(GrblInfo.TrinamicDrivers), 1);
+        PlaceTab(tabPIDTuner, GrblInfo.HasPIDLog, IndexOfTab(tabTrinamic) >= 0 ? 2 : 1);
+
+        if (selectedTab != null && IndexOfTab(selectedTab) < 0)
+            tabConfig.SelectedItem = tabConfig.Items.Count > 0 ? tabConfig.Items[0] : null;
+    }
+
+    void PlaceTab(TabItem tab, bool show, int targetIndex)
+    {
+        var currentIndex = IndexOfTab(tab);
+        if (!show)
         {
-            if (GetView(tab)?.GrblConfigType == type)
-            {
+            if (currentIndex >= 0)
                 tabConfig.Items.Remove(tab);
-                break;
-            }
+            return;
         }
+
+        targetIndex = Math.Clamp(targetIndex, 0, tabConfig.Items.Count);
+        if (currentIndex < 0)
+            tabConfig.Items.Insert(targetIndex, tab);
+        else if (currentIndex != targetIndex)
+        {
+            tabConfig.Items.Remove(tab);
+            tabConfig.Items.Insert(Math.Min(targetIndex, tabConfig.Items.Count), tab);
+        }
+    }
+
+    int IndexOfTab(TabItem tab)
+    {
+        for (var i = 0; i < tabConfig.Items.Count; i++)
+        {
+            if (ReferenceEquals(tabConfig.Items[i], tab))
+                return i;
+        }
+
+        return -1;
     }
 }

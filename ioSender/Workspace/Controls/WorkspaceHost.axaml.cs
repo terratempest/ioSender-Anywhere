@@ -460,6 +460,19 @@ public partial class WorkspaceHost : UserControl
         }
     }
 
+    public void CloseToolpathViews()
+    {
+        _toolpathRefreshVersion++;
+        if (_factory is null)
+            return;
+
+        foreach (var control in _factory.AllCached)
+        {
+            if (control is RenderControl viewer)
+                viewer.Close();
+        }
+    }
+
     protected override void OnPropertyChanged(AvaloniaPropertyChangedEventArgs change)
     {
         base.OnPropertyChanged(change);

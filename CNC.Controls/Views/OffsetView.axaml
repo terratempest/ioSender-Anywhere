@@ -29,9 +29,9 @@
             BorderBrush="{DynamicResource ThemeBorderLowBrush}">
 
       <DataGrid x:Name="dgrOffsets"
-                HorizontalAlignment="Stretch"
-                IsReadOnly="True"
-                SelectionMode= "Single"
+              HorizontalAlignment="Stretch"
+              IsReadOnly="True"
+              SelectionMode= "Single"
                 
                 AutoGenerateColumns="False"
                 CanUserReorderColumns="False"
@@ -53,6 +53,51 @@
           <Style Selector="DataGridColumnHeader:not(:sortascending):not(:sortdescending) ContentPresenter#PART_ContentPresenter">
             <Setter Property="Grid.ColumnSpan" Value="2"/>
             <Setter Property="Padding" Value="0,0,10,0"/>
+          </Style>
+          <Style Selector="DataGridCell:pointerover">
+            <Setter Property="Background" Value="Transparent"/>
+            <Setter Property="BorderBrush" Value="Transparent"/>
+          </Style>
+          <Style Selector="DataGridCell:current">
+            <Setter Property="Background" Value="Transparent"/>
+            <Setter Property="BorderBrush" Value="Transparent"/>
+          </Style>
+          <Style Selector="DataGrid:focus DataGridCell:current">
+            <Setter Property="Background" Value="Transparent"/>
+            <Setter Property="BorderBrush" Value="Transparent"/>
+          </Style>
+          <Style Selector="DataGridCell /template/ Rectangle#BackgroundRectangle">
+            <Setter Property="Fill" Value="Transparent"/>
+          </Style>
+          <Style Selector="DataGridCell:pointerover /template/ Rectangle#BackgroundRectangle">
+            <Setter Property="Fill" Value="Transparent"/>
+          </Style>
+          <Style Selector="DataGridCell:current /template/ Rectangle#BackgroundRectangle">
+            <Setter Property="Fill" Value="Transparent"/>
+          </Style>
+          <Style Selector="DataGridCell /template/ Rectangle#CurrencyVisual">
+            <Setter Property="IsVisible" Value="False"/>
+            <Setter Property="Fill" Value="Transparent"/>
+          </Style>
+          <Style Selector="DataGridRow:selected">
+            <Setter Property="Background" Value="{DynamicResource ThemeControlHighlightMidBrush}"/>
+          </Style>
+          <Style Selector="DataGridRow:selected /template/ Rectangle#BackgroundRectangle">
+            <Setter Property="Fill" Value="{DynamicResource ThemeControlHighlightMidBrush}"/>
+          </Style>
+          <Style Selector="DataGridRow:pointerover:selected /template/ Rectangle#BackgroundRectangle">
+            <Setter Property="Fill" Value="{DynamicResource ThemeControlHighlightMidBrush}"/>
+          </Style>
+          <Style Selector="DataGrid:focus DataGridRow:selected /template/ Rectangle#BackgroundRectangle">
+            <Setter Property="Fill" Value="{DynamicResource ThemeControlHighlightMidBrush}"/>
+          </Style>
+          <Style Selector="DataGridCell:selected">
+            <Setter Property="Background" Value="Transparent"/>
+            <Setter Property="BorderBrush" Value="Transparent"/>
+          </Style>
+          <Style Selector="DataGrid:focus DataGridCell:selected">
+            <Setter Property="Background" Value="Transparent"/>
+            <Setter Property="BorderBrush" Value="Transparent"/>
           </Style>
           <Style Selector="DataGridCell:current /template/ Grid#FocusVisual">
             <Setter Property="IsVisible" Value="False"/>

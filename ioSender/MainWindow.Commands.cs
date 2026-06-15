@@ -282,7 +282,7 @@ public partial class MainWindow : Window
             return;
         }
 
-        CancelActivePreviewBuilds();
+        CloseActivePreviewViews();
         _programService.Close();
     }
 
@@ -297,6 +297,20 @@ public partial class MainWindow : Window
 #if DEBUG
         watch.Stop();
         Trace.WriteLine($"Active preview cancellation fanout completed in {watch.ElapsedMilliseconds} ms");
+#endif
+    }
+
+    void CloseActivePreviewViews()
+    {
+#if DEBUG
+        var watch = Stopwatch.StartNew();
+#endif
+        JobViewControl.WorkspaceHost.CloseToolpathViews();
+        if (_viewerPreviewWindow?.Content is RenderControl viewer)
+            viewer.Close();
+#if DEBUG
+        watch.Stop();
+        Trace.WriteLine($"Active preview close fanout completed in {watch.ElapsedMilliseconds} ms");
 #endif
     }
 

@@ -9,6 +9,8 @@ using Avalonia.Data;
 using Avalonia.Controls.Templates;
 using Avalonia.Media;
 using Avalonia.Layout;
+using Avalonia.Markup.Xaml.MarkupExtensions;
+using CNC.Controls.Avalonia.Converters;
 
 namespace CNC.Controls.Avalonia.Views;
 
@@ -204,9 +206,9 @@ public partial class OffsetView : UserControl{
 
         dgrOffsets.Columns.Clear();
 
-        dgrOffsets.Columns.Add(new DataGridTextColumn{
+        dgrOffsets.Columns.Add(new DataGridTemplateColumn{
             Header = "Offset",
-            Binding = new Binding("Code"),
+            CellTemplate = BuildOffsetCellTemplate(),
             Width = new DataGridLength(80, DataGridLengthUnitType.Pixel)
         });
 
@@ -227,6 +229,50 @@ public partial class OffsetView : UserControl{
         if (_selectedOffset != null)
             dgrOffsets.SelectedItem = _selectedOffset;
     }    
+    IDataTemplate BuildOffsetCellTemplate(){
+        return new FuncDataTemplate<CoordinateSystem>((row, _) =>{
+            var accent = new Border{
+                Width = 4,
+                HorizontalAlignment = HorizontalAlignment.Left,
+                VerticalAlignment = VerticalAlignment.Stretch,
+                Background = Brushes.Transparent
+            };
+            accent.Classes.Add("offset-accent");
+            accent[!Border.BackgroundProperty] = new MultiBinding{
+                Bindings ={
+                    new Binding("IsSelected"){
+                        RelativeSource = new RelativeSource(RelativeSourceMode.FindAncestor){
+                            AncestorType = typeof(DataGridRow)
+                        }
+                    },
+                    new DynamicResourceExtension("ThemeAccentBrush"),
+                    new Binding{ Source = Brushes.Transparent }
+                },
+                Converter = new BoolToBrushConverter()
+            };
+
+            var text = new TextBlock{
+                Text = row?.Code ?? string.Empty,
+                VerticalAlignment = VerticalAlignment.Center,
+                HorizontalAlignment = HorizontalAlignment.Left,
+                TextAlignment = TextAlignment.Left,
+                Margin = new Thickness(8, 0, 4, 0)
+            };
+            text[!TextBlock.ForegroundProperty] = new DynamicResourceExtension("ThemeForegroundBrush");
+            Grid.SetColumn(text, 1);
+
+            return new Grid{
+                ColumnDefinitions = new ColumnDefinitions("4,*"),
+                HorizontalAlignment = HorizontalAlignment.Stretch,
+                VerticalAlignment = VerticalAlignment.Stretch,
+                Children ={
+                    accent,
+                    text
+                }
+            };
+        });
+    }
+
     IDataTemplate BuildAxisHeaderTemplate(OffsetAxisRow axis){
         return new FuncDataTemplate<object>((_, _) =>{
             var brush = AxisBrush(axis.Axis);
