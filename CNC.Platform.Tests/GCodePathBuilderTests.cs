@@ -163,6 +163,81 @@ public sealed class GCodePathBuilderTests
     }
 
     [Fact]
+    public void ExecutedPathCache_LargeCompletedCut_PreservesSegmentsBeyondLayerCap()
+    {
+        const int moves = PathDecimator.MaxVerticesPerLayer / 2 + 1;
+        var blocks = BuildLinearMoveBlocks(moves);
+        var completedLines = Enumerable.Range(2, moves).Select(line => (uint)line).ToHashSet();
+
+        var points = GCodePathBuilder.Build(Parse(blocks), new Point3D())
+            .ExecutedPathCache
+            .BuildCompletedCut(completedLines);
+
+        Assert.True(points.Count > PathDecimator.MaxVerticesPerLayer);
+        Assert.Equal(0, points.Count % 2);
+        Assert.Equal(moves * 2, points.Count);
+        Assert.Equal(new NumericVector3(0f, 0f, 0f), points[0]);
+        Assert.Equal(new NumericVector3(moves, 0f, 0f), points[^1]);
+    }
+
+    [Fact]
+    public void ExecutedPathCache_CutSplit_SeparatesPendingAndCompletedSegments()
+    {
+        var tokens = Parse("G21 G90 F100", "G1 X1 Y0", "G1 X2 Y0", "G1 X3 Y0");
+        var split = GCodePathBuilder.Build(tokens, new Point3D())
+            .ExecutedPathCache
+            .BuildCutSplit(new HashSet<uint> { 2, 4 });
+
+        Assert.Equal(
+            [new NumericVector3(0f, 0f, 0f), new NumericVector3(1f, 0f, 0f),
+             new NumericVector3(2f, 0f, 0f), new NumericVector3(3f, 0f, 0f)],
+            split.Completed);
+        Assert.Equal(
+            [new NumericVector3(1f, 0f, 0f), new NumericVector3(2f, 0f, 0f)],
+            split.Pending);
+    }
+
+    [Fact]
+    public void ExecutedPathCache_LargeCutSplit_PreservesCompletedSegmentsBeyondLayerCap()
+    {
+        const int moves = PathDecimator.MaxVerticesPerLayer / 2 + 1;
+        var blocks = BuildLinearMoveBlocks(moves);
+        var completedLines = Enumerable.Range(2, moves).Select(line => (uint)line).ToHashSet();
+
+        var split = GCodePathBuilder.Build(Parse(blocks), new Point3D())
+            .ExecutedPathCache
+            .BuildCutSplit(completedLines);
+
+        Assert.Empty(split.Pending);
+        Assert.True(split.Completed.Count > PathDecimator.MaxVerticesPerLayer);
+        Assert.Equal(0, split.Completed.Count % 2);
+        Assert.Equal(moves * 2, split.Completed.Count);
+        Assert.Equal(new NumericVector3(moves, 0f, 0f), split.Completed[^1]);
+    }
+
+    [Fact]
+    public void ExecutedPathAccumulator_LargeCompletedCut_AppendedMatchesRebuild()
+    {
+        const int moves = PathDecimator.MaxVerticesPerLayer / 2 + 1;
+        var blocks = BuildLinearMoveBlocks(moves);
+        var completedLines = Enumerable.Range(2, moves).Select(line => (uint)line).ToArray();
+        var cache = GCodePathBuilder.Build(Parse(blocks), new Point3D()).ExecutedPathCache;
+        var appended = cache.CreateAccumulator();
+        var rebuilt = cache.CreateAccumulator();
+
+        foreach (var line in completedLines)
+            Assert.True(appended.AppendCompletedLine(line));
+        rebuilt.Rebuild(completedLines.ToHashSet());
+
+        var appendedPoints = appended.GetPoints();
+        var rebuiltPoints = rebuilt.GetPoints();
+        Assert.Equal(rebuiltPoints, appendedPoints);
+        Assert.True(appendedPoints.Count > PathDecimator.MaxVerticesPerLayer);
+        Assert.Equal(0, appendedPoints.Count % 2);
+        Assert.Equal(new NumericVector3(moves, 0f, 0f), appendedPoints[^1]);
+    }
+
+    [Fact]
     public void CompletedCut_SkippedMotionsStillAdvanceInterpreterPosition()
     {
         var tokens = Parse("G21 G90 F100", "G1 X1 Y0", "G1 X2 Y0");
@@ -264,6 +339,16 @@ public sealed class GCodePathBuilderTests
         }
 
         return parser.Tokens;
+    }
+
+    static string[] BuildLinearMoveBlocks(int moves)
+    {
+        var blocks = new string[moves + 1];
+        blocks[0] = "G21 G90 F100";
+        for (var i = 1; i <= moves; i++)
+            blocks[i] = $"G1 X{i} Y0";
+
+        return blocks;
     }
 
     static void SetUseLinenumbers(bool value)

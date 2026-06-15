@@ -23,8 +23,6 @@ public partial class RenderControl : UserControl
 
     GCodePathSegments? _segments;
     GCodeExecutedPathCache? _executedPathCache;
-    GCodeExecutedPathAccumulator? _executedPathAccumulator;
-    readonly HashSet<uint> _executedLayerLines = [];
     PathBounds _bounds;
     IReadOnlyList<GCodeToken>? _tokens;
     GCodeViewerConfig? _subscribedConfig;
@@ -39,6 +37,8 @@ public partial class RenderControl : UserControl
     bool _dynamicLayerPending;
     bool _dynamicLayerImmediate;
     int _executedLayerVersion = -1;
+    ViewerLineLayer? _pendingCutLayer;
+    ViewerLineLayer? _completedCutLayer;
     int _renderWaitTicks;
     Point3D? _renderStartOverride;
     Point3D? _programStart;
@@ -381,7 +381,9 @@ public partial class RenderControl : UserControl
         var cfg = ViewerSession.Settings;
         scene.OriginAxes = ViewerAdornmentsBuilder.BuildOriginAxes(cfg, _bounds);
         scene.ViewCube = null;
-        scene.Executed = BuildExecutedLayer(cfg);
+        UpdateCutColorLayers(cfg);
+        scene.PendingCut = _pendingCutLayer;
+        scene.Executed = _completedCutLayer;
         ViewCube.IsVisible = cfg.ShowViewCube;
         scene.ToolMarkerLayers = BuildToolMarker(cfg);
         GlViewport.SetBackground(_themeColors.Background);
@@ -399,7 +401,8 @@ public partial class RenderControl : UserControl
         if (_segments == null)
             return;
         var cfg = ViewerSession.Settings;
-        GlViewport.UpdateDynamicLayers(BuildToolMarker(cfg), BuildExecutedLayer(cfg));
+        UpdateCutColorLayers(cfg);
+        GlViewport.UpdateDynamicLayers(BuildToolMarker(cfg), _pendingCutLayer, _completedCutLayer);
     }
 
     void QueueDynamicLayerUpdate(bool immediate = false)
@@ -450,71 +453,42 @@ public partial class RenderControl : UserControl
         _dynamicLayerTimer.Stop();
     }
 
-    ViewerLineLayer? BuildExecutedLayer(GCodeViewerConfig cfg)
+    void UpdateCutColorLayers(GCodeViewerConfig cfg)
     {
         if (_segments == null || _tokens == null || _executedPathCache == null || !cfg.RenderExecuted)
-            return null;
+        {
+            ClearCutColorLayers();
+            return;
+        }
 
-        var cut = ViewerColors.ResolveCutColor(cfg, _themeColors);
         var progress = ViewerSession.ExecutionProgress;
         if (!progress.HasCompletedLines)
-            return null;
+        {
+            ClearCutColorLayers();
+            return;
+        }
 
-        if (_executedPathAccumulator == null || _executedLayerVersion != progress.CompletedVersion)
-            RefreshExecutedLayerCache(progress);
-
-        var points = _executedPathAccumulator?.GetDecimatedPoints() ?? [];
-        return ViewerLineLayerBuilder.FromPoints(points, Dim(cut), 2f);
-    }
-
-    void RefreshExecutedLayerCache(GCodeExecutionProgress progress)
-    {
-        if (_executedPathCache == null)
+        if (_executedLayerVersion == progress.CompletedVersion)
             return;
 
-        _executedPathAccumulator ??= _executedPathCache.CreateAccumulator();
-
+        var cut = ViewerColors.ResolveCutColor(cfg, _themeColors);
         var completedLines = progress.SnapshotCompletedLineNumbers();
-        var appended = completedLines.Count >= _executedLayerLines.Count;
-        if (appended)
-        {
-            var newLines = completedLines
-                .Where(line => !_executedLayerLines.Contains(line))
-                .OrderBy(GetExecutedEntryIndex)
-                .ToArray();
-
-            foreach (var line in newLines)
-            {
-                if (!_executedPathAccumulator.AppendCompletedLine(line))
-                {
-                    appended = false;
-                    break;
-                }
-
-                _executedLayerLines.Add(line);
-            }
-        }
-
-        if (!appended)
-        {
-            _executedPathAccumulator.Rebuild(completedLines);
-            _executedLayerLines.Clear();
-            _executedLayerLines.UnionWith(completedLines);
-        }
-
+        var split = _executedPathCache.BuildCutSplit(completedLines);
+        _pendingCutLayer = ViewerLineLayerBuilder.FromPoints(split.Pending, cut, 1.5f);
+        _completedCutLayer = ViewerLineLayerBuilder.FromPoints(split.Completed, Dim(cut), 1.5f);
         _executedLayerVersion = progress.CompletedVersion;
     }
 
-    int GetExecutedEntryIndex(uint lineNumber) =>
-        _executedPathCache != null && _executedPathCache.TryGetLastEntryIndex(lineNumber, out var index)
-            ? index
-            : int.MaxValue;
+    void ClearCutColorLayers()
+    {
+        _pendingCutLayer = null;
+        _completedCutLayer = null;
+        _executedLayerVersion = -1;
+    }
 
     void ResetExecutedLayerCache()
     {
-        _executedPathAccumulator = _executedPathCache?.CreateAccumulator();
-        _executedLayerLines.Clear();
-        _executedLayerVersion = -1;
+        ClearCutColorLayers();
         _dynamicLayerPending = false;
         _dynamicLayerImmediate = false;
     }

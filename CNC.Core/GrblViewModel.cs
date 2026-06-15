@@ -1115,7 +1115,16 @@ namespace CNC.Core
                     if(!AxisHomed.Value.HasFlag(GrblInfo.AxisIndexToFlag(i)))
                         HomePosition.Values[i] = double.NaN;
                 }
+
+                var homingAxes = GrblInfo.HomingAxes == AxisFlags.None ? GrblInfo.AxisFlags : GrblInfo.HomingAxes;
+                HomedState = homingAxes == AxisFlags.None
+                    ? HomedState.Unknown
+                    : (AxisHomed.Value & homingAxes) == homingAxes
+                        ? HomedState.Homed
+                        : HomedState.NotHomed;
             }
+            else
+                HomedState = HomedState.Unknown;
         }
 
         public bool ParseStatus(string data)
@@ -1639,6 +1648,7 @@ namespace CNC.Core
                 var msg = Message;
                 ApplyToolLengthOffsetState(0);
                 GrblReset = true;
+                HomedState = HomedState.Unknown;
                 IsJobRunning = false;
                 OnGrblReset?.Invoke(data);
                 Message = msg;

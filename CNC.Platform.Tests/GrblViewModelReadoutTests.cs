@@ -109,7 +109,7 @@ public sealed class GrblViewModelReadoutTests
     }
 
     [Fact]
-    public void DataReceived_startup_banner_keeps_homed_state()
+    public void DataReceived_startup_banner_clears_homed_state_to_unknown()
     {
         var vm = new GrblViewModel { IsReady = true };
         vm.DataReceived("<Idle|MPos:0,0,0|H:1|Bf:15,128>");
@@ -117,7 +117,7 @@ public sealed class GrblViewModelReadoutTests
         vm.DataReceived("Grbl 1.1h ['$' for help]");
 
         Assert.Equal(GrblStates.Unknown, vm.GrblState.State);
-        Assert.Equal(HomedState.Homed, vm.HomedState);
+        Assert.Equal(HomedState.Unknown, vm.HomedState);
     }
 
     [Fact]
@@ -369,6 +369,79 @@ public sealed class GrblViewModelReadoutTests
         Assert.Equal(GrblStates.Alarm, vm.GrblState.State);
         Assert.Equal(11, vm.GrblState.Substate);
         Assert.Equal(HomedState.NotHomed, vm.HomedState);
+    }
+
+    [Fact]
+    public void DataReceived_home_report_sets_homed_when_all_required_axes_are_homed()
+    {
+        var oldHomingAxes = GrblInfo.HomingAxes;
+        var oldAxisFlags = GrblInfo.AxisFlags;
+
+        try
+        {
+            GrblInfo.HomingAxes = AxisFlags.XYZ;
+            SetStaticProperty(nameof(GrblInfo.AxisFlags), AxisFlags.XYZ);
+            var vm = new GrblViewModel();
+
+            vm.DataReceived("[HOME:0,0,0:7]");
+
+            Assert.Equal(AxisFlags.XYZ, vm.AxisHomed.Value);
+            Assert.Equal(HomedState.Homed, vm.HomedState);
+        }
+        finally
+        {
+            GrblInfo.HomingAxes = oldHomingAxes;
+            SetStaticProperty(nameof(GrblInfo.AxisFlags), oldAxisFlags);
+        }
+    }
+
+    [Theory]
+    [InlineData(3)]
+    [InlineData(0)]
+    public void DataReceived_home_report_sets_not_homed_when_required_axes_are_missing(int mask)
+    {
+        var oldHomingAxes = GrblInfo.HomingAxes;
+        var oldAxisFlags = GrblInfo.AxisFlags;
+
+        try
+        {
+            GrblInfo.HomingAxes = AxisFlags.XYZ;
+            SetStaticProperty(nameof(GrblInfo.AxisFlags), AxisFlags.XYZ);
+            var vm = new GrblViewModel();
+
+            vm.DataReceived($"[HOME:0,0,0:{mask}]");
+
+            Assert.Equal((AxisFlags)mask, vm.AxisHomed.Value);
+            Assert.Equal(HomedState.NotHomed, vm.HomedState);
+        }
+        finally
+        {
+            GrblInfo.HomingAxes = oldHomingAxes;
+            SetStaticProperty(nameof(GrblInfo.AxisFlags), oldAxisFlags);
+        }
+    }
+
+    [Fact]
+    public void DataReceived_home_report_sets_unknown_when_no_expected_axes_are_available()
+    {
+        var oldHomingAxes = GrblInfo.HomingAxes;
+        var oldAxisFlags = GrblInfo.AxisFlags;
+
+        try
+        {
+            GrblInfo.HomingAxes = AxisFlags.None;
+            SetStaticProperty(nameof(GrblInfo.AxisFlags), AxisFlags.None);
+            var vm = new GrblViewModel();
+
+            vm.DataReceived("[HOME:0,0,0:7]");
+
+            Assert.Equal(HomedState.Unknown, vm.HomedState);
+        }
+        finally
+        {
+            GrblInfo.HomingAxes = oldHomingAxes;
+            SetStaticProperty(nameof(GrblInfo.AxisFlags), oldAxisFlags);
+        }
     }
 
     [Fact]
@@ -652,5 +725,12 @@ public sealed class GrblViewModelReadoutTests
         vm.DataReceived("<Idle|MPos:0,0,0|A:S|FS:0,11000|Ov:100,100,110|Bf:15,128>");
         Assert.Equal(10000, vm.SpindleSetpointRPM);
         Assert.Equal(11000, vm.RPM);
+    }
+
+    static void SetStaticProperty<T>(string name, T value)
+    {
+        typeof(GrblInfo)
+            .GetProperty(name, System.Reflection.BindingFlags.Static | System.Reflection.BindingFlags.Public)!
+            .SetValue(null, value);
     }
 }

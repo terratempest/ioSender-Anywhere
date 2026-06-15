@@ -100,17 +100,26 @@ public class ToolpathGlControl : OpenGlControlBase
         SceneApplied?.Invoke(this, EventArgs.Empty);
     }
 
-    public void UpdateDynamicLayers(IReadOnlyList<ViewerLineLayer> toolMarkerLayers, ViewerLineLayer? executed)
+    public void UpdateDynamicLayers(
+        IReadOnlyList<ViewerLineLayer> toolMarkerLayers,
+        ViewerLineLayer? pendingCut,
+        ViewerLineLayer? executed)
     {
         if (_scene == null)
             return;
 
         var markerChanged = !ReferenceEquals(_scene.ToolMarkerLayers, toolMarkerLayers);
+        var wasCutSplit = _scene.PendingCut != null || _scene.Executed != null;
+        var pendingCutChanged = !ReferenceEquals(_scene.PendingCut, pendingCut);
         var executedChanged = !ReferenceEquals(_scene.Executed, executed);
         _scene.ToolMarker = null;
         _scene.ToolMarkerLayers = toolMarkerLayers;
+        _scene.PendingCut = pendingCut;
         _scene.Executed = executed;
-        if (markerChanged || executedChanged)
+        var cutSplitChanged = wasCutSplit != (_scene.PendingCut != null || _scene.Executed != null);
+        if (cutSplitChanged)
+            _sceneGpuDirty = true;
+        else if (markerChanged || pendingCutChanged || executedChanged)
             _dynamicGpuDirty = true;
         RequestNextFrameRendering();
     }
@@ -280,7 +289,7 @@ public class ToolpathGlControl : OpenGlControlBase
     {
         if (scene.Grid != null) yield return scene.Grid;
         if (scene.GridMajor != null) yield return scene.GridMajor;
-        if (scene.Cut != null) yield return scene.Cut;
+        if (scene.Cut != null && scene.PendingCut == null && scene.Executed == null) yield return scene.Cut;
         if (scene.Rapid != null) yield return scene.Rapid;
         if (scene.Retract != null) yield return scene.Retract;
         if (scene.JobBox != null) yield return scene.JobBox;
@@ -304,6 +313,7 @@ public class ToolpathGlControl : OpenGlControlBase
 
     static IEnumerable<ViewerLineLayer> DynamicLayers(ViewerScene scene)
     {
+        if (scene.PendingCut != null) yield return scene.PendingCut;
         if (scene.Executed != null) yield return scene.Executed;
         if (scene.ToolMarker != null) yield return scene.ToolMarker;
         foreach (var marker in scene.ToolMarkerLayers)

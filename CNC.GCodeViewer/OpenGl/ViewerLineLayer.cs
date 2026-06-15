@@ -29,7 +29,9 @@ public sealed class ViewerScene
     public ViewerLineLayer? GridMajor { get; init; }
     public ViewerLineLayer? JobBox { get; init; }
     public ViewerLineLayer? WorkBox { get; init; }
-    /// <summary>Completed cuts while job runs (highlight color).</summary>
+    /// <summary>Pending cuts while completed cuts are shown in a darker color.</summary>
+    public ViewerLineLayer? PendingCut { get; set; }
+    /// <summary>Completed cuts while job runs.</summary>
     public ViewerLineLayer? Executed { get; set; }
     public ViewerLineLayer? ViewCube { get; set; }
     public ViewerLineLayer? ToolMarker { get; set; }
@@ -43,13 +45,14 @@ public sealed class ViewerScene
         get
         {
             var n = 0;
-            if (Cut != null) n++;
+            if (Cut != null && PendingCut == null && Executed == null) n++;
             if (Rapid != null) n++;
             if (Retract != null) n++;
             if (Grid != null) n++;
             if (GridMajor != null) n++;
             if (JobBox != null) n++;
             if (WorkBox != null) n++;
+            if (PendingCut != null) n++;
             if (Executed != null) n++;
             if (ViewCube != null) n++;
             if (ToolMarker != null) n++;
@@ -64,11 +67,12 @@ public sealed class ViewerScene
     {
         if (Grid != null) yield return Grid;
         if (GridMajor != null) yield return GridMajor;
-        if (Cut != null) yield return Cut;
+        if (Cut != null && PendingCut == null && Executed == null) yield return Cut;
         if (Rapid != null) yield return Rapid;
         if (Retract != null) yield return Retract;
         if (JobBox != null) yield return JobBox;
         if (WorkBox != null) yield return WorkBox;
+        if (PendingCut != null) yield return PendingCut;
         if (Executed != null) yield return Executed;
         if (ViewCube != null) yield return ViewCube;
         foreach (var axis in OriginAxes)

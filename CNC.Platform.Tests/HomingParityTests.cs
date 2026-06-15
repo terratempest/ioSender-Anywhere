@@ -3,6 +3,7 @@ using System.Reflection;
 using CNC.Controls.Avalonia.Converters;
 using CNC.Controls.Avalonia.Services;
 using CNC.Core;
+using CNC.GCode;
 using CNC.GCodeViewer.Avalonia;
 using CNC.Platform.Abstractions;
 
@@ -178,10 +179,76 @@ public sealed class HomingParityTests : IDisposable
         }
     }
 
+    [Fact]
+    public void Settings_loaded_combines_grblhal_homing_cycle_masks()
+    {
+        var oldSettings = GrblSettings.Settings.ToList();
+        var oldIsGrblHal = GrblInfo.IsGrblHAL;
+        var oldHomingAxes = GrblInfo.HomingAxes;
+        var oldAxisFlags = GrblInfo.AxisFlags;
+
+        try
+        {
+            GrblSettings.Settings.Clear();
+            GrblInfo.IsGrblHAL = true;
+            SetStaticProperty(nameof(GrblInfo.AxisFlags), AxisFlags.XYZ);
+
+            SetSetting(GrblSetting.ReportInches, "0");
+            SetSetting(GrblSetting.SoftLimitsEnable, "0");
+            SetSetting(GrblSetting.HomingPulloff, "0.5");
+            SetSetting(GrblSetting.HomingDirMask, "0");
+            for (var i = 0; i < 3; i++)
+            {
+                SetSetting(GrblSetting.TravelResolutionBase + i, "100");
+                SetSetting(GrblSetting.MaxTravelBase + i, "100");
+            }
+            SetSetting((GrblSetting)grblHALSetting.HomingCycle_1, "1");
+            SetSetting((GrblSetting)grblHALSetting.HomingCycle_2, "2");
+            SetSetting((GrblSetting)grblHALSetting.HomingCycle_3, "4");
+            SetSetting((GrblSetting)grblHALSetting.HomingCycle_4, "0");
+            SetSetting((GrblSetting)grblHALSetting.HomingCycle_5, "0");
+            SetSetting((GrblSetting)grblHALSetting.HomingCycle_6, "0");
+
+            GrblInfo.OnSettingsLoaded(new GrblViewModel());
+
+            Assert.Equal(AxisFlags.XYZ, GrblInfo.HomingAxes);
+        }
+        finally
+        {
+            GrblInfo.IsGrblHAL = oldIsGrblHal;
+            GrblInfo.HomingAxes = oldHomingAxes;
+            SetStaticProperty(nameof(GrblInfo.AxisFlags), oldAxisFlags);
+            GrblSettings.Settings.Clear();
+            foreach (var setting in oldSettings)
+                GrblSettings.Settings.Add(setting);
+        }
+    }
+
     static void SetConnectionStream(ConnectionService connection, StreamComms stream)
     {
         var field = typeof(ConnectionService).GetField("_stream", BindingFlags.Instance | BindingFlags.NonPublic);
         field!.SetValue(connection, stream);
+    }
+
+    static void SetSetting(GrblSetting key, string value)
+    {
+        var setting = GrblSettings.Get(key);
+        if (setting == null)
+        {
+            setting = new GrblSettingDetails($"{(int)key}|0||||||");
+            GrblSettings.Settings.Add(setting);
+        }
+
+        setting.Value = value;
+        setting.Silent = true;
+        setting.IsDirty = false;
+    }
+
+    static void SetStaticProperty<T>(string name, T value)
+    {
+        typeof(GrblInfo)
+            .GetProperty(name, BindingFlags.Static | BindingFlags.Public)!
+            .SetValue(null, value);
     }
 
     sealed class EmptySerialPortDiscovery : ISerialPortDiscovery

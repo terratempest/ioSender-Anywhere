@@ -1093,6 +1093,7 @@ namespace CNC.Core
         public static bool HasReversableSpindle { get; private set; } = true;
         public static bool HomingEnabled { get; internal set; } = false;
         public static AxisFlags HomingDirection { get; internal set; } = AxisFlags.None;
+        public static AxisFlags HomingAxes { get; internal set; } = AxisFlags.None;
         public static bool UseLegacyRTCommands { get; internal set; } = true;
         public static bool MPGMode { get; set; }
         public static bool HasFirmwareJog { get; internal set; } = false;
@@ -1226,6 +1227,7 @@ namespace CNC.Core
             model.GrblState = model.GrblState; // Temporary hack to enable the Home button when homing is enabled
 
             HomingDirection = (AxisFlags)GrblSettings.GetInteger(GrblSetting.HomingDirMask);
+            HomingAxes = GetConfiguredHomingAxes();
 
             if (AxisFlags == AxisFlags.None)
             {
@@ -1260,6 +1262,19 @@ namespace CNC.Core
                 if (!(val = GrblSettings.GetDouble(grblHALSetting.JogFastSpeed)).Equals(double.NaN))
                     model.Keyboard.JogFeedrates[(int)KeypressHandler.JogMode.Fast] = val;
             }
+        }
+
+        private static AxisFlags GetConfiguredHomingAxes()
+        {
+            var homingAxes = AxisFlags.None;
+
+            if (IsGrblHAL)
+            {
+                for (int id = (int)grblHALSetting.HomingCycle_1; id <= (int)grblHALSetting.HomingCycle_6; id++)
+                    homingAxes |= (AxisFlags)GrblSettings.GetInteger((grblHALSetting)id);
+            }
+
+            return homingAxes == AxisFlags.None ? AxisFlags : homingAxes;
         }
 
         public static bool Get()

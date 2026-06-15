@@ -19,6 +19,12 @@ public sealed class GCodePathBuildResult
     public int MotionCount { get; init; }
 }
 
+public sealed class GCodeCutPathSplit
+{
+    public List<NumericVector3> Pending { get; } = [];
+    public List<NumericVector3> Completed { get; } = [];
+}
+
 public sealed class GCodeExecutedPathCache
 {
     readonly List<ExecutedPathEntry> _entries;
@@ -50,7 +56,33 @@ public sealed class GCodeExecutedPathCache
 
         var accumulator = CreateAccumulator();
         accumulator.Rebuild(completedLineNumbers);
-        return accumulator.GetDecimatedPoints();
+        return accumulator.GetPoints();
+    }
+
+    public GCodeCutPathSplit BuildCutSplit(IReadOnlySet<uint> completedLineNumbers)
+    {
+        var split = new GCodeCutPathSplit();
+        if (_entries.Count == 0)
+            return split;
+
+        var pendingCutCount = 0;
+        var completedCutCount = 0;
+        foreach (var entry in _entries)
+        {
+            if (entry.Kind == ExecutedPathEntryKind.Reset)
+            {
+                pendingCutCount = 0;
+                completedCutCount = 0;
+                continue;
+            }
+
+            if (completedLineNumbers.Contains(entry.LineNumber))
+                AddSegment(split.Completed, ref completedCutCount, entry.From, entry.To, _minDistanceSquared);
+            else
+                AddSegment(split.Pending, ref pendingCutCount, entry.From, entry.To, _minDistanceSquared);
+        }
+
+        return split;
     }
 
     internal bool TryGetLastEntryIndex(uint lineNumber, out int index) =>
@@ -143,7 +175,7 @@ public sealed class GCodeExecutedPathAccumulator
             _cache.ProcessRange(0, _cache.Count - 1, _completedLineNumbers, _points, ref _cutCount);
     }
 
-    public List<NumericVector3> GetDecimatedPoints() => PathDecimator.DecimateSegmentPairs(_points);
+    public List<NumericVector3> GetPoints() => _points;
 }
 
 internal enum ExecutedPathEntryKind
