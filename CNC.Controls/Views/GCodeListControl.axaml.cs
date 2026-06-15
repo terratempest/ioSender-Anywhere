@@ -5,6 +5,8 @@ using Avalonia.Controls;
 using Avalonia.Input;
 using Avalonia.Interactivity;
 using Avalonia.Platform.Storage;
+using Avalonia.Threading;
+using Avalonia.VisualTree;
 using CNC.Controls.Avalonia.Services;
 using CNC.Controls.Avalonia.ViewModels;
 using CNC.Core;
@@ -141,6 +143,64 @@ public partial class GCodeListControl : UserControl
 
         var block = _viewModel.Data[index];
         GCodeGrid.ScrollIntoView(block, null);
+        Dispatcher.UIThread.Post(() => CenterBlockInView(index, block), DispatcherPriority.Background);
+    }
+
+    void CenterBlockInView(int index, GCodeBlock block)
+    {
+        var scrollViewer = GCodeGrid.GetVisualDescendants().OfType<ScrollViewer>().FirstOrDefault();
+        if (scrollViewer == null)
+            return;
+
+        if (UsesLogicalScroll(scrollViewer, _viewModel.Data.Count))
+        {
+            scrollViewer.Offset = new Vector(scrollViewer.Offset.X, CalculateCenteredLogicalOffset(
+                index,
+                scrollViewer.Viewport.Height,
+                scrollViewer.ScrollBarMaximum.Y));
+            return;
+        }
+
+        var row = GCodeGrid.GetVisualDescendants()
+            .OfType<DataGridRow>()
+            .FirstOrDefault(row => ReferenceEquals(row.DataContext, block));
+
+        if (row == null)
+            return;
+
+        var center = row.TranslatePoint(new Point(row.Bounds.Width / 2d, row.Bounds.Height / 2d), scrollViewer);
+        if (center == null)
+            return;
+
+        scrollViewer.Offset = new Vector(scrollViewer.Offset.X, CalculateCenteredPixelOffset(
+            scrollViewer.Offset.Y,
+            center.Value.Y,
+            scrollViewer.Bounds.Height,
+            scrollViewer.ScrollBarMaximum.Y));
+    }
+
+    static bool UsesLogicalScroll(ScrollViewer scrollViewer, int itemCount) =>
+        scrollViewer.ScrollBarMaximum.Y <= itemCount;
+
+    internal static double CalculateCenteredLogicalOffset(
+        int index,
+        double viewportHeight,
+        double maxOffsetY)
+    {
+        var max = Math.Max(0d, maxOffsetY);
+        var centered = index - (viewportHeight / 2d);
+        return Math.Clamp(centered, 0d, max);
+    }
+
+    internal static double CalculateCenteredPixelOffset(
+        double currentOffsetY,
+        double rowCenterY,
+        double viewportHeight,
+        double maxOffsetY)
+    {
+        var max = Math.Max(0d, maxOffsetY);
+        var centered = currentOffsetY + rowCenterY - (viewportHeight / 2d);
+        return Math.Clamp(centered, 0d, max);
     }
 
     void OnLoadingRow(object? sender, DataGridRowEventArgs e)

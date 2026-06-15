@@ -52,6 +52,44 @@ public sealed class GCodeProgramConvertersTests
         Assert.Equal(expected, actual);
     }
 
+    [Theory]
+    [InlineData(100, 20, 400, 90)]
+    [InlineData(5, 20, 400, 0)]
+    [InlineData(395, 20, 400, 385)]
+    public void Centered_logical_scroll_offset_uses_target_row_index(
+        int index,
+        double viewportHeight,
+        double maxOffset,
+        double expected)
+    {
+        var actual = GCodeListControl.CalculateCenteredLogicalOffset(
+            index,
+            viewportHeight,
+            maxOffset);
+
+        Assert.Equal(expected, actual);
+    }
+
+    [Theory]
+    [InlineData(40, 80, 100, 400, 70)]
+    [InlineData(0, 10, 100, 400, 0)]
+    [InlineData(380, 90, 100, 400, 400)]
+    public void Centered_pixel_scroll_offset_clamps_to_viewport_range(
+        double currentOffset,
+        double rowCenter,
+        double viewportHeight,
+        double maxOffset,
+        double expected)
+    {
+        var actual = GCodeListControl.CalculateCenteredPixelOffset(
+            currentOffset,
+            rowCenter,
+            viewportHeight,
+            maxOffset);
+
+        Assert.Equal(expected, actual);
+    }
+
     static IBrush ConvertBrush(IValueConverter converter, string? sent) =>
         Assert.IsAssignableFrom<IBrush>(converter.Convert(sent, typeof(IBrush), null, CultureInfo.InvariantCulture));
 

@@ -13,7 +13,6 @@ public sealed class JobStreamingService
     private const string CheckModeActiveMessage = "Check mode active - cycle start will validate only.";
     private const string CheckModeRunningMessage = "Checking - validating only, no machine motion.";
     private const string CheckModeCompleteMessage = "Check complete - check mode remains active.";
-    private const int VisibleLinesAhead = 5;
 
     private enum StreamingHandler
     {
@@ -353,6 +352,7 @@ public sealed class JobStreamingService
                         {
                             found = block - 1;
                             GCode.Data[block].Sent = "@";
+                            _model.ScrollPosition = block;
                             break;
                         }
                     } while (--block > _job.LastExecuting);
@@ -607,7 +607,6 @@ public sealed class JobStreamingService
                 {
                     if (response != "ok")
                         GCode.Data[_job.PendingLine].Sent = response;
-                    ScrollAheadOfPendingLine();
                 }
 
                 if (_streamingHandler.Call == StreamingAwaitAction)
@@ -619,7 +618,6 @@ public sealed class JobStreamingService
                 _streamingHandler.Call(StreamingState.Error, true);
                 if (_job.IsChecking && !_job.HasError)
                 {
-                    ScrollAheadOfPendingLine();
                     GCode.Data[_job.PendingLine].Sent = response;
                 }
                 _job.HasError = _model!.IsGrblHAL;
@@ -751,14 +749,6 @@ public sealed class JobStreamingService
             {
             }
         }
-    }
-
-    private void ScrollAheadOfPendingLine()
-    {
-        if (_model == null)
-            return;
-
-        _model.ScrollPosition = Math.Min(_job.PendingLine + VisibleLinesAhead, _job.PgmEndLine);
     }
 
     private void SendRtCommand(string command)
