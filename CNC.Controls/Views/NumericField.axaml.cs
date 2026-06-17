@@ -23,6 +23,9 @@ public partial class NumericField : UserControl
     public static readonly StyledProperty<bool> IsReadOnlyProperty =
         AvaloniaProperty.Register<NumericField, bool>(nameof(IsReadOnly));
 
+    public static readonly StyledProperty<double> InputMinWidthProperty =
+        AvaloniaProperty.Register<NumericField, double>(nameof(InputMinWidth), 64d);
+
     public NumericField()
     {
         InitializeComponent();
@@ -42,6 +45,7 @@ public partial class NumericField : UserControl
     public string Label { get => GetValue(LabelProperty); set => SetValue(LabelProperty, value); }
     public string Unit { get => GetValue(UnitProperty); set => SetValue(UnitProperty, value); }
     public bool IsReadOnly { get => GetValue(IsReadOnlyProperty); set => SetValue(IsReadOnlyProperty, value); }
+    public double InputMinWidth { get => GetValue(InputMinWidthProperty); set => SetValue(InputMinWidthProperty, value); }
 
     public string Text => Value.ToInvariantString(data.Format);
 

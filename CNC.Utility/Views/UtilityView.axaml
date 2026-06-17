@@ -1,0 +1,318 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:cnc="using:CNC.Controls.Avalonia.Views"
+             xmlns:viewer="using:CNC.GCodeViewer.Avalonia.Views"
+             mc:Ignorable="d"
+             d:DesignHeight="650"
+             d:DesignWidth="1200"
+             x:Class="CNC.Utility.Views.UtilityView">
+
+  <UserControl.Styles>
+    <!-- Style for all TextBlocks -->
+    <Style Selector="TextBlock">
+      <Setter Property="VerticalAlignment" Value="Center" />
+      <Setter Property="FontSize" Value="12" />
+      <Setter Property="TextWrapping" Value="Wrap"/>
+    </Style>
+
+    <!-- Style for all TextBoxes -->
+    <Style Selector="TextBox">
+      <Setter Property="Height" Value="34" />
+      <Setter Property="VerticalContentAlignment" Value="Center" />
+      <Setter Property="HorizontalContentAlignment" Value="Center" />
+      <Setter Property="Padding" Value="0"/>
+    </Style>
+
+    <Style Selector="Button">
+      <Setter Property="VerticalAlignment" Value="Stretch"/>
+      <Setter Property="HorizontalAlignment" Value="Stretch"/>
+      <Setter Property="VerticalContentAlignment" Value="Center"/>
+      <Setter Property="HorizontalContentAlignment" Value="Center"/>
+    </Style>
+
+    <!-- Style for all ComboBoxes -->
+    <Style Selector="ComboBox">
+      <Setter Property="Height" Value="34" />
+    </Style>
+
+    <!-- Style for Row/Column Grids to enforce consistent spacing -->
+    <Style Selector="Grid.FormGrid">
+      <Setter Property="ColumnSpacing" Value="8" />
+      <Setter Property="RowSpacing" Value="8" />
+    </Style>
+    </UserControl.Styles>
+
+  <Grid ColumnDefinitions="400,*" ColumnSpacing="8" Margin="4">
+    <Border Grid.Column="0"
+            Background="{DynamicResource IoSenderPanelBrush}"
+            BorderBrush="{DynamicResource ThemeBorderLowBrush}"
+            BorderThickness="1"
+            CornerRadius="6"
+            ClipToBounds="True">
+            
+      <Grid RowDefinitions="*,Auto">
+        <TabControl x:Name="UtilityTabs">
+          <TabItem Header="Surfacing">
+            <ScrollViewer VerticalScrollBarVisibility="Auto">
+              <StackPanel TextElement.FontSize="12" Spacing="8">
+
+                <Border 
+                  Height="1"
+                  Background="{DynamicResource ThemeBorderLowBrush}"
+                />
+
+                <Grid RowDefinitions="*,*,*" ColumnDefinitions="*,*" ColumnSpacing="8" RowSpacing="8">
+                  
+                  <Grid ColumnDefinitions="Auto,*" ColumnSpacing="8">
+                    <TextBlock Text="Origin" Grid.Column="0"/>
+                    <ComboBox x:Name="SurfacingOrigin" SelectedIndex="0" Grid.Column="1">
+                      <ComboBoxItem Content="Lower-left"/>
+                      <ComboBoxItem Content="Center"/>
+                    </ComboBox>
+                  </Grid>
+
+                  <cnc:NumericField x:Name="SurfacingStepDownPasses"
+                                    Grid.Row="1"
+                                    Label="Step-down passes"
+                                    Value="1"
+                                    Unit=""
+                                    Format="###0"/>
+
+                  <cnc:NumericField x:Name="SurfacingFinishPasses"
+                                    Grid.Row="2"
+                                    Label="Finish repeats"
+                                    Value="0"
+                                    Unit=""
+                                    Format="###0"/>
+
+                  <cnc:NumericField x:Name="SurfacingSafeZ"
+                                    Grid.Column="1"
+                                    Label="Safe Z"
+                                    Value="5"
+                                    Unit="{Binding Unit}"
+                                    Format="{Binding FormatSigned}"/>
+
+                  <cnc:NumericField x:Name="SurfacingFeed"
+                                    Grid.Row="1"
+                                    Grid.Column="1"
+                                    Label="Feed rate"
+                                    Value="500"
+                                    Unit="{Binding FeedrateUnit}"
+                                    Format="{Binding Format}"/>
+
+                  <cnc:NumericField x:Name="SurfacingPlungeFeed"
+                                    Grid.Row="2"
+                                    Grid.Column="1"
+                                    Label="Plunge feed"
+                                    Value="100"
+                                    Unit="{Binding FeedrateUnit}"
+                                    Format="{Binding Format}"/>
+                </Grid>
+
+                <Border Grid.Row="1"
+                        Height="1"
+                        Background="{DynamicResource ThemeBorderLowBrush}"
+                        />
+
+                <Grid Grid.Row="2" RowDefinitions="*,*,*,*,*" ColumnDefinitions="*,*" ColumnSpacing="8" RowSpacing="8">
+                  <cnc:NumericField x:Name="SurfacingToolDiameter"
+                                    Label="Tool diameter"
+                                    Value="6"
+                                    Unit="{Binding Unit}"
+                                    Format="{Binding Format}"/>
+
+                  <cnc:NumericField x:Name="SurfacingLengthX"
+                                    Grid.Row="1"
+                                    Label="Material X length"
+                                    Value="100"
+                                    Unit="{Binding Unit}"
+                                    Format="{Binding Format}"/>
+
+                  <cnc:NumericField x:Name="SurfacingWidthY"
+                                    Grid.Row="2"
+                                    Label="Material Y width"
+                                    Value="100"
+                                    Unit="{Binding Unit}"
+                                    Format="{Binding Format}"/>
+
+                  <cnc:NumericField x:Name="SurfacingDepth"
+                                    Grid.Row="3"
+                                    Label="Target depth"
+                                    Value="0"
+                                    Unit="{Binding Unit}"
+                                    Format="{Binding FormatSigned}"/>
+
+                  <cnc:NumericField x:Name="SurfacingToolEngagement"
+                                    Grid.Row="4"
+                                    Label="Tool engagement"
+                                    Value="40"
+                                    Unit="%"
+                                    Format="###0.###"/>
+
+                  <cnc:NumericField x:Name="SurfacingRpm"
+                                    Grid.Column="1"
+                                    Label="Spindle RPM"
+                                    Value="12000"
+                                    Unit="RPM"
+                                    Format="###0"/>
+
+                  <Grid Grid.Row="1" Grid.Column="1" ColumnDefinitions="*,Auto" ColumnSpacing="8">
+                    <TextBlock Text="Pass direction"/>
+                    <ComboBox x:Name="SurfacingDirection" Grid.Column="1" SelectedIndex="0" Height="34">
+                      <ComboBoxItem Content="Along X"/>
+                      <ComboBoxItem Content="Along Y"/>
+                    </ComboBox>
+                  </Grid>
+
+                  <Grid Grid.Row="2" Grid.Column="1" ColumnDefinitions="*,Auto" ColumnSpacing="8">
+                    <TextBlock Text="Cut type"/>
+                    <ComboBox x:Name="SurfacingCutType" Grid.Column="1" SelectedIndex="0" Height="34">
+                      <ComboBoxItem Content="Both"/>
+                      <ComboBoxItem Content="Climb"/>
+                      <ComboBoxItem Content="Conventional"/>
+                    </ComboBox>
+                  </Grid>
+
+                  
+                </Grid>
+
+                <Border Grid.Row="1"
+                        Height="1"
+                        Background="{DynamicResource ThemeBorderLowBrush}"
+                        />
+
+                <StackPanel Orientation="Horizontal" Spacing="12">
+                  <CheckBox x:Name="SurfacingFlood" Content="Flood"/>
+                  <CheckBox x:Name="SurfacingMist" Content="Mist"/>
+                </StackPanel>
+
+                <Grid IsVisible="False">
+                  <cnc:NumericField x:Name="SurfacingOriginX" Value="0" Unit="{Binding Unit}" Format="{Binding FormatSigned}"/>
+                  <cnc:NumericField x:Name="SurfacingOriginY" Value="0" Unit="{Binding Unit}" Format="{Binding FormatSigned}"/>
+                  <cnc:NumericField x:Name="SurfacingOriginZ" Value="0" Unit="{Binding Unit}" Format="{Binding FormatSigned}"/>
+                </Grid>
+
+              </StackPanel>
+            </ScrollViewer>
+          </TabItem>
+
+          <TabItem Header="Drilling">
+            <ScrollViewer VerticalScrollBarVisibility="Auto">
+              <Grid RowDefinitions="Auto,Auto" RowSpacing="14" Margin="0,8,0,8">
+                <Grid ColumnDefinitions="1*,1*" ColumnSpacing="12">
+                  <Grid RowDefinitions="Auto,Auto,Auto,Auto" RowSpacing="8">
+                    <cnc:NumericField x:Name="DrillX"
+                                      Label="Hole X"
+                                      Value="0"
+                                      Unit="{Binding Unit}"
+                                      Format="{Binding FormatSigned}"/>
+
+                    <cnc:NumericField x:Name="DrillY"
+                                      Grid.Row="1"
+                                      Label="Hole Y"
+                                      Value="0"
+                                      Unit="{Binding Unit}"
+                                      Format="{Binding FormatSigned}"/>
+
+                    <cnc:NumericField x:Name="DrillDepth"
+                                      Grid.Row="2"
+                                      Label="Depth"
+                                      Value="-5"
+                                      Unit="{Binding Unit}"
+                                      Format="{Binding FormatSigned}"/>
+
+                    <cnc:NumericField x:Name="DrillDwell"
+                                      Grid.Row="3"
+                                      Label="Dwell"
+                                      Value="0"
+                                      Unit="sec"
+                                      Format="###0.###"/>
+                  </Grid>
+
+                  <Grid Grid.Column="1" RowDefinitions="Auto,Auto,Auto,Auto" RowSpacing="8">
+                    <cnc:NumericField x:Name="DrillSafeZ"
+                                      Label="Safe Z"
+                                      Value="5"
+                                      Unit="{Binding Unit}"
+                                      Format="{Binding FormatSigned}"/>
+
+                    <cnc:NumericField x:Name="DrillRetractZ"
+                                      Grid.Row="1"
+                                      Label="Retract Z"
+                                      Value="1"
+                                      Unit="{Binding Unit}"
+                                      Format="{Binding FormatSigned}"/>
+
+                    <cnc:NumericField x:Name="DrillFeed"
+                                      Grid.Row="2"
+                                      Label="Feed rate"
+                                      Value="300"
+                                      Unit="{Binding FeedrateUnit}"
+                                      Format="{Binding Format}"/>
+
+                    <cnc:NumericField x:Name="DrillPlungeFeed"
+                                      Grid.Row="3"
+                                      Label="Plunge feed"
+                                      Value="100"
+                                      Unit="{Binding FeedrateUnit}"
+                                      Format="{Binding Format}"/>
+                  </Grid>
+                </Grid>
+
+                <Grid Grid.Row="1" ColumnDefinitions="*,Auto" ColumnSpacing="8">
+                  <cnc:NumericField x:Name="DrillRpm"
+                                    Label="Spindle RPM"
+                                    Value="12000"
+                                    Unit="RPM"
+                                    Format="###0"/>
+                  <StackPanel Grid.Column="1" Orientation="Horizontal" Spacing="12">
+                    <CheckBox x:Name="DrillFlood" Content="Flood"/>
+                    <CheckBox x:Name="DrillMist" Content="Mist"/>
+                  </StackPanel>
+                </Grid>
+              </Grid>
+            </ScrollViewer>
+          </TabItem>
+        </TabControl>
+
+        <Grid Grid.Row="1" RowDefinitions="Auto,Auto" ColumnDefinitions="*,*" ColumnSpacing="10" RowSpacing="8" Margin="18,8,18,16">
+          <TextBlock x:Name="UtilityStatus"
+                     Grid.ColumnSpan="2"
+                     MinHeight="18"
+                     TextTrimming="CharacterEllipsis"/>
+          <Button Grid.Row="1"
+                  Grid.Column="0"
+                  Content="🔎 Preview"
+                  Height="40"
+                  Click="OnPreviewSelectedUtilityClick"/>
+          <Button Grid.Row="1"
+                  Grid.Column="1"
+                  Content="Load"
+                  Height="40"
+                  Classes="important"
+                  HorizontalAlignment="Stretch"
+                  Click="OnSendSelectedUtilityClick"/>
+        </Grid>
+      </Grid>
+    </Border>
+
+    <Border Grid.Column="1"
+            Background="{DynamicResource IoSenderPanelBrush}"
+            BorderBrush="{DynamicResource ThemeBorderLowBrush}"
+            BorderThickness="1"
+            CornerRadius="4"
+            ClipToBounds="True">
+      <Grid RowDefinitions="34,*">
+        <Border Background="{DynamicResource IoSenderOverlayBrush}" Padding="10,0">
+          <TextBlock Text="3D View" FontSize="18" FontWeight="SemiBold" VerticalAlignment="Center"/>
+        </Border>
+        <viewer:RenderControl x:Name="SurfacingPreview"
+                              Grid.Row="1"
+                              HorizontalAlignment="Stretch"
+                              VerticalAlignment="Stretch"/>
+      </Grid>
+    </Border>
+  </Grid>
+</UserControl>

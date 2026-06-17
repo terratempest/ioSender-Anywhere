@@ -53,6 +53,10 @@
       <Setter Property="BorderBrush" Value="{DynamicResource ThemeAccentBrush}"/>
       <Setter Property="Foreground" Value="{DynamicResource ThemeAccentBrush}"/>
     </Style>
+    <Style Selector="views|NumericField">
+      <Setter Property="MinHeight" Value="36"/> 
+      <Setter Property="InputMinWidth" Value="80"/> 
+    </Style>
   </UserControl.Styles>
 
   <Grid TextElement.FontSize="12">

@@ -19,6 +19,7 @@ using CNC.Core;
 using CNC.GCodeViewer.Avalonia;
 using CNC.GCodeViewer.Avalonia.Views;
 using CNC.Localization.Avalonia;
+using CNC.Utility.Views;
 using ioSender.Navigation;
 using ioSender.QuickAccess;
 using ioSender.Services;
@@ -35,6 +36,7 @@ public partial class MainWindow : Window
         TabHome.PointerPressed += (_, _) => OnShellTabHeaderPressed(TabHome);
         TabProbing.PointerPressed += (_, _) => OnShellTabHeaderPressed(TabProbing);
         TabOffsets.PointerPressed += (_, _) => OnShellTabHeaderPressed(TabOffsets);
+        TabUtility.PointerPressed += (_, _) => OnShellTabHeaderPressed(TabUtility);
     }
 
     void OnShellTabHeaderPressed(TabItem tab)
@@ -74,6 +76,7 @@ public partial class MainWindow : Window
         JobViewControl.IsVisible = page == ShellPage.Home;
         ProbingPageHost.IsVisible = page == ShellPage.Probing;
         OffsetsPageHost.IsVisible = page == ShellPage.Offsets;
+        UtilityPageHost.IsVisible = page == ShellPage.Utility;
         GrblConfigPageHost.IsVisible = page == ShellPage.GrblSettings;
         AppConfigPageHost.IsVisible = page == ShellPage.AppSettings;
 
@@ -87,6 +90,7 @@ public partial class MainWindow : Window
                     ShellPage.Home => TabHome,
                     ShellPage.Probing => TabProbing,
                     ShellPage.Offsets => TabOffsets,
+                    ShellPage.Utility => TabUtility,
                     _ => TabSettings,
                 };
             }
@@ -106,6 +110,8 @@ public partial class MainWindow : Window
             return ShellPage.Probing;
         if (ReferenceEquals(tab, TabOffsets))
             return ShellPage.Offsets;
+        if (ReferenceEquals(tab, TabUtility))
+            return ShellPage.Utility;
         return ShellPage.Home;
     }
 
@@ -118,6 +124,9 @@ public partial class MainWindow : Window
                 break;
             case ShellPage.Offsets:
                 EnsureOffsetsView().Activate(true);
+                break;
+            case ShellPage.Utility:
+                EnsureUtilityView();
                 break;
             case ShellPage.GrblSettings:
                 EnsureGrblConfigView().Activate(true);
@@ -174,6 +183,68 @@ public partial class MainWindow : Window
         };
         OffsetsPageHost.Content = _offsetsView;
         return _offsetsView;
+    }
+
+    UtilityView EnsureUtilityView()
+    {
+        if (_utilityView is not null)
+            return _utilityView;
+
+        using var _ = StartupTrace.Measure("Create UtilityView");
+        _utilityView = new UtilityView
+        {
+            PreviewSession = new GCodeViewerSession(
+                _session.AppConfig,
+                _viewModel.Grbl,
+                () => _utilityView?.PreviewTokens ?? [],
+                () => _utilityView?.PreviewBlocks ?? [],
+                _viewModel.SetPreviewBuilding),
+            DataContext = _viewModel.Grbl,
+            HorizontalAlignment = Avalonia.Layout.HorizontalAlignment.Stretch,
+            VerticalAlignment = Avalonia.Layout.VerticalAlignment.Stretch,
+        };
+        _utilityView.ProgramGenerated += OnUtilityProgramGenerated;
+        UtilityPageHost.Content = _utilityView;
+        return _utilityView;
+    }
+
+    async void OnUtilityProgramGenerated(object? sender, UtilityProgramGeneratedEventArgs e)
+    {
+        try
+        {
+            if (!CanMutateProgram())
+            {
+                ShowBusyMessage();
+                return;
+            }
+
+            CancelActivePreviewBuilds();
+            var path = await WriteUtilityProgramAsync(e);
+            await LoadNativeProgramAsync(path);
+            if (_programService.IsLoaded && string.Equals(_viewModel.Grbl.FileName, path, StringComparison.OrdinalIgnoreCase))
+            {
+                NavigateTo(ShellPage.Home);
+                JobViewControl.WorkspaceHost.QueueToolpathRefresh(attempts: 8);
+            }
+        }
+        catch (Exception ex) when (ex is IOException or UnauthorizedAccessException)
+        {
+            GrblUi.ShowError(ex.Message, "Utility");
+        }
+    }
+
+    static async Task<string> WriteUtilityProgramAsync(UtilityProgramGeneratedEventArgs e)
+    {
+        var directory = Path.Combine(Path.GetTempPath(), "ioSender", "Utility");
+        Directory.CreateDirectory(directory);
+
+        var stem = string.Join("_", e.DisplayName.Split(Path.GetInvalidFileNameChars(), StringSplitOptions.RemoveEmptyEntries));
+        if (string.IsNullOrWhiteSpace(stem))
+            stem = "Utility";
+
+        var path = Path.Combine(directory, $"{stem}_{DateTime.Now:yyyyMMdd_HHmmss_fff}.nc");
+        await File.WriteAllLinesAsync(path, e.Lines);
+        return path;
     }
 
     GrblConfigView EnsureGrblConfigView()

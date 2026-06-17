@@ -1,0 +1,22 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net8.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+    <RootNamespace>CNC.Utility</RootNamespace>
+    <AssemblyName>CNC.Utility</AssemblyName>
+    <AvaloniaUseCompiledBindingsByDefault>false</AvaloniaUseCompiledBindingsByDefault>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Avalonia" Version="$(AvaloniaVersion)" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\CNC.Controls\CNC.Controls.csproj" />
+    <ProjectReference Include="..\CNC.Core\CNC.Core.csproj" />
+    <ProjectReference Include="..\CNC.GCodeViewer\CNC.GCodeViewer.csproj" />
+  </ItemGroup>
+
+</Project>

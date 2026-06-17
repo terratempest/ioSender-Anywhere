@@ -19,6 +19,7 @@ using CNC.Core;
 using CNC.GCodeViewer.Avalonia;
 using CNC.GCodeViewer.Avalonia.Views;
 using CNC.Localization.Avalonia;
+using CNC.Utility.Views;
 using ioSender.Navigation;
 using ioSender.QuickAccess;
 using ioSender.Services;
@@ -47,6 +48,7 @@ public partial class MainWindow : Window
     private ShellPage _activePage = ShellPage.Home;
     private ProbingView? _probingView;
     private OffsetView? _offsetsView;
+    private UtilityView? _utilityView;
     private GrblConfigView? _grblConfigView;
     private AppConfigView? _appConfigView;
     private bool _restoringPlacement;

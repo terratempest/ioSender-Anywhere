@@ -416,20 +416,24 @@ public partial class WorkspaceHost : UserControl
         ActiveEditorsChanged?.Invoke(this, activated);
     }
 
-    void RefreshToolpathViews()
+    bool RefreshToolpathViews()
     {
         if (_factory is null)
-            return;
+            return false;
 
+        var refreshed = false;
         foreach (var control in _factory.AllCached)
         {
             if (control is RenderControl viewer)
-                viewer.TryLoadProgramIfVisible();
+                refreshed |= viewer.TryLoadProgramIfVisible();
         }
+
+        return refreshed;
     }
 
-    void QueueToolpathRefresh()
+    public void QueueToolpathRefresh(int attempts = 1)
     {
+        ArgumentOutOfRangeException.ThrowIfNegativeOrZero(attempts);
         var version = ++_toolpathRefreshVersion;
         Dispatcher.UIThread.Post(() =>
         {
@@ -439,11 +443,13 @@ public partial class WorkspaceHost : UserControl
 #if DEBUG
             var watch = Stopwatch.StartNew();
 #endif
-            RefreshToolpathViews();
+            var refreshed = RefreshToolpathViews();
 #if DEBUG
             watch.Stop();
             Trace.WriteLine($"Workspace queued toolpath refresh completed in {watch.ElapsedMilliseconds} ms");
 #endif
+            if (!refreshed && attempts > 1)
+                DispatcherTimer.RunOnce(() => QueueToolpathRefresh(attempts - 1), TimeSpan.FromMilliseconds(50));
         }, DispatcherPriority.ApplicationIdle);
     }
 

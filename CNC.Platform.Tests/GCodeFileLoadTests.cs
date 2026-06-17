@@ -1,7 +1,9 @@
 using CNC.Controls.Avalonia.Services;
 using CNC.Core;
 using CNC.Core.Geometry;
+using CNC.Utility.GCode;
 using CNC.GCodeViewer.Avalonia;
+using CNC.Platform.Windows;
 using System.Runtime.Serialization;
 
 namespace CNC.Platform.Tests;
@@ -82,6 +84,53 @@ public sealed class GCodeFileLoadTests
         {
             service.ProgramLoading -= OnLoading;
             service.ProgramChanged -= OnChanged;
+            service.Close();
+            File.Delete(path);
+        }
+    }
+
+    [Fact]
+    public async Task ProgramService_LoadAsync_UtilityGeneratedTempFile_LoadsAsPhysicalProgram()
+    {
+        var lines = UtilityGCodeGenerator.GenerateSurfacing(new SurfacingOptions(
+            UtilityUnits.Metric,
+            UtilityOrigin.LowerLeft,
+            0d,
+            0d,
+            0d,
+            4d,
+            12d,
+            8d,
+            0d,
+            1,
+            0,
+            50d,
+            100d,
+            25d,
+            5d,
+            12000,
+            new CoolantOptions(false, false),
+            SurfacingPassDirection.AlongX,
+            SurfacingCutType.Both));
+        var path = CreateProgramFile(lines);
+        var model = new GrblViewModel { PathService = new WindowsPathService() };
+        var service = new ProgramService
+        {
+            Model = model,
+        };
+
+        try
+        {
+            await service.LoadAsync(path);
+
+            Assert.True(service.IsLoaded);
+            Assert.True(service.Blocks > 0);
+            Assert.NotEmpty(service.Tokens);
+            Assert.Equal(path, model.FileName);
+            Assert.True(model.IsPhysicalFileLoaded);
+        }
+        finally
+        {
             service.Close();
             File.Delete(path);
         }

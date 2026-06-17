@@ -329,6 +329,11 @@
             <Grid/>
           </TabItem>
 
+          <TabItem x:Name="TabUtility" Header="Utility"
+            loc:Localize.Key="ioSender.mainwindow.tab_utility" loc:Localize.Fallback="Utility">
+            <Grid/>
+          </TabItem>
+
           <TabItem x:Name="TabSettings" IsVisible="False">
             <Grid/>
           </TabItem>
@@ -386,6 +391,10 @@
                 HorizontalAlignment="Stretch"
                 VerticalAlignment="Stretch"/>
               <ContentControl x:Name="OffsetsPageHost"
+                IsVisible="False"
+                HorizontalAlignment="Stretch"
+                VerticalAlignment="Stretch"/>
+              <ContentControl x:Name="UtilityPageHost"
                 IsVisible="False"
                 HorizontalAlignment="Stretch"
                 VerticalAlignment="Stretch"/>

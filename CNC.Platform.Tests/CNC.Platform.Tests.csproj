@@ -30,6 +30,7 @@
     <ProjectReference Include="..\CNC.Controls.Config\CNC.Controls.Config.csproj" />
     <ProjectReference Include="..\CNC.Controls.Probing\CNC.Controls.Probing.csproj" />
     <ProjectReference Include="..\CNC.GCodeViewer\CNC.GCodeViewer.csproj" />
+    <ProjectReference Include="..\CNC.Utility\CNC.Utility.csproj" />
     <ProjectReference Include="..\ioSender\ioSender.csproj" />
   </ItemGroup>
 

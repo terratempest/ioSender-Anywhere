@@ -44,7 +44,7 @@
         </StackPanel>
 
         <StackPanel Orientation="Horizontal">
-          <cnc:NumericField Label="Distance:" Width="220"
+          <cnc:NumericField Label="Distance:" Width="220" MinHeight="36"
                             Value="{Binding #root.Distance, Mode=TwoWay}"
                             Unit="{Binding #root.DistanceUnit}"/>
           <Button Content="Go-" Tag="-" Margin="3,0" Width="55" FontSize="12"
@@ -69,13 +69,13 @@
           </Button>
         </StackPanel>
 
-        <cnc:NumericField Label="Measured:" Width="220"
+        <cnc:NumericField Label="Measured:" Width="220" MinHeight="36"
                           IsReadOnly="{Binding #root.CanUpdate, Converter={StaticResource BooleanConverter}}"
                           Value="{Binding #root.ActualDistance, Mode=TwoWay}"
                           Unit="{Binding #root.DistanceUnit}"/>
 
         <StackPanel Orientation="Horizontal">
-          <cnc:NumericField Label="Resolution:" Width="220" IsReadOnly="True" Format="###0.000###"
+          <cnc:NumericField Label="Resolution:" Width="220" MinHeight="36" IsReadOnly="True" Format="###0.000###"
                             Value="{Binding #root.Resolution}"
                             Unit="{Binding #root.ResolutionUnit}"/>
           <Button Content="Save" Tag="save" Margin="3,0" Width="55" FontSize="12"

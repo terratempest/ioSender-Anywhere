@@ -37,6 +37,7 @@
           <RowDefinition Height="*"/>
         </Grid.RowDefinitions>
         <views:NumericField x:Name="searchField" Grid.Row="0" Label="Setting:" Unit="" ToolTip.Tip="Search for setting (Enter)"
+                            MinHeight="36"
                             Format="###0" Margin="0,0,0,5" KeyDown="OnSearchKeyDown"/>
         <TreeView x:Name="treeView" Grid.Row="1" IsVisible="False" FontSize="12"
                   SelectionChanged="OnTreeSelectionChanged"
@@ -69,7 +70,7 @@
 
       <Grid x:Name="details" DockPanel.Dock="Top" RowDefinitions="Auto,*,Auto" RowSpacing="6">
         <TextBlock x:Name="txtSettingTitle" Grid.Row="0" FontWeight="SemiBold" FontSize="12"/>
-        <TextBox x:Name="txtValue" Grid.Row="1" Width="200" HorizontalAlignment="Left" VerticalAlignment="Top"
+        <TextBox x:Name="txtValue" Grid.Row="1" Width="200" MinHeight="36" HorizontalAlignment="Left" VerticalAlignment="Top"
                  FontSize="12"
                  controls:PopupKeyboard.Layout="Numeric"
                  LostFocus="OnValueLostFocus"/>

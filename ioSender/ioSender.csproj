@@ -37,6 +37,7 @@
     <ProjectReference Include="..\CNC.Controls.Dragknife\CNC.Controls.Dragknife.csproj" />
     <ProjectReference Include="..\CNC.Converters\CNC.Converters.csproj" />
     <ProjectReference Include="..\CNC.Controls.Probing\CNC.Controls.Probing.csproj" />
+    <ProjectReference Include="..\CNC.Utility\CNC.Utility.csproj" />
     <ProjectReference Include="..\CNC.Core\CNC.Core.csproj" />
     <ProjectReference Include="..\CNC.Platform.Abstractions\CNC.Platform.Abstractions.csproj" />
     <ProjectReference Include="..\CNC.Platform.Camera.OpenCv\CNC.Platform.Camera.OpenCv.csproj" />

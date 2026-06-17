@@ -5,21 +5,21 @@
              Width="310">
   <GroupBox Header="UI jogging" BorderBrush="{DynamicResource ThemeBorderLowBrush}">
     <WrapPanel Orientation="Vertical" ItemWidth="290">
-      <cnc:NumericField Label="Distance 3:" Unit="mm" Format="###0.0##"
+      <cnc:NumericField Label="Distance 3:" Unit="mm" Format="###0.0##" MinHeight="36"
                         Value="{Binding JogUiMetric.Distance3, Mode=TwoWay}"/>
-      <cnc:NumericField Label="Distance 2:" Unit="mm" Format="###0.0##"
+      <cnc:NumericField Label="Distance 2:" Unit="mm" Format="###0.0##" MinHeight="36"
                         Value="{Binding JogUiMetric.Distance2, Mode=TwoWay}"/>
-      <cnc:NumericField Label="Distance 1:" Unit="mm" Format="###0.0##"
+      <cnc:NumericField Label="Distance 1:" Unit="mm" Format="###0.0##" MinHeight="36"
                         Value="{Binding JogUiMetric.Distance1, Mode=TwoWay}"/>
-      <cnc:NumericField Label="Distance 0:" Unit="mm" Format="###0.0##"
+      <cnc:NumericField Label="Distance 0:" Unit="mm" Format="###0.0##" MinHeight="36"
                         Value="{Binding JogUiMetric.Distance0, Mode=TwoWay}"/>
-      <cnc:NumericField Label="Feedrate 3:" Unit="mm/min" Format="####0"
+      <cnc:NumericField Label="Feedrate 3:" Unit="mm/min" Format="####0" MinHeight="36"
                         Value="{Binding JogUiMetric.Feedrate3, Mode=TwoWay}"/>
-      <cnc:NumericField Label="Feedrate 2:" Unit="mm/min" Format="####0"
+      <cnc:NumericField Label="Feedrate 2:" Unit="mm/min" Format="####0" MinHeight="36"
                         Value="{Binding JogUiMetric.Feedrate2, Mode=TwoWay}"/>
-      <cnc:NumericField Label="Feedrate 1:" Unit="mm/min" Format="####0"
+      <cnc:NumericField Label="Feedrate 1:" Unit="mm/min" Format="####0" MinHeight="36"
                         Value="{Binding JogUiMetric.Feedrate1, Mode=TwoWay}"/>
-      <cnc:NumericField Label="Feedrate 0:" Unit="mm/min" Format="####0"
+      <cnc:NumericField Label="Feedrate 0:" Unit="mm/min" Format="####0" MinHeight="36"
                         Value="{Binding JogUiMetric.Feedrate0, Mode=TwoWay}"/>
     </WrapPanel>
   </GroupBox>

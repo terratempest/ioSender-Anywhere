@@ -14,19 +14,19 @@
                    ToolTip.Tip="Warning! - Grbl has outstanding bug(s) in jog cancel (on key up)."/>
       </StackPanel>
 
-      <cnc:NumericField Label="Fast feedrate:" Unit="mm/min" Format="###0"
+      <cnc:NumericField Label="Fast feedrate:" Unit="mm/min" Format="###0" MinHeight="36"
                         Value="{Binding Jog.FastFeedrate, Mode=TwoWay}"/>
-      <cnc:NumericField Label="Fast distance:"
+      <cnc:NumericField Label="Fast distance:" MinHeight="36"
                         Value="{Binding Jog.FastDistance, Mode=TwoWay}"/>
-      <cnc:NumericField Label="Slow feedrate:" Unit="mm/min" Format="###0"
+      <cnc:NumericField Label="Slow feedrate:" Unit="mm/min" Format="###0" MinHeight="36"
                         Value="{Binding Jog.SlowFeedrate, Mode=TwoWay}"/>
-      <cnc:NumericField Label="Slow distance:"
+      <cnc:NumericField Label="Slow distance:" MinHeight="36"
                         Value="{Binding Jog.SlowDistance, Mode=TwoWay}"/>
-      <cnc:NumericField Label="Step feedrate:" Unit="mm/min" Format="###0"
+      <cnc:NumericField Label="Step feedrate:" Unit="mm/min" Format="###0" MinHeight="36"
                         Value="{Binding Jog.StepFeedrate, Mode=TwoWay}"/>
       <CheckBox Content="Link step distance to UI jogging" FontSize="12"
                 IsChecked="{Binding Jog.LinkStepJogToUI, Mode=TwoWay}" Margin="50,3,0,3"/>
-      <cnc:NumericField Label="Step distance:"
+      <cnc:NumericField Label="Step distance:" MinHeight="36"
                         Value="{Binding Jog.StepDistance, Mode=TwoWay}"
                         IsReadOnly="{Binding Jog.LinkStepJogToUI}"/>
     </WrapPanel>

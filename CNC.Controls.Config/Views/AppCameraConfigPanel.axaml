@@ -5,19 +5,19 @@
              Width="310">
   <GroupBox Header="Camera" BorderBrush="{DynamicResource ThemeBorderLowBrush}">
     <WrapPanel Orientation="Vertical" ItemWidth="290">
-      <cnc:NumericField Label="Device index:" Format="#0"
+      <cnc:NumericField Label="Device index:" Format="#0" MinHeight="36"
                         Value="{Binding Camera.DeviceIndex, Mode=TwoWay}"/>
-      <cnc:NumericField Label="Width:" Unit="px" Format="####0"
+      <cnc:NumericField Label="Width:" Unit="px" Format="####0" MinHeight="36"
                         Value="{Binding Camera.CaptureWidth, Mode=TwoWay}"/>
-      <cnc:NumericField Label="Height:" Unit="px" Format="####0"
+      <cnc:NumericField Label="Height:" Unit="px" Format="####0" MinHeight="36"
                         Value="{Binding Camera.CaptureHeight, Mode=TwoWay}"/>
       <CheckBox Content="Initial move to spindle" FontSize="12"
                 IsChecked="{Binding Camera.InitialMoveToSpindle, Mode=TwoWay}" Margin="0,4,0,0"/>
       <CheckBox Content="Confirm move" FontSize="12"
                 IsChecked="{Binding Camera.ConfirmMove, Mode=TwoWay}"/>
-      <cnc:NumericField Label="X offset:"
+      <cnc:NumericField Label="X offset:" MinHeight="36"
                         Value="{Binding Camera.XOffset, Mode=TwoWay}"/>
-      <cnc:NumericField Label="Y offset:"
+      <cnc:NumericField Label="Y offset:" MinHeight="36"
                         Value="{Binding Camera.YOffset, Mode=TwoWay}"/>
 
       <Grid ColumnDefinitions="90,*" Margin="0,2,0,0">

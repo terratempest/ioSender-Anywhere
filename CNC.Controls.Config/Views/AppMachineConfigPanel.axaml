@@ -5,11 +5,11 @@
              Width="310">
   <GroupBox Header="Machine" BorderBrush="{DynamicResource ThemeBorderLowBrush}">
     <WrapPanel Orientation="Vertical" ItemWidth="290">
-      <cnc:NumericField Label="Reset delay:" Unit="ms" Format="###0"
+      <cnc:NumericField Label="Reset delay:" Unit="ms" Format="###0" MinHeight="36"
                         Value="{Binding ResetDelay, Mode=TwoWay}"/>
-      <cnc:NumericField Label="Poll interval:" Unit="ms" Format="###0"
+      <cnc:NumericField Label="Poll interval:" Unit="ms" Format="###0" MinHeight="36"
                         Value="{Binding PollInterval, Mode=TwoWay}"/>
-      <cnc:NumericField Label="Max buffer:" Unit="bytes" Format="###0"
+      <cnc:NumericField Label="Max buffer:" Unit="bytes" Format="###0" MinHeight="36"
                         Value="{Binding MaxBufferSize, Mode=TwoWay}"/>
       <CheckBox Content="Aggressive buffering" FontSize="12" IsChecked="{Binding UseBuffering, Mode=TwoWay}"
                 ToolTip.Tip="Buffers more than one G-code block (grblHAL)."/>
