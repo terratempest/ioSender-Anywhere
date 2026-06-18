@@ -1,6 +1,7 @@
-# Build ioSender Windows installer from a self-contained win-x64 publish.
+# Build ioSender Windows installer from a self-contained publish.
 param(
     [string]$Configuration = "Release",
+    [ValidateSet('win-x64', 'win-arm64')]
     [string]$RuntimeIdentifier = "win-x64",
     [string]$InnoSetupCompiler = ""
 )
@@ -62,6 +63,7 @@ function Get-MsBuildProperty {
 
 $version = Get-MsBuildProperty -PropertyName "Version" -Fallback "0.0.0"
 $outputBaseName = "ioSender-Setup-$version-$RuntimeIdentifier"
+$installerArchitecture = if ($RuntimeIdentifier -eq "win-arm64") { "arm64" } else { "x64compatible" }
 $iscc = Resolve-InnoSetupCompiler -RequestedPath $InnoSetupCompiler
 
 New-Item -ItemType Directory -Force -Path $Artifacts | Out-Null
@@ -90,6 +92,7 @@ Write-Host "Building installer with $iscc"
     "/DSourceDir=$PublishDir" `
     "/DOutputDir=$Artifacts" `
     "/DOutputBaseFilename=$outputBaseName" `
+    "/DArchitecturesAllowed=$installerArchitecture" `
     "/DIconPath=$IconPath" `
     $InstallerScript
 

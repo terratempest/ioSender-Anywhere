@@ -4,39 +4,40 @@
              x:Class="CNC.Controls.Config.AppGCodeViewerConfigPanel"
              Width="310">
   <GroupBox Header="G-code viewer" BorderBrush="{DynamicResource ThemeBorderLowBrush}">
-    <WrapPanel Orientation="Vertical" ItemWidth="290">
-      <CheckBox Content="Enable" FontSize="12" IsChecked="{Binding GCodeViewer.IsEnabled, Mode=TwoWay}"/>
+    <WrapPanel Orientation="Vertical" ItemWidth="290" TextElement.FontSize="12">
+      <CheckBox Content="Enable" IsChecked="{Binding GCodeViewer.IsEnabled, Mode=TwoWay}"/>
       <cnc:NumericField Label="Arc resolution:" Unit="segments" Format="#0" MinHeight="36"
+                        InputMinWidth="100"
                         Value="{Binding GCodeViewer.ArcResolution, Mode=TwoWay}"/>
-      <cnc:NumericField Label="Min distance:" MinHeight="36"
+      <cnc:NumericField Label="Min distance:" MinHeight="36" InputMinWidth="100"
                         Value="{Binding GCodeViewer.MinDistance, Mode=TwoWay}"/>
-      <cnc:NumericField Label="Tool diameter:" Unit="mm" Format="###0.0" MinHeight="36"
+      <cnc:NumericField Label="Tool diameter:" Unit="mm" Format="###0.0" MinHeight="36" InputMinWidth="100"
                         Value="{Binding GCodeViewer.ToolDiameter, Mode=TwoWay}"/>
-      <CheckBox Content="Black background" FontSize="12" Margin="0,4,0,0"
+      <CheckBox Content="Black background" Margin="0,4,0,0"
                 IsChecked="{Binding GCodeViewer.BlackBackground, Mode=TwoWay}"
                 IsEnabled="{Binding GCodeViewer.IsEnabled}"/>
-      <CheckBox Content="Show grid" FontSize="12" IsChecked="{Binding GCodeViewer.ShowGrid, Mode=TwoWay}"
+      <CheckBox Content="Show grid" IsChecked="{Binding GCodeViewer.ShowGrid, Mode=TwoWay}"
                 IsEnabled="{Binding GCodeViewer.IsEnabled}"/>
-      <CheckBox Content="Show axes" FontSize="12" IsChecked="{Binding GCodeViewer.ShowAxes, Mode=TwoWay}"
+      <CheckBox Content="Show axes" IsChecked="{Binding GCodeViewer.ShowAxes, Mode=TwoWay}"
                 IsEnabled="{Binding GCodeViewer.IsEnabled}"/>
-      <CheckBox Content="Show work envelope" FontSize="12"
+      <CheckBox Content="Show work envelope" 
                 IsChecked="{Binding GCodeViewer.ShowWorkEnvelope, Mode=TwoWay}"
                 IsEnabled="{Binding GCodeViewer.IsHomingEnabled}"/>
-      <CheckBox Content="Show bounding box" FontSize="12"
+      <CheckBox Content="Show bounding box" 
                 IsChecked="{Binding GCodeViewer.ShowBoundingBox, Mode=TwoWay}"
                 IsEnabled="{Binding GCodeViewer.IsEnabled}"/>
-      <CheckBox Content="Show ViewCube" FontSize="12" IsChecked="{Binding GCodeViewer.ShowViewCube, Mode=TwoWay}"
+      <CheckBox Content="Show ViewCube" IsChecked="{Binding GCodeViewer.ShowViewCube, Mode=TwoWay}"
                 IsEnabled="{Binding GCodeViewer.IsEnabled}"/>
-      <CheckBox Content="Show coordinate system" FontSize="12"
+      <CheckBox Content="Show coordinate system" 
                 IsChecked="{Binding GCodeViewer.ShowCoordinateSystem, Mode=TwoWay}"
                 IsEnabled="{Binding GCodeViewer.IsEnabled}"/>
-      <CheckBox Content="Show text overlay" FontSize="12"
+      <CheckBox Content="Show text overlay" 
                 IsChecked="{Binding GCodeViewer.ShowTextOverlay, Mode=TwoWay}"
                 IsEnabled="{Binding GCodeViewer.IsEnabled}"/>
-      <CheckBox Content="Auto scale tool" FontSize="12"
+      <CheckBox Content="Auto scale tool" 
                 IsChecked="{Binding GCodeViewer.ToolAutoScale, Mode=TwoWay}"
                 IsEnabled="{Binding GCodeViewer.IsEnabled}"/>
-      <CheckBox Content="Highlight completed cuts" FontSize="12"
+      <CheckBox Content="Highlight completed cuts" 
                 IsChecked="{Binding GCodeViewer.RenderExecuted, Mode=TwoWay}"
                 IsEnabled="{Binding GCodeViewer.IsEnabled}"/>
     </WrapPanel>

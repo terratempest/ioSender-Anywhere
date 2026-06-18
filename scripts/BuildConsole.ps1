@@ -31,15 +31,7 @@ function Set-BuildConsoleStopwatch {
 }
 
 function Update-PhaseBoard {
-    if ($script:BuildConsoleQuiet -or $script:BuildConsolePhaseOrder.Count -eq 0) {
-        return
-    }
-    $elapsed = if ($script:BuildConsoleElapsed) {
-        $script:BuildConsoleElapsed.Elapsed
-    } else {
-        [TimeSpan]::Zero
-    }
-    Render-PhaseBoard -Elapsed $elapsed
+    return
 }
 
 function Initialize-BuildConsole {
@@ -56,11 +48,16 @@ function Initialize-BuildConsole {
 
 function Write-BuildLine {
     param(
-        [string]$Message,
-        [ConsoleColor]$ForegroundColor = [ConsoleColor]::Gray
+        [string]$Message
     )
 
-    Write-Host $Message -ForegroundColor $ForegroundColor
+    [Console]::Out.WriteLine($Message)
+}
+
+function Write-PlainLine {
+    param([string]$Message = "")
+
+    [Console]::Out.WriteLine($Message)
 }
 
 function Format-ElapsedShort {
@@ -95,21 +92,29 @@ function Show-TargetMenu {
 
     $menuMap = @{
         '1' = 'All'
-        '2' = 'WinPortable'
-        '3' = 'WinInstaller'
-        '4' = 'LinuxDeb'
+        '2' = 'Windows'
+        '3' = 'Linux'
+        '4' = 'WinPortable'
+        '5' = 'WinInstaller'
+        '6' = 'LinuxDeb'
+        '7' = 'LinuxRpm'
+        '8' = 'LinuxAppImage'
     }
 
     while ($true) {
-        Write-Host ""
-        Write-Host " ioSender release build" -ForegroundColor Yellow
-        Write-Host " Version $($script:BuildConsoleVersion)"
-        Write-Host " -------------------------------------------------------"
-        Write-Host "  [1] Build all          portable + installer + .deb"
-        Write-Host "  [2] Windows portable   .zip"
-        Write-Host "  [3] Windows installer  .exe"
-        Write-Host ("  [4] Linux .deb         WSL: {0}" -f $WslStatus)
-        Write-Host " -------------------------------------------------------"
+        Write-PlainLine
+        Write-PlainLine " ioSender release build"
+        Write-PlainLine " Version $($script:BuildConsoleVersion)"
+        Write-PlainLine " -------------------------------------------------------"
+        Write-PlainLine "  [1] Build all          Windows + Linux packages"
+        Write-PlainLine "  [2] Windows            .zip + installer"
+        Write-PlainLine ("  [3] Linux              .deb + .rpm + AppImage  WSL: {0}" -f $WslStatus)
+        Write-PlainLine "  [4] Windows portable   .zip"
+        Write-PlainLine "  [5] Windows installer  .exe"
+        Write-PlainLine ("  [6] Linux .deb         WSL: {0}" -f $WslStatus)
+        Write-PlainLine ("  [7] Linux .rpm         WSL: {0}" -f $WslStatus)
+        Write-PlainLine ("  [8] Linux AppImage     WSL: {0}" -f $WslStatus)
+        Write-PlainLine " -------------------------------------------------------"
 
         $choice = Read-Host "  Choice [1]"
         if ([string]::IsNullOrWhiteSpace($choice)) {
@@ -120,7 +125,7 @@ function Show-TargetMenu {
             return $menuMap[$choice]
         }
 
-        Write-Host "  Invalid choice '$choice'. Enter 1, 2, 3, or 4." -ForegroundColor Red
+        Write-PlainLine "  Invalid choice '$choice'. Enter 1 through 8."
     }
 }
 
@@ -138,17 +143,16 @@ function Show-PreflightPanel {
         return
     }
 
-    Write-Host ""
-    Write-Host " Prerequisites"
+    Write-PlainLine
+    Write-PlainLine " Prerequisites"
     foreach ($check in $Checks) {
         $status = if ($check.Ok) { 'ok' } else { 'FAIL' }
-        $color = if ($check.Ok) { 'Green' } else { 'Red' }
-        Write-Host ("   {0,-12} {1,-12} {2}" -f $check.Label, $check.Detail, $status) -ForegroundColor $color
+        Write-PlainLine ("  [{0}] {1}: {2}" -f $status, $check.Label, $check.Detail)
         if (-not $check.Ok) {
             throw $check.FailMessage
         }
     }
-    Write-Host ""
+    Write-PlainLine
 }
 
 function Initialize-PhaseBoard {
@@ -199,7 +203,7 @@ function Set-PhaseStatus {
         $phase.StartedAt = [DateTime]::UtcNow
     }
 
-    if ($script:BuildConsoleQuiet) {
+    if ($script:BuildConsoleQuiet -or $Status -in @('running', 'done', 'failed', 'skipped')) {
         $label = switch ($Status) {
             'running' { '...' }
             'done'    { 'ok' }
@@ -207,31 +211,15 @@ function Set-PhaseStatus {
             'skipped' { 'skip' }
             default   { '   ' }
         }
-        Write-Host ("  [{0}] {1}" -f $label, $Name)
+        Write-PlainLine ("  [{0}] {1}" -f $label, $Name)
         if ($Message) {
-            Write-Host "        $Message"
-        }
-    } elseif ($script:BuildConsoleBoardTop -ge 0) {
-        Update-PhaseBoard
-    } elseif ($Status -in @('running', 'done', 'failed', 'skipped')) {
-        Write-Host ("  {0}: {1}" -f (Get-PhaseDisplayName $Name), $Status)
-        if ($Message) {
-            Write-Host "        $Message"
+            Write-PlainLine "        $Message"
         }
     }
 }
 
 function Start-PhaseBoardDisplay {
-    if ($script:BuildConsoleQuiet -or $script:BuildConsoleBoardTop -ge 0) {
-        return
-    }
-
-    $elapsed = if ($script:BuildConsoleElapsed) {
-        $script:BuildConsoleElapsed.Elapsed
-    } else {
-        [TimeSpan]::Zero
-    }
-    Render-PhaseBoard -Elapsed $elapsed
+    return
 }
 
 function Get-PhaseDisplayName {
@@ -245,6 +233,8 @@ function Get-PhaseDisplayName {
         'WinPortable'  { return 'Win portable' }
         'WinInstaller' { return 'Win installer' }
         'LinuxDeb'     { return 'Linux .deb' }
+        'LinuxRpm'     { return 'Linux .rpm' }
+        'LinuxAppImage' { return 'Linux AppImage' }
         default        { return $Name }
     }
 }
@@ -329,50 +319,10 @@ function Get-PhaseBoardLines {
 function Write-PhaseBoardLines {
     param([string[]]$Lines)
 
-    if (-not (Test-CanUseConsoleCursor)) {
-        if ($script:BuildConsoleBoardTop -lt 0) {
-            Write-Host ""
-            foreach ($line in $Lines) {
-                Write-Host $line
-            }
-            $script:BuildConsoleBoardTop = 0
-            $script:BuildConsoleBoardLines = $Lines.Count
-        }
-        return
+    Write-PlainLine
+    foreach ($line in $Lines) {
+        Write-PlainLine $line
     }
-
-    $width = [Math]::Max(80, $Host.UI.RawUI.WindowSize.Width)
-
-    if ($script:BuildConsoleBoardTop -lt 0) {
-        Write-Host ""
-        $script:BuildConsoleBoardTop = $Host.UI.RawUI.CursorPosition.Y
-        foreach ($line in $Lines) {
-            Write-Host $line
-        }
-        $script:BuildConsoleBoardLines = $Lines.Count
-        return
-    }
-
-    $rowCount = [Math]::Max($Lines.Count, $script:BuildConsoleBoardLines)
-    for ($i = 0; $i -lt $rowCount; $i++) {
-        $y = $script:BuildConsoleBoardTop + $i
-        if ($y -ge ($Host.UI.RawUI.BufferSize.Height - 1)) {
-            break
-        }
-
-        $Host.UI.RawUI.CursorPosition = New-Object System.Management.Automation.Host.Coordinates(0, $y)
-        $text = if ($i -lt $Lines.Count) { $Lines[$i] } else { '' }
-        if ($text.Length -gt ($width - 1)) {
-            $text = $text.Substring(0, $width - 1)
-        }
-        Write-Host ($text.PadRight($width - 1)) -NoNewline
-    }
-
-    $afterY = [Math]::Min(
-        $script:BuildConsoleBoardTop + $Lines.Count,
-        $Host.UI.RawUI.BufferSize.Height - 1
-    )
-    $Host.UI.RawUI.CursorPosition = New-Object System.Management.Automation.Host.Coordinates(0, $afterY)
     $script:BuildConsoleBoardLines = $Lines.Count
 }
 
@@ -382,24 +332,11 @@ function Render-PhaseBoard {
         [System.Diagnostics.Process[]]$RunningProcesses = @()
     )
 
-    if ($script:BuildConsoleQuiet) {
-        return
-    }
-
-    $lines = Get-PhaseBoardLines -Elapsed $Elapsed
-    Write-PhaseBoardLines -Lines $lines
+    return
 }
 
 function Finish-PhaseBoard {
-    if ($script:BuildConsoleQuiet) {
-        return
-    }
-
-    if ($script:BuildConsoleBoardTop -ge 0) {
-        Write-Host ""
-        $script:BuildConsoleBoardTop = -1
-        $script:BuildConsoleBoardLines = 0
-    }
+    return
 }
 
 function Wait-BuildJobs {
@@ -485,19 +422,19 @@ function Show-FailureLogs {
         $phase = $script:BuildConsolePhases[$name]
         if ($phase.Status -ne 'failed') { continue }
 
-        Write-Host ""
-        Write-Host " --- $name failed ---" -ForegroundColor Red
+        Write-PlainLine
+        Write-PlainLine " --- $name failed ---"
         if ($null -ne $phase.ExitCode) {
-            Write-Host " exit code: $($phase.ExitCode)" -ForegroundColor DarkRed
+            Write-PlainLine " exit code: $($phase.ExitCode)"
         }
 
         $paths = @($phase.LogPath, $phase.ErrPath) | Where-Object { $_ -and (Test-Path $_) }
         foreach ($path in $paths) {
-            Write-Host " log: $path" -ForegroundColor DarkGray
+            Write-PlainLine " log: $path"
             if ($Verbose) {
-                Get-Content $path | Write-Host
+                Get-Content $path | ForEach-Object { Write-PlainLine $_ }
             } else {
-                Get-Content $path -Tail $TailLines | Write-Host
+                Get-Content $path -Tail $TailLines | ForEach-Object { Write-PlainLine $_ }
             }
         }
     }
@@ -510,28 +447,23 @@ function Show-BuildSummary {
         [switch]$Failed
     )
 
-    Write-Host ""
+    Write-PlainLine
     if ($Failed) {
-        Write-Host (" -- Build failed ({0}) --" -f (Format-ElapsedLong $Elapsed)) -ForegroundColor Red
+        Write-PlainLine (" -- Build failed ({0}) --" -f (Format-ElapsedLong $Elapsed))
     } else {
-        Write-Host (" -- Build complete ({0}) --" -f (Format-ElapsedLong $Elapsed)) -ForegroundColor Green
+        Write-PlainLine (" -- Build complete ({0}) --" -f (Format-ElapsedLong $Elapsed))
     }
-    Write-Host " -----------------------------------------------------------"
-    Write-Host ("  {0,-20} {1,-8} Path" -f 'Artifact', 'Status')
+    Write-PlainLine " -----------------------------------------------------------"
+    Write-PlainLine ("  {0,-24} {1,-8}" -f 'Artifact', 'Status')
 
     foreach ($result in $Results) {
         $status = $result.Status
-        $color = switch ($status) {
-            'ok' { 'Green' }
-            'FAIL' { 'Red' }
-            'skip' { 'DarkGray' }
-            default { 'Gray' }
-        }
         $path = if ($result.Path) { $result.Path } else { '-' }
-        Write-Host ("  {0,-20} {1,-8} {2}" -f $result.Label, $status, $path) -ForegroundColor $color
+        Write-PlainLine ("  {0,-24} {1,-8}" -f $result.Label, $status)
+        Write-PlainLine ("      {0}" -f $path)
     }
 
-    Write-Host " -----------------------------------------------------------"
+    Write-PlainLine " -----------------------------------------------------------"
 }
 
 function Show-VerbosePhaseLogs {
@@ -540,9 +472,9 @@ function Show-VerbosePhaseLogs {
         if ($phase.Status -notin @('done', 'failed')) { continue }
         foreach ($path in @($phase.LogPath, $phase.ErrPath)) {
             if (-not $path -or -not (Test-Path $path)) { continue }
-            Write-Host ""
-            Write-Host " --- $name : $path ---" -ForegroundColor DarkGray
-            Get-Content $path | Write-Host
+            Write-PlainLine
+            Write-PlainLine " --- $name : $path ---"
+            Get-Content $path | ForEach-Object { Write-PlainLine $_ }
         }
     }
 }

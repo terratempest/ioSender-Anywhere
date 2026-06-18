@@ -3,33 +3,26 @@
              xmlns:local="using:CNC.Controls.Config"
              x:Class="CNC.Controls.Config.AppAppearanceConfigPanel"
              MinWidth="720">
-  <GroupBox Header="Appearance" BorderBrush="{DynamicResource ThemeBorderLowBrush}">
+  <GroupBox Header="Appearance" TextElement.FontSize="12"
+    BorderBrush="{DynamicResource ThemeBorderLowBrush}">
     <Grid ColumnDefinitions="2*,Auto,2*,Auto,3*" RowDefinitions="Auto,*" ColumnSpacing="10">
       <StackPanel Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="5" Orientation="Horizontal" Spacing="8" Margin="0,0,0,8">
         <Grid ColumnDefinitions="90,*">
-        <TextBlock Grid.Column="0" Text="Theme:" FontSize="12" HorizontalAlignment="Right" VerticalAlignment="Center"/>
+          <TextBlock Grid.Column="0" Text="Theme:" HorizontalAlignment="Right" VerticalAlignment="Center"/>
           <ComboBox x:Name="ThemeCombo" Grid.Column="1" Margin="4,0,0,0" Width="170"
-                  FontSize="12" HorizontalAlignment="Left"
+                  HorizontalAlignment="Left"
                   SelectionChanged="OnThemeSelectionChanged"/>
         </Grid>
-        <Grid ColumnDefinitions="65,*">
-        <TextBlock Grid.Column="0" Text="Locale:" FontSize="12" HorizontalAlignment="Right" VerticalAlignment="Center"/>
-        <TextBox Grid.Column="1" Margin="4,0,0,0" Width="120" FontSize="12" HorizontalAlignment="Left"
-                 Text="{Binding Locale, Mode=TwoWay}"
-                 PlaceholderText="empty = default"
-                 ToolTip.Tip="UI culture (e.g. de-DE). Restart may be required."/>
-        </Grid>
-        <Button Content="Reset colors" FontSize="12" MinWidth="95" Click="OnResetColorsClick"/>
-        <Button Content="Save as theme" FontSize="12" MinWidth="105" Click="OnSaveAsThemeClick"/>
+        <Button Content="Reset colors" MinWidth="95" Click="OnResetColorsClick"/>
+        <Button Content="Save as theme" MinWidth="105" Click="OnSaveAsThemeClick"/>
         <CheckBox x:Name="UseSystemAccentCheck"
                   Content="Use system accent color"
-                  FontSize="12"
                   VerticalAlignment="Center"/>
       </StackPanel>
 
       <ScrollViewer Grid.Row="1" Grid.Column="0" VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled">
         <StackPanel>
-          <TextBlock Text="Theme colors" FontWeight="SemiBold" FontSize="12" Margin="0,0,0,4"/>
+          <TextBlock Text="Theme colors" FontWeight="SemiBold" Margin="0,0,0,4"/>
           <StackPanel x:Name="MainColorsPanel" Spacing="4"/>
         </StackPanel>
       </ScrollViewer>
@@ -38,9 +31,9 @@
 
       <ScrollViewer Grid.Row="1" Grid.Column="2" VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled">
         <StackPanel>
-          <TextBlock Text="3D viewer colors" FontWeight="SemiBold" FontSize="12" Margin="0,0,0,4"/>
+          <TextBlock Text="3D viewer colors" FontWeight="SemiBold" Margin="0,0,0,4"/>
           <StackPanel x:Name="ViewerColorsPanel" Spacing="4"/>
-          <Button x:Name="PreviewViewerButton" Content="Preview 3D viewer" FontSize="12" Margin="0,8,0,0"
+          <Button x:Name="PreviewViewerButton" Content="Preview 3D viewer" Margin="0,8,0,0"
                   Click="OnPreviewViewerClick"/>
         </StackPanel>
       </ScrollViewer>

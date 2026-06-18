@@ -28,7 +28,6 @@
       <controls:NumericTextBox.InnerRightContent>
         <TextBlock x:Name="unit"
           Text="{Binding Unit, RelativeSource={RelativeSource AncestorType=UserControl}}"
-          
           VerticalAlignment="Center" Margin="2,0,6,0" FontSize="10"
         />
       </controls:NumericTextBox.InnerRightContent>

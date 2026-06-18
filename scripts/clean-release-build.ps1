@@ -1,8 +1,11 @@
 # Remove intermediate and publish outputs so release builds always compile from current source.
 param(
     [Parameter(Mandatory = $true)]
-    [ValidateSet('All', 'WinPortable', 'WinInstaller', 'LinuxDeb')]
+    [ValidateSet('All', 'Windows', 'Linux', 'WinPortable', 'WinInstaller', 'LinuxDeb', 'LinuxRpm', 'LinuxAppImage')]
     [string]$Target,
+    [Alias('Rid')]
+    [ValidateSet('', 'win-x64', 'win-arm64', 'linux-x64', 'linux-arm64')]
+    [string]$RuntimeIdentifier = '',
     [switch]$Quiet
 )
 
@@ -15,11 +18,28 @@ $Artifacts = Join-Path $Root "artifacts"
 function Get-PublishDirsForTarget {
     param([string]$BuildTarget)
 
+    $windows = @('win-x64', 'win-arm64')
+    $linux = @('linux-x64', 'linux-arm64')
+    if ($RuntimeIdentifier) {
+        if ($RuntimeIdentifier.StartsWith('win')) {
+            $windows = @($RuntimeIdentifier)
+            $linux = @()
+        } elseif ($RuntimeIdentifier.StartsWith('linux')) {
+            $windows = @()
+            $linux = @($RuntimeIdentifier)
+        }
+    }
+    $windowsInstallers = @($windows | ForEach-Object { "$_-installer" })
+
     switch ($BuildTarget) {
-        'All' { return @('win-x64', 'win-x64-installer', 'linux-x64') }
-        'WinPortable' { return @('win-x64') }
-        'WinInstaller' { return @('win-x64-installer') }
-        'LinuxDeb' { return @('linux-x64') }
+        'All' { return @($windows + $windowsInstallers + $linux) }
+        'Windows' { return @($windows + $windowsInstallers) }
+        'Linux' { return @($linux) }
+        'WinPortable' { return @($windows) }
+        'WinInstaller' { return @($windowsInstallers) }
+        'LinuxDeb' { return @($linux) }
+        'LinuxRpm' { return @($linux) }
+        'LinuxAppImage' { return @($linux) }
     }
     return @()
 }
@@ -58,11 +78,14 @@ foreach ($name in (Get-PublishDirsForTarget -BuildTarget $Target)) {
     }
 }
 
-$debStaging = Join-Path $Root "packaging\debian-staging"
-if (Test-Path $debStaging) {
-    Remove-Item -LiteralPath $debStaging -Recurse -Force
-    if (-not $Quiet) {
-        Write-Host "  removed $debStaging"
+$stagingNames = @('debian-staging', 'rpm-staging', 'appimage-staging')
+foreach ($name in $stagingNames) {
+    $staging = Join-Path $Root "packaging\$name"
+    if (Test-Path $staging) {
+        Remove-Item -LiteralPath $staging -Recurse -Force
+        if (-not $Quiet) {
+            Write-Host "  removed $staging"
+        }
     }
 }
 

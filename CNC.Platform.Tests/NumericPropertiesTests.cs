@@ -1,10 +1,27 @@
 using CNC.Controls.Avalonia.Utilities;
+using CNC.Controls.Avalonia.Views;
 using CNC.Core;
 
 namespace CNC.Platform.Tests;
 
 public sealed class NumericPropertiesTests
 {
+    [Fact]
+    public void NumericField_defaults_to_no_unit()
+    {
+        var field = new NumericField();
+
+        Assert.Equal(string.Empty, field.Unit);
+    }
+
+    [Fact]
+    public void NumericField_preserves_explicit_unit()
+    {
+        var field = new NumericField { Unit = "mm" };
+
+        Assert.Equal("mm", field.Unit);
+    }
+
     [Theory]
     [InlineData("-###0.000", true, "###0.000", 1, true, 3)]
     [InlineData("###0.000", false, "###0.000", 1, true, 3)]

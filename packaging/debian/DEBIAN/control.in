@@ -2,7 +2,7 @@ Package: iosender
 Version: @VERSION@
 Section: utils
 Priority: optional
-Architecture: amd64
+Architecture: @ARCHITECTURE@
 Depends: @DEPENDS@
 Maintainer: ioSender <https://github.com/terjeio/ioSender>
 Description: G-code sender for grblHAL and Grbl controllers

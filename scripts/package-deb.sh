@@ -1,11 +1,25 @@
 #!/usr/bin/env bash
-# Build iosender_<version>_amd64.deb from a self-contained linux-x64 publish.
+# Build iosender_<version>_<arch>.deb from a self-contained Linux publish.
 set -euo pipefail
 ROOT="$(cd "$(dirname "$0")/.." && pwd)"
-PUBLISH_DIR="${PUBLISH_DIR:-$ROOT/artifacts/publish/linux-x64}"
-STAGING="$ROOT/packaging/debian-staging"
+RID="${RID:-linux-x64}"
+PUBLISH_DIR="${PUBLISH_DIR:-$ROOT/artifacts/publish/$RID}"
+STAGING="$ROOT/packaging/debian-staging/$RID"
 ARTIFACTS="$ROOT/artifacts"
 TEMPLATE_DEBIAN="$ROOT/packaging/debian"
+
+case "$RID" in
+  linux-x64)
+    DEB_ARCH="amd64"
+    ;;
+  linux-arm64)
+    DEB_ARCH="arm64"
+    ;;
+  *)
+    echo "error: unsupported Debian RID: $RID" >&2
+    exit 1
+    ;;
+esac
 
 resolve_version() {
   if [[ -n "${VERSION:-}" ]]; then
@@ -31,8 +45,8 @@ if [[ -z "$VERSION" ]]; then
   fi
 fi
 
-echo "Publishing fresh linux-x64 output..."
-OUT_DIR="$PUBLISH_DIR" bash "$ROOT/scripts/publish-linux.sh"
+echo "Publishing fresh $RID output..."
+RID="$RID" OUT_DIR="$PUBLISH_DIR" bash "$ROOT/scripts/publish-linux.sh"
 
 if [[ ! -f "$PUBLISH_DIR/ioSender" ]]; then
   echo "error: $PUBLISH_DIR/ioSender not found after publish" >&2
@@ -67,12 +81,18 @@ cp "$TEMPLATE_DEBIAN/usr/share/applications/iosender.desktop" "$STAGING/usr/shar
 cp "$ROOT/Icon/iosendericon.png" "$STAGING/usr/share/icons/hicolor/256x256/apps/iosender.png"
 cp "$TEMPLATE_DEBIAN/usr/lib/udev/rules.d/70-iosender-serial.rules" "$STAGING/usr/lib/udev/rules.d/"
 
-sed -e "s/@VERSION@/$VERSION/g" -e "s/@DEPENDS@/$DEPENDS/g" \
+sed -e "s/@VERSION@/$VERSION/g" -e "s/@ARCHITECTURE@/$DEB_ARCH/g" -e "s/@DEPENDS@/$DEPENDS/g" \
   "$TEMPLATE_DEBIAN/DEBIAN/control.in" > "$STAGING/DEBIAN/control"
 cp "$TEMPLATE_DEBIAN/DEBIAN/postinst" "$STAGING/DEBIAN/postinst"
 chmod 755 "$STAGING/DEBIAN/postinst"
+sed -i 's/\r$//' \
+  "$STAGING/DEBIAN/control" \
+  "$STAGING/DEBIAN/postinst" \
+  "$STAGING/usr/bin/iosender" \
+  "$STAGING/usr/share/applications/iosender.desktop" \
+  "$STAGING/usr/lib/udev/rules.d/70-iosender-serial.rules"
 
 mkdir -p "$ARTIFACTS"
-DEB_NAME="iosender_${VERSION}_amd64.deb"
+DEB_NAME="iosender_${VERSION}_${DEB_ARCH}.deb"
 dpkg-deb --root-owner-group --build "$STAGING" "$ARTIFACTS/$DEB_NAME"
 echo "Built $ARTIFACTS/$DEB_NAME"

@@ -1,7 +1,10 @@
-# Build Windows publish + Windows installer + Linux .deb (via WSL).
+# Build Windows packages and WSL-backed Linux packages.
 param(
-    [ValidateSet('All', 'WinPortable', 'WinInstaller', 'LinuxDeb', '')]
+    [ValidateSet('All', 'Windows', 'Linux', 'WinPortable', 'WinInstaller', 'LinuxDeb', 'LinuxRpm', 'LinuxAppImage', '')]
     [string]$Target = '',
+    [Alias('Rid')]
+    [ValidateSet('', 'win-x64', 'win-arm64', 'linux-x64', 'linux-arm64')]
+    [string]$RuntimeIdentifier = '',
     [switch]$Launch,
     [switch]$NoPause,
     [switch]$NoExplorer,
@@ -14,20 +17,13 @@ $ErrorActionPreference = "Stop"
 $Root = (Resolve-Path (Join-Path $PSScriptRoot "..")).Path
 $Scripts = Join-Path $Root "scripts"
 $Artifacts = Join-Path $Root "artifacts"
-$WinPublish = Join-Path $Artifacts "publish\win-x64"
-$WinExe = Join-Path $WinPublish "ioSender.exe"
 $Project = Join-Path $Root "ioSender\ioSender.csproj"
-$WslScriptWin = Join-Path $Scripts "wsl-build-deb.sh"
-$WinLog = Join-Path $Artifacts "build-win.log"
-$WinInstallerLog = Join-Path $Artifacts "build-win-installer.log"
-$WslLog = Join-Path $Artifacts "build-wsl.log"
-$WinErr = Join-Path $Artifacts "build-win.err"
-$WinInstallerErr = Join-Path $Artifacts "build-win-installer.err"
-$WslErr = Join-Path $Artifacts "build-wsl.err"
 $ExportDir = Join-Path $env:TEMP "iosender-export"
-
 $PsHost = if (Get-Command pwsh -ErrorAction SilentlyContinue) { 'pwsh' } else { 'powershell.exe' }
 $Quiet = [bool]$NoPause
+
+$WindowsRids = @('win-x64', 'win-arm64')
+$LinuxRids = @('linux-x64', 'linux-arm64')
 
 . (Join-Path $Scripts "BuildConsole.ps1")
 
@@ -111,8 +107,33 @@ function Ensure-WslDistroReady {
         if ([string]::IsNullOrWhiteSpace($message)) {
             $message = "No output from WSL."
         }
-        throw "WSL distro '$Distro' could not start (exit $LASTEXITCODE). Try 'wsl --shutdown' or reboot Windows, then re-run. Details: $message"
+        throw "WSL distro '$Distro' could not start (exit $LASTEXITCODE). Details: $message"
     }
+}
+
+function Get-WslHostRid {
+    param([string]$Distro)
+
+    $arch = (& wsl.exe -d $Distro --cd ~ -e /bin/bash -lc "uname -m" 2>$null | Select-Object -First 1).Trim()
+    switch ($arch) {
+        { $_ -in @('x86_64', 'amd64') } { return 'linux-x64' }
+        { $_ -in @('aarch64', 'arm64') } { return 'linux-arm64' }
+        default { throw "Unsupported WSL architecture '$arch'." }
+    }
+}
+
+function Test-WslCommandAvailable {
+    param(
+        [string]$Distro,
+        [string]$CommandName
+    )
+
+    if (-not $Distro) {
+        return $false
+    }
+
+    & wsl.exe -d $Distro --cd ~ -e /bin/bash -lc "command -v '$CommandName' >/dev/null 2>&1" 2>$null
+    return $LASTEXITCODE -eq 0
 }
 
 function Convert-ToWslPath([string]$WindowsPath) {
@@ -123,6 +144,10 @@ function Convert-ToWslPath([string]$WindowsPath) {
         return "/mnt/$drive/$rest"
     }
     throw "Cannot map '$WindowsPath' for WSL."
+}
+
+function Escape-BashSingleQuoted([string]$Value) {
+    return ($Value -replace "'", "'\''")
 }
 
 function Invoke-WslBash {
@@ -152,43 +177,6 @@ function Invoke-WslScriptFile {
     }
 }
 
-function Get-LinuxDebExport {
-    param(
-        [string]$Distro,
-        [string]$WindowsExportDir,
-        [string]$WslExportDir
-    )
-
-    for ($attempt = 0; $attempt -lt 5; $attempt++) {
-        $deb = Get-ChildItem $WindowsExportDir -Filter "iosender_*.deb" -ErrorAction SilentlyContinue |
-            Sort-Object LastWriteTime -Descending |
-            Select-Object -First 1
-        if ($deb) {
-            return $deb
-        }
-        Start-Sleep -Milliseconds 400
-    }
-
-    if ($Distro -and $WslExportDir) {
-        $copyScript = Join-Path $Scripts "wsl-copy-deb-export.sh"
-        try {
-            Invoke-WslScriptFile -Distro $Distro -ScriptPath $copyScript -Args @($WslExportDir)
-        } catch {
-            return $null
-        }
-
-        return Get-ChildItem $WindowsExportDir -Filter "iosender_*.deb" -ErrorAction SilentlyContinue |
-            Sort-Object LastWriteTime -Descending |
-            Select-Object -First 1
-    }
-
-    return $null
-}
-
-function Escape-BashSingleQuoted([string]$Value) {
-    return ($Value -replace "'", "'\''")
-}
-
 function Test-WslDirectory {
     param([string]$Distro, [string]$WslPath)
     & wsl.exe -d $Distro --cd ~ -e test -d $WslPath 2>$null
@@ -205,7 +193,7 @@ function Sync-SourceToWsl {
 
     if (-not (Test-WslDirectory -Distro $Distro -WslPath $wslSource)) {
         if (-not $Quiet) {
-            Write-Host "  Staging source for WSL (network drive)..."
+            [Console]::Out.WriteLine("  Staging source for WSL...")
         }
         $staging = Join-Path $env:TEMP "iosender-src-$PID"
         if (Test-Path $staging) { Remove-Item $staging -Recurse -Force }
@@ -213,7 +201,7 @@ function Sync-SourceToWsl {
 
         $robolog = Join-Path $Artifacts "robocopy-staging.log"
         $rc = robocopy $SourceRoot $staging /MIR `
-            /XD bin obj .git "artifacts\publish" packaging\debian-staging `
+            /XD bin obj .git "artifacts\publish" packaging\debian-staging packaging\rpm-staging packaging\appimage-staging `
             /NFL /NDL /NJH /NJS /NP `
             /LOG:$robolog
         if ($rc -ge 8) {
@@ -224,13 +212,10 @@ function Sync-SourceToWsl {
         if (-not (Test-WslDirectory -Distro $Distro -WslPath $wslSource)) {
             throw "Staged copy still not visible in WSL at $wslSource"
         }
-        if (-not $Quiet) {
-            Write-Host "  Staged source for WSL."
-        }
     }
 
     $src = Escape-BashSingleQuoted ($wslSource.TrimEnd('/') + '/')
-    $rsyncScript = "set -eu; mkdir -p ~/ioSender-build; rsync -a --delete --exclude=obj --exclude=bin --exclude=.git --exclude=packaging/debian-staging '$src' ~/ioSender-build/"
+    $rsyncScript = "set -eu; mkdir -p ~/ioSender-build; rsync -a --delete --exclude=obj --exclude=bin --exclude=.git --exclude=packaging/debian-staging --exclude=packaging/rpm-staging --exclude=packaging/appimage-staging '$src' ~/ioSender-build/"
     Invoke-WslBash -Distro $Distro -Script $rsyncScript
 }
 
@@ -244,16 +229,17 @@ function New-WslBuildScriptPath([string]$SourcePath) {
 function New-WindowsPortableZip {
     param(
         [string]$SourceDirectory,
-        [string]$Version
+        [string]$Version,
+        [string]$Rid
     )
 
     if (-not (Test-Path (Join-Path $SourceDirectory "ioSender.exe"))) {
         throw "Windows publish output missing: $SourceDirectory\ioSender.exe"
     }
 
-    $portableName = "ioSender-$Version-win-x64-portable"
+    $portableName = "ioSender-$Version-$Rid-portable"
     $zipPath = Join-Path $Artifacts "$portableName.zip"
-    $stagingRoot = Join-Path $env:TEMP "iosender-portable-$PID"
+    $stagingRoot = Join-Path $env:TEMP "iosender-portable-$PID-$Rid"
     $portableRoot = Join-Path $stagingRoot $portableName
 
     if (Test-Path $stagingRoot) { Remove-Item $stagingRoot -Recurse -Force }
@@ -296,19 +282,11 @@ function Test-DotNetSdk {
         return [PSCustomObject]@{
             Ok          = $false
             Detail      = 'not found'
-            FailMessage = '.NET SDK not found. Install .NET 8 SDK: https://dotnet.microsoft.com/download/dotnet/8.0'
+            FailMessage = '.NET SDK not found. Install .NET 8 SDK.'
         }
     }
 
     $version = (& dotnet --version 2>$null).Trim()
-    if ([string]::IsNullOrWhiteSpace($version)) {
-        return [PSCustomObject]@{
-            Ok          = $false
-            Detail      = 'unknown'
-            FailMessage = 'dotnet --version returned no output.'
-        }
-    }
-
     $major = 0
     [void][int]::TryParse(($version -split '\.')[0], [ref]$major)
     if ($major -lt 8) {
@@ -326,92 +304,131 @@ function Test-DotNetSdk {
     }
 }
 
-function Get-PhasesForTarget {
+function Test-TargetIncludesWindows {
     param([string]$BuildTarget)
+    return $BuildTarget -in @('All', 'Windows', 'WinPortable', 'WinInstaller')
+}
 
+function Test-TargetIncludesLinux {
+    param([string]$BuildTarget)
+    return $BuildTarget -in @('All', 'Linux', 'LinuxDeb', 'LinuxRpm', 'LinuxAppImage')
+}
+
+function Get-WindowsPackageTargets {
+    param([string]$BuildTarget)
     switch ($BuildTarget) {
-        'All' {
-            return @('Preflight', 'Clean', 'WslSync', 'WinPublish', 'WinPortable', 'WinInstaller', 'LinuxDeb')
-        }
-        'WinPortable' {
-            return @('Preflight', 'Clean', 'WinPublish', 'WinPortable')
-        }
-        'WinInstaller' {
-            return @('Preflight', 'Clean', 'WinInstaller')
-        }
-        'LinuxDeb' {
-            return @('Preflight', 'Clean', 'WslSync', 'LinuxDeb')
-        }
-        default {
-            throw "Unknown target '$BuildTarget'."
-        }
+        { $_ -in @('All', 'Windows') } { return @('WinPortable', 'WinInstaller') }
+        'WinPortable' { return @('WinPortable') }
+        'WinInstaller' { return @('WinInstaller') }
+        default { return @() }
     }
 }
 
-function Test-TargetNeedsLinux {
+function Get-LinuxPackageTargets {
     param([string]$BuildTarget)
-    return $BuildTarget -in @('All', 'LinuxDeb')
+    switch ($BuildTarget) {
+        { $_ -in @('All', 'Linux') } { return @('LinuxDeb', 'LinuxRpm', 'LinuxAppImage') }
+        'LinuxDeb' { return @('LinuxDeb') }
+        'LinuxRpm' { return @('LinuxRpm') }
+        'LinuxAppImage' { return @('LinuxAppImage') }
+        default { return @() }
+    }
 }
 
-function Test-TargetNeedsInstaller {
+function Assert-TargetRidCompatibility {
     param([string]$BuildTarget)
-    return $BuildTarget -in @('All', 'WinInstaller')
+
+    if (-not $RuntimeIdentifier) { return }
+
+    $isWindowsTarget = Test-TargetIncludesWindows -BuildTarget $BuildTarget
+    $isLinuxTarget = Test-TargetIncludesLinux -BuildTarget $BuildTarget
+    if ($BuildTarget -in @('WinPortable', 'WinInstaller', 'Windows') -and -not $RuntimeIdentifier.StartsWith('win')) {
+        throw "$BuildTarget requires a Windows RID."
+    }
+    if ($BuildTarget -in @('LinuxDeb', 'LinuxRpm', 'LinuxAppImage', 'Linux') -and -not $RuntimeIdentifier.StartsWith('linux')) {
+        throw "$BuildTarget requires a Linux RID."
+    }
+    if (-not $isWindowsTarget -and -not $isLinuxTarget) {
+        throw "Unknown target '$BuildTarget'."
+    }
 }
 
-function Test-TargetNeedsPortable {
+function Get-SelectedWindowsRids {
     param([string]$BuildTarget)
-    return $BuildTarget -in @('All', 'WinPortable')
+
+    if (-not (Test-TargetIncludesWindows -BuildTarget $BuildTarget)) { return @() }
+    if ($RuntimeIdentifier) {
+        if ($RuntimeIdentifier.StartsWith('win')) { return @($RuntimeIdentifier) }
+        return @()
+    }
+    return $WindowsRids
 }
 
-function Start-PowerShellJob {
+function Get-SelectedLinuxRids {
     param(
-        [string]$ScriptPath,
-        [string]$LogPath,
-        [string]$ErrPath
+        [string]$BuildTarget
     )
 
-    $args = "-NoProfile -ExecutionPolicy Bypass -File `"$ScriptPath`""
-    return Start-Process -FilePath $PsHost -WorkingDirectory $env:TEMP `
-        -ArgumentList $args -PassThru -NoNewWindow `
-        -RedirectStandardOutput $LogPath -RedirectStandardError $ErrPath
-}
-
-function Clear-WslBuildState {
-    param([string]$Distro)
-
-    $cleanScript = Join-Path $Scripts "wsl-clean-build.sh"
-    Invoke-WslScriptFile -Distro $Distro -ScriptPath $cleanScript
-}
-
-function Invoke-FreshBuildClean {
-    param([string]$BuildTarget)
-
-    $cleanScript = Join-Path $Scripts "clean-release-build.ps1"
-    & $PsHost -NoProfile -ExecutionPolicy Bypass -File $cleanScript -Target $BuildTarget -Quiet
-    if ($LASTEXITCODE -ne 0) {
-        throw "Release clean failed (exit $LASTEXITCODE)."
+    if (-not (Test-TargetIncludesLinux -BuildTarget $BuildTarget)) { return @() }
+    if ($RuntimeIdentifier) {
+        if ($RuntimeIdentifier.StartsWith('linux')) { return @($RuntimeIdentifier) }
+        return @()
     }
+    return $LinuxRids
+}
 
-    $solution = Join-Path $Root "ioSender.net.sln"
-    & dotnet restore $solution --force --nologo -v:q
-    if ($LASTEXITCODE -ne 0) {
-        throw "dotnet restore failed (exit $LASTEXITCODE)."
+function Get-DebArch {
+    param([string]$Rid)
+    switch ($Rid) {
+        'linux-x64' { return 'amd64' }
+        'linux-arm64' { return 'arm64' }
+        default { throw "Unsupported Debian RID '$Rid'." }
     }
 }
 
-function Clear-StaleArtifacts {
-    param([string]$BuildTarget)
+function Get-LinuxArtifactPattern {
+    param(
+        [string]$PackageTarget,
+        [string]$Rid
+    )
 
-    Get-ChildItem $ExportDir -Filter "iosender_*.deb" -ErrorAction SilentlyContinue | Remove-Item -Force
-    if ($BuildTarget -in @('All', 'WinInstaller')) {
-        Get-ChildItem $Artifacts -Filter "ioSender-Setup-*-win-x64.exe" -ErrorAction SilentlyContinue | Remove-Item -Force
+    switch ($PackageTarget) {
+        'LinuxDeb' { return "iosender_*_$(Get-DebArch -Rid $Rid).deb" }
+        'LinuxRpm' { return "ioSender-*-$Rid.rpm" }
+        'LinuxAppImage' { return "ioSender-*-$Rid.AppImage" }
+        default { throw "Unsupported Linux package target '$PackageTarget'." }
     }
-    if ($BuildTarget -in @('All', 'WinPortable')) {
-        Get-ChildItem $Artifacts -Filter "ioSender-*-win-x64-portable.zip" -ErrorAction SilentlyContinue | Remove-Item -Force
+}
+
+function Get-PhasesForTarget {
+    param(
+        [string[]]$WinRids,
+        [string[]]$LinuxBuildRids,
+        [string[]]$WinPackages,
+        [string[]]$LinuxPackages
+    )
+
+    $phases = @('Preflight', 'Clean')
+    if ($LinuxBuildRids.Count -gt 0) {
+        $phases += 'WslSync'
     }
-    if ($BuildTarget -in @('All', 'LinuxDeb')) {
-        Get-ChildItem $Artifacts -Filter "iosender_*.deb" -ErrorAction SilentlyContinue | Remove-Item -Force
+    if ($WinPackages -contains 'WinPortable') {
+        foreach ($rid in $WinRids) {
+            $phases += "WinPublish:$rid"
+            $phases += "WinPortable:$rid"
+        }
     }
+    if ($WinPackages -contains 'WinInstaller') {
+        foreach ($rid in $WinRids) {
+            $phases += "WinInstaller:$rid"
+        }
+    }
+    foreach ($package in $LinuxPackages) {
+        foreach ($rid in $LinuxBuildRids) {
+            $phases += "${package}:$rid"
+        }
+    }
+    return $phases
 }
 
 function Test-PhaseFailed {
@@ -423,15 +440,158 @@ function Test-PhaseFailed {
     return $script:BuildConsolePhases[$PhaseName].Status -eq 'failed'
 }
 
-function Test-BuildTargetFailed {
-    param([string]$BuildTarget)
-
-    foreach ($phaseName in (Get-PhasesForTarget -BuildTarget $BuildTarget)) {
+function Test-AnyPhaseFailed {
+    foreach ($phaseName in $script:BuildConsolePhaseOrder) {
         if (Test-PhaseFailed -PhaseName $phaseName) {
             return $true
         }
     }
     return $false
+}
+
+function ConvertTo-ProcessArgumentLine {
+    param([string[]]$Arguments)
+
+    return (($Arguments | ForEach-Object {
+        if ($_ -match '[\s"]') {
+            '"' + ($_ -replace '"', '\"') + '"'
+        } else {
+            $_
+        }
+    }) -join ' ')
+}
+
+function Get-PhaseLogPath {
+    param(
+        [string]$PhaseName,
+        [string]$Extension
+    )
+
+    $safeName = $PhaseName -replace '[^A-Za-z0-9_.-]', '-'
+    return (Join-Path $Artifacts "build-$safeName.$Extension")
+}
+
+function Invoke-PhaseProcess {
+    param(
+        [string]$PhaseName,
+        [string]$FilePath,
+        [string[]]$Arguments,
+        [string]$LogPath,
+        [string]$ErrPath,
+        [string]$SuccessPath = $null
+    )
+
+    foreach ($log in @($LogPath, $ErrPath)) {
+        if ($log -and (Test-Path $log)) { Remove-Item $log -Force }
+    }
+
+    Set-PhaseStatus -Name $PhaseName -Status 'running' -LogPath $LogPath -ErrPath $ErrPath
+    Start-PhaseBoardDisplay
+
+    $argumentLine = ConvertTo-ProcessArgumentLine -Arguments $Arguments
+    $process = Start-Process -FilePath $FilePath -WorkingDirectory $Root `
+        -ArgumentList $argumentLine -PassThru -Wait -WindowStyle Hidden `
+        -RedirectStandardOutput $LogPath -RedirectStandardError $ErrPath
+
+    $ok = $process.ExitCode -eq 0
+    if ($ok -and $SuccessPath) {
+        $ok = Test-Path $SuccessPath
+    }
+
+    Set-PhaseStatus -Name $PhaseName -Status $(if ($ok) { 'done' } else { 'failed' }) -ExitCode $process.ExitCode
+    return $ok
+}
+
+function Invoke-FreshBuildClean {
+    param([string]$BuildTarget)
+
+    $cleanScript = Join-Path $Scripts "clean-release-build.ps1"
+    $args = @('-NoProfile', '-ExecutionPolicy', 'Bypass', '-File', $cleanScript, '-Target', $BuildTarget, '-Quiet')
+    if ($RuntimeIdentifier) {
+        $args += @('-RuntimeIdentifier', $RuntimeIdentifier)
+    }
+
+    & $PsHost @args
+    if ($LASTEXITCODE -ne 0) {
+        throw "Release clean failed (exit $LASTEXITCODE)."
+    }
+
+    $solution = Join-Path $Root "ioSender.net.sln"
+    & dotnet restore $solution --force --nologo -v:q
+    if ($LASTEXITCODE -ne 0) {
+        throw "dotnet restore failed (exit $LASTEXITCODE)."
+    }
+}
+
+function Clear-WslBuildState {
+    param([string]$Distro)
+
+    $cleanScript = Join-Path $Scripts "wsl-clean-build.sh"
+    Invoke-WslScriptFile -Distro $Distro -ScriptPath $cleanScript
+}
+
+function Clear-StaleArtifacts {
+    param(
+        [string[]]$WinRids,
+        [string[]]$LinuxBuildRids,
+        [string[]]$WinPackages,
+        [string[]]$LinuxPackages
+    )
+
+    Get-ChildItem $ExportDir -File -ErrorAction SilentlyContinue | Remove-Item -Force
+
+    if ($WinPackages -contains 'WinInstaller') {
+        foreach ($rid in $WinRids) {
+            Get-ChildItem $Artifacts -Filter "ioSender-Setup-*-$rid.exe" -ErrorAction SilentlyContinue | Remove-Item -Force
+        }
+    }
+    if ($WinPackages -contains 'WinPortable') {
+        foreach ($rid in $WinRids) {
+            Get-ChildItem $Artifacts -Filter "ioSender-*-$rid-portable.zip" -ErrorAction SilentlyContinue | Remove-Item -Force
+        }
+    }
+    foreach ($package in $LinuxPackages) {
+        foreach ($rid in $LinuxBuildRids) {
+            $pattern = Get-LinuxArtifactPattern -PackageTarget $package -Rid $rid
+            Get-ChildItem $Artifacts -Filter $pattern -ErrorAction SilentlyContinue | Remove-Item -Force
+        }
+    }
+}
+
+function Get-LinuxExport {
+    param(
+        [string]$Distro,
+        [string]$WindowsExportDir,
+        [string]$WslExportDir,
+        [string]$PackageTarget,
+        [string]$Rid
+    )
+
+    $pattern = Get-LinuxArtifactPattern -PackageTarget $PackageTarget -Rid $Rid
+    for ($attempt = 0; $attempt -lt 5; $attempt++) {
+        $artifact = Get-ChildItem $WindowsExportDir -Filter $pattern -ErrorAction SilentlyContinue |
+            Sort-Object LastWriteTime -Descending |
+            Select-Object -First 1
+        if ($artifact) {
+            return $artifact
+        }
+        Start-Sleep -Milliseconds 400
+    }
+
+    if ($Distro -and $WslExportDir) {
+        $copyScript = Join-Path $Scripts "wsl-copy-deb-export.sh"
+        try {
+            Invoke-WslScriptFile -Distro $Distro -ScriptPath $copyScript -Args @($WslExportDir, $Rid)
+        } catch {
+            return $null
+        }
+
+        return Get-ChildItem $WindowsExportDir -Filter $pattern -ErrorAction SilentlyContinue |
+            Sort-Object LastWriteTime -Descending |
+            Select-Object -First 1
+    }
+
+    return $null
 }
 
 function Invoke-ReleaseBuild {
@@ -447,12 +607,26 @@ function Invoke-ReleaseBuild {
         $BuildTarget = Show-TargetMenu -WslStatus $wslStatus
     }
 
-    $needsLinux = Test-TargetNeedsLinux -BuildTarget $BuildTarget
-    $needsInstaller = Test-TargetNeedsInstaller -BuildTarget $BuildTarget
-    $needsPortable = Test-TargetNeedsPortable -BuildTarget $BuildTarget
-    $needsPublish = $BuildTarget -in @('All', 'WinPortable')
+    Assert-TargetRidCompatibility -BuildTarget $BuildTarget
 
-    Initialize-PhaseBoard -Phases (Get-PhasesForTarget -BuildTarget $BuildTarget)
+    $targetMayNeedLinux = (Test-TargetIncludesLinux -BuildTarget $BuildTarget) -and
+        (-not $RuntimeIdentifier -or $RuntimeIdentifier.StartsWith('linux'))
+    $distro = $null
+    $wslHostRid = 'linux-x64'
+    if ($targetMayNeedLinux -and $wslHint.Ready) {
+        $distro = Get-WslDistroName -Preferred $WslDistro
+        Ensure-WslDistroReady -Distro $distro
+        $wslHostRid = Get-WslHostRid -Distro $distro
+    }
+
+    $winPackages = Get-WindowsPackageTargets -BuildTarget $BuildTarget
+    $linuxPackages = Get-LinuxPackageTargets -BuildTarget $BuildTarget
+    $winRids = Get-SelectedWindowsRids -BuildTarget $BuildTarget
+    $linuxBuildRids = Get-SelectedLinuxRids -BuildTarget $BuildTarget
+    $needsLinux = $linuxBuildRids.Count -gt 0
+    $needsInstaller = (($winPackages -contains 'WinInstaller') -and $winRids.Count -gt 0)
+
+    Initialize-PhaseBoard -Phases (Get-PhasesForTarget -WinRids $winRids -LinuxBuildRids $linuxBuildRids -WinPackages $winPackages -LinuxPackages $linuxPackages)
 
     $totalSw = [System.Diagnostics.Stopwatch]::StartNew()
     Set-BuildConsoleStopwatch -Stopwatch $totalSw
@@ -481,9 +655,36 @@ function Invoke-ReleaseBuild {
     if ($needsLinux) {
         $checks += [PSCustomObject]@{
             Label       = 'WSL'
-            Detail      = if ($wslHint.Ready) { $wslHint.Detail } else { $wslHint.Detail }
+            Detail      = if ($wslHint.Ready) { "$($wslHint.Detail), $wslHostRid" } else { $wslHint.Detail }
             Ok          = $wslHint.Ready
-            FailMessage = 'WSL is required for Linux .deb builds. Install WSL + Ubuntu.'
+            FailMessage = 'WSL is required for Linux package builds. Install WSL + Ubuntu.'
+        }
+        foreach ($rid in $linuxBuildRids) {
+            $ridDetail = if ($rid -eq $wslHostRid) { "$rid native" } else { "$rid cross-build" }
+            $checks += [PSCustomObject]@{
+                Label       = 'Linux RID'
+                Detail      = $ridDetail
+                Ok          = $true
+                FailMessage = $null
+            }
+        }
+        if ($linuxPackages -contains 'LinuxRpm') {
+            $hasRpmBuild = Test-WslCommandAvailable -Distro $distro -CommandName 'rpmbuild'
+            $checks += [PSCustomObject]@{
+                Label       = 'rpmbuild'
+                Detail      = if ($hasRpmBuild) { 'found' } else { 'not found' }
+                Ok          = $hasRpmBuild
+                FailMessage = 'rpmbuild is required for Linux .rpm builds. Install in WSL: sudo apt install -y rpm'
+            }
+        }
+        if ($linuxPackages -contains 'LinuxAppImage') {
+            $hasAppImageTool = Test-WslCommandAvailable -Distro $distro -CommandName 'appimagetool'
+            $checks += [PSCustomObject]@{
+                Label       = 'appimagetool'
+                Detail      = if ($hasAppImageTool) { 'found' } else { 'not found' }
+                Ok          = $hasAppImageTool
+                FailMessage = 'appimagetool is required for Linux AppImage builds. Install appimagetool in WSL and ensure it is on PATH.'
+            }
         }
     }
 
@@ -492,22 +693,21 @@ function Invoke-ReleaseBuild {
 
     New-Item -ItemType Directory -Force -Path $Artifacts | Out-Null
     New-Item -ItemType Directory -Force -Path $ExportDir | Out-Null
-    Clear-StaleArtifacts -BuildTarget $BuildTarget
+    Clear-StaleArtifacts -WinRids $winRids -LinuxBuildRids $linuxBuildRids -WinPackages $winPackages -LinuxPackages $linuxPackages
 
     Set-PhaseStatus -Name 'Clean' -Status 'running'
     Invoke-FreshBuildClean -BuildTarget $BuildTarget
     Set-PhaseStatus -Name 'Clean' -Status 'done'
 
-    $publishScript = Join-Path $Scripts "publish-windows.ps1"
-    $installerScript = Join-Path $Scripts "package-windows-installer.ps1"
-    $distro = $null
     $wslExport = $null
     $wslSh = $null
-
     if ($needsLinux) {
         Ensure-WslInstalled
-        $distro = Get-WslDistroName -Preferred $WslDistro
-        Ensure-WslDistroReady -Distro $distro
+        if (-not $distro) {
+            $distro = Get-WslDistroName -Preferred $WslDistro
+            Ensure-WslDistroReady -Distro $distro
+            $wslHostRid = Get-WslHostRid -Distro $distro
+        }
 
         Set-PhaseStatus -Name 'WslSync' -Status 'running'
         Sync-SourceToWsl -Distro $distro -SourceRoot $Root
@@ -515,162 +715,93 @@ function Invoke-ReleaseBuild {
         Set-PhaseStatus -Name 'WslSync' -Status 'done'
 
         $wslExport = Convert-ToWslPath $ExportDir
-        $wslSh = New-WslBuildScriptPath $WslScriptWin
-    } else {
-        Set-PhaseStatus -Name 'WslSync' -Status 'skipped'
-        Set-PhaseStatus -Name 'LinuxDeb' -Status 'skipped'
-    }
-
-    $winPs = $null
-    $wslPs = $null
-    $winInstallerPs = $null
-    $parallelJobs = @{}
-
-    if ($needsPublish) {
-        foreach ($log in @($WinLog, $WinErr)) {
-            if (Test-Path $log) { Remove-Item $log -Force }
-        }
-        Set-PhaseStatus -Name 'WinPublish' -Status 'running' -LogPath $WinLog -ErrPath $WinErr
-        $winPs = Start-PowerShellJob -ScriptPath $publishScript -LogPath $WinLog -ErrPath $WinErr
-        $parallelJobs['WinPublish'] = @{
-            Process     = $winPs
-            LogPath     = $WinLog
-            ErrPath     = $WinErr
-            SuccessPath = $WinExe
-        }
-    } else {
-        Set-PhaseStatus -Name 'WinPublish' -Status 'skipped'
-    }
-
-    if ($needsLinux) {
-        foreach ($log in @($WslLog, $WslErr)) {
-            if (Test-Path $log) { Remove-Item $log -Force }
-        }
-        $wslArgs = "-d $distro --cd ~ -e /bin/bash `"$wslSh`" `"$wslExport`""
-        Set-PhaseStatus -Name 'LinuxDeb' -Status 'running' -LogPath $WslLog -ErrPath $WslErr
-        $wslPs = Start-Process -FilePath "wsl.exe" -WorkingDirectory $env:TEMP `
-            -ArgumentList $wslArgs -PassThru -NoNewWindow `
-            -RedirectStandardOutput $WslLog -RedirectStandardError $WslErr
-        $parallelJobs['LinuxDeb'] = @{
-            Process     = $wslPs
-            LogPath     = $WslLog
-            ErrPath     = $WslErr
-            SuccessPath = $ExportDir
-            RequireDeb  = $true
-        }
-    }
-
-    if ($parallelJobs.Count -gt 0) {
-        Start-PhaseBoardDisplay
-        $null = Wait-BuildJobs -JobMap $parallelJobs
-    }
-
-    if (-not $needsPublish) {
-        Set-PhaseStatus -Name 'WinPortable' -Status 'skipped'
-    }
-    if (-not $needsInstaller) {
-        Set-PhaseStatus -Name 'WinInstaller' -Status 'skipped'
-    }
-
-    $winZip = $null
-    if ($needsPortable) {
-        if (Test-Path $WinExe) {
-            Set-PhaseStatus -Name 'WinPortable' -Status 'running'
-            $winZip = New-WindowsPortableZip -SourceDirectory $WinPublish -Version $version
-            Set-PhaseStatus -Name 'WinPortable' -Status 'done' -Message $winZip
-        } else {
-            Set-PhaseStatus -Name 'WinPortable' -Status 'failed' -Message 'ioSender.exe missing'
-        }
-    }
-
-    if ($needsInstaller) {
-        if ($BuildTarget -eq 'All' -and -not (Test-Path $WinExe)) {
-            Set-PhaseStatus -Name 'WinInstaller' -Status 'skipped' -Message 'skipped (publish failed)'
-        } else {
-            foreach ($log in @($WinInstallerLog, $WinInstallerErr)) {
-                if (Test-Path $log) { Remove-Item $log -Force }
-            }
-            Set-PhaseStatus -Name 'WinInstaller' -Status 'running' -LogPath $WinInstallerLog -ErrPath $WinInstallerErr
-            Start-PhaseBoardDisplay
-            $winInstallerPs = Start-PowerShellJob -ScriptPath $installerScript -LogPath $WinInstallerLog -ErrPath $WinInstallerErr
-            $installerJobs = @{
-                WinInstaller = @{
-                    Process     = $winInstallerPs
-                    LogPath     = $WinInstallerLog
-                    ErrPath     = $WinInstallerErr
-                    SuccessPath = $null
-                }
-            }
-            $null = Wait-BuildJobs -JobMap $installerJobs
-
-            $winInstallerCheck = Get-ChildItem (Join-Path $Artifacts "ioSender-Setup-*-win-x64.exe") -ErrorAction SilentlyContinue |
-                Sort-Object LastWriteTime -Descending |
-                Select-Object -First 1
-            if ($script:BuildConsolePhases['WinInstaller'].Status -eq 'done' -and -not $winInstallerCheck) {
-                Set-PhaseStatus -Name 'WinInstaller' -Status 'failed' -Message 'setup .exe missing'
-            } elseif ($winInstallerCheck) {
-                Set-PhaseStatus -Name 'WinInstaller' -Status 'done' -Message $winInstallerCheck.Name
-            }
-        }
-    }
-
-    if ($needsLinux) {
-        $debExport = Get-LinuxDebExport -Distro $distro -WindowsExportDir $ExportDir -WslExportDir $wslExport
-
-        if ($debExport) {
-            Copy-Item $debExport.FullName (Join-Path $Artifacts $debExport.Name) -Force
-            Set-PhaseStatus -Name 'LinuxDeb' -Status 'done' -Message $debExport.Name
-        } else {
-            Set-PhaseStatus -Name 'LinuxDeb' -Status 'failed' -Message '.deb missing from export'
-        }
-    }
-
-    $deb = $null
-    if (-not (Test-PhaseFailed -PhaseName 'LinuxDeb')) {
-        $deb = Get-ChildItem (Join-Path $Artifacts "iosender_*.deb") -ErrorAction SilentlyContinue |
-            Sort-Object LastWriteTime -Descending |
-            Select-Object -First 1
-    }
-
-    $winInstaller = $null
-    if (-not (Test-PhaseFailed -PhaseName 'WinInstaller')) {
-        $winInstaller = Get-ChildItem (Join-Path $Artifacts "ioSender-Setup-*-win-x64.exe") -ErrorAction SilentlyContinue |
-            Sort-Object LastWriteTime -Descending |
-            Select-Object -First 1
+        $wslSh = New-WslBuildScriptPath (Join-Path $Scripts "wsl-build-deb.sh")
     }
 
     $results = @()
-    if ($BuildTarget -in @('All', 'WinPortable')) {
-        $portableOk = (-not (Test-PhaseFailed -PhaseName 'WinPortable')) -and
-            (-not (Test-PhaseFailed -PhaseName 'WinPublish')) -and
-            ($null -ne $winZip -and (Test-Path $winZip))
-        $results += [PSCustomObject]@{
-            Label  = 'Windows portable'
-            Status = if ($portableOk) { 'ok' } else { 'FAIL' }
-            Path   = if ($portableOk) { $winZip } else { $null }
+    $publishScript = Join-Path $Scripts "publish-windows.ps1"
+    $installerScript = Join-Path $Scripts "package-windows-installer.ps1"
+
+    if ($winPackages -contains 'WinPortable') {
+        foreach ($rid in $winRids) {
+            $publishDir = Join-Path $Artifacts "publish\$rid"
+            $exe = Join-Path $publishDir "ioSender.exe"
+            $phase = "WinPublish:$rid"
+            $log = Get-PhaseLogPath -PhaseName $phase -Extension 'log'
+            $err = Get-PhaseLogPath -PhaseName $phase -Extension 'err'
+            [void](Invoke-PhaseProcess -PhaseName $phase -FilePath $PsHost -Arguments @('-NoProfile', '-ExecutionPolicy', 'Bypass', '-File', $publishScript, '-RuntimeIdentifier', $rid) -LogPath $log -ErrPath $err -SuccessPath $exe)
+
+            $zip = $null
+            $zipPhase = "WinPortable:$rid"
+            if (Test-Path $exe) {
+                Set-PhaseStatus -Name $zipPhase -Status 'running'
+                try {
+                    $zip = New-WindowsPortableZip -SourceDirectory $publishDir -Version $version -Rid $rid
+                    Set-PhaseStatus -Name $zipPhase -Status 'done' -Message $zip
+                } catch {
+                    Set-PhaseStatus -Name $zipPhase -Status 'failed' -Message $_.Exception.Message
+                }
+            } else {
+                Set-PhaseStatus -Name $zipPhase -Status 'failed' -Message 'ioSender.exe missing'
+            }
+
+            $ok = (-not (Test-PhaseFailed -PhaseName $phase)) -and
+                (-not (Test-PhaseFailed -PhaseName $zipPhase)) -and
+                ($zip -and (Test-Path $zip))
+            $results += [PSCustomObject]@{
+                Label  = "Win zip $rid"
+                Status = if ($ok) { 'ok' } else { 'FAIL' }
+                Path   = if ($ok) { $zip } else { $null }
+            }
         }
     }
-    if ($BuildTarget -in @('All', 'WinInstaller')) {
-        $installerOk = (-not (Test-PhaseFailed -PhaseName 'WinInstaller')) -and
-            ($null -ne $winInstaller)
-        $results += [PSCustomObject]@{
-            Label  = 'Windows installer'
-            Status = if ($installerOk) { 'ok' } else { 'FAIL' }
-            Path   = if ($installerOk) { $winInstaller.FullName } else { $null }
+
+    if ($winPackages -contains 'WinInstaller') {
+        foreach ($rid in $winRids) {
+            $phase = "WinInstaller:$rid"
+            $log = Get-PhaseLogPath -PhaseName $phase -Extension 'log'
+            $err = Get-PhaseLogPath -PhaseName $phase -Extension 'err'
+            $installer = Join-Path $Artifacts "ioSender-Setup-$version-$rid.exe"
+            [void](Invoke-PhaseProcess -PhaseName $phase -FilePath $PsHost -Arguments @('-NoProfile', '-ExecutionPolicy', 'Bypass', '-File', $installerScript, '-RuntimeIdentifier', $rid) -LogPath $log -ErrPath $err -SuccessPath $installer)
+
+            $ok = (-not (Test-PhaseFailed -PhaseName $phase)) -and (Test-Path $installer)
+            $results += [PSCustomObject]@{
+                Label  = "Win setup $rid"
+                Status = if ($ok) { 'ok' } else { 'FAIL' }
+                Path   = if ($ok) { $installer } else { $null }
+            }
         }
     }
-    if ($BuildTarget -in @('All', 'LinuxDeb')) {
-        $debOk = (-not (Test-PhaseFailed -PhaseName 'LinuxDeb')) -and ($null -ne $deb)
-        $results += [PSCustomObject]@{
-            Label  = 'Linux .deb'
-            Status = if ($debOk) { 'ok' } else { 'FAIL' }
-            Path   = if ($debOk) { $deb.FullName } else { $null }
+
+    foreach ($package in $linuxPackages) {
+        foreach ($rid in $linuxBuildRids) {
+            $phase = "${package}:$rid"
+            $log = Get-PhaseLogPath -PhaseName $phase -Extension 'log'
+            $err = Get-PhaseLogPath -PhaseName $phase -Extension 'err'
+            [void](Invoke-PhaseProcess -PhaseName $phase -FilePath "wsl.exe" -Arguments @('-d', $distro, '--cd', '~', '-e', '/bin/bash', $wslSh, $wslExport, $package, $rid) -LogPath $log -ErrPath $err)
+
+            $artifact = $null
+            if (-not (Test-PhaseFailed -PhaseName $phase)) {
+                $artifact = Get-LinuxExport -Distro $distro -WindowsExportDir $ExportDir -WslExportDir $wslExport -PackageTarget $package -Rid $rid
+                if ($artifact) {
+                    Copy-Item $artifact.FullName (Join-Path $Artifacts $artifact.Name) -Force
+                    Set-PhaseStatus -Name $phase -Status 'done' -Message $artifact.Name
+                } else {
+                    Set-PhaseStatus -Name $phase -Status 'failed' -Message 'artifact missing from export'
+                }
+            }
+
+            $ok = (-not (Test-PhaseFailed -PhaseName $phase)) -and ($null -ne $artifact)
+            $results += [PSCustomObject]@{
+                Label  = "$package $rid"
+                Status = if ($ok) { 'ok' } else { 'FAIL' }
+                Path   = if ($ok) { (Join-Path $Artifacts $artifact.Name) } else { $null }
+            }
         }
     }
 
     $totalSw.Stop()
-    $buildFailed = (Test-BuildTargetFailed -BuildTarget $BuildTarget) -or
-        (@($results | Where-Object { $_.Status -ne 'ok' }).Count -gt 0)
+    $buildFailed = (Test-AnyPhaseFailed) -or (@($results | Where-Object { $_.Status -ne 'ok' }).Count -gt 0)
 
     Finish-PhaseBoard
 
@@ -687,8 +818,15 @@ function Invoke-ReleaseBuild {
         throw "One or more builds failed. Check logs in $Artifacts"
     }
 
-    if ($Launch -and (Test-Path $WinExe)) {
-        Start-Process $WinExe
+    if ($Launch) {
+        $launchExe = Join-Path $Artifacts "publish\win-x64\ioSender.exe"
+        if (-not (Test-Path $launchExe)) {
+            $launchExe = Get-ChildItem (Join-Path $Artifacts "publish") -Filter "ioSender.exe" -Recurse -ErrorAction SilentlyContinue |
+                Select-Object -First 1 -ExpandProperty FullName
+        }
+        if ($launchExe -and (Test-Path $launchExe)) {
+            Start-Process $launchExe
+        }
     }
 
     if (-not $NoExplorer) {
@@ -700,7 +838,7 @@ $exitCode = 0
 try {
     Invoke-ReleaseBuild -BuildTarget $Target
 } catch {
-    Write-Host $_.Exception.Message -ForegroundColor Red
+    [Console]::Out.WriteLine($_.Exception.Message)
     $exitCode = 1
 } finally {
     if (-not $NoPause) {

@@ -21,7 +21,7 @@ public partial class AppConfigView : UserControl
         controllerConfig.Capture = controllerCapture;
         appearanceConfig.PreviewViewerRequested += (_, _) => PreviewViewerRequested?.Invoke(this, EventArgs.Empty);
         SettingsList.SelectedIndex = 0;
-        ShowSettingsPage(0);
+        ShowSettingsPage("General");
         if (appConfig != null)
             DataContext = appConfig.Base;
         Loaded += OnLoaded;
@@ -43,21 +43,20 @@ public partial class AppConfigView : UserControl
     {
         _ = e;
 
-        var selectedIndex = sender is SelectingItemsControl list ? list.SelectedIndex : 0;
-        ShowSettingsPage(selectedIndex);
+        if (sender is not SelectingItemsControl { SelectedItem: ListBoxItem { Tag: string pageId } })
+            return;
+
+        ShowSettingsPage(pageId);
     }
 
-    void ShowSettingsPage(int selectedIndex)
+    void ShowSettingsPage(string pageId)
     {
-        ProbingPage.IsVisible = selectedIndex == 0;
-        JogPage.IsVisible = selectedIndex == 1;
-        AppearancePage.IsVisible = selectedIndex == 2;
-        MachinePage.IsVisible = selectedIndex == 3;
-        CameraPage.IsVisible = selectedIndex == 4;
-        ViewerPage.IsVisible = selectedIndex == 5;
-        StripPage.IsVisible = selectedIndex == 6;
-        KeyboardPage.IsVisible = selectedIndex == 7;
-        ControllerPage.IsVisible = selectedIndex == 8;
+        GeneralPage.IsVisible = pageId == "General";
+        MachinePage.IsVisible = pageId == "Machine";
+        MotionPage.IsVisible = pageId == "Motion";
+        CameraPage.IsVisible = pageId == "Camera";
+        DisplayPage.IsVisible = pageId == "Display";
+        InputPage.IsVisible = pageId == "Input";
     }
 
     void OnSaveClick(object? sender, RoutedEventArgs e)

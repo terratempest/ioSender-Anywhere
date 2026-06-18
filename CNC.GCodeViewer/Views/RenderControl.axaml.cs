@@ -36,6 +36,7 @@ public partial class RenderControl : UserControl
     DispatcherTimer? _dynamicLayerTimer;
     bool _dynamicLayerPending;
     bool _dynamicLayerImmediate;
+    bool _loadWhenReady;
     int _executedLayerVersion = -1;
     ViewerLineLayer? _pendingCutLayer;
     ViewerLineLayer? _completedCutLayer;
@@ -78,10 +79,12 @@ public partial class RenderControl : UserControl
             if (_renderPending && GlViewport.Bounds.Width >= 4 && GlViewport.Bounds.Height >= 4)
                 TryFlushRender();
         };
+        SizeChanged += (_, _) => RetryDeferredLoad();
     }
 
     public void Close()
     {
+        _loadWhenReady = false;
         UnsubscribeExecutionProgress();
         _tokens = null;
         _segments = null;
@@ -123,6 +126,7 @@ public partial class RenderControl : UserControl
 #if DEBUG
         var watch = Stopwatch.StartNew();
 #endif
+        _loadWhenReady = false;
         if (!ViewerSession.Settings.IsEnabled)
         {
             Close();
@@ -144,10 +148,32 @@ public partial class RenderControl : UserControl
     public bool TryLoadProgramIfVisible()
     {
         if (!IsPreviewEligible)
+        {
+            DeferProgramLoadIfNeeded();
             return false;
+        }
 
+        _loadWhenReady = false;
         TryLoadProgram();
         return true;
+    }
+
+    void DeferProgramLoadIfNeeded()
+    {
+        if (Session == null || !ViewerSession.Settings.IsEnabled)
+        {
+            _loadWhenReady = false;
+            return;
+        }
+
+        var tokens = ViewerSession.GetProgramTokens();
+        _loadWhenReady = tokens.Count > 0;
+    }
+
+    void RetryDeferredLoad()
+    {
+        if (_loadWhenReady)
+            TryLoadProgramIfVisible();
     }
 
     bool IsPreviewEligible =>
@@ -168,11 +194,13 @@ public partial class RenderControl : UserControl
         GlViewport.SetAnimationActive(true);
         SetStatus(_glInitFailed ? "3D view unavailable — OpenGL" : "3D view — ready");
         TryLoadProgramIfVisible();
+        Dispatcher.UIThread.Post(RetryDeferredLoad, DispatcherPriority.Loaded);
     }
 
     protected override void OnDetachedFromVisualTree(VisualTreeAttachmentEventArgs e)
     {
         GlViewport.SaveCameraToConfig();
+        _loadWhenReady = false;
         GlViewport.SetAnimationActive(false);
         StopRenderWaitTimer();
         CancelPathBuild();
@@ -183,8 +211,16 @@ public partial class RenderControl : UserControl
         base.OnDetachedFromVisualTree(e);
     }
 
+    protected override void OnPropertyChanged(AvaloniaPropertyChangedEventArgs change)
+    {
+        base.OnPropertyChanged(change);
+        if (change.Property.Name is nameof(IsVisible) or nameof(IsEffectivelyVisible) or nameof(Bounds))
+            RetryDeferredLoad();
+    }
+
     void RequestRender(Point3D? start = null)
     {
+        _loadWhenReady = false;
         _renderStartOverride = start;
         _renderPending = true;
         if (_pathBuildInProgress)

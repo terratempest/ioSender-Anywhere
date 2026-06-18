@@ -1,0 +1,13 @@
+# Fedora/RHEL packages required at runtime.
+# One package name per line. Lines starting with # are ignored.
+glibc
+libX11
+libICE
+libSM
+libXext
+fontconfig
+mesa-libGL
+mesa-libEGL
+gtk3
+libstdc++
+systemd-udev

@@ -19,6 +19,7 @@ if command -v dotnet >/dev/null 2>&1; then
 fi
 
 find . -type d \( -name bin -o -name obj \) -not -path './.git/*' -print0 2>/dev/null | xargs -0 rm -rf 2>/dev/null || true
-rm -rf artifacts/publish/linux-x64 packaging/debian-staging
+rm -rf artifacts/publish/linux-x64 artifacts/publish/linux-arm64
+rm -rf packaging/debian-staging packaging/rpm-staging packaging/appimage-staging
 
 echo "==> WSL build tree cleaned"

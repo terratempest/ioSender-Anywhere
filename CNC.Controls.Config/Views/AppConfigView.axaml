@@ -22,71 +22,58 @@
               Padding="4" Margin="0,0,8,0">
         <ListBox x:Name="SettingsList" Background="Transparent" BorderThickness="0"
                  FontSize="12" SelectionChanged="OnSettingsSelectionChanged">
-          <ListBoxItem Content="Probing"
-                       loc:Localize.Key="ioSender.mainwindow.tab_probing"
-                       loc:Localize.Fallback="Probing"/>
-          <ListBoxItem Content="Jog"
-                       loc:Localize.Key="ioSender.appconfig.tab_jog"
-                       loc:Localize.Fallback="Jog"/>
-          <ListBoxItem Content="Appearance"
-                       loc:Localize.Key="ioSender.appconfig.tab_appearance"
-                       loc:Localize.Fallback="Appearance"/>
-          <ListBoxItem Content="Machine"
-                       loc:Localize.Key="ioSender.appconfig.tab_machine"
-                       loc:Localize.Fallback="Machine"/>
-          <ListBoxItem Content="Camera"
-                       loc:Localize.Key="ioSender.mainwindow.mnu_camera"
-                       loc:Localize.Fallback="Camera"/>
-          <ListBoxItem Content="G-code viewer"
-                       loc:Localize.Key="ioSender.appconfig.tab_viewer"
-                       loc:Localize.Fallback="G-code viewer"/>
-          <ListBoxItem Content="Program strip"
-                       loc:Localize.Key="ioSender.appconfig.tab_strip"
-                       loc:Localize.Fallback="Program strip"/>
-          <ListBoxItem Content="Keyboard"
-                       loc:Localize.Key="ioSender.appconfig.tab_keyboard"
-                       loc:Localize.Fallback="Keyboard"/>
-          <ListBoxItem Content="Controller bindings"/>
+          <ListBoxItem Content="General" Tag="General"/>
+          <ListBoxItem Content="Machine &amp; Sender" Tag="Machine"/>
+          <ListBoxItem Content="Motion" Tag="Motion"/>
+          <ListBoxItem Content="Camera" Tag="Camera"/>
+          <ListBoxItem Content="Display" Tag="Display"/>
+          <ListBoxItem Content="Input" Tag="Input"/>
         </ListBox>
       </Border>
 
       <Grid Grid.Column="1">
-        <WrapPanel x:Name="ProbingPage" Orientation="Vertical" ItemWidth="320">
-          <probing:ProbingSettingsControl x:Name="probingConfig" DataContext="{Binding}" Margin="0,0,8,8"/>
-        </WrapPanel>
+        <ScrollViewer x:Name="GeneralPage" VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Auto">
+          <WrapPanel Orientation="Vertical" ItemWidth="320" Margin="8">
+            <local:AppGeneralConfigPanel x:Name="generalConfig" DataContext="{Binding}" Margin="0,0,8,8"/>
+          </WrapPanel>
+        </ScrollViewer>
 
-        <WrapPanel x:Name="JogPage" Orientation="Vertical" ItemWidth="320" IsVisible="False">
-          <local:JogUiConfigControl x:Name="jogUiConfig" DataContext="{Binding}" Margin="0,0,8,8"/>
-          <local:JogConfigControl x:Name="jogConfig" DataContext="{Binding}" Margin="0,0,8,8"/>
-        </WrapPanel>
+        <ScrollViewer x:Name="MachinePage" IsVisible="False" VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Auto">
+          <WrapPanel Orientation="Vertical" ItemWidth="320" Margin="8">
+            <local:AppMachineConfigPanel x:Name="machineConfig" DataContext="{Binding}" Margin="0,0,8,8"/>
+            <local:AppGCodeStripConfigPanel x:Name="stripConfig" DataContext="{Binding}" Margin="0,0,8,8"/>
+          </WrapPanel>
+        </ScrollViewer>
 
-        <Grid x:Name="AppearancePage" IsVisible="False">
-          <local:AppAppearanceConfigPanel x:Name="appearanceConfig" DataContext="{Binding}" Margin="0,0,8,8"/>
-        </Grid>
+        <ScrollViewer x:Name="MotionPage" IsVisible="False" VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Auto">
+          <WrapPanel Orientation="Vertical" ItemWidth="320" Margin="8">
+            <probing:ProbingSettingsControl x:Name="probingConfig" DataContext="{Binding}" Margin="0,0,8,8"/>
+            <local:JogUiConfigControl x:Name="jogUiConfig" DataContext="{Binding}" Margin="0,0,8,8"/>
+            <local:JogConfigControl x:Name="jogConfig" DataContext="{Binding}" Margin="0,0,8,8"/>
+          </WrapPanel>
+        </ScrollViewer>
 
-        <WrapPanel x:Name="MachinePage" Orientation="Vertical" ItemWidth="320" IsVisible="False">
-          <local:AppMachineConfigPanel x:Name="machineConfig" DataContext="{Binding}" Margin="0,0,8,8"/>
-        </WrapPanel>
+        <ScrollViewer x:Name="CameraPage" IsVisible="False" VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Auto">
+          <WrapPanel Orientation="Vertical" ItemWidth="320" Margin="8">
+            <local:AppCameraConfigPanel x:Name="cameraConfig" DataContext="{Binding}" Margin="0,0,8,8"/>
+          </WrapPanel>
+        </ScrollViewer>
 
-        <WrapPanel x:Name="CameraPage" Orientation="Vertical" ItemWidth="320" IsVisible="False">
-          <local:AppCameraConfigPanel x:Name="cameraConfig" DataContext="{Binding}" Margin="0,0,8,8"/>
-        </WrapPanel>
+        <ScrollViewer x:Name="DisplayPage" IsVisible="False" VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Auto">
+          <StackPanel Margin="8">
+            <local:AppAppearanceConfigPanel x:Name="appearanceConfig" DataContext="{Binding}" Margin="0,0,8,8"/>
+            <WrapPanel Orientation="Vertical" ItemWidth="320">
+              <local:AppGCodeViewerConfigPanel x:Name="viewerConfig" DataContext="{Binding}" Margin="0,0,8,8"/>
+            </WrapPanel>
+          </StackPanel>
+        </ScrollViewer>
 
-        <WrapPanel x:Name="ViewerPage" Orientation="Vertical" ItemWidth="320" IsVisible="False">
-          <local:AppGCodeViewerConfigPanel x:Name="viewerConfig" DataContext="{Binding}" Margin="0,0,8,8"/>
-        </WrapPanel>
-
-        <WrapPanel x:Name="StripPage" Orientation="Vertical" ItemWidth="320" IsVisible="False">
-          <local:AppGCodeStripConfigPanel x:Name="stripConfig" DataContext="{Binding}" Margin="0,0,8,8"/>
-        </WrapPanel>
-
-        <WrapPanel x:Name="KeyboardPage" Orientation="Vertical" ItemWidth="320" IsVisible="False">
-          <local:AppKeyboardConfigPanel x:Name="keyboardConfig" DataContext="{Binding}" Margin="0,0,8,8"/>
-        </WrapPanel>
-
-        <WrapPanel x:Name="ControllerPage" Orientation="Vertical" ItemWidth="430" IsVisible="False">
-          <local:AppControllerConfigPanel x:Name="controllerConfig" DataContext="{Binding}" Margin="0,0,8,8"/>
-        </WrapPanel>
+        <ScrollViewer x:Name="InputPage" IsVisible="False" VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Auto">
+          <WrapPanel Orientation="Vertical" ItemWidth="430" Margin="8">
+            <local:AppKeyboardConfigPanel x:Name="keyboardConfig" DataContext="{Binding}" Margin="0,0,8,8"/>
+            <local:AppControllerConfigPanel x:Name="controllerConfig" DataContext="{Binding}" Margin="0,0,8,8"/>
+          </WrapPanel>
+        </ScrollViewer>
       </Grid>
     </Grid>
   </DockPanel>

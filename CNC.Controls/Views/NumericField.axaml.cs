@@ -18,7 +18,7 @@ public partial class NumericField : UserControl
         AvaloniaProperty.Register<NumericField, string>(nameof(Label), "Label:");
 
     public static readonly StyledProperty<string> UnitProperty =
-        AvaloniaProperty.Register<NumericField, string>(nameof(Unit), "mm");
+        AvaloniaProperty.Register<NumericField, string>(nameof(Unit), string.Empty);
 
     public static readonly StyledProperty<bool> IsReadOnlyProperty =
         AvaloniaProperty.Register<NumericField, bool>(nameof(IsReadOnly));

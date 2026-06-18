@@ -1,8 +1,17 @@
 #!/usr/bin/env bash
-# Publish ioSender for Linux x64 (self-contained)
+# Publish ioSender for Linux (self-contained).
 set -euo pipefail
 ROOT="$(cd "$(dirname "$0")/.." && pwd)"
-OUT_DIR="${OUT_DIR:-$ROOT/artifacts/publish/linux-x64}"
+RID="${RID:-linux-x64}"
+OUT_DIR="${OUT_DIR:-$ROOT/artifacts/publish/$RID}"
+
+case "$RID" in
+  linux-x64|linux-arm64) ;;
+  *)
+    echo "error: unsupported Linux RID: $RID" >&2
+    exit 1
+    ;;
+esac
 
 if [[ -d "$OUT_DIR" ]]; then
   rm -rf "$OUT_DIR"
@@ -12,7 +21,7 @@ mkdir -p "$OUT_DIR"
 publish() {
   dotnet publish "$ROOT/ioSender/ioSender.csproj" \
     -c Release \
-    -r linux-x64 \
+    -r "$RID" \
     --self-contained true \
     -p:PublishSingleFile=false \
     --force \

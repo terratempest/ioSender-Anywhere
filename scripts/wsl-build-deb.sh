@@ -1,6 +1,8 @@
 #!/bin/bash
-# Build .deb from ~/ioSender-build (populated by build-all.ps1 via rsync).
-# Arg1: WSL export dir on /mnt/c/... for copying the .deb back to Windows.
+# Build Linux package(s) from ~/ioSender-build (populated by build-all.ps1 via rsync).
+# Arg1: WSL export dir on /mnt/c/... for copying artifacts back to Windows.
+# Arg2: package target (LinuxDeb, LinuxRpm, LinuxAppImage, Linux).
+# Arg3: RID (linux-x64 or linux-arm64).
 set -eu
 
 export DOTNET_ROOT="${DOTNET_ROOT:-$HOME/.dotnet}"
@@ -8,8 +10,10 @@ export PATH="$DOTNET_ROOT:$DOTNET_ROOT/tools:/usr/local/sbin:/usr/local/bin:/usr
 
 BUILD_DIR="${IOSENDER_WSL_BUILD_DIR:-$HOME/ioSender-build}"
 EXPORT_DIR="${1:-}"
+TARGET="${2:-LinuxDeb}"
+RID="${3:-linux-x64}"
 
-if [[ ! -f "$BUILD_DIR/scripts/package-deb.sh" ]]; then
+if [[ ! -f "$BUILD_DIR/scripts/build-linux.sh" ]]; then
   echo "error: build tree missing at $BUILD_DIR (run build-all.ps1 sync first)" >&2
   exit 1
 fi
@@ -22,11 +26,6 @@ if ! command -v dotnet >/dev/null 2>&1; then
 fi
 
 echo "==> dotnet $(dotnet --version) ($DOTNET_ROOT)"
-
-if ! command -v dpkg-deb >/dev/null 2>&1; then
-  echo "error: dpkg-deb not found. Run: sudo apt install -y dpkg-dev" >&2
-  exit 1
-fi
 
 fix_crlf() {
   local f
@@ -41,20 +40,43 @@ fix_crlf "$BUILD_DIR/packaging/debian/DEBIAN/postinst"
 fix_crlf "$BUILD_DIR/packaging/debian/usr/bin/iosender" 2>/dev/null || true
 chmod +x "$BUILD_DIR/scripts/"*.sh
 
-echo "==> Building .deb in $BUILD_DIR"
+echo "==> Building $TARGET for $RID in $BUILD_DIR"
 cd "$BUILD_DIR"
-./scripts/package-deb.sh
+RID="$RID" ./scripts/build-linux.sh "$TARGET" "$RID"
 
-DEB="$(ls -1 "$BUILD_DIR/artifacts/"iosender_*.deb 2>/dev/null | tail -1)"
-if [[ -z "$DEB" ]]; then
-  echo "error: no .deb produced in $BUILD_DIR/artifacts" >&2
+shopt -s nullglob
+case "$TARGET" in
+  LinuxDeb|Deb|deb)
+    files=("$BUILD_DIR/artifacts/"iosender_*.deb)
+    ;;
+  LinuxRpm|Rpm|rpm)
+    files=("$BUILD_DIR/artifacts/"ioSender-*-"$RID".rpm)
+    ;;
+  LinuxAppImage|AppImage|appimage)
+    files=("$BUILD_DIR/artifacts/"ioSender-*-"$RID".AppImage)
+    ;;
+  All|Linux)
+    files=("$BUILD_DIR/artifacts/"iosender_*.deb "$BUILD_DIR/artifacts/"ioSender-*-"$RID".rpm "$BUILD_DIR/artifacts/"ioSender-*-"$RID".AppImage)
+    ;;
+  *)
+    echo "error: unknown target: $TARGET" >&2
+    exit 1
+    ;;
+esac
+
+if (( ${#files[@]} == 0 )); then
+  echo "error: no artifacts produced in $BUILD_DIR/artifacts" >&2
   exit 1
 fi
 
 if [[ -n "$EXPORT_DIR" ]]; then
   mkdir -p "$EXPORT_DIR"
-  cp -f "$DEB" "$EXPORT_DIR/"
-  echo "==> Copied $(basename "$DEB") -> $EXPORT_DIR/"
+  for artifact in "${files[@]}"; do
+    cp -f "$artifact" "$EXPORT_DIR/"
+    echo "==> Copied $(basename "$artifact") -> $EXPORT_DIR/"
+  done
 else
-  echo "==> Built $(basename "$DEB") (no export dir)"
+  for artifact in "${files[@]}"; do
+    echo "==> Built $(basename "$artifact") (no export dir)"
+  done
 fi

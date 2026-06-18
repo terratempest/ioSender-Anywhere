@@ -13,9 +13,7 @@
                         Value="{Binding MaxBufferSize, Mode=TwoWay}"/>
       <CheckBox Content="Aggressive buffering" FontSize="12" IsChecked="{Binding UseBuffering, Mode=TwoWay}"
                 ToolTip.Tip="Buffers more than one G-code block (grblHAL)."/>
-      <CheckBox Content="Keep MDI focus" FontSize="12" IsChecked="{Binding KeepMdiFocus, Mode=TwoWay}"/>
       <CheckBox Content="Auto-compress gcode on transforms" FontSize="12" IsChecked="{Binding AutoCompress, Mode=TwoWay}"/>
-      <CheckBox Content="Restore last window size and position on startup" FontSize="12" IsChecked="{Binding KeepWindowSize, Mode=TwoWay}"/>
       <CheckBox Content="Send comments" FontSize="12" IsChecked="{Binding SendComments, Mode=TwoWay}"/>
       <CheckBox Content="Add line numbers" FontSize="12" IsChecked="{Binding AddLineNumbers, Mode=TwoWay}"/>
     </WrapPanel>

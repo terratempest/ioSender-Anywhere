@@ -66,6 +66,7 @@ public partial class MainWindow : Window
             _viewerPreviewWindow = null;
         };
         _viewerPreviewWindow.Show(this);
+        Dispatcher.UIThread.Post(() => viewer.TryLoadProgramIfVisible(), DispatcherPriority.ApplicationIdle);
     }
 
     void UpdateFloatingPanelMenuEnabled()
