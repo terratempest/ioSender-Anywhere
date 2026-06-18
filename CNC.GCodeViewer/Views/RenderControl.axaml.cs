@@ -37,6 +37,7 @@ public partial class RenderControl : UserControl
     bool _dynamicLayerPending;
     bool _dynamicLayerImmediate;
     bool _loadWhenReady;
+    RenderBuildResult? _pendingScene;
     int _executedLayerVersion = -1;
     ViewerLineLayer? _pendingCutLayer;
     ViewerLineLayer? _completedCutLayer;
@@ -44,6 +45,13 @@ public partial class RenderControl : UserControl
     Point3D? _renderStartOverride;
     Point3D? _programStart;
     ViewerThemeColors _themeColors = ViewerThemeColors.Current();
+
+    sealed record RenderBuildResult(
+        GCodePathSegments Segments,
+        GCodeExecutedPathCache ExecutedPathCache,
+        PathBounds Bounds,
+        int MotionCount,
+        ViewerScene Scene);
 
     public GCodeViewerSession? Session { get; set; }
 
@@ -85,6 +93,7 @@ public partial class RenderControl : UserControl
     public void Close()
     {
         _loadWhenReady = false;
+        _pendingScene = null;
         UnsubscribeExecutionProgress();
         _tokens = null;
         _segments = null;
@@ -102,6 +111,7 @@ public partial class RenderControl : UserControl
 
     public void Open(IReadOnlyList<GCodeToken> tokens, Point3D? start = null)
     {
+        _pendingScene = null;
         _tokens = tokens;
         _programStart = start;
         SubscribeExecutionProgress();
@@ -113,6 +123,7 @@ public partial class RenderControl : UserControl
 #if DEBUG
         var watch = Stopwatch.StartNew();
 #endif
+        _pendingScene = null;
         _renderPending = false;
         CancelPathBuild();
 #if DEBUG
@@ -147,6 +158,9 @@ public partial class RenderControl : UserControl
 
     public bool TryLoadProgramIfVisible()
     {
+        if (TryApplyPendingScene())
+            return true;
+
         if (!IsPreviewEligible)
         {
             DeferProgramLoadIfNeeded();
@@ -172,8 +186,44 @@ public partial class RenderControl : UserControl
 
     void RetryDeferredLoad()
     {
+        if (TryApplyPendingScene())
+            return;
+
         if (_loadWhenReady)
             TryLoadProgramIfVisible();
+    }
+
+    bool TryApplyPendingScene()
+    {
+        if (_pendingScene == null)
+            return false;
+
+        if (!ViewerSession.Settings.IsEnabled)
+        {
+            _pendingScene = null;
+            return false;
+        }
+
+        if (!CanApplyScene)
+            return false;
+
+        var pending = _pendingScene;
+        _pendingScene = null;
+        _renderPending = false;
+        ApplyRenderResult(pending);
+        return true;
+    }
+
+    bool CanApplyScene =>
+        ViewerSession.Settings.IsEnabled
+        && IsPreviewEligible
+        && GlViewport.Bounds.Width >= 4
+        && GlViewport.Bounds.Height >= 4;
+
+    void ApplyRenderResult(RenderBuildResult result)
+    {
+        SubscribeExecutionProgress();
+        ApplyScene(result.Segments, result.ExecutedPathCache, result.Bounds, result.MotionCount, result.Scene);
     }
 
     bool IsPreviewEligible =>
@@ -193,17 +243,16 @@ public partial class RenderControl : UserControl
         GlViewport.ViewerConfig = ViewerSession.Settings;
         GlViewport.SetAnimationActive(true);
         SetStatus(_glInitFailed ? "3D view unavailable — OpenGL" : "3D view — ready");
-        TryLoadProgramIfVisible();
+        if (!TryApplyPendingScene())
+            TryLoadProgramIfVisible();
         Dispatcher.UIThread.Post(RetryDeferredLoad, DispatcherPriority.Loaded);
     }
 
     protected override void OnDetachedFromVisualTree(VisualTreeAttachmentEventArgs e)
     {
         GlViewport.SaveCameraToConfig();
-        _loadWhenReady = false;
         GlViewport.SetAnimationActive(false);
         StopRenderWaitTimer();
-        CancelPathBuild();
         AppThemeKeys.ThemeApplied -= OnAppThemeApplied;
         UnsubscribeConfig();
         UnsubscribeGrbl();
@@ -221,6 +270,7 @@ public partial class RenderControl : UserControl
     void RequestRender(Point3D? start = null)
     {
         _loadWhenReady = false;
+        _pendingScene = null;
         _renderStartOverride = start;
         _renderPending = true;
         if (_pathBuildInProgress)
@@ -305,11 +355,34 @@ public partial class RenderControl : UserControl
                             return;
                         }
 
+                        if (!ViewerSession.Settings.IsEnabled)
+                        {
+                            _pendingScene = null;
+                            _renderPending = false;
+                            Close();
+                            SetStatus("3D view disabled in App Settings â†’ G-code viewer");
+                            ViewerSession.SetPreviewBuilding?.Invoke(false);
+                            return;
+                        }
+
+                        var result = new RenderBuildResult(
+                            built.Segments,
+                            built.ExecutedPathCache,
+                            bounds,
+                            built.MotionCount,
+                            scene);
                         _renderPending = false;
 #if DEBUG
                         var applyWatch = Stopwatch.StartNew();
 #endif
-                        ApplyScene(built.Segments, built.ExecutedPathCache, bounds, built.MotionCount, scene);
+                        if (CanApplyScene)
+                            ApplyRenderResult(result);
+                        else
+                        {
+                            _pendingScene = result;
+                            SetStatus("3D view â€” preview ready");
+                            Dispatcher.UIThread.Post(RetryDeferredLoad, DispatcherPriority.Loaded);
+                        }
 #if DEBUG
                         applyWatch.Stop();
                         Trace.WriteLine($"G-code preview UI apply completed in {applyWatch.ElapsedMilliseconds} ms; tokens={tokenCount}; motions={built.MotionCount}");
@@ -326,7 +399,7 @@ public partial class RenderControl : UserControl
                         ViewerSession.SetPreviewBuilding?.Invoke(false);
                         SetStatus("3D view — build failed");
                     }
-                }, DispatcherPriority.ApplicationIdle);
+                }, DispatcherPriority.Loaded);
             }
             catch (OperationCanceledException)
             {

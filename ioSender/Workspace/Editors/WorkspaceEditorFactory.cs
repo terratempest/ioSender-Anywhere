@@ -75,6 +75,12 @@ public sealed class WorkspaceEditorFactory
             ReleaseControl(control);
     }
 
+    public void DetachAllFromVisualTree()
+    {
+        foreach (var control in _cache.Values.ToList())
+            WorkspaceRegionChrome.DetachEditor(control);
+    }
+
     public void PruneToTree(WorkspaceNode root)
     {
         var live = EnumerateCacheIds(root).ToHashSet();

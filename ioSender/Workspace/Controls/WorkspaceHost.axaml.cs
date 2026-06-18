@@ -123,7 +123,7 @@ public partial class WorkspaceHost : UserControl
         _factory.PruneToTree(_root);
         foreach (var chrome in _regionChromes)
             chrome.ClearEditorHost();
-        _factory.ReleaseAllFromVisualTree();
+        _factory.DetachAllFromVisualTree();
         _regionChromes.Clear();
         RootPanel.Children.Clear();
         _builder = new SplitLayoutBuilder(

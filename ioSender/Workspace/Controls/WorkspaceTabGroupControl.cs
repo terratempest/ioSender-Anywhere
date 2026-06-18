@@ -315,11 +315,22 @@ public sealed class WorkspaceTabGroupControl : UserControl
         }
 
         if (_activeEditorId == active.Id && _activeEditor is not null)
+        {
+            if (ReferenceEquals(_contentHost.Content, _activeEditor))
+                return;
+
+            AttachEditor(active, _activeEditor);
             return;
+        }
 
         ReleaseActiveEditor();
 
         var editor = _factory.GetOrCreate(active);
+        AttachEditor(active, editor);
+    }
+
+    void AttachEditor(WorkspaceTabEntry active, Control editor)
+    {
         WorkspaceRegionChrome.DetachEditor(editor);
         _contentHost.Content = editor;
         _activeEditorId = active.Id;
