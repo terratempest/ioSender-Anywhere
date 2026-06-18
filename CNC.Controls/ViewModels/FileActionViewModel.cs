@@ -8,17 +8,25 @@ public sealed class FileActionViewModel
 {
     readonly ProgramService _program;
     readonly IExternalEditor? _externalEditor;
+    readonly bool _ownsProgramModel;
+    GrblViewModel? _model;
 
     public FileActionViewModel(ProgramService? program = null, IExternalEditor? externalEditor = null)
     {
+        _ownsProgramModel = program is null;
         _program = program ?? new ProgramService();
         _externalEditor = externalEditor;
     }
 
     public GrblViewModel? Model
     {
-        get => _program.Model;
-        set => _program.Model = value;
+        get => _ownsProgramModel ? _program.Model : _model;
+        set
+        {
+            _model = value;
+            if (_ownsProgramModel)
+                _program.Model = value;
+        }
     }
 
     public void Open(string path)

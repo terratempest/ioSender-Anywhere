@@ -220,8 +220,9 @@ public partial class MainWindow : Window
 
             CancelActivePreviewBuilds();
             var path = await WriteUtilityProgramAsync(e);
+            _programService.Model = _viewModel.Grbl;
             await LoadNativeProgramAsync(path);
-            if (_programService.IsLoaded && string.Equals(_viewModel.Grbl.FileName, path, StringComparison.OrdinalIgnoreCase))
+            if (_programService.IsLoaded && _programService.Tokens.Count > 0)
             {
                 NavigateTo(ShellPage.Home);
                 JobViewControl.WorkspaceHost.QueueToolpathRefresh(attempts: 8);

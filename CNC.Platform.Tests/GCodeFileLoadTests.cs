@@ -1,4 +1,5 @@
 using CNC.Controls.Avalonia.Services;
+using CNC.Controls.Avalonia.ViewModels;
 using CNC.Core;
 using CNC.Core.Geometry;
 using CNC.Utility.GCode;
@@ -133,6 +134,107 @@ public sealed class GCodeFileLoadTests
         {
             service.Close();
             File.Delete(path);
+        }
+    }
+
+    [Fact]
+    public void GCodeListViewModel_InjectedProgram_DoesNotClearProgramModelOnDetach()
+    {
+        var service = new ProgramService();
+        var appModel = new GrblViewModel { PathService = new WindowsPathService() };
+        var controlModel = new GrblViewModel { PathService = new WindowsPathService() };
+
+        try
+        {
+            service.Model = appModel;
+            var viewModel = new GCodeListViewModel(service);
+
+            viewModel.Model = controlModel;
+            viewModel.Model = null;
+
+            Assert.Same(appModel, service.Model);
+        }
+        finally
+        {
+            service.Close();
+            service.Model = null;
+        }
+    }
+
+    [Fact]
+    public void FileActionViewModel_InjectedProgram_DoesNotClearProgramModelOnDetach()
+    {
+        var service = new ProgramService();
+        var appModel = new GrblViewModel { PathService = new WindowsPathService() };
+        var controlModel = new GrblViewModel { PathService = new WindowsPathService() };
+
+        try
+        {
+            service.Model = appModel;
+            var viewModel = new FileActionViewModel(service);
+
+            viewModel.Model = controlModel;
+            viewModel.Model = null;
+
+            Assert.Same(appModel, service.Model);
+        }
+        finally
+        {
+            service.Close();
+            service.Model = null;
+        }
+    }
+
+    [Fact]
+    public async Task ProgramService_LoadAsync_AfterProgramTabDetach_UpdatesMainModel()
+    {
+        var firstPath = CreateProgramFile(new[]
+        {
+            "G21 G90 F100",
+            "G0 X0 Y0",
+            "G1 X1"
+        });
+        var utilityLines = UtilityGCodeGenerator.GenerateDrilling(new DrillingOptions(
+            UtilityUnits.Metric,
+            5d,
+            1d,
+            100d,
+            50d,
+            12000,
+            new CoolantOptions(false, false),
+            [new DrillHole(1d, 2d, -1d, 0d)]));
+        var utilityPath = CreateProgramFile(utilityLines);
+        var model = new GrblViewModel { PathService = new WindowsPathService() };
+        var service = new ProgramService
+        {
+            Model = model,
+        };
+
+        try
+        {
+            await service.LoadAsync(firstPath);
+            var previousBlocks = model.Blocks;
+
+            var programTab = new GCodeListViewModel(service)
+            {
+                Model = model,
+            };
+            programTab.Model = null;
+
+            await service.LoadAsync(utilityPath);
+
+            Assert.True(service.IsLoaded);
+            Assert.NotEqual(previousBlocks, service.Blocks);
+            Assert.Equal(service.Blocks, model.Blocks);
+            Assert.Equal(utilityPath, model.FileName);
+            Assert.NotEmpty(service.Tokens);
+        }
+        finally
+        {
+            service.Close();
+            service.Model = null;
+            File.Delete(firstPath);
+            File.Delete(utilityPath);
         }
     }
 

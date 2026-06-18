@@ -8,17 +8,25 @@ public sealed class GCodeListViewModel
 {
     readonly ProgramService _program;
     readonly MachineCommandService _commands;
+    readonly bool _ownsProgramModel;
+    GrblViewModel? _model;
 
     public GCodeListViewModel(ProgramService? program = null, MachineCommandService? commands = null)
     {
+        _ownsProgramModel = program is null;
         _program = program ?? new ProgramService();
         _commands = commands ?? new MachineCommandService();
     }
 
     public GrblViewModel? Model
     {
-        get => _program.Model;
-        set => _program.Model = value;
+        get => _ownsProgramModel ? _program.Model : _model;
+        set
+        {
+            _model = value;
+            if (_ownsProgramModel)
+                _program.Model = value;
+        }
     }
 
     public ObservableCollection<GCodeBlock> Data => _program.Data;
