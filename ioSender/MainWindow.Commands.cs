@@ -181,7 +181,7 @@ public partial class MainWindow : Window
         Trace.WriteLine($"Open program click reached file picker call in {clickWatch.ElapsedMilliseconds} ms");
         var pickerWatch = Stopwatch.StartNew();
 #endif
-        var path = await PickGCodeOrConvertedPathAsync(storage);
+        var path = await ProgramOpenFilePicker.PickAsync(this, storage);
 #if DEBUG
         pickerWatch.Stop();
         Trace.WriteLine($"Open program file picker returned in {pickerWatch.ElapsedMilliseconds} ms");
@@ -202,27 +202,6 @@ public partial class MainWindow : Window
         }
 
         _programService.Save();
-    }
-
-    static async Task<string?> PickGCodeOrConvertedPathAsync(IStorageProvider storage)
-    {
-        var filter = new List<FilePickerFileType>(GCodeFilePicker.FileTypes);
-        var converterPatterns = GCodeConverterRegistry.OpenPatterns
-            .GroupBy(p => p.Description)
-            .Select(g => new FilePickerFileType(g.Key)
-            {
-                Patterns = g.Select(p => "*." + p.Extension).ToList()
-            });
-        filter.AddRange(converterPatterns);
-
-        var files = await storage.OpenFilePickerAsync(new FilePickerOpenOptions
-        {
-            Title = "Open file",
-            AllowMultiple = false,
-            FileTypeFilter = filter
-        });
-
-        return files.FirstOrDefault()?.TryGetLocalPath();
     }
 
     void OnDragKnifeTransformClick(object? sender, RoutedEventArgs e)
