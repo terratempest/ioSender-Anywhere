@@ -882,7 +882,7 @@ namespace CNC.Core
                 return;
 
             _rpmOverride = value;
-            OnPropertyChanged();
+            OnPropertyChanged(nameof(RPMOverride));
             SyncRpmDisplay();
         }
         public bool RPMOverrideDisabled { get { return _rpmOverrideDisabled; } private set { _rpmOverrideDisabled = value; OnPropertyChanged(); } }

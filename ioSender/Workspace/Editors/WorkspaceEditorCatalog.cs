@@ -25,6 +25,7 @@ public static class WorkspaceEditorCatalog
         Desc(WorkspaceEditorId.Coolant, "ioSender.workspace.editor_coolant", "Coolant", 250, 80, fillsWorkspace: true),
         Desc(WorkspaceEditorId.Feed, "ioSender.workspace.editor_feed", "Feed", 250, 110, fillsWorkspace: true),
         Desc(WorkspaceEditorId.FeedTouch, "ioSender.workspace.editor_feedTouch", "Feed (Touch)", 220, 200, fillsWorkspace: true),
+        Desc(WorkspaceEditorId.FeedLarge, "ioSender.workspace.editor_feedLarge", "Feed (Large)", 360, 260, fillsWorkspace: true),
         Desc(WorkspaceEditorId.JobBar, "ioSender.workspace.editor_jobbar", "Job", 400, 40, minHeight: 36, fillsWorkspace: true),
         Desc(WorkspaceEditorId.Macros, "ioSender.workspace.editor_macros", "Macros", 300, 160, fillsWorkspace: true),
         Desc(WorkspaceEditorId.Keyboard, "ioSender.workspace.editor_keyboard", "Keyboard", 360, 220, grbl: false, fillsWorkspace: true),
@@ -74,7 +75,9 @@ public static class WorkspaceEditorCatalog
             or WorkspaceEditorId.GrblConfig
             or WorkspaceEditorId.AppConfig
             or WorkspaceEditorId.Signals
-            or WorkspaceEditorId.Status));
+            or WorkspaceEditorId.Status
+            or WorkspaceEditorId.Keyboard
+            or WorkspaceEditorId.NumberPad));
 
     /// <summary>Entries assignable in the Home workspace layout picker.</summary>
     public static IEnumerable<WorkspaceEditorDescriptor> LayoutPickableDescriptors =>
@@ -86,7 +89,9 @@ public static class WorkspaceEditorCatalog
             or WorkspaceEditorId.GrblConfig
             or WorkspaceEditorId.AppConfig
             or WorkspaceEditorId.Signals
-            or WorkspaceEditorId.Status));
+            or WorkspaceEditorId.Status
+            or WorkspaceEditorId.Keyboard
+            or WorkspaceEditorId.NumberPad));
 
     public static WorkspaceEditorDescriptor Get(WorkspaceEditorId id) =>
         All.First(d => d.Id == id);

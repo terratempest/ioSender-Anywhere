@@ -193,6 +193,7 @@
                       HorizontalAlignment="Stretch"
                       HorizontalContentAlignment="Center"
                       VerticalContentAlignment="Center"
+                      IsEnabled="{Binding CanEdit, ElementName=root}"
                       Click="btnSetAll_Click"/>
 
               <Separator Margin="0,0,0,0"

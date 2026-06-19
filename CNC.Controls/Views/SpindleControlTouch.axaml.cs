@@ -77,6 +77,7 @@ public partial class SpindleControlTouch : UserControl
         txtRPM.Text = "12000";
         LblActualRpm.Text = "RPM:11500";
         LblRpmOverride.Text = "RPM % 85";
+        SetSpindleStateSelection(SpindleState.CW);
     }
 
     void SpindleControlTouch_DataContextChanged(object? sender, EventArgs e)
@@ -89,6 +90,7 @@ public partial class SpindleControlTouch : UserControl
 
         UpdateRpmText(force: true);
         UpdateSpindleStateEnabled();
+        UpdateSpindleStateSelection();
     }
 
     void OnDataContextPropertyChanged(object? sender, PropertyChangedEventArgs e)
@@ -98,6 +100,9 @@ public partial class SpindleControlTouch : UserControl
 
         if (e.PropertyName is nameof(GrblViewModel.SpindleSetpointRPM) or nameof(GrblViewModel.IsJobRunning))
             UpdateRpmText(force: e.PropertyName == nameof(GrblViewModel.IsJobRunning));
+
+        if (e.PropertyName == nameof(GrblViewModel.SpindleState))
+            UpdateSpindleStateSelection();
     }
 
     void UpdateRpmText(bool force = false)
@@ -112,6 +117,14 @@ public partial class SpindleControlTouch : UserControl
         IsSpindleStateEnabled = _viewModel.IsSpindleStateEnabled;
     }
 
+    void UpdateSpindleStateSelection()
+    {
+        if (_viewModel.Model == null)
+            return;
+
+        SetSpindleStateSelection(_viewModel.Model.SpindleState.Value);
+    }
+
     void BtnSetRpm_Click(object? sender, RoutedEventArgs e)
     {
         if (_viewModel.TrySetRpm(txtRPM.Text, out var normalizedRpmText))
@@ -123,6 +136,11 @@ public partial class SpindleControlTouch : UserControl
         if (sender is not ToggleButton rb || rb.CommandParameter is not string commandTemplate)
             return;
 
+        SetSpindleStateSelection(rb == rbSpindleCW
+            ? SpindleState.CW
+            : rb == rbSpindleCCW
+                ? SpindleState.CCW
+                : SpindleState.Off);
         _viewModel.SelectSpindleState(commandTemplate);
     }
 
@@ -159,7 +177,19 @@ public partial class SpindleControlTouch : UserControl
         if (sender is not ToggleButton selected)
             return;
 
-        RbStepFine.IsChecked = selected == RbStepFine;
-        RbStepCoarse.IsChecked = selected == RbStepCoarse;
+        SetOverrideStepSelection(selected == RbStepCoarse);
+    }
+
+    void SetSpindleStateSelection(SpindleState state)
+    {
+        rbSpindleCW.IsChecked = state == SpindleState.CW;
+        rbSpindleCCW.IsChecked = state == SpindleState.CCW;
+        rbSpindleOff.IsChecked = state == SpindleState.Off;
+    }
+
+    void SetOverrideStepSelection(bool coarse)
+    {
+        RbStepFine.IsChecked = !coarse;
+        RbStepCoarse.IsChecked = coarse;
     }
 }

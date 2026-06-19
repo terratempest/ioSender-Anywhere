@@ -33,4 +33,5 @@ public enum WorkspaceEditorId
     Tools,
     GrblConfig,
     AppConfig,
+    FeedLarge,
 }

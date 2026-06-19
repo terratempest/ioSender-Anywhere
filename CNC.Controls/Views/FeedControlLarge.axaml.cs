@@ -4,28 +4,30 @@ using Avalonia.Controls;
 using Avalonia.Controls.Primitives;
 using Avalonia.Interactivity;
 
-using CNC.Core;
 using CNC.Controls.Avalonia.Services;
 using CNC.Controls.Avalonia.Utilities;
 using CNC.Controls.Avalonia.ViewModels;
+using CNC.Core;
 using CNC.Localization.Avalonia;
 
 namespace CNC.Controls.Avalonia.Views;
 
-public partial class FeedControlTouch : UserControl
+public partial class FeedControlLarge : UserControl
 {
     readonly FeedPanelViewModel _viewModel;
+    bool _useCoarseFeedStep;
     GrblViewModel? _subscribedModel;
 
-    public FeedControlTouch() : this(null)
+    public FeedControlLarge() : this(null)
     {
     }
 
-    public FeedControlTouch(MachineCommandService? commands)
+    public FeedControlLarge(MachineCommandService? commands)
     {
         _viewModel = new FeedPanelViewModel(commands);
         InitializeComponent();
-        DataContextChanged += FeedControlTouch_DataContextChanged;
+
+        DataContextChanged += FeedControlLarge_DataContextChanged;
         Loaded += (_, _) =>
         {
             if (Design.IsDesignMode)
@@ -50,13 +52,13 @@ public partial class FeedControlTouch : UserControl
 
     void ApplyDesignPreviewValues()
     {
-        cvFeedRate.Text = "1250";
-        LblFeedOverrideSummary.Text = "mm/min % 100";
-        LblFeedOverride.Text = "Feed % 100";
-        LblRapidsOverride.Text = "%100";
+        TxtFeedRate.Text = "1250";
+        TxtFeedOverride.Text = "100%";
+        UpdateFeedStepText();
+        SetRapidSelection(100);
     }
 
-    void FeedControlTouch_DataContextChanged(object? sender, EventArgs e)
+    void FeedControlLarge_DataContextChanged(object? sender, EventArgs e)
     {
         PropertyChangedSubscription.Swap(
             ref _subscribedModel,
@@ -82,13 +84,12 @@ public partial class FeedControlTouch : UserControl
             return;
 
         _viewModel.UpdateFromModel();
-        cvFeedRate.Text = _viewModel.FeedRateText;
-        LblFeedOverrideSummary.Text = _viewModel.FeedOverrideSummary;
-        LblFeedOverride.Text = _viewModel.FeedOverrideText;
-        LblRapidsOverride.Text = _viewModel.RapidsOverrideText;
+        TxtFeedRate.Text = $"{_viewModel.FeedRateText} {_viewModel.Model.FeedrateUnit}";
+        TxtFeedOverride.Text = $"{_viewModel.Model.FeedOverride:0}%";
+        SetRapidSelection((int)_viewModel.Model.RapidsOverride);
     }
 
-    bool UseCoarseFeedStep => RbFeedStepCoarse.IsChecked == true;
+    bool UseCoarseFeedStep => _useCoarseFeedStep;
 
     void BtnFeedOvrPlus_Click(object? sender, RoutedEventArgs e)
     {
@@ -107,24 +108,39 @@ public partial class FeedControlTouch : UserControl
 
     void FeedOvrStep_Click(object? sender, RoutedEventArgs e)
     {
-        if (sender is not ToggleButton selected)
+        _useCoarseFeedStep = !_useCoarseFeedStep;
+        UpdateFeedStepText();
+    }
+
+    void RapidOverride_Click(object? sender, RoutedEventArgs e)
+    {
+        var value = sender switch
+        {
+            ToggleButton button when button == RbRapid25 => 25,
+            ToggleButton button when button == RbRapid50 => 50,
+            ToggleButton button when button == RbRapid100 => 100,
+            _ => 0
+        };
+
+        if (value == 0)
             return;
 
-        SetFeedStepSelection(selected == RbFeedStepCoarse);
+        SetRapidSelection(value);
+        _viewModel.SetRapidsOverride(value);
     }
 
-    void BtnRapidOvrPlus_Click(object? sender, RoutedEventArgs e) =>
-        _viewModel.RapidsOverridePlus();
-
-    void BtnRapidOvrMinus_Click(object? sender, RoutedEventArgs e) =>
-        _viewModel.RapidsOverrideMinus();
-
-    void BtnRapidOvrReset_Click(object? sender, RoutedEventArgs e) =>
-        _viewModel.RapidsOverrideReset();
-
-    void SetFeedStepSelection(bool coarse)
+    void BtnRapidOvrReset_Click(object? sender, RoutedEventArgs e)
     {
-        RbFeedStepFine.IsChecked = !coarse;
-        RbFeedStepCoarse.IsChecked = coarse;
+        SetRapidSelection(100);
+        _viewModel.RapidsOverrideReset();
     }
+
+    void SetRapidSelection(int value)
+    {
+        RbRapid25.IsChecked = value <= 25;
+        RbRapid50.IsChecked = value > 25 && value <= 50;
+        RbRapid100.IsChecked = value > 50;
+    }
+
+    void UpdateFeedStepText() => BtnFeedStep.Content = _useCoarseFeedStep ? "X10" : "X1";
 }

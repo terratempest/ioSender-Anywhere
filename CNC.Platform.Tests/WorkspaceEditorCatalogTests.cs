@@ -70,17 +70,28 @@ public class WorkspaceEditorCatalogTests
         Assert.True(descriptor.RequiresGrblDataContext);
     }
 
+    [Fact]
+    public void FeedLarge_is_pickable()
+    {
+        Assert.Contains(
+            WorkspaceEditorCatalog.LayoutPickableDescriptors,
+            d => d.Id == WorkspaceEditorId.FeedLarge);
+        Assert.Contains(
+            WorkspaceEditorCatalog.PanelPickableDescriptors,
+            d => d.Id == WorkspaceEditorId.FeedLarge);
+    }
+
     [Theory]
     [InlineData(WorkspaceEditorId.Keyboard)]
     [InlineData(WorkspaceEditorId.NumberPad)]
-    public void Popup_keyboard_panels_are_pickable_and_do_not_require_grbl_context(WorkspaceEditorId id)
+    public void Popup_keyboard_panels_are_not_pickable_but_remain_registered(WorkspaceEditorId id)
     {
         var descriptor = WorkspaceEditorCatalog.Get(id);
 
-        Assert.Contains(
+        Assert.DoesNotContain(
             WorkspaceEditorCatalog.LayoutPickableDescriptors,
             d => d.Id == id);
-        Assert.Contains(
+        Assert.DoesNotContain(
             WorkspaceEditorCatalog.PanelPickableDescriptors,
             d => d.Id == id);
         Assert.False(descriptor.RequiresGrblDataContext);

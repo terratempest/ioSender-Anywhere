@@ -116,6 +116,11 @@ public sealed class WorkspaceEditorControlFactory
             HorizontalAlignment = Avalonia.Layout.HorizontalAlignment.Stretch,
             VerticalAlignment = Avalonia.Layout.VerticalAlignment.Stretch,
         },
+        WorkspaceEditorId.FeedLarge => new FeedControlLarge(_session.MachineCommands)
+        {
+            HorizontalAlignment = Avalonia.Layout.HorizontalAlignment.Stretch,
+            VerticalAlignment = Avalonia.Layout.VerticalAlignment.Stretch,
+        },
         WorkspaceEditorId.JobBar => new JobBarEditorControl(_session.AppConfig.Base, _session.MachineCommands),
         WorkspaceEditorId.Macros => new MacroExecuteControl(_session.AppConfig)
         {

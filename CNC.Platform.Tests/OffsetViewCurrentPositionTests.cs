@@ -1,4 +1,5 @@
 using System.Reflection;
+using System.Xml.Linq;
 using CNC.Controls.Avalonia.Views;
 using CNC.Core;
 using CNC.GCode;
@@ -72,6 +73,18 @@ public sealed class OffsetViewCurrentPositionTests : IDisposable
         Assert.Equal(6d, view.Offset.Z);
     }
 
+    [Fact]
+    public void Set_all_button_uses_can_edit_binding()
+    {
+        var document = XDocument.Load(GetSourcePath("CNC.Controls", "Views", "OffsetView.axaml"));
+        var button = document
+            .Descendants()
+            .Single(e => e.Name.LocalName == "Button" &&
+                         e.Attributes().Any(a => a.Name.LocalName == "Name" && a.Value == "btnSetAll"));
+
+        Assert.Equal("{Binding CanEdit, ElementName=root}", button.Attribute("IsEnabled")?.Value);
+    }
+
     OffsetView CreateViewWithCommsSubscription()
     {
         var view = new OffsetView();
@@ -79,6 +92,15 @@ public sealed class OffsetViewCurrentPositionTests : IDisposable
         var parameters = Assert.IsType<GrblViewModel>(field?.GetValue(view));
         _comms.DataReceived += parameters.DataReceived;
         return view;
+    }
+
+    static string GetSourcePath(params string[] parts)
+    {
+        var pathParts = new[] { AppContext.BaseDirectory, "..", "..", "..", ".." }
+            .Concat(parts)
+            .ToArray();
+
+        return Path.GetFullPath(Path.Combine(pathParts));
     }
 
     static void SetAxisFlags(AxisFlags flags)
