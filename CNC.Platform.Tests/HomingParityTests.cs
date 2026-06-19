@@ -87,6 +87,98 @@ public sealed class HomingParityTests : IDisposable
     }
 
     [Fact]
+    public void Command_router_requests_status_refresh_after_homing_ack()
+    {
+        var oldIsGrblHal = GrblInfo.IsGrblHAL;
+
+        try
+        {
+            GrblInfo.IsGrblHAL = true;
+            var vm = new GrblViewModel { StreamingState = StreamingState.Idle };
+            var router = new GrblCommandRouter();
+            router.Attach(vm);
+
+            vm.ExecuteCommand(GrblConstants.CMD_HOMING);
+            vm.DataReceived("ok");
+
+            Assert.Equal([GrblConstants.CMD_HOMING], _comms.Commands);
+            Assert.Equal([GrblConstants.CMD_STATUS_REPORT_ALL], _comms.Bytes);
+        }
+        finally
+        {
+            GrblInfo.IsGrblHAL = oldIsGrblHal;
+        }
+    }
+
+    [Fact]
+    public void Command_router_does_not_request_status_refresh_after_non_homing_ack()
+    {
+        var vm = new GrblViewModel { StreamingState = StreamingState.Idle };
+        var router = new GrblCommandRouter();
+        router.Attach(vm);
+
+        vm.ExecuteCommand(GrblConstants.CMD_UNLOCK);
+        vm.DataReceived("ok");
+
+        Assert.Equal([GrblConstants.CMD_UNLOCK], _comms.Commands);
+        Assert.Empty(_comms.Bytes);
+    }
+
+    [Fact]
+    public void Homed_state_requests_status_refresh_after_reset_banner()
+    {
+        var oldIsGrblHal = GrblInfo.IsGrblHAL;
+
+        try
+        {
+            GrblInfo.IsGrblHAL = true;
+            var vm = new GrblViewModel { IsReady = true };
+            vm.DataReceived("<Idle|MPos:0,0,0|H:1|Bf:15,128>");
+
+            vm.DataReceived("GrblHAL 1.1f ['$' or '$HELP' for help]");
+
+            Assert.Equal(HomedState.Unknown, vm.HomedState);
+            Assert.Contains(GrblConstants.CMD_STATUS_REPORT_ALL, _comms.Bytes);
+
+            vm.DataReceived("<Idle|MPos:0,0,0|H:1|Bf:15,128>");
+
+            Assert.Equal(HomedState.Homed, vm.HomedState);
+        }
+        finally
+        {
+            GrblInfo.IsGrblHAL = oldIsGrblHal;
+        }
+    }
+
+    [Fact]
+    public void Homed_state_requests_status_refresh_for_ambiguous_home_report_downgrade()
+    {
+        var oldIsGrblHal = GrblInfo.IsGrblHAL;
+        var oldHomingAxes = GrblInfo.HomingAxes;
+        var oldAxisFlags = GrblInfo.AxisFlags;
+
+        try
+        {
+            GrblInfo.IsGrblHAL = true;
+            GrblInfo.HomingAxes = AxisFlags.XYZ;
+            SetStaticProperty(nameof(GrblInfo.AxisFlags), AxisFlags.XYZ);
+            var vm = new GrblViewModel();
+            vm.DataReceived("<Idle|MPos:0,0,0|H:1|Bf:15,128>");
+
+            vm.DataReceived("[HOME:0,0,0:0]");
+
+            Assert.Equal(HomedState.Homed, vm.HomedState);
+            Assert.Contains(GrblConstants.CMD_STATUS_REPORT_ALL, _comms.Bytes);
+        }
+        finally
+        {
+            GrblInfo.IsGrblHAL = oldIsGrblHal;
+            GrblInfo.HomingAxes = oldHomingAxes;
+            SetStaticProperty(nameof(GrblInfo.AxisFlags), oldAxisFlags);
+        }
+    }
+
+    [Fact]
     public void Command_router_blocks_homing_while_streaming_job()
     {
         var vm = new GrblViewModel { StreamingState = StreamingState.Send };

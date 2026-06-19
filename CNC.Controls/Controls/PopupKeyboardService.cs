@@ -14,6 +14,18 @@ public static class PopupKeyboardService
 
     public static Func<int> TriggerClickCount { get; set; } = () => 2;
 
+    public static bool TryShowFor(TextBox target, int clickCount)
+    {
+        if (!ShouldOpenForClickCount(clickCount))
+            return false;
+
+        var topLevel = TopLevel.GetTopLevel(target);
+        if (topLevel is not Window window || !Sessions.TryGetValue(window, out var session))
+            return false;
+
+        return session.TryShowFor(target);
+    }
+
     public static bool IsPopupOpenFor(TextBox target)
     {
         var topLevel = TopLevel.GetTopLevel(target);
@@ -58,21 +70,13 @@ public static class PopupKeyboardService
         {
             ClosePopupOnClickAway(e.Source);
 
-            var triggerClickCount = TriggerClickCount();
-            if (triggerClickCount <= 0 || e.ClickCount != triggerClickCount)
+            if (!ShouldOpenForClickCount(e.ClickCount))
                 return;
 
             var textBox = FindTextBox(e.Source);
-            if (textBox is null || textBox.IsReadOnly || !textBox.IsEnabled)
+            if (textBox is null || !TryShowFor(textBox))
                 return;
 
-            var layout = ResolveLayout(textBox);
-            if (layout == PopupKeyboardLayout.None)
-                return;
-            if (layout == PopupKeyboardLayout.Default)
-                layout = PopupKeyboardLayout.Regular;
-
-            ShowPopup(textBox, layout);
             e.Handled = true;
         }
 
@@ -134,6 +138,21 @@ public static class PopupKeyboardService
             RaisePopupClosed(target);
         }
 
+        public bool TryShowFor(TextBox target)
+        {
+            if (target.IsReadOnly || !target.IsEnabled)
+                return false;
+
+            var layout = ResolveLayout(target);
+            if (layout == PopupKeyboardLayout.None)
+                return false;
+            if (layout == PopupKeyboardLayout.Default)
+                layout = PopupKeyboardLayout.Regular;
+
+            ShowPopup(target, layout);
+            return true;
+        }
+
         public bool IsPopupOpenFor(TextBox target) =>
             _popupWindow is not null && ReferenceEquals(_target, target);
     }
@@ -169,5 +188,11 @@ public static class PopupKeyboardService
         return textBox is NumericTextBox
             ? PopupKeyboardLayout.Numeric
             : PopupKeyboardLayout.Regular;
+    }
+
+    internal static bool ShouldOpenForClickCount(int clickCount)
+    {
+        var triggerClickCount = TriggerClickCount();
+        return triggerClickCount > 0 && clickCount == triggerClickCount;
     }
 }

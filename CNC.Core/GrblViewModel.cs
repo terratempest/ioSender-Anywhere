@@ -1042,7 +1042,10 @@ namespace CNC.Core
                 else if (newstate == GrblStates.Alarm)
                 {
                     if (substate == 11)
-                        HomedState = HomedState.NotHomed;
+                    {
+                        ApplyHomedState(HomedState.NotHomed, confirmedNotHomed: true);
+                        RequestImmediateStatusSnapshot();
+                    }
                 }
             }
 
@@ -1117,14 +1120,54 @@ namespace CNC.Core
                 }
 
                 var homingAxes = GrblInfo.HomingAxes == AxisFlags.None ? GrblInfo.AxisFlags : GrblInfo.HomingAxes;
-                HomedState = homingAxes == AxisFlags.None
-                    ? HomedState.Unknown
-                    : (AxisHomed.Value & homingAxes) == homingAxes
-                        ? HomedState.Homed
-                        : HomedState.NotHomed;
+                if (homingAxes == AxisFlags.None)
+                    ApplyHomedState(HomedState.Unknown);
+                else if ((AxisHomed.Value & homingAxes) == homingAxes)
+                    ApplyHomedState(HomedState.Homed);
+                else
+                    ApplyHomedState(HomedState.NotHomed, confirmedNotHomed: IsHomingRequiredAlarm, refreshIfAmbiguousDowngrade: true);
             }
             else
+                ApplyHomedState(HomedState.Unknown);
+        }
+
+        private bool IsHomingRequiredAlarm => GrblState.State == GrblStates.Alarm && GrblState.Substate == 11;
+
+        private void ApplyHomedState(
+            HomedState state,
+            bool confirmedNotHomed = false,
+            bool refreshIfAmbiguousDowngrade = false)
+        {
+            if (state == HomedState.Homed)
+            {
+                HomedState = HomedState.Homed;
+                return;
+            }
+
+            if (state == HomedState.NotHomed && confirmedNotHomed)
+            {
+                HomedState = HomedState.NotHomed;
+                return;
+            }
+
+            if (state == HomedState.NotHomed && HomedState != HomedState.Homed)
                 HomedState = HomedState.Unknown;
+            else if (state == HomedState.Unknown)
+                HomedState = HomedState.Unknown;
+
+            if (state == HomedState.NotHomed && refreshIfAmbiguousDowngrade)
+                RequestImmediateStatusSnapshot();
+        }
+
+        private static void RequestImmediateStatusSnapshot()
+        {
+            if (Comms.com is not { IsOpen: true })
+                return;
+
+            var command = GrblInfo.IsGrblHAL
+                ? GrblConstants.CMD_STATUS_REPORT_ALL
+                : GrblLegacy.ConvertRTCommand(GrblConstants.CMD_STATUS_REPORT_ALL);
+            Comms.com.WriteByte(command);
         }
 
         public bool ParseStatus(string data)
@@ -1469,14 +1512,13 @@ namespace CNC.Core
                     {
                         _h = value;
                         var hs = _h.Split(',');
-                        HomedState = hs[0] switch
+                        var state = hs[0] switch
                         {
                             "1" => HomedState.Homed,
-                            "0" => GrblState.State == GrblStates.Alarm && GrblState.Substate == 11
-                                ? HomedState.NotHomed
-                                : HomedState.Unknown,
+                            "0" => HomedState.NotHomed,
                             _ => HomedState.Unknown
                         };
+                        ApplyHomedState(state, confirmedNotHomed: state == HomedState.NotHomed && IsHomingRequiredAlarm);
                     }
                     break;
 
@@ -1648,9 +1690,11 @@ namespace CNC.Core
                 var msg = Message;
                 ApplyToolLengthOffsetState(0);
                 GrblReset = true;
-                HomedState = HomedState.Unknown;
+                _h = string.Empty;
+                ApplyHomedState(HomedState.Unknown);
                 IsJobRunning = false;
                 OnGrblReset?.Invoke(data);
+                RequestImmediateStatusSnapshot();
                 Message = msg;
                 _reset = false;
                 OnPropertyChanged(nameof(IsCheckMode));

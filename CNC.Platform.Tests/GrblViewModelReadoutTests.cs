@@ -413,7 +413,7 @@ public sealed class GrblViewModelReadoutTests
     [Theory]
     [InlineData(3)]
     [InlineData(0)]
-    public void DataReceived_home_report_sets_not_homed_when_required_axes_are_missing(int mask)
+    public void DataReceived_home_report_sets_unknown_when_required_axes_are_missing_without_alarm_11(int mask)
     {
         var oldHomingAxes = GrblInfo.HomingAxes;
         var oldAxisFlags = GrblInfo.AxisFlags;
@@ -427,6 +427,56 @@ public sealed class GrblViewModelReadoutTests
             vm.DataReceived($"[HOME:0,0,0:{mask}]");
 
             Assert.Equal((AxisFlags)mask, vm.AxisHomed.Value);
+            Assert.Equal(HomedState.Unknown, vm.HomedState);
+        }
+        finally
+        {
+            GrblInfo.HomingAxes = oldHomingAxes;
+            SetStaticProperty(nameof(GrblInfo.AxisFlags), oldAxisFlags);
+        }
+    }
+
+    [Fact]
+    public void DataReceived_home_report_missing_axes_keeps_existing_homed_state_without_alarm_11()
+    {
+        var oldHomingAxes = GrblInfo.HomingAxes;
+        var oldAxisFlags = GrblInfo.AxisFlags;
+
+        try
+        {
+            GrblInfo.HomingAxes = AxisFlags.XYZ;
+            SetStaticProperty(nameof(GrblInfo.AxisFlags), AxisFlags.XYZ);
+            var vm = new GrblViewModel();
+
+            vm.DataReceived("<Idle|MPos:0,0,0|H:1|Bf:15,128>");
+            vm.DataReceived("[HOME:0,0,0:0]");
+
+            Assert.Equal(AxisFlags.None, vm.AxisHomed.Value);
+            Assert.Equal(HomedState.Homed, vm.HomedState);
+        }
+        finally
+        {
+            GrblInfo.HomingAxes = oldHomingAxes;
+            SetStaticProperty(nameof(GrblInfo.AxisFlags), oldAxisFlags);
+        }
+    }
+
+    [Fact]
+    public void DataReceived_alarm_11_home_report_missing_axes_sets_not_homed()
+    {
+        var oldHomingAxes = GrblInfo.HomingAxes;
+        var oldAxisFlags = GrblInfo.AxisFlags;
+
+        try
+        {
+            GrblInfo.HomingAxes = AxisFlags.XYZ;
+            SetStaticProperty(nameof(GrblInfo.AxisFlags), AxisFlags.XYZ);
+            var vm = new GrblViewModel();
+
+            vm.DataReceived("<Alarm:11|MPos:0,0,0|Bf:15,128>");
+            vm.DataReceived("[HOME:0,0,0:0]");
+
+            Assert.Equal(AxisFlags.None, vm.AxisHomed.Value);
             Assert.Equal(HomedState.NotHomed, vm.HomedState);
         }
         finally

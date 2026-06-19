@@ -54,4 +54,43 @@ public class PopupKeyboardTests
 
         Assert.True(shouldClose);
     }
+
+    [Theory]
+    [InlineData(PopupKeyboardTrigger.Off, 1, false)]
+    [InlineData(PopupKeyboardTrigger.OneClick, 1, true)]
+    [InlineData(PopupKeyboardTrigger.TwoClick, 1, false)]
+    [InlineData(PopupKeyboardTrigger.TwoClick, 2, true)]
+    public void PopupKeyboardService_matches_configured_click_trigger(
+        PopupKeyboardTrigger trigger,
+        int clickCount,
+        bool expected)
+    {
+        var previous = PopupKeyboardService.TriggerClickCount;
+        PopupKeyboardService.TriggerClickCount = () => (int)trigger;
+
+        try
+        {
+            Assert.Equal(expected, PopupKeyboardService.ShouldOpenForClickCount(clickCount));
+        }
+        finally
+        {
+            PopupKeyboardService.TriggerClickCount = previous;
+        }
+    }
+
+    [Fact]
+    public void PopupKeyboardService_does_not_show_when_trigger_is_off()
+    {
+        var previous = PopupKeyboardService.TriggerClickCount;
+        PopupKeyboardService.TriggerClickCount = () => (int)PopupKeyboardTrigger.Off;
+
+        try
+        {
+            Assert.False(PopupKeyboardService.TryShowFor(new TextBox(), 1));
+        }
+        finally
+        {
+            PopupKeyboardService.TriggerClickCount = previous;
+        }
+    }
 }

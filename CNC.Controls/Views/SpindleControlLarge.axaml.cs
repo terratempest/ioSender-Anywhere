@@ -177,11 +177,11 @@ public partial class SpindleControlLarge : UserControl
         if (!CanEditRpm)
             return;
 
-        BeginRpmEdit();
+        BeginRpmEdit(e.ClickCount);
         e.Handled = true;
     }
 
-    void BeginRpmEdit()
+    void BeginRpmEdit(int clickCount)
     {
         _isEditingRpm = true;
         TxtRpm.Text = TxtRpmDisplay.Text;
@@ -191,6 +191,7 @@ public partial class SpindleControlLarge : UserControl
         {
             TxtRpm.Focus();
             TxtRpm.CaretIndex = TxtRpm.Text?.Length ?? 0;
+            PopupKeyboardService.TryShowFor(TxtRpm, clickCount);
         });
     }
 

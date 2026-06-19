@@ -13,6 +13,7 @@ public sealed class GrblCommandRouter
     readonly Queue<string> _pending = new();
     GrblViewModel? _model;
     bool _awaitingResponse;
+    string? _activeCommand;
 
     public GrblCommandRouter(ProgramService? program = null)
     {
@@ -40,6 +41,7 @@ public sealed class GrblCommandRouter
         _model = null;
         _pending.Clear();
         _awaitingResponse = false;
+        _activeCommand = null;
     }
 
     void OnModelPropertyChanged(object? sender, PropertyChangedEventArgs e)
@@ -55,7 +57,11 @@ public sealed class GrblCommandRouter
 
         if (response == "ok" || response.StartsWith("error", StringComparison.OrdinalIgnoreCase))
         {
+            var completedCommand = _activeCommand;
+            _activeCommand = null;
             _awaitingResponse = false;
+            if (response == "ok" && completedCommand == GrblConstants.CMD_HOMING)
+                RequestHomingStatusRefresh();
             FlushPending();
         }
     }
@@ -94,7 +100,19 @@ public sealed class GrblCommandRouter
             return;
 
         _awaitingResponse = true;
-        Comms.com.WriteCommand(_pending.Dequeue());
+        _activeCommand = _pending.Dequeue();
+        Comms.com.WriteCommand(_activeCommand);
+    }
+
+    static void RequestHomingStatusRefresh()
+    {
+        if (Comms.com is not { IsOpen: true })
+            return;
+
+        var command = GrblInfo.IsGrblHAL
+            ? GrblConstants.CMD_STATUS_REPORT_ALL
+            : GrblLegacy.ConvertRTCommand(GrblConstants.CMD_STATUS_REPORT_ALL);
+        Comms.com.WriteByte(command);
     }
 
     static void SendRealtime(char command)
