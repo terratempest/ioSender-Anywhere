@@ -151,7 +151,7 @@ public sealed class HomingParityTests : IDisposable
     }
 
     [Fact]
-    public void Homed_state_requests_status_refresh_for_ambiguous_home_report_downgrade()
+    public void Homed_state_remains_homed_for_incomplete_home_report()
     {
         var oldIsGrblHal = GrblInfo.IsGrblHAL;
         var oldHomingAxes = GrblInfo.HomingAxes;
@@ -168,7 +168,6 @@ public sealed class HomingParityTests : IDisposable
             vm.DataReceived("[HOME:0,0,0:0]");
 
             Assert.Equal(HomedState.Homed, vm.HomedState);
-            Assert.Contains(GrblConstants.CMD_STATUS_REPORT_ALL, _comms.Bytes);
         }
         finally
         {

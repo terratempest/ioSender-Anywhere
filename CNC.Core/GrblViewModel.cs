@@ -1043,7 +1043,7 @@ namespace CNC.Core
                 {
                     if (substate == 11)
                     {
-                        ApplyHomedState(HomedState.NotHomed, confirmedNotHomed: true);
+                        ApplyHomedState(HomedState.NotHomed);
                         RequestImmediateStatusSnapshot();
                     }
                 }
@@ -1111,52 +1111,22 @@ namespace CNC.Core
         {
             string[] values = data.TrimEnd(']').Split(':');
             if (values.Length == 3 && HomePosition.Parse(values[1]))
-            {
-                AxisHomed.Value = (AxisFlags)int.Parse(values[2]);
-                for (int i = 0; i < GrblInfo.NumAxes; i++)
-                {
-                    if(!AxisHomed.Value.HasFlag(GrblInfo.AxisIndexToFlag(i)))
-                        HomePosition.Values[i] = double.NaN;
-                }
-
-                var homingAxes = GrblInfo.HomingAxes == AxisFlags.None ? GrblInfo.AxisFlags : GrblInfo.HomingAxes;
-                if (homingAxes == AxisFlags.None)
-                    ApplyHomedState(HomedState.Unknown);
-                else if ((AxisHomed.Value & homingAxes) == homingAxes)
-                    ApplyHomedState(HomedState.Homed);
-                else
-                    ApplyHomedState(HomedState.NotHomed, confirmedNotHomed: IsHomingRequiredAlarm, refreshIfAmbiguousDowngrade: true);
-            }
-            else
-                ApplyHomedState(HomedState.Unknown);
+                SetAxisHomed((AxisFlags)int.Parse(values[2]));
         }
 
-        private bool IsHomingRequiredAlarm => GrblState.State == GrblStates.Alarm && GrblState.Substate == 11;
-
-        private void ApplyHomedState(
-            HomedState state,
-            bool confirmedNotHomed = false,
-            bool refreshIfAmbiguousDowngrade = false)
+        private void SetAxisHomed(AxisFlags axes)
         {
-            if (state == HomedState.Homed)
+            AxisHomed.Value = axes;
+            for (int i = 0; i < GrblInfo.NumAxes; i++)
             {
-                HomedState = HomedState.Homed;
-                return;
+                if (!AxisHomed.Value.HasFlag(GrblInfo.AxisIndexToFlag(i)))
+                    HomePosition.Values[i] = double.NaN;
             }
+        }
 
-            if (state == HomedState.NotHomed && confirmedNotHomed)
-            {
-                HomedState = HomedState.NotHomed;
-                return;
-            }
-
-            if (state == HomedState.NotHomed && HomedState != HomedState.Homed)
-                HomedState = HomedState.Unknown;
-            else if (state == HomedState.Unknown)
-                HomedState = HomedState.Unknown;
-
-            if (state == HomedState.NotHomed && refreshIfAmbiguousDowngrade)
-                RequestImmediateStatusSnapshot();
+        private void ApplyHomedState(HomedState state)
+        {
+            HomedState = state;
         }
 
         private static void RequestImmediateStatusSnapshot()
@@ -1515,10 +1485,14 @@ namespace CNC.Core
                         var state = hs[0] switch
                         {
                             "1" => HomedState.Homed,
-                            "0" => HomedState.NotHomed,
+                            "0" when GrblState.State == GrblStates.Alarm && GrblState.Substate == 11 => HomedState.NotHomed,
+                            "0" => HomedState.Unknown,
                             _ => HomedState.Unknown
                         };
-                        ApplyHomedState(state, confirmedNotHomed: state == HomedState.NotHomed && IsHomingRequiredAlarm);
+                        ApplyHomedState(state);
+
+                        if (hs.Length > 1 && int.TryParse(hs[1], out var homedMask))
+                            SetAxisHomed((AxisFlags)homedMask);
                     }
                     break;
 
