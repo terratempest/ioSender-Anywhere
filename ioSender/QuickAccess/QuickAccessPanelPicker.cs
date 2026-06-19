@@ -27,7 +27,7 @@ public static class QuickAccessPanelPicker
             var id = desc.Id;
             var item = new MenuItem
             {
-                Header = Localize.T(desc.TitleKey, desc.TitleFallback),
+                Header = WorkspaceEditorTitles.SelectionTitle(desc),
             };
             item.Click += (_, _) =>
             {
@@ -51,7 +51,7 @@ public static class QuickAccessPanelPicker
             var id = desc.Id;
             change.Items.Add(new MenuItem
             {
-                Header = Localize.T(desc.TitleKey, desc.TitleFallback),
+                Header = WorkspaceEditorTitles.SelectionTitle(desc),
                 Command = null,
             });
             if (change.Items[^1] is MenuItem pick)

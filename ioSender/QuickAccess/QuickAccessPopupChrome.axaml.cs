@@ -42,7 +42,7 @@ public partial class QuickAccessPopupChrome : UserControl
     public void SetTitle(WorkspaceEditorId editorId)
     {
         var desc = WorkspaceEditorCatalog.Get(editorId);
-        TitleText.Text = Localize.T(desc.TitleKey, desc.TitleFallback);
+        TitleText.Text = WorkspaceEditorTitles.HeaderTitle(desc);
     }
 
     public void SetEditor(WorkspaceEditorId editorId, Control content)

@@ -7,6 +7,8 @@ public sealed class WorkspaceEditorDescriptor
     public required WorkspaceEditorId Id { get; init; }
     public required string TitleKey { get; init; }
     public required string TitleFallback { get; init; }
+    public string? HeaderTitleKey { get; init; }
+    public string? HeaderTitleFallback { get; init; }
     public double MinWidth { get; init; } = 120;
     public double MinHeight { get; init; } = 80;
     public bool RequiresGrblDataContext { get; init; } = true;

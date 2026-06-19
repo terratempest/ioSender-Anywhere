@@ -174,7 +174,7 @@ public partial class WorkspaceRegionChrome : Border
     public void RefreshTitle()
     {
         var desc = WorkspaceEditorCatalog.Get(EditorId);
-        TitleText.Text = Localize.T(desc.TitleKey, desc.TitleFallback);
+        TitleText.Text = WorkspaceEditorTitles.HeaderTitle(desc);
     }
 
     public void SetTitleText(string text)
@@ -313,7 +313,7 @@ public partial class WorkspaceRegionChrome : Border
         {
             var id = desc.Id;
             change.Items.Add(MakeItem(
-                Localize.T(desc.TitleKey, desc.TitleFallback),
+                WorkspaceEditorTitles.SelectionTitle(desc),
                 () => ChangeEditorRequested?.Invoke(this, id)));
         }
         menu.Items.Add(change);

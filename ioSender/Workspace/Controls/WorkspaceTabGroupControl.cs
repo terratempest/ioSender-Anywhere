@@ -146,7 +146,7 @@ public sealed class WorkspaceTabGroupControl : UserControl
     Button CreateTabButton(WorkspaceTabEntry tab)
     {
         var desc = WorkspaceEditorCatalog.Get(tab.Editor);
-        var title = Localize.T(desc.TitleKey, desc.TitleFallback);
+        var title = WorkspaceEditorTitles.HeaderTitle(desc);
         var button = CreateBaseButton(title);
         button.Tag = tab;
         button.Classes.Set("active", tab.Id == _group.ActiveTabId);
@@ -347,11 +347,11 @@ public sealed class WorkspaceTabGroupControl : UserControl
         if (active is null)
         {
             var groupDesc = WorkspaceEditorCatalog.Get(WorkspaceEditorId.TabGroup);
-            _titleChanged(Localize.T(groupDesc.TitleKey, groupDesc.TitleFallback));
+            _titleChanged(WorkspaceEditorTitles.HeaderTitle(groupDesc));
             return;
         }
 
         var desc = WorkspaceEditorCatalog.Get(active.Editor);
-        _titleChanged(Localize.T(desc.TitleKey, desc.TitleFallback));
+        _titleChanged(WorkspaceEditorTitles.HeaderTitle(desc));
     }
 }

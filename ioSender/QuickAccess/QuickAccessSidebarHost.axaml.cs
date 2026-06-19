@@ -122,7 +122,7 @@ public partial class QuickAccessSidebarHost : UserControl
     Button CreateTabButton(QuickAccessTabEntry tab)
     {
         var desc = WorkspaceEditorCatalog.Get(tab.EditorId);
-        var title = Localize.T(desc.TitleKey, desc.TitleFallback);
+        var title = WorkspaceEditorTitles.HeaderTitle(desc);
 
         var label = new TextBlock
         {
