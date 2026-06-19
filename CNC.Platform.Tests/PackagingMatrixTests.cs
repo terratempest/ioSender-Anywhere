@@ -48,16 +48,20 @@ public sealed class PackagingMatrixTests
         var root = FindRepositoryRoot();
         var rpm = File.ReadAllText(Path.Combine(root, "scripts", "package-rpm.sh"));
         var appImage = File.ReadAllText(Path.Combine(root, "scripts", "package-appimage.sh"));
+        var deb = File.ReadAllText(Path.Combine(root, "scripts", "package-deb.sh"));
         var dependencyCheck = File.ReadAllText(Path.Combine(root, "scripts", "check-linux-deps.sh"));
 
+        Assert.Contains("IOSENDER_REUSE_PUBLISH", deb);
         Assert.Contains("RPM_ARCH=\"x86_64\"", rpm);
         Assert.Contains("RPM_ARCH=\"aarch64\"", rpm);
+        Assert.Contains("IOSENDER_REUSE_PUBLISH", rpm);
         Assert.Contains("ioSender-$VERSION-$RID.rpm", rpm);
         Assert.Contains("--target \"$RPM_ARCH-linux\"", rpm);
         Assert.Contains("buildarch_compat: $HOST_RPM_ARCH: $RPM_ARCH noarch", rpm);
         Assert.Contains("__brp_strip %{nil}", rpm);
         Assert.Contains("APPIMAGE_ARCH=\"x86_64\"", appImage);
         Assert.Contains("APPIMAGE_ARCH=\"aarch64\"", appImage);
+        Assert.Contains("IOSENDER_REUSE_PUBLISH", appImage);
         Assert.Contains("ioSender-$VERSION-$RID.AppImage", appImage);
         Assert.Contains("sed -i 's/\\r$//'", appImage);
         Assert.Contains("\"$APPDIR/ioSender.desktop\"", appImage);
@@ -100,6 +104,22 @@ public sealed class PackagingMatrixTests
         Assert.Contains("return $LinuxRids", script);
         Assert.DoesNotContain("DefaultLinuxRid", script);
         Assert.DoesNotContain("packages require matching WSL/native host", script);
+    }
+
+    [Fact]
+    public void Linux_release_build_publishes_once_per_rid_and_reuses_output()
+    {
+        var root = FindRepositoryRoot();
+        var publish = File.ReadAllText(Path.Combine(root, "scripts", "publish-linux.sh"));
+        var orchestrator = File.ReadAllText(Path.Combine(root, "scripts", "build-all.ps1"));
+        var wsl = File.ReadAllText(Path.Combine(root, "scripts", "wsl-build-deb.sh"));
+
+        Assert.Contains("-m:1", publish);
+        Assert.Contains("--disable-build-servers", publish);
+        Assert.Contains("LinuxPublish:$rid", orchestrator);
+        Assert.Contains("LinuxPublish", wsl);
+        Assert.Contains("IOSENDER_REUSE_PUBLISH=1", orchestrator);
+        Assert.Contains("IOSENDER_REUSE_PUBLISH=\"${IOSENDER_REUSE_PUBLISH:-0}\"", wsl);
     }
 
     [Fact]

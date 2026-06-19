@@ -46,8 +46,12 @@ if [[ -z "$VERSION" ]]; then
   VERSION="0.0.0"
 fi
 
-echo "Publishing fresh $RID output..."
-RID="$RID" OUT_DIR="$PUBLISH_DIR" bash "$ROOT/scripts/publish-linux.sh"
+if [[ "${IOSENDER_REUSE_PUBLISH:-}" == "1" && -f "$PUBLISH_DIR/ioSender" ]]; then
+  echo "Reusing existing $RID publish output at $PUBLISH_DIR"
+else
+  echo "Publishing fresh $RID output..."
+  RID="$RID" OUT_DIR="$PUBLISH_DIR" bash "$ROOT/scripts/publish-linux.sh"
+fi
 
 if [[ ! -f "$PUBLISH_DIR/ioSender" ]]; then
   echo "error: $PUBLISH_DIR/ioSender not found after publish" >&2

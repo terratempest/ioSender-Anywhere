@@ -51,7 +51,7 @@ public sealed class JobStreamingServiceStopTests : IDisposable
     {
         _streaming.CycleStart(0);
 
-        var sentRow = Assert.Single(GCodeFileService.Instance.Data.Where(row => row.Sent == "*"));
+        var sentRow = Assert.Single(GCodeFileService.Instance.Data.Where(row => row.Sent == "*").ToList());
 
         _model.OnCommandResponseReceived?.Invoke("ok");
 

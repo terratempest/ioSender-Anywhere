@@ -411,6 +411,9 @@ function Get-PhasesForTarget {
     $phases = @('Preflight', 'Clean')
     if ($LinuxBuildRids.Count -gt 0) {
         $phases += 'WslSync'
+        foreach ($rid in $LinuxBuildRids) {
+            $phases += "LinuxPublish:$rid"
+        }
     }
     if ($WinPackages -contains 'WinPortable') {
         foreach ($rid in $WinRids) {
@@ -773,12 +776,25 @@ function Invoke-ReleaseBuild {
         }
     }
 
+    foreach ($rid in $linuxBuildRids) {
+        $phase = "LinuxPublish:$rid"
+        $log = Get-PhaseLogPath -PhaseName $phase -Extension 'log'
+        $err = Get-PhaseLogPath -PhaseName $phase -Extension 'err'
+        [void](Invoke-PhaseProcess -PhaseName $phase -FilePath "wsl.exe" -Arguments @('-d', $distro, '--cd', '~', '-e', '/bin/bash', $wslSh, $wslExport, 'LinuxPublish', $rid) -LogPath $log -ErrPath $err)
+    }
+
     foreach ($package in $linuxPackages) {
         foreach ($rid in $linuxBuildRids) {
+            $publishPhase = "LinuxPublish:$rid"
             $phase = "${package}:$rid"
             $log = Get-PhaseLogPath -PhaseName $phase -Extension 'log'
             $err = Get-PhaseLogPath -PhaseName $phase -Extension 'err'
-            [void](Invoke-PhaseProcess -PhaseName $phase -FilePath "wsl.exe" -Arguments @('-d', $distro, '--cd', '~', '-e', '/bin/bash', $wslSh, $wslExport, $package, $rid) -LogPath $log -ErrPath $err)
+            if (Test-PhaseFailed -PhaseName $publishPhase) {
+                Set-PhaseStatus -Name $phase -Status 'failed' -Message "$publishPhase failed"
+            } else {
+                $reuseScript = "IOSENDER_REUSE_PUBLISH=1 exec /bin/bash '$wslSh' '$wslExport' '$package' '$rid'"
+                [void](Invoke-PhaseProcess -PhaseName $phase -FilePath "wsl.exe" -Arguments @('-d', $distro, '--cd', '~', '-e', '/bin/bash', '-lc', $reuseScript) -LogPath $log -ErrPath $err)
+            }
 
             $artifact = $null
             if (-not (Test-PhaseFailed -PhaseName $phase)) {

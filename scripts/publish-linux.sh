@@ -22,6 +22,8 @@ publish() {
   dotnet publish "$ROOT/ioSender/ioSender.csproj" \
     -c Release \
     -r "$RID" \
+    -m:1 \
+    --disable-build-servers \
     --self-contained true \
     -p:PublishSingleFile=false \
     --force \

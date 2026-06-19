@@ -1,7 +1,7 @@
 #!/bin/bash
 # Build Linux package(s) from ~/ioSender-build (populated by build-all.ps1 via rsync).
 # Arg1: WSL export dir on /mnt/c/... for copying artifacts back to Windows.
-# Arg2: package target (LinuxDeb, LinuxRpm, LinuxAppImage, Linux).
+# Arg2: package target (LinuxPublish, LinuxDeb, LinuxRpm, LinuxAppImage, Linux).
 # Arg3: RID (linux-x64 or linux-arm64).
 set -eu
 
@@ -42,10 +42,17 @@ chmod +x "$BUILD_DIR/scripts/"*.sh
 
 echo "==> Building $TARGET for $RID in $BUILD_DIR"
 cd "$BUILD_DIR"
-RID="$RID" ./scripts/build-linux.sh "$TARGET" "$RID"
+if [[ "$TARGET" == "LinuxPublish" ]]; then
+  RID="$RID" ./scripts/publish-linux.sh
+else
+  RID="$RID" IOSENDER_REUSE_PUBLISH="${IOSENDER_REUSE_PUBLISH:-0}" ./scripts/build-linux.sh "$TARGET" "$RID"
+fi
 
 shopt -s nullglob
 case "$TARGET" in
+  LinuxPublish)
+    files=()
+    ;;
   LinuxDeb|Deb|deb)
     files=("$BUILD_DIR/artifacts/"iosender_*.deb)
     ;;
@@ -63,6 +70,15 @@ case "$TARGET" in
     exit 1
     ;;
 esac
+
+if [[ "$TARGET" == "LinuxPublish" ]]; then
+  if [[ ! -f "$BUILD_DIR/artifacts/publish/$RID/ioSender" ]]; then
+    echo "error: publish output missing: $BUILD_DIR/artifacts/publish/$RID/ioSender" >&2
+    exit 1
+  fi
+  echo "==> Published $RID output"
+  exit 0
+fi
 
 if (( ${#files[@]} == 0 )); then
   echo "error: no artifacts produced in $BUILD_DIR/artifacts" >&2
