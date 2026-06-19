@@ -101,6 +101,11 @@ public sealed class WorkspaceEditorControlFactory
             HorizontalAlignment = Avalonia.Layout.HorizontalAlignment.Stretch,
             VerticalAlignment = Avalonia.Layout.VerticalAlignment.Stretch,
         },
+        WorkspaceEditorId.SpindleLarge => new SpindleControlLarge(_session.MachineCommands)
+        {
+            HorizontalAlignment = Avalonia.Layout.HorizontalAlignment.Stretch,
+            VerticalAlignment = Avalonia.Layout.VerticalAlignment.Stretch,
+        },
         WorkspaceEditorId.Coolant => new CoolantControl
         {
             HorizontalAlignment = Avalonia.Layout.HorizontalAlignment.Stretch,

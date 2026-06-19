@@ -34,4 +34,5 @@ public enum WorkspaceEditorId
     GrblConfig,
     AppConfig,
     FeedLarge,
+    SpindleLarge,
 }

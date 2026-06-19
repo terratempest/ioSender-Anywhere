@@ -81,6 +81,17 @@ public class WorkspaceEditorCatalogTests
             d => d.Id == WorkspaceEditorId.FeedLarge);
     }
 
+    [Fact]
+    public void SpindleLarge_is_pickable()
+    {
+        Assert.Contains(
+            WorkspaceEditorCatalog.LayoutPickableDescriptors,
+            d => d.Id == WorkspaceEditorId.SpindleLarge);
+        Assert.Contains(
+            WorkspaceEditorCatalog.PanelPickableDescriptors,
+            d => d.Id == WorkspaceEditorId.SpindleLarge);
+    }
+
     [Theory]
     [InlineData(WorkspaceEditorId.Keyboard)]
     [InlineData(WorkspaceEditorId.NumberPad)]

@@ -93,12 +93,19 @@ public sealed class SpindlePanelViewModel
             || double.TryParse(value, NumberStyles.Float, CultureInfo.CurrentCulture, out rpm);
     }
 
-    public void SendOverride(byte command) => _commands.SendRealtime(command);
+    public void SendOverride(byte command)
+    {
+        _commands.SendRealtime(command);
+        _commands.StatusReport();
+    }
 
     public void SendOverrideCommands(byte[] commands, int len)
     {
         for (var i = 0; i < len; i++)
             _commands.SendRealtime(commands[i]);
+
+        if (len > 0)
+            _commands.StatusReport();
     }
 
     public bool TrySetRpmFromValue(double rpm)
@@ -111,5 +118,9 @@ public sealed class SpindlePanelViewModel
         return true;
     }
 
-    void Send(byte command) => _commands.SendRealtime(command);
+    void Send(byte command)
+    {
+        _commands.SendRealtime(command);
+        _commands.StatusReport();
+    }
 }

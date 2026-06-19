@@ -1,0 +1,190 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:controls="using:CNC.Controls.Avalonia.Controls"
+             xmlns:primitives="using:Avalonia.Controls.Primitives"
+             xmlns:conv="using:CNC.Controls.Avalonia.Converters"
+             xmlns:loc="using:CNC.Localization.Avalonia"
+             xmlns:core="using:CNC.Core"
+             x:Class="CNC.Controls.Avalonia.Views.SpindleControlLarge"
+             x:Name="root"
+             x:DataType="core:GrblViewModel"
+             mc:Ignorable="d"
+             d:DesignWidth="250"
+             d:DesignHeight="300"
+             MinWidth="220"
+             MinHeight="150">
+
+  <UserControl.Resources>
+    <ResourceDictionary>
+      <ResourceDictionary.MergedDictionaries>
+        <ResourceInclude Source="avares://CNC.Controls.Avalonia/Themes/Controls.axaml"/>
+      </ResourceDictionary.MergedDictionaries>
+      <conv:LogicalNotConverter x:Key="LogicalNotConverter"/>
+    </ResourceDictionary>
+  </UserControl.Resources>
+
+  <Grid Margin="4"
+    RowDefinitions="*,Auto,Auto,Auto,*"
+    RowSpacing="4">
+
+    <Grid Grid.Row="0" ColumnDefinitions="48,*" ColumnSpacing="8" MinHeight="32" MaxHeight="64">
+      <TextBlock x:Name="LblSpindleSpeed"
+        Text="RPM"
+        Foreground="{DynamicResource ThemeForegroundBrush}"
+        FontWeight="Bold"
+        VerticalAlignment="Center" HorizontalAlignment="Right"
+        TextWrapping="Wrap"
+        MaxLines="2"
+        TextAlignment="Center"
+        loc:Localize.Key="CNC.Controls.Avalonia.spindlecontrol.lbl_spindle_speed"
+        loc:Localize.Fallback="RPM"/>
+
+      <Border x:Name="RpmReadoutBorder"
+        Grid.Column="1"
+        Background="{DynamicResource IoSenderDroReadoutBrush}"
+        BorderBrush="{DynamicResource ThemeBorderHighBrush}"
+        BorderThickness="1"
+        CornerRadius="4"
+        Padding="8,4">
+        <Grid>
+          <Viewbox Stretch="Uniform"
+            StretchDirection="DownOnly"
+            MaxHeight="36"
+            HorizontalAlignment="Center">
+            <TextBlock x:Name="TxtRpmDisplay"
+              Text="0"
+              FontSize="24"
+              FontFamily="Consolas,Courier New,monospace"
+              Foreground="#1A1A1A"
+              TextAlignment="Center"/>
+          </Viewbox>
+          <TextBox x:Name="TxtRpm"
+            Text="0"
+            FontSize="24"
+            FontFamily="Consolas,Courier New,monospace"
+            Foreground="#1A1A1A"
+            Background="{DynamicResource IoSenderDroReadoutBrush}"
+            BorderBrush="Transparent"
+            BorderThickness="0"
+            Padding="0"
+            TextAlignment="Center"
+            HorizontalContentAlignment="Center"
+            VerticalContentAlignment="Center"
+            CaretBrush="#1A1A1A"
+            SelectionBrush="{DynamicResource ThemeAccentBrush}"
+            SelectionForegroundBrush="#1A1A1A"
+            IsVisible="False"
+            KeyDown="TxtRpm_KeyDown"
+            LostFocus="TxtRpm_LostFocus"
+            controls:PopupKeyboard.Layout="Numeric">
+            <TextBox.Styles>
+              <Style Selector="TextBox#TxtRpm:pointerover /template/ Border#PART_BorderElement">
+                <Setter Property="Background" Value="{DynamicResource IoSenderDroReadoutBrush}"/>
+                <Setter Property="BorderBrush" Value="Transparent"/>
+                <Setter Property="BorderThickness" Value="0"/>
+              </Style>
+              <Style Selector="TextBox#TxtRpm:focus /template/ Border#PART_BorderElement">
+                <Setter Property="Background" Value="{DynamicResource IoSenderDroReadoutBrush}"/>
+                <Setter Property="BorderBrush" Value="Transparent"/>
+                <Setter Property="BorderThickness" Value="0"/>
+              </Style>
+              <Style Selector="TextBox#TxtRpm:focus-within /template/ Border#PART_BorderElement">
+                <Setter Property="Background" Value="{DynamicResource IoSenderDroReadoutBrush}"/>
+                <Setter Property="BorderBrush" Value="Transparent"/>
+                <Setter Property="BorderThickness" Value="0"/>
+              </Style>
+            </TextBox.Styles>
+          </TextBox>
+        </Grid>
+      </Border>
+    </Grid>
+
+    <Grid Grid.Row="1" ColumnDefinitions="4*,2*" ColumnSpacing="4">
+      <Grid Grid.Column="0"
+        ColumnDefinitions="Auto,*,Auto"
+        ColumnSpacing="2"
+        IsEnabled="{Binding RPMOverrideDisabled, Converter={StaticResource LogicalNotConverter}}">
+
+        <Button x:Name="BtnOvrMinus"
+          Grid.Column="0"
+          Classes="panel-action"
+          Content="-"
+          MinWidth="36"
+          Click="BtnOvrMinus_Click"/>
+
+        <TextBlock x:Name="TxtRpmOverride"
+          Grid.Column="1"
+          Text="100%"
+          FontSize="24"
+          VerticalAlignment="Center"
+          Foreground="{DynamicResource ThemeAccentBrush}"
+          FontFamily="Consolas,Courier New,monospace"
+          TextAlignment="Center"/>
+
+        <Button x:Name="BtnOvrPlus"
+          Grid.Column="2"
+          Classes="panel-action"
+          Content="+"
+          MinWidth="36"
+          Click="BtnOvrPlus_Click"/>
+      </Grid>
+
+      <Grid Grid.Column="1"
+        ColumnDefinitions="*,*"
+        ColumnSpacing="4"
+        MinHeight="36"
+        IsEnabled="{Binding RPMOverrideDisabled, Converter={StaticResource LogicalNotConverter}}">
+        <Button x:Name="BtnStep"
+          Grid.Column="0"
+          Classes="panel-action"
+          Content="X1"
+          Click="OvrStep_Click"/>
+        <Button x:Name="BtnOvrReset"
+          Grid.Column="1"
+          Classes="panel-action"
+          Content="↺"
+          Click="BtnOvrReset_Click"/>
+      </Grid>
+    </Grid>
+
+    <Border Grid.Row="2"
+      Height="1"
+      VerticalAlignment="Center"
+      Background="{DynamicResource ThemeBorderHighBrush}"/>
+
+    <Grid Grid.Row="3" ColumnDefinitions="*" VerticalAlignment="Center">
+      <TextBlock x:Name="LblSpindlePower"
+        Text="Spindle:"
+        Foreground="{DynamicResource ThemeForegroundBrush}"
+        FontWeight="Bold"
+        FontSize="20"
+        loc:Localize.Key="CNC.Controls.Avalonia.spindlecontrol.lbl_spindle_power"
+        loc:Localize.Fallback="Spindle:"/>
+    </Grid>
+
+    <Grid Grid.Row="4"
+      ColumnDefinitions="*,*,*"
+      ColumnSpacing="4"
+      MinHeight="36"
+      VerticalAlignment="Stretch"
+      IsEnabled="{Binding IsSpindleStateEnabled, ElementName=root}">
+      <primitives:ToggleButton x:Name="RbSpindleCW"
+        Grid.Column="0"
+        Classes="panel-toggle"
+        Content="CW"
+        Click="RbSpindle_Click"/>
+      <primitives:ToggleButton x:Name="RbSpindleCCW"
+        Grid.Column="1"
+        Classes="panel-toggle"
+        Content="CCW"
+        Click="RbSpindle_Click"/>
+      <primitives:ToggleButton x:Name="RbSpindleOff"
+        Grid.Column="2"
+        Classes="panel-toggle"
+        Content="OFF"
+        Click="RbSpindle_Click"/>
+    </Grid>
+  </Grid>
+</UserControl>
