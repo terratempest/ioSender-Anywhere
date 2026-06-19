@@ -232,7 +232,7 @@ public partial class SpindleControlLarge : UserControl
         e.Handled = true;
     }
 
-    void TxtRpm_LostFocus(object? sender, RoutedEventArgs e)
+    void TxtRpm_LostFocus(object? sender, FocusChangedEventArgs e)
     {
         if (PopupKeyboardService.IsPopupOpenFor(TxtRpm))
             return;
@@ -251,6 +251,17 @@ public partial class SpindleControlLarge : UserControl
                 ? SpindleState.CCW
                 : SpindleState.Off);
         _viewModel.SelectSpindleState(commandTemplate);
+    }
+
+    void cbxSpindle_SelectionChanged(object? sender, SelectionChangedEventArgs e)
+    {
+        if (e.AddedItems.Count != 1
+            || e.AddedItems[0] is not Spindle spindle
+            || sender is not ComboBox combo
+            || !combo.IsDropDownOpen)
+            return;
+
+        _viewModel.ChangeSpindle(spindle);
     }
 
     bool UseCoarseOverrideStep => _useCoarseOverrideStep;

@@ -22,6 +22,7 @@
         <ResourceInclude Source="avares://CNC.Controls.Avalonia/Themes/Controls.axaml"/>
       </ResourceDictionary.MergedDictionaries>
       <conv:LogicalNotConverter x:Key="LogicalNotConverter"/>
+      <conv:BoolToVisibleConverter x:Key="IsVisibleConverter"/>
     </ResourceDictionary>
   </UserControl.Resources>
 
@@ -154,14 +155,31 @@
       VerticalAlignment="Center"
       Background="{DynamicResource ThemeBorderHighBrush}"/>
 
-    <Grid Grid.Row="3" ColumnDefinitions="*" VerticalAlignment="Center">
-      <TextBlock x:Name="LblSpindlePower"
+    <Grid Grid.Row="3" ColumnDefinitions="Auto,*" 
+      ColumnSpacing="4"
+      VerticalAlignment="Center">
+      <TextBlock x:Name="LblSpindlePower" Grid.Column="0"
         Text="Spindle:"
         Foreground="{DynamicResource ThemeForegroundBrush}"
         FontWeight="Bold"
         FontSize="20"
         loc:Localize.Key="CNC.Controls.Avalonia.spindlecontrol.lbl_spindle_power"
         loc:Localize.Fallback="Spindle:"/>
+
+      <ComboBox x:Name="cbxSpindle"
+                Grid.Column="1"
+                HorizontalAlignment="Stretch"                
+                ItemsSource="{Binding Spindles}"
+                SelectedValue="{Binding SpindleNum, Mode=OneWay}"
+                IsEnabled="{Binding IsJobRunning, Converter={StaticResource LogicalNotConverter}}"
+                IsVisible="{Binding MultiSpindle, Converter={StaticResource IsVisibleConverter}}"
+                SelectionChanged="cbxSpindle_SelectionChanged">
+        <ComboBox.ItemTemplate>
+          <DataTemplate>
+            <TextBlock Text="{Binding Name}"/>
+          </DataTemplate>
+        </ComboBox.ItemTemplate>
+      </ComboBox>
     </Grid>
 
     <Grid Grid.Row="4"

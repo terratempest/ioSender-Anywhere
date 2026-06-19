@@ -53,6 +53,7 @@
         <RadioButton x:Name="rbSpindleOff" GroupName="SpindleDirection" Content="Off" Margin="0,-4"
                      loc:Localize.Key="CNC.Controls.Avalonia.spindlecontrol.lbl_off" loc:Localize.Fallback="Off"
                      Click="rbSpindle_Click">
+
           <RadioButton.RenderTransform>
             <ScaleTransform ScaleX="0.8" ScaleY="0.8"/>
           </RadioButton.RenderTransform>
@@ -93,21 +94,7 @@
         </RadioButton>
       </StackPanel>
 
-      <ComboBox x:Name="cbxSpindle"
-                Grid.Column="2"
-                HorizontalAlignment="Stretch"
-                VerticalAlignment="Top"
-                ItemsSource="{Binding Spindles}"
-                SelectedValue="{Binding SpindleNum, Mode=OneWay}"
-                IsEnabled="{Binding IsJobRunning, Converter={StaticResource LogicalNotConverter}}"
-                IsVisible="{Binding MultiSpindle, Converter={StaticResource IsVisibleConverter}}"
-                SelectionChanged="cbxSpindle_SelectionChanged">
-        <ComboBox.ItemTemplate>
-          <DataTemplate>
-            <TextBlock Text="{Binding Name}"/>
-          </DataTemplate>
-        </ComboBox.ItemTemplate>
-      </ComboBox>
+      
     </Grid>
     <Grid Grid.Row="1" ColumnDefinitions="Auto, *" TextElement.FontSize="12" HorizontalAlignment="Stretch">
       <TextBlock x:Name="lblOverride"
