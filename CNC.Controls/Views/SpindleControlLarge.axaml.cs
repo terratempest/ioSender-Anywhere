@@ -5,6 +5,7 @@ using Avalonia.Controls.Primitives;
 using Avalonia.Input;
 using Avalonia.Interactivity;
 using Avalonia.Threading;
+using CNC.Controls.Avalonia.Controls;
 using CNC.Controls.Avalonia.Services;
 using CNC.Controls.Avalonia.Utilities;
 using CNC.Controls.Avalonia.ViewModels;
@@ -34,7 +35,9 @@ public partial class SpindleControlLarge : UserControl
         InitializeComponent();
 
         DataContextChanged += SpindleControlLarge_DataContextChanged;
+        DetachedFromVisualTree += SpindleControlLarge_DetachedFromVisualTree;
         RpmReadoutBorder.PointerPressed += RpmReadoutBorder_PointerPressed;
+        PopupKeyboardService.PopupClosed += PopupKeyboardService_PopupClosed;
 
         RbSpindleOff.CommandParameter = "M5";
         RbSpindleCW.CommandParameter = "M3{0}";
@@ -91,6 +94,15 @@ public partial class SpindleControlLarge : UserControl
         UpdateOverrideText();
         UpdateSpindleStateEnabled();
         UpdateSpindleStateSelection();
+    }
+
+    void SpindleControlLarge_DetachedFromVisualTree(object? sender, VisualTreeAttachmentEventArgs e) =>
+        PopupKeyboardService.PopupClosed -= PopupKeyboardService_PopupClosed;
+
+    void PopupKeyboardService_PopupClosed(object? sender, TextBox target)
+    {
+        if (ReferenceEquals(target, TxtRpm))
+            EndRpmEdit(commit: true);
     }
 
     void OnDataContextPropertyChanged(object? sender, PropertyChangedEventArgs e)
@@ -220,7 +232,13 @@ public partial class SpindleControlLarge : UserControl
         e.Handled = true;
     }
 
-    void TxtRpm_LostFocus(object? sender, RoutedEventArgs e) => EndRpmEdit(commit: true);
+    void TxtRpm_LostFocus(object? sender, RoutedEventArgs e)
+    {
+        if (PopupKeyboardService.IsPopupOpenFor(TxtRpm))
+            return;
+
+        EndRpmEdit(commit: true);
+    }
 
     void RbSpindle_Click(object? sender, RoutedEventArgs e)
     {

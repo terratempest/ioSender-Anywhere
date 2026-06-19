@@ -10,7 +10,18 @@ public static class PopupKeyboardService
 {
     static readonly ConditionalWeakTable<Window, PopupKeyboardSession> Sessions = new();
 
+    public static event EventHandler<TextBox>? PopupClosed;
+
     public static Func<int> TriggerClickCount { get; set; } = () => 2;
+
+    public static bool IsPopupOpenFor(TextBox target)
+    {
+        var topLevel = TopLevel.GetTopLevel(target);
+        if (topLevel is not Window window || !Sessions.TryGetValue(window, out var session))
+            return false;
+
+        return session.IsPopupOpenFor(target);
+    }
 
     public static void Attach(Window window)
     {
@@ -92,9 +103,11 @@ public static class PopupKeyboardService
             if (sender is not PopupKeyboardWindow closedWindow || !ReferenceEquals(closedWindow, _popupWindow))
                 return;
 
+            var target = _target;
             closedWindow.Closed -= OnPopupClosed;
             _popupWindow = null;
             _target = null;
+            RaisePopupClosed(target);
         }
 
         void ClosePopupOnClickAway(object? source)
@@ -109,6 +122,7 @@ public static class PopupKeyboardService
 
         void ClosePopup()
         {
+            var target = _target;
             if (_popupWindow is not null)
             {
                 _popupWindow.Closed -= OnPopupClosed;
@@ -117,7 +131,17 @@ public static class PopupKeyboardService
 
             _popupWindow = null;
             _target = null;
+            RaisePopupClosed(target);
         }
+
+        public bool IsPopupOpenFor(TextBox target) =>
+            _popupWindow is not null && ReferenceEquals(_target, target);
+    }
+
+    static void RaisePopupClosed(TextBox? target)
+    {
+        if (target is not null)
+            PopupClosed?.Invoke(null, target);
     }
 
     static TextBox? FindTextBox(object? source)
