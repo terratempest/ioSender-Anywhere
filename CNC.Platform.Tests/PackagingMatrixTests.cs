@@ -11,8 +11,9 @@ public sealed class PackagingMatrixTests
         Assert.Contains("[ValidateSet('win-x64', 'win-arm64')]", script);
         Assert.Contains("-r $RuntimeIdentifier", script);
         Assert.Contains("PublishDir", script);
-        Assert.Contains("BaseIntermediateOutputPath", script);
-        Assert.Contains("BaseOutputPath", script);
+        Assert.DoesNotContain("BaseIntermediateOutputPath", script);
+        Assert.DoesNotContain("BaseOutputPath", script);
+        Assert.Contains("throw \"dotnet publish failed for $RuntimeIdentifier", script);
     }
 
     [Fact]
@@ -29,6 +30,9 @@ public sealed class PackagingMatrixTests
         Assert.Contains("ArchitecturesAllowed={#ArchitecturesAllowed}", installerTemplate);
         Assert.Contains("PublishDir", script);
         Assert.Contains("if ($PublishDir)", script);
+        Assert.DoesNotContain("BaseIntermediateOutputPath", script);
+        Assert.DoesNotContain("BaseOutputPath", script);
+        Assert.Contains("throw \"dotnet publish failed for $RuntimeIdentifier", script);
     }
 
     [Fact]
@@ -122,10 +126,12 @@ public sealed class PackagingMatrixTests
         Assert.Contains("--disable-build-servers", publish);
         Assert.Contains("LinuxPublish:$rid", orchestrator);
         Assert.Contains("LinuxPublish", wsl);
-        Assert.Contains("IOSENDER_REUSE_PUBLISH=1", orchestrator);
-        Assert.Contains("IOSENDER_REUSE_PUBLISH=\"${IOSENDER_REUSE_PUBLISH:-0}\"", wsl);
-        Assert.Contains("BaseIntermediateOutputPath", publish);
-        Assert.Contains("BaseOutputPath", publish);
+        Assert.Contains("REUSE_PUBLISH=\"${4:-0}\"", wsl);
+        Assert.Contains("IOSENDER_REUSE_PUBLISH=\"$REUSE_PUBLISH\"", wsl);
+        Assert.Contains("'/bin/bash', $wslSh, $wslExport, $package, $rid, '1'", orchestrator);
+        Assert.DoesNotContain("'-lc', $reuseScript", orchestrator);
+        Assert.DoesNotContain("BaseIntermediateOutputPath", publish);
+        Assert.DoesNotContain("BaseOutputPath", publish);
     }
 
     [Fact]

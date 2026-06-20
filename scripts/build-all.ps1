@@ -736,33 +736,35 @@ function Invoke-ReleaseBuild {
     $results = @()
     $publishScript = Join-Path $Scripts "publish-windows.ps1"
     $installerScript = Join-Path $Scripts "package-windows-installer.ps1"
-    $publishJobs = @{}
     $packageJobs = @{}
 
-    foreach ($rid in $winRids) {
-        if ($winPackages -contains 'WinPortable' -or $winPackages -contains 'WinInstaller') {
+    $publishRounds = [Math]::Max($winRids.Count, $linuxBuildRids.Count)
+    for ($index = 0; $index -lt $publishRounds; $index++) {
+        $publishJobs = @{}
+
+        if ($index -lt $winRids.Count -and ($winPackages -contains 'WinPortable' -or $winPackages -contains 'WinInstaller')) {
+            $rid = $winRids[$index]
             $publishDir = Join-Path $Artifacts "publish\$rid"
-            $intermediateDir = Join-Path $Artifacts "msbuild\publish\$rid"
             $publishArgs = @(
                 '-NoProfile',
                 '-ExecutionPolicy', 'Bypass',
                 '-File', $publishScript,
                 '-RuntimeIdentifier', $rid,
-                '-PublishDir', $publishDir,
-                '-IntermediateDir', $intermediateDir
+                '-PublishDir', $publishDir
             )
             $exe = Join-Path $publishDir "ioSender.exe"
             Start-PhaseProcessJob -JobMap $publishJobs -PhaseName "WinPublish:$rid" -FilePath $PsHost -Arguments $publishArgs -SuccessPath $exe
         }
-    }
 
-    foreach ($rid in $linuxBuildRids) {
-        Start-PhaseProcessJob -JobMap $publishJobs -PhaseName "LinuxPublish:$rid" -FilePath "wsl.exe" -Arguments @('-d', $distro, '--cd', '~', '-e', '/bin/bash', $wslSh, $wslExport, 'LinuxPublish', $rid)
-    }
+        if ($index -lt $linuxBuildRids.Count) {
+            $rid = $linuxBuildRids[$index]
+            Start-PhaseProcessJob -JobMap $publishJobs -PhaseName "LinuxPublish:$rid" -FilePath "wsl.exe" -Arguments @('-d', $distro, '--cd', '~', '-e', '/bin/bash', $wslSh, $wslExport, 'LinuxPublish', $rid)
+        }
 
-    Render-PhaseBoard -Elapsed $totalSw.Elapsed
-    if ($publishJobs.Count -gt 0) {
-        [void](Wait-BuildJobs -JobMap $publishJobs)
+        Render-PhaseBoard -Elapsed $totalSw.Elapsed
+        if ($publishJobs.Count -gt 0) {
+            [void](Wait-BuildJobs -JobMap $publishJobs)
+        }
     }
 
     foreach ($rid in $winRids) {
@@ -832,8 +834,7 @@ function Invoke-ReleaseBuild {
                 'LinuxAppImage' { Join-Path $ExportDir ("ioSender-{0}-{1}.AppImage" -f $version, $rid) }
                 default { $null }
             }
-            $reuseScript = "VERSION='$version' IOSENDER_REUSE_PUBLISH=1 exec /bin/bash '$wslSh' '$wslExport' '$package' '$rid'"
-            Start-PhaseProcessJob -JobMap $packageJobs -PhaseName $phase -FilePath "wsl.exe" -Arguments @('-d', $distro, '--cd', '~', '-e', '/bin/bash', '-lc', $reuseScript) -SuccessPath $successPath
+            Start-PhaseProcessJob -JobMap $packageJobs -PhaseName $phase -FilePath "wsl.exe" -Arguments @('-d', $distro, '--cd', '~', '-e', '/bin/bash', $wslSh, $wslExport, $package, $rid, '1') -SuccessPath $successPath
         }
     }
 

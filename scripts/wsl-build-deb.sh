@@ -3,6 +3,7 @@
 # Arg1: WSL export dir on /mnt/c/... for copying artifacts back to Windows.
 # Arg2: package target (LinuxPublish, LinuxDeb, LinuxRpm, LinuxAppImage, Linux).
 # Arg3: RID (linux-x64 or linux-arm64).
+# Arg4: reuse existing publish output (0 or 1).
 set -eu
 
 export DOTNET_ROOT="${DOTNET_ROOT:-$HOME/.dotnet}"
@@ -12,6 +13,7 @@ BUILD_DIR="${IOSENDER_WSL_BUILD_DIR:-$HOME/ioSender-build}"
 EXPORT_DIR="${1:-}"
 TARGET="${2:-LinuxDeb}"
 RID="${3:-linux-x64}"
+REUSE_PUBLISH="${4:-0}"
 
 if [[ ! -f "$BUILD_DIR/scripts/build-linux.sh" ]]; then
   echo "error: build tree missing at $BUILD_DIR (run build-all.ps1 sync first)" >&2
@@ -45,7 +47,7 @@ cd "$BUILD_DIR"
 if [[ "$TARGET" == "LinuxPublish" ]]; then
   RID="$RID" ./scripts/publish-linux.sh
 else
-  RID="$RID" IOSENDER_REUSE_PUBLISH="${IOSENDER_REUSE_PUBLISH:-0}" ./scripts/build-linux.sh "$TARGET" "$RID"
+  RID="$RID" IOSENDER_REUSE_PUBLISH="$REUSE_PUBLISH" ./scripts/build-linux.sh "$TARGET" "$RID"
 fi
 
 shopt -s nullglob

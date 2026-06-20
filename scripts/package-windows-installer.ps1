@@ -15,9 +15,6 @@ $Root = (Resolve-Path (Join-Path $PSScriptRoot "..")).Path
 $Project = Join-Path $Root "ioSender\ioSender.csproj"
 $Artifacts = Join-Path $Root "artifacts"
 $SelfPublishDir = Join-Path $Artifacts "publish\$RuntimeIdentifier-installer"
-$IntermediateDir = if ($IntermediateDir) { $IntermediateDir } else { Join-Path $Artifacts "msbuild\installer\$RuntimeIdentifier" }
-$BaseIntermediateOutputPath = Join-Path $IntermediateDir "obj"
-$BaseOutputPath = Join-Path $IntermediateDir "bin"
 $InstallerScript = Join-Path $Root "packaging\windows\iosender.iss"
 $IconPath = Join-Path $Root "Icon\iosendericon.ico"
 
@@ -83,8 +80,6 @@ if ($PublishDir) {
         Remove-Item $SelfPublishDir -Recurse -Force
     }
     New-Item -ItemType Directory -Force -Path $SelfPublishDir | Out-Null
-    New-Item -ItemType Directory -Force -Path $BaseIntermediateOutputPath | Out-Null
-    New-Item -ItemType Directory -Force -Path $BaseOutputPath | Out-Null
 
     Write-Host "Publishing self-contained $RuntimeIdentifier to $SelfPublishDir"
     dotnet publish $Project `
@@ -92,10 +87,12 @@ if ($PublishDir) {
         -r $RuntimeIdentifier `
         --self-contained true `
         -p:PublishSingleFile=false `
-        -p:BaseIntermediateOutputPath=$BaseIntermediateOutputPath `
-        -p:BaseOutputPath=$BaseOutputPath `
         --force `
         -o $SelfPublishDir
+
+    if ($LASTEXITCODE -ne 0) {
+        throw "dotnet publish failed for $RuntimeIdentifier (exit $LASTEXITCODE)."
+    }
 
     $PublishDir = $SelfPublishDir
 }
