@@ -355,14 +355,29 @@ public sealed class GrblViewModelReadoutTests
     }
 
     [Fact]
-    public void DataReceived_not_homed_field_sets_unknown_state_when_not_alarm_11()
+    public void DataReceived_not_homed_field_sets_not_homed_state_when_not_alarm_11()
     {
         var vm = new GrblViewModel();
 
         vm.DataReceived("<Idle|MPos:0,0,0|H:1|Bf:15,128>");
         vm.DataReceived("<Idle|MPos:0,0,0|H:0|Bf:15,128>");
 
-        Assert.Equal(HomedState.Unknown, vm.HomedState);
+        Assert.Equal(HomedState.NotHomed, vm.HomedState);
+    }
+
+    [Fact]
+    public void DataReceived_not_homed_field_without_mask_clears_homing_details()
+    {
+        var vm = new GrblViewModel();
+        vm.DataReceived("[HOME:1,2,3:7]");
+
+        vm.DataReceived("<Idle|MPos:0,0,0|H:0|Bf:15,128>");
+
+        Assert.Equal(HomedState.NotHomed, vm.HomedState);
+        Assert.Equal(AxisFlags.None, vm.AxisHomed.Value);
+        Assert.True(double.IsNaN(vm.HomePosition.X));
+        Assert.True(double.IsNaN(vm.HomePosition.Y));
+        Assert.True(double.IsNaN(vm.HomePosition.Z));
     }
 
     [Fact]
@@ -491,11 +506,30 @@ public sealed class GrblViewModelReadoutTests
     public void DataReceived_invalid_home_report_keeps_existing_homed_state()
     {
         var vm = new GrblViewModel();
+        vm.DataReceived("[HOME:1,2,3:7]");
         vm.DataReceived("<Idle|MPos:0,0,0|H:1|Bf:15,128>");
 
         vm.DataReceived("[HOME:invalid:0]");
 
         Assert.Equal(HomedState.Homed, vm.HomedState);
+        Assert.Equal(AxisFlags.XYZ, vm.AxisHomed.Value);
+        Assert.Equal(1d, vm.HomePosition.X);
+        Assert.Equal(2d, vm.HomePosition.Y);
+        Assert.Equal(3d, vm.HomePosition.Z);
+    }
+
+    [Fact]
+    public void DataReceived_home_report_with_invalid_mask_keeps_existing_homing_details()
+    {
+        var vm = new GrblViewModel();
+        vm.DataReceived("[HOME:1,2,3:7]");
+
+        vm.DataReceived("[HOME:4,5,6:not-a-mask]");
+
+        Assert.Equal(AxisFlags.XYZ, vm.AxisHomed.Value);
+        Assert.Equal(1d, vm.HomePosition.X);
+        Assert.Equal(2d, vm.HomePosition.Y);
+        Assert.Equal(3d, vm.HomePosition.Z);
     }
 
     [Fact]
@@ -594,6 +628,8 @@ public sealed class GrblViewModelReadoutTests
         vm.Clear();
 
         Assert.Equal(HomedState.Unknown, vm.HomedState);
+        Assert.Equal(AxisFlags.None, vm.AxisHomed.Value);
+        Assert.True(double.IsNaN(vm.HomePosition.X));
     }
 
     [Fact]

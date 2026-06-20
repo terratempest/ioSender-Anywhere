@@ -10,7 +10,9 @@ public sealed class PackagingMatrixTests
 
         Assert.Contains("[ValidateSet('win-x64', 'win-arm64')]", script);
         Assert.Contains("-r $RuntimeIdentifier", script);
-        Assert.Contains("artifacts\\publish\\$RuntimeIdentifier", script);
+        Assert.Contains("PublishDir", script);
+        Assert.Contains("BaseIntermediateOutputPath", script);
+        Assert.Contains("BaseOutputPath", script);
     }
 
     [Fact]
@@ -25,6 +27,8 @@ public sealed class PackagingMatrixTests
         Assert.Contains("\"x64compatible\"", script);
         Assert.Contains("/DArchitecturesAllowed=$installerArchitecture", script);
         Assert.Contains("ArchitecturesAllowed={#ArchitecturesAllowed}", installerTemplate);
+        Assert.Contains("PublishDir", script);
+        Assert.Contains("if ($PublishDir)", script);
     }
 
     [Fact]
@@ -120,6 +124,8 @@ public sealed class PackagingMatrixTests
         Assert.Contains("LinuxPublish", wsl);
         Assert.Contains("IOSENDER_REUSE_PUBLISH=1", orchestrator);
         Assert.Contains("IOSENDER_REUSE_PUBLISH=\"${IOSENDER_REUSE_PUBLISH:-0}\"", wsl);
+        Assert.Contains("BaseIntermediateOutputPath", publish);
+        Assert.Contains("BaseOutputPath", publish);
     }
 
     [Fact]
@@ -129,6 +135,21 @@ public sealed class PackagingMatrixTests
         var script = File.ReadAllText(Path.Combine(root, "scripts", "build-all.ps1"));
 
         Assert.Contains("if ($RuntimeIdentifier.StartsWith('linux')) { return @($RuntimeIdentifier) }", script);
+    }
+
+    [Fact]
+    public void Build_orchestrator_batches_process_jobs_before_waiting()
+    {
+        var root = FindRepositoryRoot();
+        var script = File.ReadAllText(Path.Combine(root, "scripts", "build-all.ps1"));
+
+        Assert.Contains("function Start-PhaseProcessJob", script);
+        Assert.Contains("$publishJobs = @{}", script);
+        Assert.Contains("$packageJobs = @{}", script);
+        Assert.Contains("Wait-BuildJobs -JobMap $publishJobs", script);
+        Assert.Contains("Wait-BuildJobs -JobMap $packageJobs", script);
+        Assert.Contains("-PublishDir", script);
+        Assert.DoesNotContain("-Wait -WindowStyle Hidden", script);
     }
 
     [Fact]
@@ -145,7 +166,7 @@ public sealed class PackagingMatrixTests
     }
 
     [Fact]
-    public void Build_console_uses_linear_output_without_cursor_redraw()
+    public void Build_console_uses_cursor_dashboard_for_live_updates()
     {
         var root = FindRepositoryRoot();
         var script = File.ReadAllText(Path.Combine(root, "scripts", "BuildConsole.ps1"));
@@ -153,13 +174,16 @@ public sealed class PackagingMatrixTests
         Assert.Contains("function Start-PhaseBoardDisplay", script);
         Assert.Contains("function Render-PhaseBoard", script);
         Assert.Contains("function Finish-PhaseBoard", script);
-        Assert.Contains("return", script);
+        Assert.Contains("SetCursorPosition", script);
+        Assert.Contains("CursorVisible", script);
+        Assert.Contains("Wait-BuildJobs", script);
         Assert.Contains("{0,-24} {1,-8}", script);
         Assert.Contains("[{0}] {1}: {2}", script);
         Assert.Contains("Write-PlainLine", script);
+        Assert.Contains("Get-LogTailLine", script);
         Assert.DoesNotContain("Write-Host ($text.PadRight($width - 1)) -NoNewline", script);
         Assert.DoesNotContain("-ForegroundColor", script);
-        Assert.DoesNotContain("{0,-12} {1,-12} {2}", script);
+        Assert.DoesNotContain("-Wait -WindowStyle Hidden", script);
     }
 
     [Fact]

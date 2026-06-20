@@ -7,12 +7,20 @@ $script:BuildConsolePhases = @{}
 $script:BuildConsolePhaseOrder = @()
 $script:BuildConsoleBoardLines = 0
 $script:BuildConsoleBoardTop = -1
+$script:BuildConsoleBoardLeft = 0
+$script:BuildConsoleBoardActive = $false
+$script:BuildConsoleCursorVisible = $true
+$script:BuildConsoleCanUseCursor = $false
 $script:BuildConsoleSpinnerIndex = 0
 $script:BuildConsoleSpinners = @('|', '/', '-', '\')
 $script:BuildConsoleElapsed = $null
 
 function Test-CanUseConsoleCursor {
     if ($Host.Name -ne 'ConsoleHost') {
+        return $false
+    }
+
+    if ([Console]::IsInputRedirected -or [Console]::IsOutputRedirected -or [Console]::IsErrorRedirected) {
         return $false
     }
 
@@ -44,6 +52,12 @@ function Initialize-BuildConsole {
     $script:BuildConsoleVersion = $Version
     $script:BuildConsoleRoot = $Root
     $script:BuildConsoleQuiet = [bool]$Quiet
+    $script:BuildConsoleCanUseCursor = Test-CanUseConsoleCursor
+    $script:BuildConsoleBoardActive = $false
+    $script:BuildConsoleBoardLines = 0
+    $script:BuildConsoleBoardTop = -1
+    $script:BuildConsoleBoardLeft = 0
+    $script:BuildConsoleCursorVisible = $true
 }
 
 function Write-BuildLine {
@@ -203,7 +217,7 @@ function Set-PhaseStatus {
         $phase.StartedAt = [DateTime]::UtcNow
     }
 
-    if ($script:BuildConsoleQuiet -or $Status -in @('running', 'done', 'failed', 'skipped')) {
+    if ($script:BuildConsoleQuiet -or -not $script:BuildConsoleCanUseCursor) {
         $label = switch ($Status) {
             'running' { '...' }
             'done'    { 'ok' }
@@ -219,7 +233,20 @@ function Set-PhaseStatus {
 }
 
 function Start-PhaseBoardDisplay {
-    return
+    if ($script:BuildConsoleQuiet -or $script:BuildConsoleBoardActive) {
+        return
+    }
+
+    $script:BuildConsoleCanUseCursor = Test-CanUseConsoleCursor
+    if (-not $script:BuildConsoleCanUseCursor) {
+        return
+    }
+
+    $script:BuildConsoleCursorVisible = [Console]::CursorVisible
+    $script:BuildConsoleBoardActive = $true
+    $script:BuildConsoleBoardTop = [Console]::CursorTop
+    $script:BuildConsoleBoardLeft = [Console]::CursorLeft
+    [Console]::CursorVisible = $false
 }
 
 function Get-PhaseDisplayName {
@@ -326,17 +353,90 @@ function Write-PhaseBoardLines {
     $script:BuildConsoleBoardLines = $Lines.Count
 }
 
+function Get-PhaseBoardWidth {
+    try {
+        $width = [Console]::WindowWidth
+        if ($width -lt 20) {
+            return 20
+        }
+        return $width
+    } catch {
+        return 120
+    }
+}
+
+function Write-BuildConsoleLine {
+    param(
+        [string]$Text,
+        [int]$Width
+    )
+
+    if ($Text.Length -gt $Width) {
+        $Text = $Text.Substring(0, $Width)
+    } else {
+        $Text = $Text.PadRight($Width)
+    }
+
+    [Console]::Out.WriteLine($Text)
+}
+
 function Render-PhaseBoard {
     param(
         [TimeSpan]$Elapsed,
         [System.Diagnostics.Process[]]$RunningProcesses = @()
     )
 
-    return
+    if ($script:BuildConsoleQuiet) {
+        return
+    }
+
+    Start-PhaseBoardDisplay
+    if (-not $script:BuildConsoleCanUseCursor) {
+        return
+    }
+
+    $lines = @(Get-PhaseBoardLines -Elapsed $Elapsed)
+    $width = Get-PhaseBoardWidth
+
+    if (-not $script:BuildConsoleBoardActive -or $script:BuildConsoleBoardTop -lt 0) {
+        $script:BuildConsoleBoardTop = [Console]::CursorTop
+        $script:BuildConsoleBoardLeft = [Console]::CursorLeft
+        $script:BuildConsoleBoardActive = $true
+    }
+
+    try {
+        [Console]::SetCursorPosition($script:BuildConsoleBoardLeft, $script:BuildConsoleBoardTop)
+    } catch {
+        return
+    }
+
+    foreach ($line in $lines) {
+        Write-BuildConsoleLine -Text $line -Width $width
+    }
+
+    $clearLines = [Math]::Max(0, $script:BuildConsoleBoardLines - $lines.Count)
+    for ($i = 0; $i -lt $clearLines; $i++) {
+        Write-BuildConsoleLine -Text '' -Width $width
+    }
+
+    $script:BuildConsoleBoardLines = $lines.Count
 }
 
 function Finish-PhaseBoard {
-    return
+    if ($script:BuildConsoleQuiet) {
+        return
+    }
+
+    if ($script:BuildConsoleCanUseCursor -and $script:BuildConsoleBoardActive) {
+        try {
+            if ($script:BuildConsoleElapsed) {
+                Render-PhaseBoard -Elapsed $script:BuildConsoleElapsed.Elapsed
+            }
+        } finally {
+            [Console]::CursorVisible = $script:BuildConsoleCursorVisible
+            $script:BuildConsoleBoardActive = $false
+        }
+    }
 }
 
 function Wait-BuildJobs {
@@ -346,7 +446,6 @@ function Wait-BuildJobs {
     )
 
     $sw = [System.Diagnostics.Stopwatch]::StartNew()
-    $processes = @($JobMap.Values | ForEach-Object { $_.Process } | Where-Object { $_ })
 
     while ($true) {
         $anyRunning = $false
@@ -374,7 +473,7 @@ function Wait-BuildJobs {
         if (-not $anyRunning) {
             break
         }
-        Start-Sleep -Milliseconds $PollInterval.TotalMilliseconds
+        Start-Sleep -Milliseconds ([int]$PollInterval.TotalMilliseconds)
     }
 
     foreach ($entry in $JobMap.GetEnumerator()) {

@@ -89,6 +89,14 @@ foreach ($name in $stagingNames) {
     }
 }
 
+$msbuildCache = Join-Path $Artifacts "msbuild"
+if (Test-Path $msbuildCache) {
+    Remove-Item -LiteralPath $msbuildCache -Recurse -Force
+    if (-not $Quiet) {
+        Write-Host "  removed $msbuildCache"
+    }
+}
+
 if (-not $Quiet) {
     Write-Host "Clean complete."
 }

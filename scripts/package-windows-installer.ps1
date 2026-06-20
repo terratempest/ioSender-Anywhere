@@ -3,6 +3,9 @@ param(
     [string]$Configuration = "Release",
     [ValidateSet('win-x64', 'win-arm64')]
     [string]$RuntimeIdentifier = "win-x64",
+    [string]$PublishDir = "",
+    [string]$IntermediateDir = "",
+    [string]$Version = "",
     [string]$InnoSetupCompiler = ""
 )
 
@@ -11,7 +14,10 @@ $ErrorActionPreference = "Stop"
 $Root = (Resolve-Path (Join-Path $PSScriptRoot "..")).Path
 $Project = Join-Path $Root "ioSender\ioSender.csproj"
 $Artifacts = Join-Path $Root "artifacts"
-$PublishDir = Join-Path $Artifacts "publish\$RuntimeIdentifier-installer"
+$SelfPublishDir = Join-Path $Artifacts "publish\$RuntimeIdentifier-installer"
+$IntermediateDir = if ($IntermediateDir) { $IntermediateDir } else { Join-Path $Artifacts "msbuild\installer\$RuntimeIdentifier" }
+$BaseIntermediateOutputPath = Join-Path $IntermediateDir "obj"
+$BaseOutputPath = Join-Path $IntermediateDir "bin"
 $InstallerScript = Join-Path $Root "packaging\windows\iosender.iss"
 $IconPath = Join-Path $Root "Icon\iosendericon.ico"
 
@@ -61,25 +67,38 @@ function Get-MsBuildProperty {
     return $value
 }
 
-$version = Get-MsBuildProperty -PropertyName "Version" -Fallback "0.0.0"
+$version = if ($Version) { $Version } else { Get-MsBuildProperty -PropertyName "Version" -Fallback "0.0.0" }
 $outputBaseName = "ioSender-Setup-$version-$RuntimeIdentifier"
 $installerArchitecture = if ($RuntimeIdentifier -eq "win-arm64") { "arm64" } else { "x64compatible" }
 $iscc = Resolve-InnoSetupCompiler -RequestedPath $InnoSetupCompiler
 
 New-Item -ItemType Directory -Force -Path $Artifacts | Out-Null
-if (Test-Path $PublishDir) {
-    Remove-Item $PublishDir -Recurse -Force
-}
-New-Item -ItemType Directory -Force -Path $PublishDir | Out-Null
 
-Write-Host "Publishing self-contained $RuntimeIdentifier to $PublishDir"
-dotnet publish $Project `
-    -c $Configuration `
-    -r $RuntimeIdentifier `
-    --self-contained true `
-    -p:PublishSingleFile=false `
-    --force `
-    -o $PublishDir
+if ($PublishDir) {
+    if (-not (Test-Path $PublishDir)) {
+        throw "Publish output missing: $PublishDir"
+    }
+} else {
+    if (Test-Path $SelfPublishDir) {
+        Remove-Item $SelfPublishDir -Recurse -Force
+    }
+    New-Item -ItemType Directory -Force -Path $SelfPublishDir | Out-Null
+    New-Item -ItemType Directory -Force -Path $BaseIntermediateOutputPath | Out-Null
+    New-Item -ItemType Directory -Force -Path $BaseOutputPath | Out-Null
+
+    Write-Host "Publishing self-contained $RuntimeIdentifier to $SelfPublishDir"
+    dotnet publish $Project `
+        -c $Configuration `
+        -r $RuntimeIdentifier `
+        --self-contained true `
+        -p:PublishSingleFile=false `
+        -p:BaseIntermediateOutputPath=$BaseIntermediateOutputPath `
+        -p:BaseOutputPath=$BaseOutputPath `
+        --force `
+        -o $SelfPublishDir
+
+    $PublishDir = $SelfPublishDir
+}
 
 $exe = Join-Path $PublishDir "ioSender.exe"
 if (-not (Test-Path $exe)) {

@@ -234,6 +234,7 @@ namespace CNC.Core
             IsMPGActive = null; //??
 
             ClearPosition();
+            ClearHomingDetails();
             GrblParserState.Clear();
 
             Set("Pn", string.Empty);
@@ -277,6 +278,7 @@ namespace CNC.Core
             IsMPGActive = null;
 
             ClearPosition();
+            ClearHomingDetails();
             GrblParserState.Clear();
             Set("Pn", string.Empty);
             Set("A", string.Empty);
@@ -1110,8 +1112,16 @@ namespace CNC.Core
         public void ParseHomedStatus(string data)
         {
             string[] values = data.TrimEnd(']').Split(':');
-            if (values.Length == 3 && HomePosition.Parse(values[1]))
-                SetAxisHomed((AxisFlags)int.Parse(values[2]));
+            if (values.Length != 3 || !TryParseHomedMask(values[2], out var axes))
+                return;
+
+            if (!TryParseHomedPosition(values[1], out var position))
+                return;
+
+            HomePosition.Clear();
+            for (var i = 0; i < position.Length; i++)
+                HomePosition.Values[i] = position[i];
+            SetAxisHomed(axes);
         }
 
         private void SetAxisHomed(AxisFlags axes)
@@ -1122,6 +1132,40 @@ namespace CNC.Core
                 if (!AxisHomed.Value.HasFlag(GrblInfo.AxisIndexToFlag(i)))
                     HomePosition.Values[i] = double.NaN;
             }
+        }
+
+        private void ClearHomingDetails()
+        {
+            AxisHomed.Value = AxisFlags.None;
+            HomePosition.Clear();
+        }
+
+        private static bool TryParseHomedMask(string value, out AxisFlags axes)
+        {
+            axes = AxisFlags.None;
+            if (!int.TryParse(value, out var mask) || mask < 0)
+                return false;
+
+            axes = (AxisFlags)mask;
+            return true;
+        }
+
+        private bool TryParseHomedPosition(string value, out double[] position)
+        {
+            var values = value.Split(',');
+            position = [];
+            if (values.Length == 0 || values.Length > HomePosition.Values.Length)
+                return false;
+
+            position = new double[values.Length];
+            for (var i = 0; i < values.Length; i++)
+            {
+                if (!double.TryParse(values[i], System.Globalization.NumberStyles.Float,
+                    System.Globalization.CultureInfo.InvariantCulture, out position[i]))
+                    return false;
+            }
+
+            return true;
         }
 
         private void ApplyHomedState(HomedState state)
@@ -1485,14 +1529,15 @@ namespace CNC.Core
                         var state = hs[0] switch
                         {
                             "1" => HomedState.Homed,
-                            "0" when GrblState.State == GrblStates.Alarm && GrblState.Substate == 11 => HomedState.NotHomed,
-                            "0" => HomedState.Unknown,
+                            "0" => HomedState.NotHomed,
                             _ => HomedState.Unknown
                         };
                         ApplyHomedState(state);
 
-                        if (hs.Length > 1 && int.TryParse(hs[1], out var homedMask))
-                            SetAxisHomed((AxisFlags)homedMask);
+                        if (hs.Length > 1 && TryParseHomedMask(hs[1], out var homedMask))
+                            SetAxisHomed(homedMask);
+                        else if (hs[0] == "0")
+                            ClearHomingDetails();
                     }
                     break;
 
@@ -1665,6 +1710,7 @@ namespace CNC.Core
                 ApplyToolLengthOffsetState(0);
                 GrblReset = true;
                 _h = string.Empty;
+                ClearHomingDetails();
                 ApplyHomedState(HomedState.Unknown);
                 IsJobRunning = false;
                 OnGrblReset?.Invoke(data);

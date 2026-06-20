@@ -32,6 +32,7 @@ public sealed class HomingParityTests : IDisposable
             FileName = @"C:\tmp\loaded.nc",
             IsReady = true
         };
+        vm.DataReceived("[HOME:1,2,3:7]");
         vm.DataReceived("<Idle|MPos:1,2,3|H:1|Pn:X|A:S|FS:100,500|P:1|Bf:15,128>");
 
         vm.ClearConnectionState();
@@ -43,6 +44,8 @@ public sealed class HomingParityTests : IDisposable
         Assert.False(vm.GrblState.MPG);
         Assert.Null(vm.IsMPGActive);
         Assert.Equal(HomedState.Unknown, vm.HomedState);
+        Assert.Equal(AxisFlags.None, vm.AxisHomed.Value);
+        Assert.True(double.IsNaN(vm.HomePosition.X));
         Assert.Equal(Signals.Off, vm.Signals.Value);
         Assert.True(double.IsNaN(vm.Position.X));
         Assert.Equal(0d, vm.MachinePosition.X);
@@ -62,6 +65,7 @@ public sealed class HomingParityTests : IDisposable
         SetConnectionStream(connection, _comms);
         var coordinator = new MachineConnectionCoordinator(connection);
         var vm = new GrblViewModel { IsReady = true };
+        vm.DataReceived("[HOME:1,2,3:7]");
         vm.DataReceived("<Idle|MPos:1,2,3|H:1|Bf:15,128>");
 
         Assert.True(coordinator.AttachAfterConnect(vm));
@@ -72,6 +76,8 @@ public sealed class HomingParityTests : IDisposable
         Assert.False(vm.IsReady);
         Assert.Equal(GrblStates.Unknown, vm.GrblState.State);
         Assert.Equal(HomedState.Unknown, vm.HomedState);
+        Assert.Equal(AxisFlags.None, vm.AxisHomed.Value);
+        Assert.True(double.IsNaN(vm.HomePosition.X));
     }
 
     [Fact]
@@ -133,11 +139,14 @@ public sealed class HomingParityTests : IDisposable
         {
             GrblInfo.IsGrblHAL = true;
             var vm = new GrblViewModel { IsReady = true };
+            vm.DataReceived("[HOME:1,2,3:7]");
             vm.DataReceived("<Idle|MPos:0,0,0|H:1|Bf:15,128>");
 
             vm.DataReceived("GrblHAL 1.1f ['$' or '$HELP' for help]");
 
             Assert.Equal(HomedState.Unknown, vm.HomedState);
+            Assert.Equal(AxisFlags.None, vm.AxisHomed.Value);
+            Assert.True(double.IsNaN(vm.HomePosition.X));
             Assert.Contains(GrblConstants.CMD_STATUS_REPORT_ALL, _comms.Bytes);
 
             vm.DataReceived("<Idle|MPos:0,0,0|H:1|Bf:15,128>");

@@ -474,6 +474,27 @@ function Get-PhaseLogPath {
     return (Join-Path $Artifacts "build-$safeName.$Extension")
 }
 
+function Start-PhaseProcessJob {
+    param(
+        [hashtable]$JobMap,
+        [string]$PhaseName,
+        [string]$FilePath,
+        [string[]]$Arguments,
+        [string]$SuccessPath = $null
+    )
+
+    $log = Get-PhaseLogPath -PhaseName $PhaseName -Extension 'log'
+    $err = Get-PhaseLogPath -PhaseName $PhaseName -Extension 'err'
+    $process = Invoke-PhaseProcess -PhaseName $PhaseName -FilePath $FilePath -Arguments $Arguments -LogPath $log -ErrPath $err -SuccessPath $SuccessPath
+
+    $JobMap[$PhaseName] = [PSCustomObject]@{
+        Process    = $process
+        LogPath    = $log
+        ErrPath    = $err
+        SuccessPath = $SuccessPath
+    }
+}
+
 function Invoke-PhaseProcess {
     param(
         [string]$PhaseName,
@@ -488,21 +509,12 @@ function Invoke-PhaseProcess {
         if ($log -and (Test-Path $log)) { Remove-Item $log -Force }
     }
 
-    Set-PhaseStatus -Name $PhaseName -Status 'running' -LogPath $LogPath -ErrPath $ErrPath
-    Start-PhaseBoardDisplay
-
     $argumentLine = ConvertTo-ProcessArgumentLine -Arguments $Arguments
     $process = Start-Process -FilePath $FilePath -WorkingDirectory $Root `
-        -ArgumentList $argumentLine -PassThru -Wait -WindowStyle Hidden `
+        -ArgumentList $argumentLine -PassThru -WindowStyle Hidden `
         -RedirectStandardOutput $LogPath -RedirectStandardError $ErrPath
 
-    $ok = $process.ExitCode -eq 0
-    if ($ok -and $SuccessPath) {
-        $ok = Test-Path $SuccessPath
-    }
-
-    Set-PhaseStatus -Name $PhaseName -Status $(if ($ok) { 'done' } else { 'failed' }) -ExitCode $process.ExitCode
-    return $ok
+    return $process
 }
 
 function Invoke-FreshBuildClean {
@@ -724,19 +736,65 @@ function Invoke-ReleaseBuild {
     $results = @()
     $publishScript = Join-Path $Scripts "publish-windows.ps1"
     $installerScript = Join-Path $Scripts "package-windows-installer.ps1"
+    $publishJobs = @{}
+    $packageJobs = @{}
 
-    if ($winPackages -contains 'WinPortable') {
-        foreach ($rid in $winRids) {
+    foreach ($rid in $winRids) {
+        if ($winPackages -contains 'WinPortable' -or $winPackages -contains 'WinInstaller') {
             $publishDir = Join-Path $Artifacts "publish\$rid"
+            $intermediateDir = Join-Path $Artifacts "msbuild\publish\$rid"
+            $publishArgs = @(
+                '-NoProfile',
+                '-ExecutionPolicy', 'Bypass',
+                '-File', $publishScript,
+                '-RuntimeIdentifier', $rid,
+                '-PublishDir', $publishDir,
+                '-IntermediateDir', $intermediateDir
+            )
             $exe = Join-Path $publishDir "ioSender.exe"
-            $phase = "WinPublish:$rid"
-            $log = Get-PhaseLogPath -PhaseName $phase -Extension 'log'
-            $err = Get-PhaseLogPath -PhaseName $phase -Extension 'err'
-            [void](Invoke-PhaseProcess -PhaseName $phase -FilePath $PsHost -Arguments @('-NoProfile', '-ExecutionPolicy', 'Bypass', '-File', $publishScript, '-RuntimeIdentifier', $rid) -LogPath $log -ErrPath $err -SuccessPath $exe)
+            Start-PhaseProcessJob -JobMap $publishJobs -PhaseName "WinPublish:$rid" -FilePath $PsHost -Arguments $publishArgs -SuccessPath $exe
+        }
+    }
 
-            $zip = $null
+    foreach ($rid in $linuxBuildRids) {
+        Start-PhaseProcessJob -JobMap $publishJobs -PhaseName "LinuxPublish:$rid" -FilePath "wsl.exe" -Arguments @('-d', $distro, '--cd', '~', '-e', '/bin/bash', $wslSh, $wslExport, 'LinuxPublish', $rid)
+    }
+
+    Render-PhaseBoard -Elapsed $totalSw.Elapsed
+    if ($publishJobs.Count -gt 0) {
+        [void](Wait-BuildJobs -JobMap $publishJobs)
+    }
+
+    foreach ($rid in $winRids) {
+        if ($winPackages -contains 'WinInstaller') {
+            $publishPhase = "WinPublish:$rid"
+            $publishDir = Join-Path $Artifacts "publish\$rid"
+            $installer = Join-Path $Artifacts "ioSender-Setup-$version-$rid.exe"
+
+            if (Test-PhaseFailed -PhaseName $publishPhase) {
+                Set-PhaseStatus -Name "WinInstaller:$rid" -Status 'failed' -Message "$publishPhase failed"
+            } else {
+                $installerArgs = @(
+                    '-NoProfile',
+                    '-ExecutionPolicy', 'Bypass',
+                    '-File', $installerScript,
+                    '-RuntimeIdentifier', $rid,
+                    '-PublishDir', $publishDir,
+                    '-Version', $version
+                )
+                Start-PhaseProcessJob -JobMap $packageJobs -PhaseName "WinInstaller:$rid" -FilePath $PsHost -Arguments $installerArgs -SuccessPath $installer
+            }
+        }
+
+        if ($winPackages -contains 'WinPortable') {
+            $publishPhase = "WinPublish:$rid"
+            $publishDir = Join-Path $Artifacts "publish\$rid"
             $zipPhase = "WinPortable:$rid"
-            if (Test-Path $exe) {
+            $zip = $null
+
+            if (Test-PhaseFailed -PhaseName $publishPhase) {
+                Set-PhaseStatus -Name $zipPhase -Status 'failed' -Message "$publishPhase failed"
+            } elseif (Test-Path (Join-Path $publishDir "ioSender.exe")) {
                 Set-PhaseStatus -Name $zipPhase -Status 'running'
                 try {
                     $zip = New-WindowsPortableZip -SourceDirectory $publishDir -Version $version -Rid $rid
@@ -748,9 +806,7 @@ function Invoke-ReleaseBuild {
                 Set-PhaseStatus -Name $zipPhase -Status 'failed' -Message 'ioSender.exe missing'
             }
 
-            $ok = (-not (Test-PhaseFailed -PhaseName $phase)) -and
-                (-not (Test-PhaseFailed -PhaseName $zipPhase)) -and
-                ($zip -and (Test-Path $zip))
+            $ok = (-not (Test-PhaseFailed -PhaseName $zipPhase)) -and ($zip -and (Test-Path $zip))
             $results += [PSCustomObject]@{
                 Label  = "Win zip $rid"
                 Status = if ($ok) { 'ok' } else { 'FAIL' }
@@ -759,14 +815,37 @@ function Invoke-ReleaseBuild {
         }
     }
 
-    if ($winPackages -contains 'WinInstaller') {
-        foreach ($rid in $winRids) {
-            $phase = "WinInstaller:$rid"
-            $log = Get-PhaseLogPath -PhaseName $phase -Extension 'log'
-            $err = Get-PhaseLogPath -PhaseName $phase -Extension 'err'
-            $installer = Join-Path $Artifacts "ioSender-Setup-$version-$rid.exe"
-            [void](Invoke-PhaseProcess -PhaseName $phase -FilePath $PsHost -Arguments @('-NoProfile', '-ExecutionPolicy', 'Bypass', '-File', $installerScript, '-RuntimeIdentifier', $rid) -LogPath $log -ErrPath $err -SuccessPath $installer)
+    foreach ($rid in $linuxBuildRids) {
+        $publishPhase = "LinuxPublish:$rid"
+        if (Test-PhaseFailed -PhaseName $publishPhase) {
+            foreach ($package in $linuxPackages) {
+                Set-PhaseStatus -Name "${package}:$rid" -Status 'failed' -Message "$publishPhase failed"
+            }
+            continue
+        }
 
+        foreach ($package in $linuxPackages) {
+            $phase = "${package}:$rid"
+            $successPath = switch ($package) {
+                'LinuxDeb' { Join-Path $ExportDir ("iosender_{0}_{1}.deb" -f $version, (Get-DebArch -Rid $rid)) }
+                'LinuxRpm' { Join-Path $ExportDir ("ioSender-{0}-{1}.rpm" -f $version, $rid) }
+                'LinuxAppImage' { Join-Path $ExportDir ("ioSender-{0}-{1}.AppImage" -f $version, $rid) }
+                default { $null }
+            }
+            $reuseScript = "VERSION='$version' IOSENDER_REUSE_PUBLISH=1 exec /bin/bash '$wslSh' '$wslExport' '$package' '$rid'"
+            Start-PhaseProcessJob -JobMap $packageJobs -PhaseName $phase -FilePath "wsl.exe" -Arguments @('-d', $distro, '--cd', '~', '-e', '/bin/bash', '-lc', $reuseScript) -SuccessPath $successPath
+        }
+    }
+
+    Render-PhaseBoard -Elapsed $totalSw.Elapsed
+    if ($packageJobs.Count -gt 0) {
+        [void](Wait-BuildJobs -JobMap $packageJobs)
+    }
+
+    foreach ($rid in $winRids) {
+        if ($winPackages -contains 'WinInstaller') {
+            $phase = "WinInstaller:$rid"
+            $installer = Join-Path $Artifacts "ioSender-Setup-$version-$rid.exe"
             $ok = (-not (Test-PhaseFailed -PhaseName $phase)) -and (Test-Path $installer)
             $results += [PSCustomObject]@{
                 Label  = "Win setup $rid"
@@ -777,25 +856,8 @@ function Invoke-ReleaseBuild {
     }
 
     foreach ($rid in $linuxBuildRids) {
-        $phase = "LinuxPublish:$rid"
-        $log = Get-PhaseLogPath -PhaseName $phase -Extension 'log'
-        $err = Get-PhaseLogPath -PhaseName $phase -Extension 'err'
-        [void](Invoke-PhaseProcess -PhaseName $phase -FilePath "wsl.exe" -Arguments @('-d', $distro, '--cd', '~', '-e', '/bin/bash', $wslSh, $wslExport, 'LinuxPublish', $rid) -LogPath $log -ErrPath $err)
-    }
-
-    foreach ($package in $linuxPackages) {
-        foreach ($rid in $linuxBuildRids) {
-            $publishPhase = "LinuxPublish:$rid"
+        foreach ($package in $linuxPackages) {
             $phase = "${package}:$rid"
-            $log = Get-PhaseLogPath -PhaseName $phase -Extension 'log'
-            $err = Get-PhaseLogPath -PhaseName $phase -Extension 'err'
-            if (Test-PhaseFailed -PhaseName $publishPhase) {
-                Set-PhaseStatus -Name $phase -Status 'failed' -Message "$publishPhase failed"
-            } else {
-                $reuseScript = "IOSENDER_REUSE_PUBLISH=1 exec /bin/bash '$wslSh' '$wslExport' '$package' '$rid'"
-                [void](Invoke-PhaseProcess -PhaseName $phase -FilePath "wsl.exe" -Arguments @('-d', $distro, '--cd', '~', '-e', '/bin/bash', '-lc', $reuseScript) -LogPath $log -ErrPath $err)
-            }
-
             $artifact = $null
             if (-not (Test-PhaseFailed -PhaseName $phase)) {
                 $artifact = Get-LinuxExport -Distro $distro -WindowsExportDir $ExportDir -WslExportDir $wslExport -PackageTarget $package -Rid $rid

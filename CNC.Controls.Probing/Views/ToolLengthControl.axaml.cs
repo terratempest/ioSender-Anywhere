@@ -51,7 +51,7 @@ public partial class ToolLengthControl : UserControl, IProbeTab
         if (grbl == null)
             return;
 
-        if (probing.ProbeFixture && !grbl.AxisHomed.Value.HasFlag(AxisFlags.X | AxisFlags.Y | AxisFlags.Z))
+        if (probing.ProbeFixture && (grbl.HomedState != HomedState.Homed || !grbl.AxisHomed.Value.HasFlag(AxisFlags.X | AxisFlags.Y | AxisFlags.Z)))
         {
             GrblUi.ShowError(InitFailed, "Probing");
             return;

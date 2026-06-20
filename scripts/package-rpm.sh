@@ -10,6 +10,7 @@ RPMROOT="$STAGING/rpmbuild"
 PAYLOAD="$STAGING/payload"
 ARTIFACTS="$ROOT/artifacts"
 TEMPLATE_DEBIAN="$ROOT/packaging/debian"
+INTERMEDIATE_DIR="${INTERMEDIATE_DIR:-$ROOT/artifacts/msbuild/package-rpm/$RID}"
 
 case "$RID" in
   linux-x64)
@@ -64,7 +65,7 @@ if [[ "${IOSENDER_REUSE_PUBLISH:-}" == "1" && -f "$PUBLISH_DIR/ioSender" ]]; the
   echo "Reusing existing $RID publish output at $PUBLISH_DIR"
 else
   echo "Publishing fresh $RID output..."
-  RID="$RID" OUT_DIR="$PUBLISH_DIR" bash "$ROOT/scripts/publish-linux.sh"
+  RID="$RID" OUT_DIR="$PUBLISH_DIR" INTERMEDIATE_DIR="$INTERMEDIATE_DIR" bash "$ROOT/scripts/publish-linux.sh"
 fi
 
 if [[ ! -f "$PUBLISH_DIR/ioSender" ]]; then
