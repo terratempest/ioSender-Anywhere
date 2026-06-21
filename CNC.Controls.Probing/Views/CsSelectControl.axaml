@@ -16,7 +16,7 @@
         <RadioButton Content="Set coordinate system:"
           IsChecked="{Binding CoordinateMode, Mode=TwoWay, Converter={StaticResource EnumToCheckedConverter}, ConverterParameter=G10}"
           VerticalAlignment="Center"/>
-        <ComboBox Grid.Column="1"
+        <ComboBox Classes="dropdown-select" Grid.Column="1"
           Margin="4,0,0,0" Width="84"
           PlaceholderText="G99.9"
           ItemsSource="{Binding CoordinateSystems}"

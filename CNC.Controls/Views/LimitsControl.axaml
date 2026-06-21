@@ -11,13 +11,6 @@
              mc:Ignorable="d"
              d:DesignWidth="250">
 
-  <UserControl.Resources>
-    <ResourceDictionary>
-      <ResourceDictionary.MergedDictionaries>
-        <ResourceInclude Source="avares://CNC.Controls.Avalonia/Themes/Controls.axaml"/>
-      </ResourceDictionary.MergedDictionaries>
-    </ResourceDictionary>
-  </UserControl.Resources>
   <StackPanel Spacing="4" Margin="4">
     <views:LimitsBaseControl x:Name="axisX" Label="X"
                               MinValue="{Binding ProgramLimits.MinX, Mode=OneWay}"

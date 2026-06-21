@@ -16,17 +16,6 @@
     <conv:BoolToVisibleConverter x:Key="ToVisibleConverter"/>
     <local:OriginToX0Y0Converter x:Key="UseX0Y0Converter"/>
     <local:OriginToCurrentPosConverter x:Key="UseXYConverter"/>
-    <ControlTheme x:Key="RotFlagRadioTheme" TargetType="RadioButton">
-      <Setter Property="Focusable" Value="False"/>
-      <Setter Property="BorderThickness" Value="0"/>
-      <Setter Property="Width" Value="80"/>
-      <Setter Property="Height" Value="80"/>
-      <Setter Property="Background" Value="Transparent"/>
-      <Setter Property="Opacity" Value="0.5"/>
-      <Style Selector="^:checked">
-        <Setter Property="Opacity" Value="1"/>
-      </Style>
-    </ControlTheme>
 
   </UserControl.Resources>
 
@@ -87,7 +76,7 @@
                                  ImageUri="avares://CNC.Controls.Probing.Avalonia/Views/Resources/RotaterCB.png"/>
         </Grid>
 
-        <GroupBox Grid.Column="1" Header="Preview" BorderBrush="{DynamicResource ThemeBorderLowBrush}"
+        <GroupBox Grid.Column="1" Header="Preview" Classes="form-section"
                   IsVisible="{Binding PreviewEnable, Converter={StaticResource ToVisibleConverter}}">
           <TextBox IsReadOnly="True" Text="{Binding PreviewText, Mode=OneWay}" TextWrapping="NoWrap"
                    FontSize="10" FontFamily="Verdana"
@@ -98,17 +87,17 @@
       </Grid>
     </StackPanel>
 
-    <StackPanel Margin="5,0,0,5" Orientation="Horizontal" HorizontalAlignment="Left" VerticalAlignment="Bottom" Spacing="4">
-      <Button Content="Start" Width="75" HorizontalContentAlignment="Center"
+    <Grid Classes="action-footer" Margin="5,0,5,5" ColumnDefinitions="*,*,*" ColumnSpacing="4" VerticalAlignment="Bottom">
+      <Button Grid.Column="0" Classes="action-footer-button" Content="Start"
               IsEnabled="{Binding Grbl.IsJobRunning, Converter={StaticResource IsNotRunningConverter}}"
               Click="OnStartClick"/>
-      <Button Content="Stop" Width="75" HorizontalContentAlignment="Center"
+      <Button Grid.Column="1" Classes="action-footer-button" Content="Stop"
               IsEnabled="{Binding Grbl.IsJobRunning}"
               Click="OnStopClick"/>
-      <Button Content="Apply" Width="75" HorizontalContentAlignment="Center"
+      <Button Grid.Column="2" Classes="action-footer-button" Content="Apply"
               IsEnabled="{Binding CanApplyTransform}"
               Click="OnApplyClick"/>
-    </StackPanel>
+    </Grid>
 
   </Grid>
 

@@ -1,0 +1,528 @@
+<Styles xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:primitives="using:Avalonia.Controls.Primitives"
+        xmlns:controls="using:CNC.Controls.Avalonia.Controls"
+        xmlns:views="using:CNC.Controls.Avalonia.Views">
+
+<Style Selector="Button.danger">
+    <Setter Property="Background" Value="{DynamicResource IoSenderDangerBrush}"/>
+    <Setter Property="Foreground" Value="{DynamicResource IoSenderDangerForegroundBrush}"/>
+    <Setter Property="FontWeight" Value="SemiBold"/>
+  </Style>
+
+  <Style Selector="Button.important">
+    <Setter Property="Background" Value="Salmon"/>
+    <Setter Property="Padding" Value="8"/>
+    <Setter Property="HorizontalAlignment" Value="Center"/>
+    <Setter Property="VerticalAlignment" Value="Center"/>
+    <Setter Property="HorizontalContentAlignment" Value="Center"/>
+    <Setter Property="VerticalContentAlignment" Value="Center"/>
+  </Style>
+
+  <Style Selector="Button.status-indicator:disabled">
+    <Setter Property="Opacity" Value="1"/>
+    <Setter Property="Foreground" Value="{DynamicResource ThemeForegroundBrush}"/>
+  </Style>
+  <Style Selector="Button.status-indicator:disabled /template/ ContentPresenter">
+    <Setter Property="Opacity" Value="1"/>
+    <Setter Property="Background" Value="{Binding Background, RelativeSource={RelativeSource TemplatedParent}}"/>
+    <Setter Property="BorderBrush" Value="{Binding BorderBrush, RelativeSource={RelativeSource TemplatedParent}}"/>
+    <Setter Property="Foreground" Value="{Binding Foreground, RelativeSource={RelativeSource TemplatedParent}}"/>
+  </Style>
+
+  <Style Selector="Button.panel-action">
+    <Setter Property="Background" Value="{DynamicResource ThemeControlHighBrush}"/>
+    <Setter Property="Foreground" Value="{DynamicResource ThemeForegroundBrush}"/>
+    <Setter Property="BorderBrush" Value="{DynamicResource ThemeBorderMidBrush}"/>
+    <Setter Property="BorderThickness" Value="1"/>
+    <Setter Property="CornerRadius" Value="3"/>
+    <Setter Property="MinHeight" Value="{DynamicResource UiControlHeight}"/>
+    <Setter Property="MinWidth" Value="{DynamicResource UiControlHeight}"/>
+    <Setter Property="Padding" Value="0"/>
+    <Setter Property="HorizontalAlignment" Value="Stretch"/>
+    <Setter Property="VerticalAlignment" Value="Stretch"/>
+    <Setter Property="HorizontalContentAlignment" Value="Center"/>
+    <Setter Property="VerticalContentAlignment" Value="Center"/>
+    <Setter Property="FontWeight" Value="SemiBold"/>
+    <Setter Property="FontSize" Value="16"/>
+    <Setter Property="Focusable" Value="False"/>
+    <Setter Property="Cursor" Value="Hand"/>
+  </Style>
+  <Style Selector="Button.panel-action:pointerover">
+    <Setter Property="Background" Value="{DynamicResource ThemeControlHighlightMidBrush}"/>
+    <Setter Property="BorderBrush" Value="{DynamicResource ThemeBorderHighBrush}"/>
+  </Style>
+  <Style Selector="Button.panel-action:pressed">
+    <Setter Property="Background" Value="{DynamicResource ThemeControlHighlightLowBrush}"/>
+  </Style>
+  <Style Selector="Button.panel-action.compact">
+    <Setter Property="MinHeight" Value="{DynamicResource UiCompactControlHeight}"/>
+    <Setter Property="MinWidth" Value="{DynamicResource UiCompactControlHeight}"/>
+    <Setter Property="FontSize" Value="12"/>
+    <Setter Property="Padding" Value="2,0"/>
+  </Style>
+
+  <Style Selector="primitives|ToggleButton.panel-toggle">
+    <Setter Property="Background" Value="{DynamicResource ThemeControlHighBrush}"/>
+    <Setter Property="Foreground" Value="{DynamicResource ThemeForegroundBrush}"/>
+    <Setter Property="BorderBrush" Value="{DynamicResource ThemeBorderMidBrush}"/>
+    <Setter Property="BorderThickness" Value="1"/>
+    <Setter Property="CornerRadius" Value="3"/>
+    <Setter Property="Padding" Value="4,2"/>
+    <Setter Property="HorizontalAlignment" Value="Stretch"/>
+    <Setter Property="VerticalAlignment" Value="Stretch"/>
+    <Setter Property="HorizontalContentAlignment" Value="Center"/>
+    <Setter Property="VerticalContentAlignment" Value="Center"/>
+    <Setter Property="FontWeight" Value="SemiBold"/>
+    <Setter Property="Focusable" Value="False"/>
+    <Setter Property="Cursor" Value="Hand"/>
+    <Setter Property="Template">
+      <ControlTemplate TargetType="primitives:ToggleButton">
+        <Border Background="{TemplateBinding Background}"
+                BorderBrush="{TemplateBinding BorderBrush}"
+                BorderThickness="{TemplateBinding BorderThickness}"
+                CornerRadius="{TemplateBinding CornerRadius}"
+                Padding="{TemplateBinding Padding}"
+                HorizontalAlignment="Stretch"
+                VerticalAlignment="Stretch">
+          <Viewbox Stretch="Uniform" StretchDirection="DownOnly"
+                   HorizontalAlignment="Center" VerticalAlignment="Center">
+            <ContentPresenter Content="{TemplateBinding Content}"
+                              ContentTemplate="{TemplateBinding ContentTemplate}"
+                              Foreground="{TemplateBinding Foreground}"
+                              FontWeight="{TemplateBinding FontWeight}"
+                              HorizontalAlignment="Center"
+                              VerticalAlignment="Center"
+                              HorizontalContentAlignment="Center"
+                              VerticalContentAlignment="Center"
+                              TextBlock.TextAlignment="Center"/>
+          </Viewbox>
+        </Border>
+      </ControlTemplate>
+    </Setter>
+  </Style>
+  <Style Selector="primitives|ToggleButton.panel-toggle:pointerover">
+    <Setter Property="Background" Value="{DynamicResource ThemeControlHighlightMidBrush}"/>
+    <Setter Property="BorderBrush" Value="{DynamicResource ThemeBorderHighBrush}"/>
+  </Style>
+  <Style Selector="primitives|ToggleButton.panel-toggle:pressed">
+    <Setter Property="Background" Value="{DynamicResource ThemeControlHighlightLowBrush}"/>
+  </Style>
+  <Style Selector="primitives|ToggleButton.panel-toggle:checked">
+    <Setter Property="Background" Value="{DynamicResource ThemeAccentBrush}"/>
+    <Setter Property="BorderBrush" Value="{DynamicResource ThemeAccentBrush}"/>
+  </Style>
+  <Style Selector="primitives|ToggleButton.panel-toggle:checked:pointerover">
+    <Setter Property="Background" Value="{DynamicResource ThemeAccentBrushHigh}"/>
+    <Setter Property="BorderBrush" Value="{DynamicResource ThemeAccentBrushHigh}"/>
+  </Style>
+  <Style Selector="primitives|ToggleButton.panel-toggle.compact">
+    <Setter Property="Padding" Value="2,2"/>
+  </Style>
+
+  <Style Selector="controls|JogButton.jog-direction">
+    <Setter Property="Background" Value="{DynamicResource ThemeControlHighBrush}"/>
+    <Setter Property="Foreground" Value="{DynamicResource ThemeForegroundBrush}"/>
+    <Setter Property="BorderBrush" Value="{DynamicResource ThemeBorderMidBrush}"/>
+    <Setter Property="BorderThickness" Value="1"/>
+    <Setter Property="HorizontalAlignment" Value="Center"/>
+    <Setter Property="VerticalAlignment" Value="Center"/>
+    <Setter Property="HorizontalContentAlignment" Value="Center"/>
+    <Setter Property="VerticalContentAlignment" Value="Center"/>
+    <Setter Property="FontWeight" Value="SemiBold"/>
+    <Setter Property="Focusable" Value="False"/>
+    <Setter Property="Cursor" Value="Hand"/>
+  </Style>
+  <Style Selector="controls|JogButton.jog-direction:pointerover">
+    <Setter Property="Background" Value="{DynamicResource ThemeControlHighlightMidBrush}"/>
+    <Setter Property="BorderBrush" Value="{DynamicResource ThemeBorderHighBrush}"/>
+  </Style>
+  <Style Selector="controls|JogButton.jog-direction:pressed">
+    <Setter Property="Background" Value="{DynamicResource ThemeControlHighlightLowBrush}"/>
+    <Setter Property="BorderBrush" Value="{DynamicResource ThemeAccentBrushLow}"/>
+  </Style>
+
+  <Style Selector="Button.jog-stop">
+    <Setter Property="Background" Value="{DynamicResource ThemeControlHighBrush}"/>
+    <Setter Property="BorderBrush" Value="{DynamicResource ThemeBorderMidBrush}"/>
+    <Setter Property="BorderThickness" Value="1"/>
+    <Setter Property="CornerRadius" Value="3"/>
+    <Setter Property="HorizontalAlignment" Value="Center"/>
+    <Setter Property="VerticalAlignment" Value="Center"/>
+    <Setter Property="HorizontalContentAlignment" Value="Center"/>
+    <Setter Property="VerticalContentAlignment" Value="Center"/>
+    <Setter Property="Focusable" Value="False"/>
+    <Setter Property="Cursor" Value="Hand"/>
+  </Style>
+  <Style Selector="Button.jog-stop:pointerover">
+    <Setter Property="Background" Value="{DynamicResource ThemeControlHighlightMidBrush}"/>
+    <Setter Property="BorderBrush" Value="{DynamicResource ThemeBorderHighBrush}"/>
+  </Style>
+  <Style Selector="Button.jog-stop:pressed">
+    <Setter Property="Background" Value="{DynamicResource ThemeControlHighlightLowBrush}"/>
+  </Style>
+
+  <Style Selector="Button.job-transport">
+    <Setter Property="Background" Value="#9C9C9C"/>
+    <Setter Property="Foreground" Value="#111111"/>
+    <Setter Property="BorderBrush" Value="#9C9C9C"/>
+    <Setter Property="BorderThickness" Value="1"/>
+    <Setter Property="CornerRadius" Value="2"/>
+    <Setter Property="FontWeight" Value="SemiBold"/>
+    <Setter Property="HorizontalAlignment" Value="Stretch"/>
+    <Setter Property="VerticalAlignment" Value="Stretch"/>
+    <Setter Property="HorizontalContentAlignment" Value="Center"/>
+    <Setter Property="VerticalContentAlignment" Value="Center"/>
+    <Setter Property="Focusable" Value="False"/>
+    <Setter Property="Cursor" Value="Hand"/>
+  </Style>
+  <Style Selector="Button.job-transport:pointerover">
+    <Setter Property="Background" Value="#AAAAAA"/>
+    <Setter Property="BorderBrush" Value="#AAAAAA"/>
+  </Style>
+  <Style Selector="Button.job-transport:pressed">
+    <Setter Property="Background" Value="#868686"/>
+    <Setter Property="BorderBrush" Value="#868686"/>
+  </Style>
+  <Style Selector="Button.job-transport:disabled">
+    <Setter Property="Background" Value="#5B5B5B"/>
+    <Setter Property="Foreground" Value="#1A1A1A"/>
+    <Setter Property="BorderBrush" Value="#5B5B5B"/>
+    <Setter Property="Opacity" Value="1"/>
+  </Style>
+
+<Design.PreviewWith>
+    <Grid RowDefinitions="*,4,*,4,*" Width="200" Height="200" Margin="4">
+      <ComboBox Grid.Row="0" Classes="dropdown-select" SelectedIndex="0" >
+        <ComboBoxItem>G54</ComboBoxItem>
+        <ComboBoxItem>G55</ComboBoxItem>
+        <ComboBoxItem>G56</ComboBoxItem>
+      </ComboBox>
+      <ComboBox Grid.Row="2" Classes="dropdown-select " SelectedIndex="1">
+        <ComboBoxItem>Tool 1</ComboBoxItem>
+        <ComboBoxItem>Tool 2</ComboBoxItem>
+      </ComboBox>
+      <Grid Grid.Row="4" ColumnDefinitions="*,4,*" >
+        <ComboBox Grid.Column="0" Classes="dropdown-select" SelectedIndex="1">
+          <ComboBoxItem>Tool 1</ComboBoxItem>
+          <ComboBoxItem>Tool 2</ComboBoxItem>
+        </ComboBox>
+        <ComboBox Grid.Column="2" Classes="dropdown-select" SelectedIndex="1">
+          <ComboBoxItem>Tool 1</ComboBoxItem>
+          <ComboBoxItem>Tool 2</ComboBoxItem>
+        </ComboBox>
+      </Grid>
+    </Grid>
+  </Design.PreviewWith>
+
+  <Style Selector="ComboBox.dropdown-select">
+    <Setter Property="MinHeight" Value="{DynamicResource UiInputMinHeight}"/>
+
+    <Setter Property="Padding" Value="8,0,0,0"/>
+    <Setter Property="HorizontalContentAlignment" Value="Stretch"/>
+    <Setter Property="VerticalContentAlignment" Value="Center"/>
+    <Setter Property="Background"  Value="{DynamicResource ThemeControlHighBrush}"/>
+    <Setter Property="Foreground"  Value="{DynamicResource ThemeForegroundBrush}"/>
+    <Setter Property="BorderBrush" Value="{DynamicResource ThemeBorderMidBrush}"/>
+    <Setter Property="BorderThickness" Value="1"/>
+    <Setter Property="CornerRadius" Value="3"/>
+    <Setter Property="Focusable" Value="False"/>
+    <Setter Property="HorizontalAlignment" Value="Stretch"/>
+    <Setter Property="VerticalAlignment" Value="Stretch"/>
+  </Style>
+
+  <Style Selector="ComboBox.dropdown-select:pointerover">
+    <Setter Property="Background" Value="{DynamicResource ThemeControlHighlightMidBrush}"/>
+    <Setter Property="BorderBrush" Value="{DynamicResource ThemeBorderHighBrush}"/>
+  </Style>
+
+  <Style Selector="ComboBox.dropdown-select:pressed">
+    <Setter Property="Background" Value="{DynamicResource ThemeControlHighlightLowBrush}"/>
+    <Setter Property="BorderBrush" Value="{DynamicResource ThemeAccentBrushLow}"/>
+  </Style>
+
+  <Style Selector="ComboBox.dropdown-select:focus">
+    <Setter Property="BorderBrush" Value="{DynamicResource ThemeAccentBrush}"/>
+  </Style>
+
+  <Style Selector="ComboBox.dropdown-select:disabled">
+    <Setter Property="Opacity" Value="0.55"/>
+  </Style>
+
+  <Style Selector="ComboBox.dropdown-select.compact">
+    <Setter Property="Height" Value="{DynamicResource UiCompactControlHeight}"/>
+    <Setter Property="MinHeight" Value="{DynamicResource UiCompactControlHeight}"/>
+    <Setter Property="Padding" Value="6,0"/>
+  </Style>
+
+  <Style Selector="ComboBox.dropdown-select ComboBoxItem">
+    <Setter Property="MinHeight" Value="24"/>
+    <Setter Property="Padding" Value="8,0"/>
+    <Setter Property="HorizontalContentAlignment" Value="Center"/>
+    <Setter Property="VerticalContentAlignment" Value="Center"/>
+    <Setter Property="Foreground" Value="{DynamicResource ThemeForegroundBrush}"/>
+    <Setter Property="Background" Value="{DynamicResource ThemeControlLowBrush}"/>
+  </Style>
+
+  <Style Selector="ComboBoxItem.jog-selector-item">
+    <Setter Property="Padding" Value="0"/>
+  </Style>
+
+  <Style Selector="ComboBox.dropdown-select ComboBoxItem:pointerover">
+    <Setter Property="Background" Value="{DynamicResource ThemeControlHighlightMidBrush}"/>
+  </Style>
+
+  <Style Selector="ComboBox.dropdown-select ComboBoxItem:selected">
+    <Setter Property="Background" Value="{DynamicResource ThemeAccentBrushLow}"/>
+  </Style>
+
+  <Style Selector="ComboBox.dropdown-select ComboBoxItem:selected:pointerover">
+    <Setter Property="Background" Value="{DynamicResource ThemeAccentBrushLow}"/>
+  </Style>
+
+  <Style Selector="Border.ui-panel">
+    <Setter Property="Background" Value="{DynamicResource ThemeControlLowBrush}"/>
+    <Setter Property="BorderBrush" Value="{DynamicResource ThemeBorderMidBrush}"/>
+    <Setter Property="BorderThickness" Value="1"/>
+    <Setter Property="CornerRadius" Value="3"/>
+  </Style>
+
+  <Style Selector="Border.ui-readout">
+    <Setter Property="Background" Value="{DynamicResource IoSenderDroReadoutBrush}"/>
+    <Setter Property="BorderBrush" Value="{DynamicResource ThemeBorderHighBrush}"/>
+    <Setter Property="BorderThickness" Value="1"/>
+    <Setter Property="CornerRadius" Value="4"/>
+    <Setter Property="Padding" Value="8,4"/>
+  </Style>
+
+  <Style Selector="Border.ui-input-surface">
+    <Setter Property="Background" Value="{DynamicResource ThemeControlLowBrush}"/>
+    <Setter Property="BorderBrush" Value="{DynamicResource ThemeBorderMidBrush}"/>
+    <Setter Property="BorderThickness" Value="1"/>
+    <Setter Property="CornerRadius" Value="2"/>
+    <Setter Property="Padding" Value="2,0"/>
+  </Style>
+
+  <Style Selector="TextBox.input-standard">
+    <Setter Property="MinHeight" Value="{DynamicResource UiInputMinHeight}"/>
+    <Setter Property="VerticalContentAlignment" Value="Center"/>
+  </Style>
+
+  <Style Selector="TextBlock.ui-label">
+    <Setter Property="Foreground" Value="{DynamicResource ThemeForegroundBrush}"/>
+    <Setter Property="FontSize" Value="{DynamicResource UiBodyFontSize}"/>
+  </Style>
+
+  <Style Selector="TextBlock.ui-readout-text">
+    <Setter Property="FontSize" Value="{DynamicResource UiReadoutFontSize}"/>
+    <Setter Property="FontFamily" Value="Consolas,Courier New,monospace"/>
+    <Setter Property="Foreground" Value="#1A1A1A"/>
+    <Setter Property="TextAlignment" Value="Center"/>
+  </Style>
+
+  <Style Selector="Border.ui-separator">
+    <Setter Property="Height" Value="1"/>
+    <Setter Property="VerticalAlignment" Value="Center"/>
+    <Setter Property="Background" Value="{DynamicResource ThemeBorderHighBrush}"/>
+  </Style>
+
+  <Style Selector="UserControl.settings-panel">
+    <Setter Property="Width" Value="310"/>
+  </Style>
+
+  <Style Selector="GroupBox.form-section">
+    <Setter Property="BorderBrush" Value="{DynamicResource ThemeBorderLowBrush}"/>
+    <Setter Property="FontSize" Value="{DynamicResource UiBodyFontSize}"/>
+  </Style>
+
+  <Style Selector="Border.form-section">
+    <Setter Property="BorderBrush" Value="{DynamicResource ThemeBorderLowBrush}"/>
+    <Setter Property="BorderThickness" Value="1"/>
+    <Setter Property="Padding" Value="8"/>
+    <Setter Property="CornerRadius" Value="2"/>
+  </Style>
+
+  <Style Selector="WrapPanel.settings-form">
+    <Setter Property="Orientation" Value="Vertical"/>
+    <Setter Property="ItemWidth" Value="290"/>
+    <Setter Property="TextElement.FontSize" Value="{DynamicResource UiBodyFontSize}"/>
+  </Style>
+
+  <Style Selector="views|NumericField.form-field">
+    <Setter Property="MinHeight" Value="{DynamicResource UiInputMinHeight}"/>
+    <Setter Property="InputMinWidth" Value="80"/>
+  </Style>
+
+  <Style Selector="CheckBox.form-option">
+    <Setter Property="FontSize" Value="{DynamicResource UiBodyFontSize}"/>
+  </Style>
+
+  <Style Selector="TextBlock.help-text">
+    <Setter Property="FontSize" Value="11"/>
+    <Setter Property="Opacity" Value="0.85"/>
+    <Setter Property="TextWrapping" Value="Wrap"/>
+  </Style>
+
+  <Style Selector="Button.form-action">
+    <Setter Property="FontSize" Value="{DynamicResource UiBodyFontSize}"/>
+    <Setter Property="HorizontalContentAlignment" Value="Center"/>
+  </Style>
+
+  <Style Selector="Border.settings-navigation">
+    <Setter Property="Background" Value="{DynamicResource ThemeControlLowBrush}"/>
+    <Setter Property="BorderBrush" Value="{DynamicResource ThemeBorderLowBrush}"/>
+    <Setter Property="BorderThickness" Value="1"/>
+    <Setter Property="Padding" Value="4"/>
+  </Style>
+
+  <Style Selector="Grid.action-footer">
+    <Setter Property="ColumnSpacing" Value="{DynamicResource UiActionGap}"/>
+    <Setter Property="MinHeight" Value="{DynamicResource UiActionFooterHeight}"/>
+  </Style>
+
+  <Style Selector="Button.action-footer-button">
+    <Setter Property="HorizontalAlignment" Value="Stretch"/>
+    <Setter Property="VerticalAlignment" Value="Stretch"/>
+    <Setter Property="HorizontalContentAlignment" Value="Center"/>
+    <Setter Property="VerticalContentAlignment" Value="Center"/>
+    <Setter Property="MinHeight" Value="{DynamicResource UiActionFooterHeight}"/>
+  </Style>
+
+  <Style Selector="TextBlock.validation-message">
+    <Setter Property="Foreground" Value="IndianRed"/>
+    <Setter Property="TextWrapping" Value="Wrap"/>
+  </Style>
+
+  <Style Selector="Button.mdi-history-button">
+    <Setter Property="Background" Value="Transparent"/>
+    <Setter Property="BorderThickness" Value="0"/>
+    <Setter Property="Padding" Value="0"/>
+    <Setter Property="Focusable" Value="False"/>
+    <Setter Property="HorizontalContentAlignment" Value="Center"/>
+    <Setter Property="VerticalContentAlignment" Value="Center"/>
+  </Style>
+
+  <Style Selector="TextBox.mdi-input">
+    <Setter Property="VerticalContentAlignment" Value="Center"/>
+    <Setter Property="Padding" Value="8,0,34,0"/>
+  </Style>
+
+  <Style Selector="DataGrid.offset-grid">
+    <Setter Property="HorizontalAlignment" Value="Stretch"/>
+    <Setter Property="IsReadOnly" Value="True"/>
+    <Setter Property="SelectionMode" Value="Single"/>
+    <Setter Property="AutoGenerateColumns" Value="False"/>
+    <Setter Property="CanUserReorderColumns" Value="False"/>
+    <Setter Property="CanUserResizeColumns" Value="False"/>
+    <Setter Property="CanUserSortColumns" Value="False"/>
+    <Setter Property="GridLinesVisibility" Value="All"/>
+    <Setter Property="RowHeight" Value="33"/>
+    <Setter Property="FontSize" Value="18"/>
+  </Style>
+
+  <Style Selector="DataGrid.offset-grid DataGridColumnHeader">
+    <Setter Property="Background" Value="Transparent"/>
+  </Style>
+  <Style Selector="DataGrid.offset-grid DataGridColumnHeader:not(:sortascending):not(:sortdescending) ContentPresenter#PART_ContentPresenter">
+    <Setter Property="Grid.ColumnSpan" Value="2"/>
+    <Setter Property="Padding" Value="0,0,10,0"/>
+  </Style>
+  <Style Selector="DataGrid.offset-grid DataGridCell:pointerover, DataGrid.offset-grid DataGridCell:current, DataGrid.offset-grid DataGridCell:selected">
+    <Setter Property="Background" Value="Transparent"/>
+    <Setter Property="BorderBrush" Value="Transparent"/>
+  </Style>
+  <Style Selector="DataGrid.offset-grid:focus DataGridCell:current, DataGrid.offset-grid:focus DataGridCell:selected">
+    <Setter Property="Background" Value="Transparent"/>
+    <Setter Property="BorderBrush" Value="Transparent"/>
+  </Style>
+  <Style Selector="DataGrid.offset-grid DataGridCell /template/ Rectangle#BackgroundRectangle, DataGrid.offset-grid DataGridCell:pointerover /template/ Rectangle#BackgroundRectangle, DataGrid.offset-grid DataGridCell:current /template/ Rectangle#BackgroundRectangle">
+    <Setter Property="Fill" Value="Transparent"/>
+  </Style>
+  <Style Selector="DataGrid.offset-grid DataGridCell /template/ Rectangle#CurrencyVisual">
+    <Setter Property="IsVisible" Value="False"/>
+    <Setter Property="Fill" Value="Transparent"/>
+  </Style>
+  <Style Selector="DataGrid.offset-grid DataGridRow:selected">
+    <Setter Property="Background" Value="{DynamicResource ThemeControlHighlightMidBrush}"/>
+  </Style>
+  <Style Selector="DataGrid.offset-grid DataGridRow:selected /template/ Rectangle#BackgroundRectangle, DataGrid.offset-grid DataGridRow:pointerover:selected /template/ Rectangle#BackgroundRectangle, DataGrid.offset-grid:focus DataGridRow:selected /template/ Rectangle#BackgroundRectangle">
+    <Setter Property="Fill" Value="{DynamicResource ThemeControlHighlightMidBrush}"/>
+  </Style>
+  <Style Selector="DataGrid.offset-grid DataGridCell:current /template/ Grid#FocusVisual, DataGrid.offset-grid:focus DataGridCell:current /template/ Grid#FocusVisual">
+    <Setter Property="IsVisible" Value="False"/>
+  </Style>
+
+  <Style Selector="views|SignalControl">
+    <Setter Property="HorizontalAlignment" Value="Stretch"/>
+    <Setter Property="VerticalAlignment" Value="Center"/>
+  </Style>
+
+  <Style Selector="DataGrid.gcode-compact-grid DataGridCell">
+    <Setter Property="FontSize" Value="12"/>
+    <Setter Property="BorderThickness" Value="0"/>
+    <Setter Property="BorderBrush" Value="Transparent"/>
+    <Setter Property="MinHeight" Value="14.52"/>
+    <Setter Property="Padding" Value="0"/>
+  </Style>
+
+  <Style Selector="DataGrid.gcode-compact-grid DataGridRow">
+    <Setter Property="MinHeight" Value="14.52"/>
+  </Style>
+
+  <Style Selector="DataGrid.gcode-compact-grid DataGridColumnHeader">
+    <Setter Property="UseLayoutRounding" Value="False"/>
+  </Style>
+
+  <Style Selector="DataGrid.gcode-compact-grid DataGridCell TextBlock">
+    <Setter Property="FontSize" Value="12"/>
+    <Setter Property="FontFamily" Value="Consolas"/>
+  </Style>
+
+  <Style Selector="DataGrid.gcode-compact-grid DataGridCell:focus, DataGrid.gcode-compact-grid DataGridCell:selected, DataGrid.gcode-compact-grid DataGridCell:current">
+    <Setter Property="BorderThickness" Value="0"/>
+    <Setter Property="BorderBrush" Value="Transparent"/>
+  </Style>
+
+  <Style Selector="Border.disconnected-overlay">
+    <Setter Property="Background" Value="{DynamicResource IoSenderOverlayBrush}"/>
+    <Setter Property="IsHitTestVisible" Value="True"/>
+  </Style>
+
+  <Style Selector="TextBlock.overlay-message">
+    <Setter Property="Foreground" Value="{DynamicResource ThemeForegroundBrush}"/>
+    <Setter Property="HorizontalAlignment" Value="Center"/>
+  </Style>
+
+  <Style Selector="DataGrid.gcode-program-grid">
+    <Setter Property="HorizontalAlignment" Value="Stretch"/>
+    <Setter Property="VerticalAlignment" Value="Stretch"/>
+    <Setter Property="GridLinesVisibility" Value="None"/>
+    <Setter Property="HeadersVisibility" Value="None"/>
+  </Style>
+
+  <Style Selector="DataGridRow.gcode-current">
+    <Setter Property="Background" Value="#2E7D32"/>
+  </Style>
+
+  <Style Selector="DataGridRow.gcode-pending">
+    <Setter Property="Background" Value="#C76B00"/>
+  </Style>
+
+  <Style Selector="controls|NumericTextBox">
+    <Setter Property="MinHeight" Value="{DynamicResource UiInputMinHeight}"/>
+    <Setter Property="TextAlignment" Value="Right"/>
+    <Setter Property="Background" Value="{DynamicResource ThemeControlLowBrush}"/>
+    <Setter Property="BorderBrush" Value="{DynamicResource ThemeBorderMidBrush}"/>
+    <Setter Property="Foreground" Value="{DynamicResource ThemeForegroundBrush}"/>
+  </Style>
+
+  <Style Selector="controls|NumericTextBox.compact">
+    <Setter Property="MinHeight" Value="{DynamicResource UiCompactControlHeight}"/>
+    <Setter Property="Height" Value="{DynamicResource UiCompactControlHeight}"/>
+  </Style>
+
+  <Style Selector="views|NumericField">
+    <Setter Property="MinHeight" Value="{DynamicResource UiInputMinHeight}"/>
+  </Style>
+
+</Styles>

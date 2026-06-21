@@ -4,7 +4,6 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              xmlns:controls="using:CNC.Controls.Avalonia.Controls"
              xmlns:views="using:CNC.Controls.Avalonia.Views"
-             xmlns:conv="using:CNC.Controls.Avalonia.Converters"
              xmlns:loc="using:CNC.Localization.Avalonia"
              xmlns:core="using:CNC.Core"
              x:Class="CNC.Controls.Avalonia.Views.FeedControl"
@@ -14,15 +13,6 @@
              d:DesignWidth="250"
              d:DesignHeight="250"
              HorizontalAlignment="Stretch">
-
-  <UserControl.Resources>
-    <ResourceDictionary>
-      <ResourceDictionary.MergedDictionaries>
-        <ResourceInclude Source="avares://CNC.Controls.Avalonia/Themes/Controls.axaml"/>
-      </ResourceDictionary.MergedDictionaries>
-      <conv:LogicalNotConverter x:Key="LogicalNotConverter"/>
-    </ResourceDictionary>
-  </UserControl.Resources>
 
   <Grid Margin="4" RowDefinitions="Auto,Auto,Auto" HorizontalAlignment="Stretch">
 

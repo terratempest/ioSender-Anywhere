@@ -15,7 +15,7 @@ public static class AppTheme
     public const string Dark = AppThemeKeys.Dark;
     public const string DarkHighContrast = AppThemeKeys.DarkHighContrast;
 
-    const string HighContrastPaletteUri = "avares://CNC.Controls.Config.Avalonia/Themes/IoSenderHighContrastPalette.axaml";
+    const string HighContrastPaletteUri = "avares://ioSender/Themes/HighContrastPalette.axaml";
 
     static ResourceDictionary? _highContrastOverlay;
     static ResourceDictionary? _customOverlay;

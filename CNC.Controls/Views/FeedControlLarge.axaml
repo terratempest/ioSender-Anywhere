@@ -3,7 +3,6 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              xmlns:primitives="using:Avalonia.Controls.Primitives"
-             xmlns:conv="using:CNC.Controls.Avalonia.Converters"
              xmlns:loc="using:CNC.Localization.Avalonia"
              xmlns:core="using:CNC.Core"
              x:Class="CNC.Controls.Avalonia.Views.FeedControlLarge"
@@ -14,15 +13,6 @@
              MinWidth="220"
              MinHeight="150">
 
-  <UserControl.Resources>
-    <ResourceDictionary>
-      <ResourceDictionary.MergedDictionaries>
-        <ResourceInclude Source="avares://CNC.Controls.Avalonia/Themes/Controls.axaml"/>
-      </ResourceDictionary.MergedDictionaries>
-      <conv:LogicalNotConverter x:Key="LogicalNotConverter"/>
-    </ResourceDictionary>
-  </UserControl.Resources>
-  
   <Grid Margin="4"
     RowDefinitions="*,Auto,Auto,Auto,*"
     RowSpacing="4">
@@ -41,21 +31,13 @@
         loc:Localize.Fallback="FEED RATE"/>
 
 
-      <Border Grid.Column="1"
-        Background="{DynamicResource IoSenderDroReadoutBrush}"
-        BorderBrush="{DynamicResource ThemeBorderHighBrush}"
-        BorderThickness="1"
-        CornerRadius="4"
-        Padding="8,4">
+      <Border Grid.Column="1" Classes="ui-readout">
         <Viewbox Stretch="Uniform" StretchDirection="DownOnly" 
           MaxHeight="36"
           HorizontalAlignment="Right"
           >
-          <TextBlock x:Name="TxtFeedRate"
+          <TextBlock x:Name="TxtFeedRate" Classes="ui-readout-text"
             Text="0"
-            FontSize="24"
-            FontFamily="Consolas,Courier New,monospace"
-            Foreground="#1A1A1A"
             TextAlignment="Right"/>
         </Viewbox>
       </Border>
@@ -111,10 +93,7 @@
       </Grid>
     </Grid>
 
-    <Border Grid.Row="2"
-      Height="1"
-      VerticalAlignment="Center"
-      Background="{DynamicResource ThemeBorderHighBrush}"/>
+    <Border Grid.Row="2" Classes="ui-separator"/>
 
     <Grid Grid.Row="3" ColumnDefinitions="*,Auto" VerticalAlignment="Center">
       <TextBlock x:Name="LblRapids"

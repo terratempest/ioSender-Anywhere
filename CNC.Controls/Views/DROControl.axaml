@@ -13,9 +13,6 @@
              >
   <UserControl.Resources>
     <ResourceDictionary>
-      <ResourceDictionary.MergedDictionaries>
-        <ResourceInclude Source="avares://CNC.Controls.Avalonia/Themes/Controls.axaml"/>
-      </ResourceDictionary.MergedDictionaries>
       <conv:LatheModeToStringConverter x:Key="LatheModeConverter"/>
       <conv:LogicalNotConverter x:Key="BooleanConverter"/>
       <conv:BoolToVisibleConverter x:Key="IsVisibleConverter"/>

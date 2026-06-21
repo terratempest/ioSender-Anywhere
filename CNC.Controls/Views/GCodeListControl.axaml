@@ -21,7 +21,7 @@
   </UserControl.Resources>
 
   <DataGrid x:Name="GCodeGrid"
-            Classes="gcode-program-grid"
+            Classes="gcode-program-grid gcode-compact-grid"
             HorizontalAlignment="Stretch"
             VerticalAlignment="Stretch"
             Margin="2"
@@ -42,37 +42,6 @@
             </Style.Resources>
         </Style>
         
-        <Style Selector="DataGridColumnHeader">
-            <Setter Property="UseLayoutRounding" Value="False" />
-        </Style>
-
-        <Style Selector="DataGridRow">
-            <Setter Property="MinHeight" Value="14.52" />
-        </Style>
-
-        <Style Selector="DataGridCell">
-            <Setter Property="FontSize" Value="12" />
-            <Setter Property="BorderThickness" Value="0" />
-            <Setter Property="BorderBrush" Value="Transparent" />
-            <Setter Property="MinHeight" Value="14.52" />
-            <Setter Property="Padding" Value="0" />
-        </Style>
-
-        <Style Selector="DataGridCell:focus">
-            <Setter Property="BorderThickness" Value="0" />
-            <Setter Property="BorderBrush" Value="Transparent" />
-        </Style>
-
-        <Style Selector="DataGridCell:selected">
-            <Setter Property="BorderThickness" Value="0" />
-            <Setter Property="BorderBrush" Value="Transparent" />
-        </Style>
-
-        <Style Selector="DataGridCell:current">
-            <Setter Property="BorderThickness" Value="0" />
-            <Setter Property="BorderBrush" Value="Transparent" />
-        </Style>
-
         <Style Selector="DataGridCell:current /template/ Grid#FocusVisual">
             <Setter Property="IsVisible" Value="False" />
         </Style>
@@ -81,10 +50,6 @@
             <Setter Property="IsVisible" Value="False" />
         </Style>
 
-        <Style Selector="DataGridCell TextBlock">
-            <Setter Property="FontSize" Value="12" />
-            <Setter Property="FontFamily" Value="Consolas" />
-        </Style>
     </DataGrid.Styles>
 
     <DataGrid.Columns>

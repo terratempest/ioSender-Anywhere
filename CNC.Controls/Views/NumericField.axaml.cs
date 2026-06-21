@@ -20,6 +20,9 @@ public partial class NumericField : UserControl
     public static readonly StyledProperty<string> UnitProperty =
         AvaloniaProperty.Register<NumericField, string>(nameof(Unit), string.Empty);
 
+    public static readonly StyledProperty<string> PreviewTextProperty =
+        AvaloniaProperty.Register<NumericField, string>(nameof(PreviewText), string.Empty);
+
     public static readonly StyledProperty<bool> IsReadOnlyProperty =
         AvaloniaProperty.Register<NumericField, bool>(nameof(IsReadOnly));
 
@@ -44,6 +47,7 @@ public partial class NumericField : UserControl
     public string Format { get => GetValue(FormatProperty); set => SetValue(FormatProperty, value); }
     public string Label { get => GetValue(LabelProperty); set => SetValue(LabelProperty, value); }
     public string Unit { get => GetValue(UnitProperty); set => SetValue(UnitProperty, value); }
+    public string PreviewText { get => GetValue(PreviewTextProperty); set => SetValue(PreviewTextProperty, value); }
     public bool IsReadOnly { get => GetValue(IsReadOnlyProperty); set => SetValue(IsReadOnlyProperty, value); }
     public double InputMinWidth { get => GetValue(InputMinWidthProperty); set => SetValue(InputMinWidthProperty, value); }
 

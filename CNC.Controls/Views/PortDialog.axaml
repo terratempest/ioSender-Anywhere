@@ -24,7 +24,7 @@
           <TextBlock x:Name="LblSerialPort" Grid.Row="0" Grid.Column="0" Text="Port:" VerticalAlignment="Center"
                      loc:Localize.Key="CNC.Controls.Avalonia.portdialog.lbl_serialPort"/>
 
-          <ComboBox x:Name="PortCombo" Grid.Row="0" Grid.Column="1"
+          <ComboBox Classes="dropdown-select" x:Name="PortCombo" Grid.Row="0" Grid.Column="1"
                     ItemsSource="{Binding Ports}"
                     SelectedItem="{Binding SelectedPort}">
             <ComboBox.ItemTemplate>
@@ -37,7 +37,7 @@
           <TextBlock x:Name="LblSerialBaud" Grid.Row="1" Grid.Column="0" Text="Baud rate:" VerticalAlignment="Center" Margin="0,8,0,0"
                      loc:Localize.Key="CNC.Controls.Avalonia.portdialog.lbl_serialBaud"/>
 
-          <ComboBox Grid.Row="1" Grid.Column="1" Margin="0,8,0,0"
+          <ComboBox Classes="dropdown-select" Grid.Row="1" Grid.Column="1" Margin="0,8,0,0"
                     ItemsSource="{Binding BaudRates}"
                     SelectedItem="{Binding SelectedBaud}"/>
         </Grid>
@@ -78,24 +78,21 @@
       </TabItem>
     </TabControl>
 
-    <TextBlock Text="{Binding ErrorMessage}"
-               Foreground="IndianRed"
+    <TextBlock Classes="validation-message" Text="{Binding ErrorMessage}"
                IsVisible="{Binding HasError}"
                TextWrapping="Wrap"/>
 
-    <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" Spacing="8" Margin="0,8,0,0">
+    <Grid Classes="action-footer" ColumnDefinitions="*,*" Margin="0,8,0,0">
 
-      <Button x:Name="BtnConnect" 
-        Content="Connect" Width="80" IsEnabled="{Binding CanConnect}" Click="OnConnectClick"
-        HorizontalContentAlignment="Center"
+      <Button x:Name="BtnConnect" Grid.Column="0" Classes="action-footer-button"
+        Content="Connect" IsEnabled="{Binding CanConnect}" Click="OnConnectClick"
         loc:Localize.Fallback="Connect"/>
 
-      <Button x:Name="BtnCancel" 
-        Content="Cancel" Width="80" Click="OnCancelClick"
-        HorizontalContentAlignment="Center"
+      <Button x:Name="BtnCancel" Grid.Column="1" Classes="action-footer-button"
+        Content="Cancel" Click="OnCancelClick"
         loc:Localize.Key="CNC.Controls.Avalonia.portdialog.btn_cancel"/>
 
-    </StackPanel>
+    </Grid>
 
   </StackPanel>
 

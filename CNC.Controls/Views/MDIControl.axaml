@@ -11,27 +11,14 @@
              HorizontalAlignment="Stretch"
              VerticalAlignment="Stretch">
 
-  <UserControl.Styles>
-    <Style Selector="Button.mdi-history-button">
-      <Setter Property="Background" Value="Transparent"/>
-      <Setter Property="BorderThickness" Value="0"/>
-      <Setter Property="Padding" Value="0"/>
-      <Setter Property="Focusable" Value="False"/>
-      <Setter Property="HorizontalContentAlignment" Value="Center"/>
-      <Setter Property="VerticalContentAlignment" Value="Center"/>
-    </Style>
-  </UserControl.Styles>
-
   <Grid ColumnDefinitions="*,Auto"
         Margin="4"
         HorizontalAlignment="Stretch" VerticalAlignment="Top">
     <Grid Grid.Column="0">
-      <TextBox x:Name="MdiText"
+      <TextBox x:Name="MdiText" Classes="mdi-input"
                MinWidth="100"
                Text="{Binding Command, RelativeSource={RelativeSource AncestorType=UserControl}, Mode=TwoWay}"
                HorizontalAlignment="Stretch"
-               VerticalContentAlignment="Center"
-               Padding="8,0,34,0"
                KeyDown="OnMdiKeyDown"/>
       <Button x:Name="BtnHistory" Classes="mdi-history-button"
               Width="28"

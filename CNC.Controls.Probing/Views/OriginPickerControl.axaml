@@ -6,31 +6,6 @@
              Width="42" Height="42">
   <UserControl.Resources>
     <conv:EnumValueToBooleanConverter x:Key="EnumToOriginConverter"/>
-    <ControlTheme x:Key="OriginRadioTheme" TargetType="RadioButton">
-      <Setter Property="Focusable" Value="False"/>
-      <Setter Property="Width" Value="14"/>
-      <Setter Property="Height" Value="14"/>
-      <Setter Property="Padding" Value="0"/>
-      <Setter Property="Background" Value="Transparent"/>
-      <Setter Property="BorderThickness" Value="0"/>
-      <Setter Property="Template">
-        <ControlTemplate>
-          <Panel Background="{TemplateBinding Background}">
-            <Ellipse Width="12" Height="12"
-                     HorizontalAlignment="Center"
-                     VerticalAlignment="Center"
-                     Fill="{DynamicResource ThemeBackgroundBrush}"
-                     Stroke="{DynamicResource ThemeBorderMidBrush}"
-                     StrokeThickness="1"/>
-            <Ellipse Width="6" Height="6"
-                     HorizontalAlignment="Center"
-                     VerticalAlignment="Center"
-                     Fill="{DynamicResource ThemeForegroundBrush}"
-                     IsVisible="{TemplateBinding IsChecked}"/>
-          </Panel>
-        </ControlTemplate>
-      </Setter>
-    </ControlTheme>
   </UserControl.Resources>
   <Grid RowDefinitions="14,14,14" ColumnDefinitions="14,14,14">
     <RadioButton GroupName="origin" Theme="{StaticResource OriginRadioTheme}"

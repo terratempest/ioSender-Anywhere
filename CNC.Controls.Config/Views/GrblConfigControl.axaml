@@ -26,18 +26,13 @@
   </UserControl.DataTemplates>
 
   <DockPanel>
-    <Border DockPanel.Dock="Left" Width="400" Margin="10,10,0,10"
-            Background="{DynamicResource ThemeControlLowBrush}"
-            BorderBrush="{DynamicResource ThemeBorderLowBrush}"
-            BorderThickness="1"
-            Padding="6">
+    <Border Classes="ui-panel" DockPanel.Dock="Left" Width="400" Margin="10,10,0,10" Padding="6">
       <Grid>
         <Grid.RowDefinitions>
           <RowDefinition Height="Auto"/>
           <RowDefinition Height="*"/>
         </Grid.RowDefinitions>
-        <views:NumericField x:Name="searchField" Grid.Row="0" Label="Setting:" Unit="" ToolTip.Tip="Search for setting (Enter)"
-                            MinHeight="36"
+        <views:NumericField x:Name="searchField" Classes="form-field" Grid.Row="0" Label="Setting:" Unit="" ToolTip.Tip="Search for setting (Enter)"
                             Format="###0" Margin="0,0,0,5" KeyDown="OnSearchKeyDown"/>
         <TreeView x:Name="treeView" Grid.Row="1" IsVisible="False" FontSize="12"
                   SelectionChanged="OnTreeSelectionChanged"
@@ -70,7 +65,7 @@
 
       <Grid x:Name="details" DockPanel.Dock="Top" RowDefinitions="Auto,*,Auto" RowSpacing="6">
         <TextBlock x:Name="txtSettingTitle" Grid.Row="0" FontWeight="SemiBold" FontSize="12"/>
-        <TextBox x:Name="txtValue" Grid.Row="1" Width="200" MinHeight="36" HorizontalAlignment="Left" VerticalAlignment="Top"
+        <TextBox x:Name="txtValue" Classes="input-standard" Grid.Row="1" Width="200" HorizontalAlignment="Left" VerticalAlignment="Top"
                  FontSize="12"
                  controls:PopupKeyboard.Layout="Numeric"
                  LostFocus="OnValueLostFocus"/>

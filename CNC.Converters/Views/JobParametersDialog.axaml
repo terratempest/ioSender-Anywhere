@@ -44,9 +44,9 @@
         <controls:NumericField Label="Diameter:" Unit="mm" Format="##0.###" Value="{Binding ToolDiameter, Mode=TwoWay}"/>
       </StackPanel>
     </Border>
-    <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" Margin="0,8,0,0">
-      <Button Content="Ok" Width="75" Click="OnOkClick"/>
-      <Button Content="Cancel" Width="75" Margin="8,0,0,0" Click="OnCancelClick"/>
-    </StackPanel>
+    <Grid Classes="action-footer" ColumnDefinitions="*,*" Margin="0,8,0,0">
+      <Button Grid.Column="0" Classes="action-footer-button" Content="Ok" Click="OnOkClick"/>
+      <Button Grid.Column="1" Classes="action-footer-button" Content="Cancel" Click="OnCancelClick"/>
+    </Grid>
   </StackPanel>
 </Window>

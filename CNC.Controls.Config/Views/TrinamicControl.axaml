@@ -19,7 +19,7 @@
   <DockPanel>
     <DockPanel DockPanel.Dock="Left" Width="520" Margin="5,5,5,0">
       <StackPanel DockPanel.Dock="Top">
-        <GroupBox Header="Load (SG_RESULT)" Width="514" Height="268" HorizontalAlignment="Left">
+        <GroupBox Header="Load (SG_RESULT)" Classes="form-section" Width="514" Height="268" HorizontalAlignment="Left">
           <Canvas x:Name="SgPlot" Background="{DynamicResource ThemeControlLowBrush}" Width="512" Height="240"/>
         </GroupBox>
 
@@ -67,7 +67,7 @@
             </RadioButton>
         </StackPanel>
 
-        <GroupBox Header="stallGuard" Margin="0,6,0,0">
+        <GroupBox Header="stallGuard" Classes="form-section" Margin="0,6,0,0">
             <StackPanel Orientation="Horizontal" Spacing="5">
               <Slider x:Name="sgSlider" Width="169" Minimum="{Binding #root.SGValueMin}"
                       Maximum="{Binding #root.SGValueMax}" Value="{Binding #root.SGValue, Mode=TwoWay}"
@@ -92,7 +92,7 @@
       </StackPanel>
     </DockPanel>
 
-    <GroupBox Header="Driver status" Margin="8,5,5,5">
+    <GroupBox Header="Driver status" Classes="form-section" Margin="8,5,5,5">
       <Grid RowDefinitions="*,Auto">
         <TextBox Grid.Row="0" Text="{Binding #root.DriverStatus}" IsReadOnly="True" AcceptsReturn="True"
                  TextWrapping="Wrap" FontFamily="Consolas,Courier New,monospace" FontSize="12"/>

@@ -1,9 +1,9 @@
 <UserControl xmlns="https://github.com/avaloniaui"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              x:Class="CNC.Controls.Config.AppGeneralConfigPanel"
-             Width="310">
-  <GroupBox Header="General" BorderBrush="{DynamicResource ThemeBorderLowBrush}">
-    <WrapPanel Orientation="Vertical" ItemWidth="290">
+             Classes="settings-panel">
+  <GroupBox Header="General" Classes="form-section">
+    <WrapPanel Classes="settings-form">
       <Grid ColumnDefinitions="90,*">
         <TextBlock Grid.Column="0" Text="Locale:" FontSize="12" HorizontalAlignment="Right" VerticalAlignment="Center"/>
         <TextBox Grid.Column="1" Margin="4,0,0,0" Width="120" FontSize="12" HorizontalAlignment="Left"
@@ -11,9 +11,9 @@
                  PlaceholderText="empty = default"
                  ToolTip.Tip="UI culture (e.g. de-DE). Restart may be required."/>
       </Grid>
-      <CheckBox Content="Restore last window size and position on startup" FontSize="12"
+      <CheckBox Classes="form-option" Content="Restore last window size and position on startup"
                 IsChecked="{Binding KeepWindowSize, Mode=TwoWay}" Margin="0,4,0,0"/>
-      <CheckBox Content="Keep MDI focus" FontSize="12"
+      <CheckBox Classes="form-option" Content="Keep MDI focus"
                 IsChecked="{Binding KeepMdiFocus, Mode=TwoWay}"/>
     </WrapPanel>
   </GroupBox>

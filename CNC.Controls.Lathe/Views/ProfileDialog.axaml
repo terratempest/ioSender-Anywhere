@@ -11,7 +11,7 @@
   <Grid Margin="10" RowDefinitions="Auto,Auto,Auto,Auto,Auto,Auto,Auto,Auto">
     <StackPanel Grid.Row="0" Orientation="Horizontal" Spacing="6" Margin="0,0,0,8">
       <TextBlock Text="Profile:" VerticalAlignment="Center"/>
-      <ComboBox x:Name="ProfileCombo" Width="280"
+      <ComboBox Classes="dropdown-select" x:Name="ProfileCombo" Width="280"
                 ItemsSource="{Binding Profiles}"
                 SelectedItem="{Binding SelectedProfile, Mode=TwoWay}">
         <ComboBox.ItemTemplate>
@@ -23,7 +23,7 @@
       <Button x:Name="BtnAddProfile" Content="Add" Width="46" IsEnabled="False" Click="OnAddProfileClick"/>
     </StackPanel>
 
-    <Border Grid.Row="1" BorderBrush="{DynamicResource ThemeBorderLowBrush}" BorderThickness="1" Padding="8" Margin="0,0,0,8">
+    <Border Grid.Row="1" Classes="form-section" Margin="0,0,0,8">
       <StackPanel Spacing="6">
         <TextBlock Text="Cut depths" FontWeight="SemiBold"/>
         <StackPanel Orientation="Horizontal" Spacing="12">
@@ -77,9 +77,9 @@
       </StackPanel>
     </Border>
 
-    <StackPanel Grid.Row="7" Orientation="Horizontal" HorizontalAlignment="Center" Spacing="24" Margin="0,8,0,0">
-      <Button Content="Ok" Width="75" Click="OnOkClick"/>
-      <Button Content="Cancel" Width="75" Click="OnCancelClick"/>
-    </StackPanel>
+    <Grid Grid.Row="7" Classes="action-footer" ColumnDefinitions="*,*" Margin="0,8,0,0">
+      <Button Grid.Column="0" Classes="action-footer-button" Content="Ok" Click="OnOkClick"/>
+      <Button Grid.Column="1" Classes="action-footer-button" Content="Cancel" Click="OnCancelClick"/>
+    </Grid>
   </Grid>
 </Window>

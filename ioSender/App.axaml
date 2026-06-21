@@ -7,14 +7,15 @@
         <FluentTheme />
         <StyleInclude Source="avares://Avalonia.Controls.ColorPicker/Themes/Fluent/Fluent.xaml"/>
         <StyleInclude Source="avares://Avalonia.Controls.DataGrid/Themes/Fluent.xaml"/>
-        <StyleInclude Source="avares://CNC.Controls.Avalonia/Themes/ControlsStyles.axaml"/>
-        <StyleInclude Source="avares://ioSender/Themes/IoSenderStyles.axaml"/>
+        <StyleInclude Source="avares://ioSender/Themes/FoundationStyles.axaml"/>
+        <StyleInclude Source="avares://ioSender/Themes/PatternStyles.axaml"/>
+        <StyleInclude Source="avares://ioSender/Themes/ShellStyles.axaml"/>
     </Application.Styles>
 
     <Application.Resources>
         <ResourceDictionary>
             <ResourceDictionary.MergedDictionaries>
-                <ResourceInclude Source="avares://CNC.Controls.Config.Avalonia/Themes/IoSenderPalette.axaml"/>
+                <ResourceInclude Source="avares://ioSender/Themes/Resources.axaml"/>
             </ResourceDictionary.MergedDictionaries>
         </ResourceDictionary>
     </Application.Resources>

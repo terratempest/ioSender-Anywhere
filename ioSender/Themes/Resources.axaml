@@ -1,0 +1,82 @@
+<ResourceDictionary xmlns="https://github.com/avaloniaui"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                    xmlns:conv="using:CNC.Controls.Avalonia.Converters">
+  <ResourceDictionary.MergedDictionaries>
+    <ResourceInclude Source="avares://ioSender/Themes/Palette.axaml"/>
+  </ResourceDictionary.MergedDictionaries>
+  <!-- Shared UI metrics. Consume through semantic styles instead of duplicating literals in views. -->
+  <x:Double x:Key="UiControlHeight">32</x:Double>
+  <x:Double x:Key="UiInputMinHeight">36</x:Double>
+  <x:Double x:Key="UiCompactControlHeight">24</x:Double>
+  <x:Double x:Key="UiActionFooterHeight">40</x:Double>
+  <x:Double x:Key="UiPanelPadding">8</x:Double>
+  <x:Double x:Key="UiActionGap">8</x:Double>
+  <x:Double x:Key="UiBodyFontSize">12</x:Double>
+  <x:Double x:Key="UiReadoutFontSize">24</x:Double>
+
+  <conv:IsAxisVisibleConverter x:Key="IsAxisVisibleConverter"/>
+  <conv:IsSignalVisibleConverter x:Key="IsSignalVisibleConverter"/>
+  <conv:EnumFlagsHasFlagConverter x:Key="EnumFlagsHasFlagConverter"/>
+  <conv:SpindleStateIsActiveConverter x:Key="SpindleStateIsActiveConverter"/>
+  <conv:LogicalNotConverter x:Key="LogicalNotConverter"/>
+  <conv:HomedStateToBooleanConverter x:Key="IsHomedConverter"/>
+
+  <Style x:Key="FlyoutCloseButton" Selector="Button.flyout-close">
+    <Setter Property="Background" Value="Transparent"/>
+    <Setter Property="BorderThickness" Value="0"/>
+    <Setter Property="Padding" Value="0"/>
+    <Setter Property="Width" Value="14"/>
+    <Setter Property="Height" Value="18"/>
+    <Setter Property="Focusable" Value="False"/>
+    <Setter Property="VerticalContentAlignment" Value="Top"/>
+  </Style>
+
+  <Style x:Key="FlyoutPanelBorder" Selector="Border.flyout-panel">
+    <Setter Property="BorderBrush" Value="{DynamicResource ThemeBorderLowBrush}"/>
+    <Setter Property="BorderThickness" Value="1"/>
+    <Setter Property="CornerRadius" Value="3"/>
+    <Setter Property="Background" Value="{DynamicResource ThemeControlLowBrush}"/>
+  </Style>
+
+<ControlTheme x:Key="ProbeSelectorTheme" TargetType="RadioButton">
+    <Setter Property="Focusable" Value="False"/>
+    <Setter Property="BorderThickness" Value="0"/>
+    <Setter Property="Background" Value="Transparent"/>
+    <Setter Property="Opacity" Value="0.5"/>
+    <Style Selector="^:checked">
+      <Setter Property="Opacity" Value="1"/>
+    </Style>
+  </ControlTheme>
+
+  <ControlTheme x:Key="EdgeFlagRadioTheme" TargetType="RadioButton" BasedOn="{StaticResource ProbeSelectorTheme}">
+    <Setter Property="Width" Value="60"/>
+    <Setter Property="Height" Value="60"/>
+  </ControlTheme>
+
+  <ControlTheme x:Key="RotFlagRadioTheme" TargetType="RadioButton" BasedOn="{StaticResource ProbeSelectorTheme}">
+    <Setter Property="Width" Value="80"/>
+    <Setter Property="Height" Value="80"/>
+  </ControlTheme>
+
+  <ControlTheme x:Key="CenterRadioTheme" TargetType="RadioButton" BasedOn="{StaticResource ProbeSelectorTheme}">
+    <Setter Property="Width" Value="120"/>
+    <Setter Property="Height" Value="120"/>
+  </ControlTheme>
+
+  <ControlTheme x:Key="OriginRadioTheme" TargetType="RadioButton">
+    <Setter Property="Focusable" Value="False"/>
+    <Setter Property="Width" Value="14"/>
+    <Setter Property="Height" Value="14"/>
+    <Setter Property="Padding" Value="0"/>
+    <Setter Property="Background" Value="Transparent"/>
+    <Setter Property="BorderThickness" Value="0"/>
+    <Setter Property="Template">
+      <ControlTemplate>
+        <Panel Background="{TemplateBinding Background}">
+          <Ellipse Width="12" Height="12" HorizontalAlignment="Center" VerticalAlignment="Center" Fill="{DynamicResource ThemeBackgroundBrush}" Stroke="{DynamicResource ThemeBorderMidBrush}" StrokeThickness="1"/>
+          <Ellipse Width="6" Height="6" HorizontalAlignment="Center" VerticalAlignment="Center" Fill="{DynamicResource ThemeForegroundBrush}" IsVisible="{TemplateBinding IsChecked}"/>
+        </Panel>
+      </ControlTemplate>
+    </Setter>
+  </ControlTheme>
+</ResourceDictionary>

@@ -19,11 +19,12 @@
     />
 
     <controls:NumericTextBox x:Name="data" Grid.Column="1" HorizontalAlignment="Right" VerticalContentAlignment="Center"
-      MinHeight="0" MinWidth="{Binding InputMinWidth, RelativeSource={RelativeSource AncestorType=UserControl}}" MaxWidth="9999" Padding="6,0,0,0"
+      MinHeight="{Binding MinHeight, RelativeSource={RelativeSource AncestorType=UserControl}}" MinWidth="{Binding InputMinWidth, RelativeSource={RelativeSource AncestorType=UserControl}}" MaxWidth="9999" Padding="6,0,0,0"
       
       IsReadOnly="{Binding IsReadOnly, RelativeSource={RelativeSource AncestorType=UserControl}}"
       Value ="{Binding Value, RelativeSource={RelativeSource AncestorType=UserControl}, Mode=TwoWay}"
       Format="{Binding Format, RelativeSource={RelativeSource AncestorType=UserControl}, Mode=OneWay}"
+      PreviewText="{Binding PreviewText, RelativeSource={RelativeSource AncestorType=UserControl}, Mode=OneWay}"
     >
       <controls:NumericTextBox.InnerRightContent>
         <TextBlock x:Name="unit"

@@ -20,11 +20,10 @@
   </UserControl.Resources>
   <UserControl.Styles>
     <Style Selector="TextBox#txtState:pointerover /template/ Border#PART_BorderElement">
-      <Setter Property="Background" Value="{Binding #txtState.Background}" />
-      <Setter Property="BorderBrush" Value="{Binding #txtState.BorderBrush}" />
+      <Setter Property="Background" Value="{Binding #txtState.Background}"/>
+      <Setter Property="BorderBrush" Value="{Binding #txtState.BorderBrush}"/>
     </Style>
   </UserControl.Styles>
-
   <Grid x:Name="gridLayout" Margin="4" ColumnDefinitions="Auto,*,Auto,Auto" 
         HorizontalAlignment="Stretch" VerticalAlignment="Stretch">
         

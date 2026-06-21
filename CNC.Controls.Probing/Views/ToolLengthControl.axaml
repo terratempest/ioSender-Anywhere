@@ -29,7 +29,7 @@
           IsChecked="{Binding ProbeFixture, Mode=TwoWay}"
           VerticalAlignment="Center"/>
         <TextBlock Text="with tool:" VerticalAlignment="Center"/>
-        <ComboBox Margin="2" Height="22" MinWidth="70" Padding="8,0,0,0" HorizontalContentAlignment="Center" 
+        <ComboBox Classes="dropdown-select compact" Margin="2" MinWidth="70" Padding="8,0,0,0" HorizontalContentAlignment="Center"
           PlaceholderText="000"
           ItemsSource="{Binding Grbl.Tools}"
           DisplayMemberBinding="{Binding Code}"
@@ -52,13 +52,13 @@
       />
 
 
-      <GroupBox Header="Workpiece offset" Margin="5,5,0,0" BorderBrush="{DynamicResource ThemeBorderLowBrush}"
+      <GroupBox Header="Workpiece offset" Classes="form-section" Margin="5,5,0,0"
               IsVisible="{Binding ProbeFixture, Converter={StaticResource IsNotVisibleConverter}}">
         <StackPanel Spacing="4">
           <CheckBox Content="Add offset" IsChecked="{Binding AddAction, Mode=TwoWay}" Margin="5,4,0,0"/>
           <StackPanel Orientation="Horizontal" Spacing="6">
             <local:CsSelectControl IsEnabled="{Binding AddAction}"/>
-            <GroupBox Header="Workpiece" BorderBrush="{DynamicResource ThemeBorderLowBrush}">
+            <GroupBox Header="Workpiece" Classes="form-section">
               <StackPanel Spacing="4">
                 <views:NumericField 
                   Label="Height:"
@@ -85,15 +85,14 @@
       
     </StackPanel>
 
-    <StackPanel Margin="5,0,0,5" Orientation="Horizontal"
-      HorizontalAlignment="Left" VerticalAlignment="Bottom" Spacing="4">
-      <Button Content="Start" Width="75" HorizontalContentAlignment="Center"
+    <Grid Classes="action-footer" Margin="5,0,5,5" ColumnDefinitions="*,*" ColumnSpacing="4" VerticalAlignment="Bottom">
+      <Button Grid.Column="0" Classes="action-footer-button" Content="Start"
         IsEnabled="{Binding Grbl.IsJobRunning, Converter={StaticResource IsNotRunningConverter}}"
         Click="OnStartClick"/>
-      <Button Content="Stop" Width="75" HorizontalContentAlignment="Center"
+      <Button Grid.Column="1" Classes="action-footer-button" Content="Stop"
         IsEnabled="{Binding Grbl.IsJobRunning}"
         Click="OnStopClick"/>
-    </StackPanel>
+    </Grid>
 
   </Grid>
 </UserControl>

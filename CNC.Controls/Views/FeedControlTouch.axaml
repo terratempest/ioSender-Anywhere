@@ -4,7 +4,6 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              xmlns:controls="using:CNC.Controls.Avalonia.Controls"
              xmlns:primitives="using:Avalonia.Controls.Primitives"
-             xmlns:conv="using:CNC.Controls.Avalonia.Converters"
              xmlns:loc="using:CNC.Localization.Avalonia"
              xmlns:core="using:CNC.Core"
              x:Class="CNC.Controls.Avalonia.Views.FeedControlTouch"
@@ -16,15 +15,6 @@
              MinHeight="80"
              HorizontalAlignment="Stretch"
              VerticalAlignment="Stretch">
-
-  <UserControl.Resources>
-    <ResourceDictionary>
-      <ResourceDictionary.MergedDictionaries>
-        <ResourceInclude Source="avares://CNC.Controls.Avalonia/Themes/Controls.axaml"/>
-      </ResourceDictionary.MergedDictionaries>
-      <conv:LogicalNotConverter x:Key="LogicalNotConverter"/>
-    </ResourceDictionary>
-  </UserControl.Resources>
 
   <Grid Margin="4" RowDefinitions="Auto,*,Auto,Auto,*"
         HorizontalAlignment="Stretch" VerticalAlignment="Stretch">
@@ -46,10 +36,7 @@
                    loc:Localize.Fallback="Feed Rate:"/>
       </Viewbox>
 
-      <Border Grid.Column="1" MinHeight="24" MinWidth="58" HorizontalAlignment="Stretch" VerticalAlignment="Center"
-              Background="{DynamicResource ThemeControlLowBrush}"
-              BorderBrush="{DynamicResource ThemeBorderMidBrush}"
-              BorderThickness="1" CornerRadius="2" Padding="2,0">
+      <Border Grid.Column="1" Classes="ui-input-surface" MinHeight="24" MinWidth="58" HorizontalAlignment="Stretch" VerticalAlignment="Center">
         <TextBox x:Name="cvFeedRate"
                  HorizontalAlignment="Stretch" VerticalAlignment="Stretch"
                  HorizontalContentAlignment="Center" VerticalContentAlignment="Center"

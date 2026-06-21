@@ -3,7 +3,6 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              xmlns:conv="using:CNC.Controls.Avalonia.Converters"
-             xmlns:controls="using:CNC.Controls.Avalonia.Controls"
              xmlns:views="using:CNC.Controls.Avalonia.Views"
              xmlns:local="using:CNC.Controls.Probing"
              xmlns:loc="using:CNC.Localization.Avalonia"
@@ -22,55 +21,13 @@
     <local:ProbingMacroActiveBrushConverter x:Key="MacroActiveBrushConverter"/>
   </UserControl.Resources>
 
-  <UserControl.Styles>
-    <Style Selector="Button.probing-action">
-      <Setter Property="Background" Value="{DynamicResource ThemeControlHighBrush}"/>
-      <Setter Property="Foreground" Value="{DynamicResource ThemeForegroundBrush}"/>
-      <Setter Property="BorderBrush" Value="{DynamicResource ThemeBorderMidBrush}"/>
-      <Setter Property="BorderThickness" Value="1"/>
-      <Setter Property="CornerRadius" Value="4"/>
-      <Setter Property="Height" Value="64"/>
-      <Setter Property="Width" Value="64"/>
-      <Setter Property="Margin" Value="0,0,4,0"/>
-      <Setter Property="MinWidth" Value="0"/>
-      <Setter Property="HorizontalAlignment" Value="Left"/>
-      <Setter Property="Padding" Value="0"/>
-      <Setter Property="HorizontalContentAlignment" Value="Center"/>
-      <Setter Property="VerticalContentAlignment" Value="Center"/>
-      <Setter Property="FontWeight" Value="SemiBold"/>
-      <Setter Property="FontSize" Value="10"/>
-      <Setter Property="Cursor" Value="Hand"/>
-    </Style>
-    <Style Selector="Button.probing-action:pointerover">
-      <Setter Property="Background" Value="{DynamicResource ThemeControlHighlightMidBrush}"/>
-      <Setter Property="BorderBrush" Value="{DynamicResource ThemeBorderHighBrush}"/>
-    </Style>
-    <Style Selector="Button.probing-action:pressed">
-      <Setter Property="Background" Value="{DynamicResource ThemeControlHighlightLowBrush}"/>
-    </Style>
-    <Style Selector="Button.probing-action.selected">
-      <Setter Property="Background" Value="{DynamicResource ThemeControlHighlightLowBrush}"/>
-      <Setter Property="BorderBrush" Value="{DynamicResource ThemeAccentBrush}"/>
-      <Setter Property="Foreground" Value="{DynamicResource ThemeAccentBrush}"/>
-    </Style>
-    <Style Selector="views|NumericField">
-      <Setter Property="MinHeight" Value="36"/> 
-      <Setter Property="InputMinWidth" Value="80"/> 
-    </Style>
-  </UserControl.Styles>
-
   <Grid TextElement.FontSize="12">
     <Grid x:Name="ProbingVmRoot"
           ColumnDefinitions="260,*"
           RowDefinitions="*"
           >
 
-      <Border Grid.Column="0"
-              BorderBrush="{DynamicResource ThemeBorderLowBrush}"
-              BorderThickness="1"
-              Padding="4"
-              CornerRadius="2" 
-              Background="{DynamicResource ThemeControlLowBrush}">
+      <Border Grid.Column="0" Classes="ui-panel" Padding="4" CornerRadius="2">
         <ScrollViewer HorizontalScrollBarVisibility="Disabled"
                       VerticalScrollBarVisibility="Auto">
           <StackPanel x:Name="SidebarHost" Spacing="5">
@@ -127,7 +84,7 @@
                     IsEnabled="{Binding ProbeDiameterEnable}">
               <StackPanel Spacing="2">
                 <TextBlock Text="Probe tip/tool" FontWeight="SemiBold"/>
-                <views:NumericField Label="Diameter:"
+                <views:NumericField Classes="form-field" Label="Diameter:"
                                     Value="{Binding ProbeDiameter, Mode=TwoWay}"
                                     IsEnabled="{Binding ProbeDiameterEnable}"
                                     Format="0.###"
@@ -142,7 +99,7 @@
                     IsEnabled="{Binding ShowTouchPlateSection}">
               <StackPanel Spacing="2">
                 <TextBlock Text="Touch plate/fixture height" FontWeight="SemiBold"/>
-                <views:NumericField Label="Touch plate:"
+                <views:NumericField Classes="form-field" Label="Touch plate:"
                                     Value="{Binding TouchPlateHeight, Mode=TwoWay}"
                                     IsEnabled="{Binding TouchPlateHeightEnable}"
                                     IsVisible="{Binding TouchPlateHeightEnable, Converter={StaticResource IsVisibleConverter}}"
@@ -150,7 +107,7 @@
                                     Unit="{Binding Grbl.Unit}"
                                     Width="220"
                                     HorizontalAlignment="Stretch"/>
-                <views:NumericField Label="Fixture:"
+                <views:NumericField Classes="form-field" Label="Fixture:"
                                     Value="{Binding FixtureHeight, Mode=TwoWay}"
                                     IsEnabled="{Binding FixtureHeightEnable}"
                                     IsVisible="{Binding FixtureHeightEnable, Converter={StaticResource IsVisibleConverter}}"
@@ -164,31 +121,31 @@
             <Border Classes="panel-chrome">
               <StackPanel Spacing="2">
                 <TextBlock Text="Probing distances and speed" FontWeight="SemiBold"/>
-                <views:NumericField Label="Rapids feed rate:"
+                <views:NumericField Classes="form-field" Label="Rapids feed rate:"
                                     Value="{Binding RapidsFeedRate, Mode=TwoWay}"
                                     Format="###0"
                                     Unit="mm/min"
                                     Width="220"
                                     HorizontalAlignment="Stretch"/>
-                <views:NumericField Label="Search feed rate:"
+                <views:NumericField Classes="form-field" Label="Search feed rate:"
                                     Value="{Binding ProbeFeedRate, Mode=TwoWay}"
                                     Format="###0"
                                     Unit="mm/min"
                                     Width="220"
                                     HorizontalAlignment="Stretch"/>
-                <views:NumericField Label="Latch feed rate:"
+                <views:NumericField Classes="form-field" Label="Latch feed rate:"
                                     Value="{Binding LatchFeedRate, Mode=TwoWay}"
                                     Format="###0"
                                     Unit="mm/min"
                                     Width="220"
                                     HorizontalAlignment="Stretch"/>
-                <views:NumericField Label="Probing distance:"
+                <views:NumericField Classes="form-field" Label="Probing distance:"
                                     Value="{Binding ProbeDistance, Mode=TwoWay}"
                                     Format="0.000"
                                     Unit="{Binding Grbl.Unit}"
                                     Width="220"
                                     HorizontalAlignment="Stretch"/>
-                <views:NumericField Label="Latch distance:"
+                <views:NumericField Classes="form-field" Label="Latch distance:"
                                     Value="{Binding LatchDistance, Mode=TwoWay}"
                                     Format="0.000"
                                     Unit="{Binding Grbl.Unit}"
@@ -202,7 +159,7 @@
                     IsEnabled="{Binding ShowClearancesSection}">
               <StackPanel Spacing="2">
                 <TextBlock Text="Probing clearances" FontWeight="SemiBold"/>
-                <views:NumericField Label="XY clearance:"
+                <views:NumericField Classes="form-field" Label="XY clearance:"
                                     Value="{Binding XYClearance, Mode=TwoWay}"
                                     IsEnabled="{Binding XYOffsetEnable}"
                                     IsVisible="{Binding XYOffsetEnable, Converter={StaticResource IsVisibleConverter}}"
@@ -210,7 +167,7 @@
                                     Unit="{Binding Grbl.Unit}"
                                     Width="220"
                                     HorizontalAlignment="Stretch"/>
-                <views:NumericField Label="Offset:"
+                <views:NumericField Classes="form-field" Label="Offset:"
                                     Value="{Binding Offset, Mode=TwoWay}"
                                     IsEnabled="{Binding OffsetEnable}"
                                     IsVisible="{Binding OffsetEnable, Converter={StaticResource IsVisibleConverter}}"
@@ -218,7 +175,7 @@
                                     Unit="{Binding Grbl.Unit}"
                                     Width="220"
                                     HorizontalAlignment="Stretch"/>
-                <views:NumericField Label="Depth:"
+                <views:NumericField Classes="form-field" Label="Depth:"
                                     Value="{Binding Depth, Mode=TwoWay}"
                                     IsEnabled="{Binding XYOffsetEnable}"
                                     IsVisible="{Binding XYOffsetEnable, Converter={StaticResource IsVisibleConverter}}"
@@ -234,13 +191,9 @@
                     IsEnabled="{Binding XYOffsetEnable}">
               <StackPanel Spacing="4">
                 <TextBlock Text="Probe/touchplate XY offsets" FontWeight="SemiBold"/>
-                <Grid ColumnDefinitions="Auto,*,Auto,Auto,*,Auto">
-                  <TextBlock Text="X:" VerticalAlignment="Center" Margin="0,0,4,0"/>
-                  <controls:NumericTextBox Grid.Column="1" Value="{Binding ProbeOffsetX, Mode=TwoWay}" Format="0.###"/>
-                  <TextBlock Grid.Column="2" Text="{Binding Grbl.Unit}" VerticalAlignment="Center" Margin="4,0,0,0"/>
-                  <TextBlock Grid.Column="3" Text="Y:" VerticalAlignment="Center" Margin="8,0,4,0"/>
-                  <controls:NumericTextBox Grid.Column="4" Value="{Binding ProbeOffsetY, Mode=TwoWay}" Format="0.###"/>
-                  <TextBlock Grid.Column="5" Text="{Binding Grbl.Unit}" VerticalAlignment="Center" Margin="4,0,0,0"/>
+                <Grid ColumnDefinitions="*,*" ColumnSpacing="8">
+                  <views:NumericField Grid.Column="0" Classes="form-field" Label="X:" Unit="{Binding Grbl.Unit}" Value="{Binding ProbeOffsetX, Mode=TwoWay}" Format="0.###"/>
+                  <views:NumericField Grid.Column="1" Classes="form-field" Label="Y:" Unit="{Binding Grbl.Unit}" Value="{Binding ProbeOffsetY, Mode=TwoWay}" Format="0.###"/>
                 </Grid>
                 <CheckBox Content="Is touch plate"
                           IsChecked="{Binding TouchPlateIsXY, Mode=TwoWay}"
@@ -412,34 +365,6 @@
           SelectionChanged="OnTabSelectionChanged"
           >
 
-          <TabControl.Styles>
-            <Style Selector="TabControl#WizardTabs">
-              <Setter Property="Template">
-                <ControlTemplate>
-                  <Grid RowDefinitions="0,*">
-                    <ItemsPresenter Name="PART_ItemsPresenter"
-                                    Grid.Row="0"
-                                    IsVisible="False"/>
-                    <ContentPresenter Name="PART_SelectedContentHost"
-                                      Grid.Row="1"
-                                      Content="{TemplateBinding SelectedContent}"
-                                      ContentTemplate="{TemplateBinding SelectedContentTemplate}"
-                                      HorizontalContentAlignment="{TemplateBinding HorizontalContentAlignment}"
-                                      VerticalContentAlignment="{TemplateBinding VerticalContentAlignment}"/>
-                  </Grid>
-                </ControlTemplate>
-              </Setter>
-            </Style>
-
-            <Style Selector="Border.probing-tab-content">
-              <Setter Property="Background" Value="{DynamicResource ThemeControlLowBrush}"/>
-              <Setter Property="BorderBrush" Value="{DynamicResource ThemeBorderLowBrush}"/>
-              <Setter Property="BorderThickness" Value="1"/>
-              <Setter Property="Margin" Value="4,0,4,0"/>
-              <Setter Property="Padding" Value="0"/>
-            </Style>
-          </TabControl.Styles>
-
           <TabItem Header="Tool length offset" FontSize="16" >
             <Border Classes="probing-tab-content">
               <local:ToolLengthControl HorizontalAlignment="Stretch" VerticalAlignment="Stretch"/>
@@ -478,8 +403,7 @@
                      TextWrapping="Wrap"
                      MinHeight="48"/>
           <StackPanel Grid.Row="0" Grid.Column="1" Spacing="4">
-            <ComboBox x:Name="ProbeCombo"
-              Classes="dropdown-select compact"
+            <ComboBox Classes="dropdown-select compact" x:Name="ProbeCombo"
               ItemsSource="{Binding Grbl.Probes}"
               SelectedValue="{Binding Grbl.Probe, Mode=OneWay}"
               SelectedValueBinding="{Binding Id}"

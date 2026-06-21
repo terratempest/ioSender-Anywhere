@@ -2,16 +2,16 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:cnc="using:CNC.Controls.Avalonia.Views"
              x:Class="CNC.Controls.Config.AppGCodeViewerConfigPanel"
-             Width="310">
-  <GroupBox Header="G-code viewer" BorderBrush="{DynamicResource ThemeBorderLowBrush}">
-    <WrapPanel Orientation="Vertical" ItemWidth="290" TextElement.FontSize="12">
+             Classes="settings-panel">
+  <GroupBox Header="G-code viewer" Classes="form-section">
+    <WrapPanel Classes="settings-form">
       <CheckBox Content="Enable" IsChecked="{Binding GCodeViewer.IsEnabled, Mode=TwoWay}"/>
-      <cnc:NumericField Label="Arc resolution:" Unit="segments" Format="#0" MinHeight="36"
+      <cnc:NumericField Classes="form-field" Label="Arc resolution:" Unit="segments" Format="#0"
                         InputMinWidth="100"
                         Value="{Binding GCodeViewer.ArcResolution, Mode=TwoWay}"/>
-      <cnc:NumericField Label="Min distance:" MinHeight="36" InputMinWidth="100"
+      <cnc:NumericField Classes="form-field" Label="Min distance:" InputMinWidth="100"
                         Value="{Binding GCodeViewer.MinDistance, Mode=TwoWay}"/>
-      <cnc:NumericField Label="Tool diameter:" Unit="mm" Format="###0.0" MinHeight="36" InputMinWidth="100"
+      <cnc:NumericField Classes="form-field" Label="Tool diameter:" Unit="mm" Format="###0.0" InputMinWidth="100"
                         Value="{Binding GCodeViewer.ToolDiameter, Mode=TwoWay}"/>
       <CheckBox Content="Black background" Margin="0,4,0,0"
                 IsChecked="{Binding GCodeViewer.BlackBackground, Mode=TwoWay}"

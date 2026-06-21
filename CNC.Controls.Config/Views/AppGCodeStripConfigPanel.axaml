@@ -1,24 +1,24 @@
 <UserControl xmlns="https://github.com/avaloniaui"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              x:Class="CNC.Controls.Config.AppGCodeStripConfigPanel"
-             Width="310">
-  <GroupBox Header="Program strip" BorderBrush="{DynamicResource ThemeBorderLowBrush}">
-    <WrapPanel Orientation="Vertical" ItemWidth="290">
+             Classes="settings-panel">
+  <GroupBox Header="Program strip" Classes="form-section">
+    <WrapPanel Classes="settings-form">
       <Grid ColumnDefinitions="70,*" RowDefinitions="Auto,Auto,Auto,Auto">
         <TextBlock Grid.Row="0" Grid.Column="0" Text="M6:" FontSize="12" HorizontalAlignment="Right" VerticalAlignment="Center"/>
-        <ComboBox Grid.Row="0" Grid.Column="1" Margin="4,0,0,0" FontSize="12"
+        <ComboBox Classes="dropdown-select" Grid.Row="0" Grid.Column="1" Margin="4,0,0,0" FontSize="12"
                   ItemsSource="{Binding CommandIgnoreStates}"
                   SelectedItem="{Binding IgnoreM6, Mode=TwoWay}"/>
         <TextBlock Grid.Row="1" Grid.Column="0" Text="M7:" FontSize="12" HorizontalAlignment="Right" VerticalAlignment="Center"/>
-        <ComboBox Grid.Row="1" Grid.Column="1" Margin="4,4,0,0" FontSize="12"
+        <ComboBox Classes="dropdown-select" Grid.Row="1" Grid.Column="1" Margin="4,4,0,0" FontSize="12"
                   ItemsSource="{Binding CommandIgnoreStates}"
                   SelectedItem="{Binding IgnoreM7, Mode=TwoWay}"/>
         <TextBlock Grid.Row="2" Grid.Column="0" Text="M8:" FontSize="12" HorizontalAlignment="Right" VerticalAlignment="Center"/>
-        <ComboBox Grid.Row="2" Grid.Column="1" Margin="4,4,0,0" FontSize="12"
+        <ComboBox Classes="dropdown-select" Grid.Row="2" Grid.Column="1" Margin="4,4,0,0" FontSize="12"
                   ItemsSource="{Binding CommandIgnoreStates}"
                   SelectedItem="{Binding IgnoreM8, Mode=TwoWay}"/>
         <TextBlock Grid.Row="3" Grid.Column="0" Text="G61/G64:" FontSize="12" HorizontalAlignment="Right" VerticalAlignment="Center"/>
-        <ComboBox Grid.Row="3" Grid.Column="1" Margin="4,4,0,0" FontSize="12"
+        <ComboBox Classes="dropdown-select" Grid.Row="3" Grid.Column="1" Margin="4,4,0,0" FontSize="12"
                   ItemsSource="{Binding CommandIgnoreStates}"
                   SelectedItem="{Binding IgnoreG61G64, Mode=TwoWay}"/>
       </Grid>

@@ -2,11 +2,11 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:app="using:CNC.App"
              x:Class="CNC.Controls.Config.AppKeyboardConfigPanel"
-             Width="310">
-  <GroupBox Header="Keyboard mappings" BorderBrush="{DynamicResource ThemeBorderLowBrush}">
-    <WrapPanel Orientation="Vertical" ItemWidth="290">
+             Classes="settings-panel">
+  <GroupBox Header="Keyboard mappings" Classes="form-section">
+    <WrapPanel Classes="settings-form">
       <StackPanel Orientation="Horizontal" Spacing="4">
-        <TextBlock Text="Popup keyboard:" FontSize="12" VerticalAlignment="Center"/>
+        <TextBlock Classes="ui-label" Text="Popup keyboard:" VerticalAlignment="Center"/>
         <Border Width="12" Height="12"
                 CornerRadius="6"
                 Background="{DynamicResource ThemeControlMidBrush}"
@@ -22,25 +22,23 @@
         </Border>
       </StackPanel>
 
-      <ComboBox x:Name="PopupKeyboardTriggerCombo" FontSize="12" HorizontalAlignment="Stretch"
+      <ComboBox Classes="dropdown-select" x:Name="PopupKeyboardTriggerCombo" HorizontalAlignment="Stretch"
                 SelectionChanged="OnPopupKeyboardTriggerChanged"
                 Margin="0,0,0,8"/>
 
-      <TextBlock Text="Jog mode:" FontSize="12"/>
+      <TextBlock Classes="ui-label" Text="Jog mode:"/>
 
-      <ComboBox x:Name="JogModeCombo" FontSize="12" HorizontalAlignment="Stretch"
+      <ComboBox Classes="dropdown-select" x:Name="JogModeCombo" HorizontalAlignment="Stretch"
                 SelectionChanged="OnJogModeChanged"/>
 
-      <TextBlock x:Name="KeyMapPathText" TextWrapping="Wrap" FontSize="11" Opacity="0.85" Margin="0,4,0,0"/>
+      <TextBlock x:Name="KeyMapPathText" Classes="help-text" Margin="0,4,0,0"/>
 
       <StackPanel Orientation="Horizontal" Spacing="6" Margin="0,4,0,0">
-        <Button x:Name="SaveKeyMapBtn" Content="Save mappings" MinWidth="110" FontSize="12"
-                HorizontalContentAlignment="Center" Click="OnSaveKeyMapClick"/>
-        <Button x:Name="LoadKeyMapBtn" Content="Load mappings" MinWidth="110" FontSize="12"
-                HorizontalContentAlignment="Center" Click="OnLoadKeyMapClick"/>
+        <Button x:Name="SaveKeyMapBtn" Classes="form-action" Content="Save mappings" MinWidth="110" Click="OnSaveKeyMapClick"/>
+        <Button x:Name="LoadKeyMapBtn" Classes="form-action" Content="Load mappings" MinWidth="110" Click="OnLoadKeyMapClick"/>
       </StackPanel>
 
-      <TextBlock x:Name="KeyMapStatusText" TextWrapping="Wrap" FontSize="11" Opacity="0.85" Margin="0,4,0,0"/>
+      <TextBlock x:Name="KeyMapStatusText" Classes="help-text" Margin="0,4,0,0"/>
     </WrapPanel>
   </GroupBox>
 </UserControl>

@@ -8,13 +8,6 @@
              x:Class="CNC.Controls.Avalonia.Views.ToolView"
              x:Name="root"
              d:DesignHeight="515" d:DesignWidth="875">
-  <UserControl.Resources>
-    <ResourceDictionary>
-      <ResourceDictionary.MergedDictionaries>
-        <ResourceInclude Source="avares://CNC.Controls.Avalonia/Themes/Controls.axaml"/>
-      </ResourceDictionary.MergedDictionaries>
-    </ResourceDictionary>
-  </UserControl.Resources>
   <Grid ColumnDefinitions="Auto,Auto" TextElement.FontSize="12">
     <DataGrid x:Name="dgrTools" Grid.Column="0" IsReadOnly="True" SelectionMode="Single"
               AutoGenerateColumns="False" CanUserReorderColumns="False" CanUserResizeColumns="False"

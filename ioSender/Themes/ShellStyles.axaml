@@ -20,16 +20,51 @@
     <Setter Property="FontWeight" Value="SemiBold"/>
   </Style>
 
-  <Style Selector="TextBlock.status-connected">
-    <Setter Property="Foreground" Value="{StaticResource IoSenderConnectedBrush}"/>
-  </Style>
-
-  <Style Selector="TextBlock.status-disconnected">
-    <Setter Property="Foreground" Value="{StaticResource IoSenderDisconnectedBrush}"/>
-  </Style>
-
   <Style Selector="Border.workspace-region-edit">
     <Setter Property="BorderBrush" Value="{DynamicResource ThemeAccentBrush}"/>
+  </Style>
+
+  <Style Selector="Border.app-titlebar">
+    <Setter Property="Background" Value="{DynamicResource ThemeControlLowBrush}"/>
+    <Setter Property="BorderBrush" Value="{DynamicResource ThemeBorderLowBrush}"/>
+    <Setter Property="BorderThickness" Value="0,0,0,1"/>
+  </Style>
+
+  <Style Selector="Border.quickaccess-sidebar">
+    <Setter Property="Background" Value="{DynamicResource ThemeControlMidBrush}"/>
+    <Setter Property="BorderBrush" Value="{DynamicResource ThemeBorderLowBrush}"/>
+    <Setter Property="BorderThickness" Value="1"/>
+    <Setter Property="Padding" Value="2"/>
+  </Style>
+
+  <Style Selector="Button.quickaccess-tab">
+    <Setter Property="Width" Value="30"/>
+    <Setter Property="Height" Value="65"/>
+    <Setter Property="Padding" Value="-8"/>
+    <Setter Property="Margin" Value="0"/>
+    <Setter Property="ClipToBounds" Value="True"/>
+    <Setter Property="Focusable" Value="False"/>
+    <Setter Property="FontSize" Value="12"/>
+    <Setter Property="FontWeight" Value="SemiBold"/>
+    <Setter Property="HorizontalAlignment" Value="Center"/>
+    <Setter Property="HorizontalContentAlignment" Value="Center"/>
+    <Setter Property="VerticalContentAlignment" Value="Center"/>
+    <Setter Property="Background" Value="{DynamicResource ThemeControlLowBrush}"/>
+    <Setter Property="BorderBrush" Value="{DynamicResource ThemeBorderLowBrush}"/>
+    <Setter Property="BorderThickness" Value="1"/>
+    <Setter Property="CornerRadius" Value="3"/>
+  </Style>
+
+  <Style Selector="Button.quickaccess-add">
+    <Setter Property="Width" Value="30"/>
+    <Setter Property="Height" Value="30"/>
+    <Setter Property="Padding" Value="0"/>
+    <Setter Property="Margin" Value="0,2,0,0"/>
+    <Setter Property="FontSize" Value="16"/>
+    <Setter Property="FontWeight" Value="Bold"/>
+    <Setter Property="HorizontalAlignment" Value="Center"/>
+    <Setter Property="HorizontalContentAlignment" Value="Center"/>
+    <Setter Property="VerticalContentAlignment" Value="Center"/>
   </Style>
 
   <Style Selector="Border.layout-lock-indicator">

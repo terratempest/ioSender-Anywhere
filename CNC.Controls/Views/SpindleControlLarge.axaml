@@ -18,10 +18,6 @@
 
   <UserControl.Resources>
     <ResourceDictionary>
-      <ResourceDictionary.MergedDictionaries>
-        <ResourceInclude Source="avares://CNC.Controls.Avalonia/Themes/Controls.axaml"/>
-      </ResourceDictionary.MergedDictionaries>
-      <conv:LogicalNotConverter x:Key="LogicalNotConverter"/>
       <conv:BoolToVisibleConverter x:Key="IsVisibleConverter"/>
     </ResourceDictionary>
   </UserControl.Resources>
@@ -42,23 +38,14 @@
         loc:Localize.Key="CNC.Controls.Avalonia.spindlecontrol.lbl_spindle_speed"
         loc:Localize.Fallback="RPM"/>
 
-      <Border x:Name="RpmReadoutBorder"
-        Grid.Column="1"
-        Background="{DynamicResource IoSenderDroReadoutBrush}"
-        BorderBrush="{DynamicResource ThemeBorderHighBrush}"
-        BorderThickness="1"
-        CornerRadius="4"
-        Padding="8,4">
+      <Border x:Name="RpmReadoutBorder" Grid.Column="1" Classes="ui-readout">
         <Grid>
           <Viewbox Stretch="Uniform"
             StretchDirection="DownOnly"
             MaxHeight="36"
             HorizontalAlignment="Center">
-            <TextBlock x:Name="TxtRpmDisplay"
+            <TextBlock x:Name="TxtRpmDisplay" Classes="ui-readout-text"
               Text="0"
-              FontSize="24"
-              FontFamily="Consolas,Courier New,monospace"
-              Foreground="#1A1A1A"
               TextAlignment="Center"/>
           </Viewbox>
           <TextBox x:Name="TxtRpm"
@@ -150,10 +137,7 @@
       </Grid>
     </Grid>
 
-    <Border Grid.Row="2"
-      Height="1"
-      VerticalAlignment="Center"
-      Background="{DynamicResource ThemeBorderHighBrush}"/>
+    <Border Grid.Row="2" Classes="ui-separator"/>
 
     <Grid Grid.Row="3" ColumnDefinitions="Auto,*" 
       ColumnSpacing="4"
@@ -166,7 +150,7 @@
         loc:Localize.Key="CNC.Controls.Avalonia.spindlecontrol.lbl_spindle_power"
         loc:Localize.Fallback="Spindle:"/>
 
-      <ComboBox x:Name="cbxSpindle"
+      <ComboBox Classes="dropdown-select" x:Name="cbxSpindle"
                 Grid.Column="1"
                 HorizontalAlignment="Stretch"                
                 ItemsSource="{Binding Spindles}"

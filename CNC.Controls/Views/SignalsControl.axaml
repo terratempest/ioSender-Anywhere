@@ -7,21 +7,6 @@
              x:DataType="core:GrblViewModel"
              >
 
-  <UserControl.Resources>
-    <ResourceDictionary>
-      <ResourceDictionary.MergedDictionaries>
-        <ResourceInclude Source="avares://CNC.Controls.Avalonia/Themes/Controls.axaml"/>
-      </ResourceDictionary.MergedDictionaries>
-    </ResourceDictionary>
-  </UserControl.Resources>
-
-  <UserControl.Styles>
-    <Style Selector="views|SignalControl">
-      <Setter Property="HorizontalAlignment" Value="Stretch"/>
-      <Setter Property="VerticalAlignment" Value="Center"/>
-    </Style>
-  </UserControl.Styles>
-
   <UniformGrid Rows="1" Margin="4" VerticalAlignment="Center" HorizontalAlignment="Stretch">
         <views:SignalControl Label="X">
           <views:SignalControl.IsSet>

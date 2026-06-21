@@ -10,10 +10,10 @@
 
       <Grid ColumnDefinitions="Auto,*" RowDefinitions="Auto,Auto,Auto">
         <TextBlock Grid.Row="0" Grid.Column="0" Text="Type:" VerticalAlignment="Center"/>
-        <ComboBox Grid.Row="0" Grid.Column="1" x:Name="ThreadTypeCombo" Height="22"/>
+        <ComboBox Grid.Row="0" Grid.Column="1" x:Name="ThreadTypeCombo" Classes="dropdown-select compact"/>
 
         <TextBlock Grid.Row="1" Grid.Column="0" Text="Size:" VerticalAlignment="Center"/>
-        <ComboBox Grid.Row="1" Grid.Column="1" x:Name="ThreadSizeCombo" Height="22"
+        <ComboBox Grid.Row="1" Grid.Column="1" x:Name="ThreadSizeCombo" Classes="dropdown-select compact"
                   ItemsSource="{Binding Thread.ThreadSizes}"
                   SelectedItem="{Binding Thread.ThreadSize, Mode=TwoWay}">
           <ComboBox.ItemTemplate>
@@ -31,7 +31,7 @@
         </StackPanel>
       </Grid>
 
-      <Border BorderBrush="{DynamicResource ThemeBorderLowBrush}" BorderThickness="1" Padding="8" CornerRadius="2">
+      <Border Classes="form-section">
         <Grid ColumnDefinitions="*,Auto">
           <StackPanel Spacing="6">
             <StackPanel Spacing="2">
@@ -82,17 +82,17 @@
           <TextBlock Text="linuxCNC options" FontWeight="SemiBold"/>
           <StackPanel Orientation="Horizontal" Spacing="8">
             <TextBlock Text="Taper" VerticalAlignment="Center"/>
-            <ComboBox Width="80" ItemsSource="{Binding Thread.TaperTypes}" SelectedItem="{Binding Thread.TaperType, Mode=TwoWay}"/>
+            <ComboBox Classes="dropdown-select" Width="80" ItemsSource="{Binding Thread.TaperTypes}" SelectedItem="{Binding Thread.TaperType, Mode=TwoWay}"/>
             <controls:NumericTextBox Value="{Binding Thread.TaperLength, Mode=TwoWay}" Format="##0.###" Width="80"
                                      IsEnabled="{Binding Thread.TaperType, Converter={x:Static conv:LatheConverters.TaperTypeToBool}}"/>
           </StackPanel>
           <StackPanel Orientation="Horizontal" Spacing="8">
             <TextBlock Text="Compound angle" VerticalAlignment="Center"/>
-            <ComboBox Width="80" ItemsSource="{Binding Thread.CompoundAngles}" SelectedItem="{Binding Thread.CompoundAngle, Mode=TwoWay}"/>
+            <ComboBox Classes="dropdown-select" Width="80" ItemsSource="{Binding Thread.CompoundAngles}" SelectedItem="{Binding Thread.CompoundAngle, Mode=TwoWay}"/>
           </StackPanel>
           <StackPanel Orientation="Horizontal" Spacing="8">
             <TextBlock Text="Depth degression" VerticalAlignment="Center"/>
-            <ComboBox x:Name="DepthDegressionCombo" Width="80" ItemsSource="{Binding Thread.DepthDegressions}"
+            <ComboBox Classes="dropdown-select" x:Name="DepthDegressionCombo" Width="80" ItemsSource="{Binding Thread.DepthDegressions}"
                       SelectedItem="{Binding Thread.DepthDegression, Mode=TwoWay}"/>
           </StackPanel>
         </StackPanel>

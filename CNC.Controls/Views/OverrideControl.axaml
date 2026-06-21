@@ -64,14 +64,12 @@
         </TextBox.Background>
       </TextBox>
       <Button x:Name="btnOvReset"
+            Classes="panel-action"
             Content="↺"
-            Focusable="False"
             Height="36"
             Width="36"
             FontSize="24"
-            Padding="4"
-            VerticalContentAlignment="Center"
-            HorizontalContentAlignment="Center"/>
+            Padding="4"/>
     </StackPanel>
   </Grid>
 </UserControl>

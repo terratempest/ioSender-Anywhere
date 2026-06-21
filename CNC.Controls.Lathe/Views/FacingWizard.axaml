@@ -23,7 +23,7 @@
         </StackPanel>
       </StackPanel>
 
-      <Border BorderBrush="{DynamicResource ThemeBorderLowBrush}" BorderThickness="1" Padding="8" CornerRadius="2">
+      <Border Classes="form-section">
         <StackPanel Spacing="6">
           <TextBlock Text="Diameter" FontWeight="SemiBold"/>
           <StackPanel Orientation="Horizontal" Spacing="12">

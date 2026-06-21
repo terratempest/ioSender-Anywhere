@@ -11,15 +11,12 @@
 
   <DockPanel>
     <StackPanel DockPanel.Dock="Bottom" Orientation="Horizontal" Spacing="5" Margin="5">
-      <Button x:Name="btnSave" Content="Save settings" MinWidth="110" FontSize="12"
-              HorizontalContentAlignment="Center" Click="OnSaveClick"
+      <Button x:Name="btnSave" Classes="form-action" Content="Save settings" MinWidth="110" Click="OnSaveClick"
               loc:Localize.Key="ioSender.appconfig.btn_save" loc:Localize.Fallback="Save settings"/>
     </StackPanel>
 
     <Grid Margin="5" ColumnDefinitions="190,*">
-      <Border Grid.Column="0" Background="{DynamicResource ThemeControlLowBrush}"
-              BorderBrush="{DynamicResource ThemeBorderLowBrush}" BorderThickness="1"
-              Padding="4" Margin="0,0,8,0">
+      <Border Grid.Column="0" Classes="settings-navigation" Margin="0,0,8,0">
         <ListBox x:Name="SettingsList" Background="Transparent" BorderThickness="0"
                  FontSize="12" SelectionChanged="OnSettingsSelectionChanged">
           <ListBoxItem Content="General" Tag="General"/>

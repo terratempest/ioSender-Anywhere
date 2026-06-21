@@ -1,0 +1,58 @@
+<Styles xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:views="using:CNC.Controls.Avalonia.Views">
+  <Style Selector="Button.probing-action">
+    <Setter Property="Background" Value="{DynamicResource ThemeControlHighBrush}"/>
+    <Setter Property="Foreground" Value="{DynamicResource ThemeForegroundBrush}"/>
+    <Setter Property="BorderBrush" Value="{DynamicResource ThemeBorderMidBrush}"/>
+    <Setter Property="BorderThickness" Value="1"/>
+    <Setter Property="CornerRadius" Value="4"/>
+    <Setter Property="Height" Value="64"/>
+    <Setter Property="Width" Value="64"/>
+    <Setter Property="Margin" Value="0,0,4,0"/>
+    <Setter Property="MinWidth" Value="0"/>
+    <Setter Property="HorizontalAlignment" Value="Left"/>
+    <Setter Property="Padding" Value="0"/>
+    <Setter Property="HorizontalContentAlignment" Value="Center"/>
+    <Setter Property="VerticalContentAlignment" Value="Center"/>
+    <Setter Property="FontWeight" Value="SemiBold"/>
+    <Setter Property="FontSize" Value="10"/>
+    <Setter Property="Cursor" Value="Hand"/>
+  </Style>
+  <Style Selector="Button.probing-action:pointerover">
+    <Setter Property="Background" Value="{DynamicResource ThemeControlHighlightMidBrush}"/>
+    <Setter Property="BorderBrush" Value="{DynamicResource ThemeBorderHighBrush}"/>
+  </Style>
+  <Style Selector="Button.probing-action:pressed">
+    <Setter Property="Background" Value="{DynamicResource ThemeControlHighlightLowBrush}"/>
+  </Style>
+  <Style Selector="Button.probing-action.selected">
+    <Setter Property="Background" Value="{DynamicResource ThemeControlHighlightLowBrush}"/>
+    <Setter Property="BorderBrush" Value="{DynamicResource ThemeAccentBrush}"/>
+    <Setter Property="Foreground" Value="{DynamicResource ThemeAccentBrush}"/>
+  </Style>
+
+  <Style Selector="TabControl#WizardTabs">
+    <Setter Property="Template">
+      <ControlTemplate>
+        <Grid RowDefinitions="0,*">
+          <ItemsPresenter Name="PART_ItemsPresenter" Grid.Row="0" IsVisible="False"/>
+          <ContentPresenter Name="PART_SelectedContentHost" Grid.Row="1"
+                            Content="{TemplateBinding SelectedContent}"
+                            ContentTemplate="{TemplateBinding SelectedContentTemplate}"
+                            HorizontalContentAlignment="{TemplateBinding HorizontalContentAlignment}"
+                            VerticalContentAlignment="{TemplateBinding VerticalContentAlignment}"/>
+        </Grid>
+      </ControlTemplate>
+    </Setter>
+  </Style>
+
+  <Style Selector="Border.probing-tab-content">
+    <Setter Property="Background" Value="{DynamicResource ThemeControlLowBrush}"/>
+    <Setter Property="BorderBrush" Value="{DynamicResource ThemeBorderLowBrush}"/>
+    <Setter Property="BorderThickness" Value="1"/>
+    <Setter Property="Margin" Value="4,0,4,0"/>
+    <Setter Property="Padding" Value="0"/>
+  </Style>
+
+</Styles>

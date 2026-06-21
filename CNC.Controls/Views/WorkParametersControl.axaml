@@ -23,7 +23,7 @@
       VerticalAlignment="Center" Foreground="{DynamicResource ThemeForegroundBrush}"
       loc:Localize.Key="CNC.Controls.Avalonia.workparameterscontrol.lbl_offset" loc:Localize.Fallback="Offset:"/>
     
-      <ComboBox x:Name="cbxOffset" Grid.Row="0" Grid.Column="1" 
+      <ComboBox Classes="dropdown-select" x:Name="cbxOffset" Grid.Row="0" Grid.Column="1"
         Margin="4, 0"
         ItemsSource="{Binding CoordinateSystems}"
         IsEnabled="{Binding IsJobRunning, Converter={StaticResource BooleanConverter}}"
@@ -39,7 +39,7 @@
     <TextBlock x:Name="LblTool" Grid.Row="0" Grid.Column="2" Text="Tool:" 
       VerticalAlignment="Center" Foreground="{DynamicResource ThemeForegroundBrush}"
       loc:Localize.Key="CNC.Controls.Avalonia.workparameterscontrol.lbl_tool" loc:Localize.Fallback="Tool:"/>
-    <ComboBox x:Name="cbxTool" Grid.Row="0" Grid.Column="3" Margin="4, 0, 0, 0"
+    <ComboBox Classes="dropdown-select" x:Name="cbxTool" Grid.Row="0" Grid.Column="3" Margin="4, 0, 0, 0"
       ItemsSource="{Binding Tools}"
       SelectedValue="{Binding Tool, Mode=OneWay}"
       SelectedValueBinding="{Binding Code}"

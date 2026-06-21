@@ -48,9 +48,9 @@
       </Grid>
     </Grid>
 
-    <StackPanel Grid.Row="1" Orientation="Horizontal" HorizontalAlignment="Right" Spacing="8">
-      <Button Content="Ok" Width="75" Click="OnOkClick"/>
-      <Button Content="Cancel" Width="75" Click="OnCancelClick"/>
-    </StackPanel>
+    <Grid Grid.Row="1" Classes="action-footer" ColumnDefinitions="*,*">
+      <Button Grid.Column="0" Classes="action-footer-button" Content="Ok" Click="OnOkClick"/>
+      <Button Grid.Column="1" Classes="action-footer-button" Content="Cancel" Click="OnCancelClick"/>
+    </Grid>
   </Grid>
 </Window>

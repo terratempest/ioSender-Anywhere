@@ -18,12 +18,8 @@
 
   <UserControl.Resources>
     <ResourceDictionary>
-      <ResourceDictionary.MergedDictionaries>
-        <ResourceInclude Source="avares://CNC.Controls.Avalonia/Themes/Controls.axaml"/>
-      </ResourceDictionary.MergedDictionaries>
       <conv:EnumValueToBooleanConverter x:Key="EnumToCheckedConverter"/>
       <conv:BoolToVisibleConverter x:Key="IsVisibleConverter"/>
-      <conv:LogicalNotConverter x:Key="LogicalNotConverter"/>
       <conv:LogicalNotConverter x:Key="IsNotVisibleConverter">
         <conv:LogicalNotConverter.FinalConverter>
           <conv:BoolToVisibleConverter/>

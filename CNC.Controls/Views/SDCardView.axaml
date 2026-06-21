@@ -15,8 +15,9 @@
               IsEnabled="{Binding CanViewAll, ElementName=root}"
               IsChecked="{Binding ViewAll, ElementName=root, Mode=TwoWay, Converter={StaticResource NotConverter}}"
               Margin="30,5,0,0" HorizontalAlignment="Left" Click="ViewAll_Click"/>
-    <DataGrid x:Name="dgrSDCard" Grid.Row="1" IsReadOnly="True" Margin="30,0,0,0"
-              Height="450" Width="380" HorizontalAlignment="Left" VerticalAlignment="Top"
+    <Grid Grid.Row="1" Margin="30,0,30,0" ColumnDefinitions="380,8,*">
+    <DataGrid x:Name="dgrSDCard" Grid.Column="0" IsReadOnly="True"
+              Height="450" HorizontalAlignment="Stretch" VerticalAlignment="Top"
               SelectionMode="Single" AutoGenerateColumns="False"
               CanUserReorderColumns="False" CanUserResizeColumns="False"
               CanUserSortColumns="False" SelectionChanged="dgrSDCard_SelectionChanged"
@@ -39,9 +40,9 @@
         </ContextMenu>
       </DataGrid.ContextMenu>
     </DataGrid>
-    <Button Grid.Row="1" Content="Upload"
+    <Button Grid.Column="2" Classes="action-footer-button" Content="Upload"
             IsEnabled="{Binding CanUpload, ElementName=root}"
-            HorizontalAlignment="Left" Margin="428,430,0,0" VerticalAlignment="Top"
-            Width="75" Click="Upload_Click"/>
+            VerticalAlignment="Bottom" Click="Upload_Click"/>
+    </Grid>
   </Grid>
 </UserControl>

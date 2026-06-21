@@ -7,6 +7,13 @@
              mc:Ignorable="d" d:DesignWidth="600" d:DesignHeight="600"
              x:Class="CNC.Controls.Avalonia.Views.ConsoleControl"
              x:DataType="core:GrblViewModel">
+  <UserControl.Styles>
+    <Style Selector="TextBox.console-output:pointerover /template/ Border#PART_BorderElement, TextBox.console-output:focus /template/ Border#PART_BorderElement, TextBox.console-output:focus-within /template/ Border#PART_BorderElement">
+      <Setter Property="Background" Value="{DynamicResource ThemeControlLowBrush}"/>
+      <Setter Property="BorderBrush" Value="{DynamicResource ThemeBorderLowBrush}"/>
+      <Setter Property="BorderThickness" Value="0"/>
+    </Style>
+  </UserControl.Styles>
   
   <Grid RowDefinitions="Auto, *">
     <Grid Grid.Row="0" ColumnDefinitions="Auto,*" Margin="4, 0" TextElement.FontSize="12">
@@ -39,7 +46,7 @@
           loc:Localize.Fallback="Clear"/>
       </StackPanel>
     </Grid>
-    <TextBox x:Name="ConsoleText"
+    <TextBox x:Name="ConsoleText" Classes="console-output"
       Grid.Row="1"
       Text="{Binding ResponseLogText, Mode=OneWay}"
       IsReadOnly="True"
@@ -55,24 +62,6 @@
       BorderBrush="{DynamicResource ThemeBorderLowBrush}"
       ScrollViewer.HorizontalScrollBarVisibility="Disabled"
       ScrollViewer.VerticalScrollBarVisibility="Auto">
-      <TextBox.Styles>
-        <Style Selector="TextBox#ConsoleText:pointerover /template/ Border#PART_BorderElement">
-          <Setter Property="Background" Value="{DynamicResource ThemeControlLowBrush}"/>
-          <Setter Property="BorderBrush" Value="{DynamicResource ThemeBorderLowBrush}"/>
-        </Style>
-
-        <Style Selector="TextBox#ConsoleText:focus /template/ Border#PART_BorderElement">
-          <Setter Property="Background" Value="{DynamicResource ThemeControlLowBrush}"/>
-          <Setter Property="BorderBrush" Value="{DynamicResource ThemeBorderLowBrush}"/>
-          <Setter Property="BorderThickness" Value="0"/> 
-        </Style>
-
-        <Style Selector="TextBox#ConsoleText:focus-within /template/ Border#PART_BorderElement">
-          <Setter Property="Background" Value="{DynamicResource ThemeControlLowBrush}"/>
-          <Setter Property="BorderBrush" Value="{DynamicResource ThemeBorderLowBrush}"/>
-          <Setter Property="BorderThickness" Value="0"/>
-        </Style>
-      </TextBox.Styles>
     </TextBox>
   </Grid>
 </UserControl>

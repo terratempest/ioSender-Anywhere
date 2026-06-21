@@ -3,7 +3,7 @@
              x:Class="CNC.Controls.Lathe.ProfileControl">
   <Grid ColumnDefinitions="Auto,*,Auto">
     <TextBlock Grid.Column="0" Text="Profile:" VerticalAlignment="Center" Margin="0,0,6,0"/>
-    <ComboBox Grid.Column="1" x:Name="ProfileCombo" Height="22"
+    <ComboBox Grid.Column="1" x:Name="ProfileCombo" Classes="dropdown-select compact"
               ItemsSource="{Binding ItemsSource, RelativeSource={RelativeSource AncestorType=UserControl}}"
               SelectedItem="{Binding SelectedProfile, RelativeSource={RelativeSource AncestorType=UserControl}, Mode=TwoWay}">
       <ComboBox.ItemTemplate>

@@ -46,7 +46,7 @@
             Click="OnGotoClick"/>
 
     <StackPanel Grid.Row="2" Orientation="Horizontal" HorizontalAlignment="Center" Spacing="4">
-      <ComboBox x:Name="cbxCoordinateSystem" Width="80" Height="36"
+      <ComboBox Classes="dropdown-select" x:Name="cbxCoordinateSystem" Width="80" Height="36"
                 ItemsSource="{Binding CoordinateSystems, RelativeSource={RelativeSource AncestorType=UserControl}}"
                 SelectionChanged="OnCoordinateSystemSelectionChanged"
                 PlaceholderText="G99.9">

@@ -8,7 +8,7 @@
         WindowStartupLocation="CenterOwner">
   <Grid RowDefinitions="32,*,*" ColumnDefinitions="*,*">
     <StackPanel Grid.Row="0" Grid.ColumnSpan="2" Orientation="Horizontal" Margin="5,5,0,0" Spacing="8">
-      <ComboBox x:Name="MacroCombo" Width="175" Height="22"
+      <ComboBox Classes="dropdown-select compact" x:Name="MacroCombo" Width="175"
                 ItemsSource="{Binding Macros}"
                 SelectedItem="{Binding SelectedMacro, Mode=TwoWay}"
                 DisplayMemberBinding="{Binding Name}"/>

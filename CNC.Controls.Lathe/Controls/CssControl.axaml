@@ -11,7 +11,7 @@
                                Value="{Binding Speed, RelativeSource={RelativeSource AncestorType=UserControl}, Mode=TwoWay}"/>
       <TextBlock x:Name="SpeedUnit" Text="RPM" VerticalAlignment="Center"/>
     </StackPanel>
-    <ComboBox Grid.Column="2" x:Name="SpindleDirCombo" Width="60" Height="22"
+    <ComboBox Grid.Column="2" x:Name="SpindleDirCombo" Classes="dropdown-select compact" Width="60"
               ItemsSource="{Binding SpindleDirections, RelativeSource={RelativeSource AncestorType=UserControl}}"
               SelectedItem="{Binding SpindleDirection, RelativeSource={RelativeSource AncestorType=UserControl}, Mode=TwoWay}">
       <ComboBox.ItemTemplate>

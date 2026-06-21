@@ -2,37 +2,36 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:cnc="using:CNC.Controls.Avalonia.Views"
              x:Class="CNC.Controls.Config.AppCameraConfigPanel"
-             Width="310">
-  <GroupBox Header="Camera" BorderBrush="{DynamicResource ThemeBorderLowBrush}">
-    <WrapPanel Orientation="Vertical" ItemWidth="290">
-      <cnc:NumericField Label="Device index:" Format="#0" MinHeight="36"
+             Classes="settings-panel">
+  <GroupBox Header="Camera" Classes="form-section">
+    <WrapPanel Classes="settings-form">
+      <cnc:NumericField Classes="form-field" Label="Device index:" Format="#0"
                         Value="{Binding Camera.DeviceIndex, Mode=TwoWay}"/>
-      <cnc:NumericField Label="Width:" Unit="px" Format="####0" MinHeight="36"
+      <cnc:NumericField Classes="form-field" Label="Width:" Unit="px" Format="####0"
                         Value="{Binding Camera.CaptureWidth, Mode=TwoWay}"/>
-      <cnc:NumericField Label="Height:" Unit="px" Format="####0" MinHeight="36"
+      <cnc:NumericField Classes="form-field" Label="Height:" Unit="px" Format="####0"
                         Value="{Binding Camera.CaptureHeight, Mode=TwoWay}"/>
-      <CheckBox Content="Initial move to spindle" FontSize="12"
+      <CheckBox Classes="form-option" Content="Initial move to spindle"
                 IsChecked="{Binding Camera.InitialMoveToSpindle, Mode=TwoWay}" Margin="0,4,0,0"/>
-      <CheckBox Content="Confirm move" FontSize="12"
+      <CheckBox Classes="form-option" Content="Confirm move"
                 IsChecked="{Binding Camera.ConfirmMove, Mode=TwoWay}"/>
-      <cnc:NumericField Label="X offset:" MinHeight="36"
+      <cnc:NumericField Classes="form-field" Label="X offset:"
                         Value="{Binding Camera.XOffset, Mode=TwoWay}"/>
-      <cnc:NumericField Label="Y offset:" MinHeight="36"
+      <cnc:NumericField Classes="form-field" Label="Y offset:"
                         Value="{Binding Camera.YOffset, Mode=TwoWay}"/>
 
       <Grid ColumnDefinitions="90,*" Margin="0,2,0,0">
         <TextBlock Grid.Column="0" Text="Offset motion:" FontSize="12" HorizontalAlignment="Right" VerticalAlignment="Center"/>
-        <ComboBox Grid.Column="1" Margin="4,0,0,0" Width="120" FontSize="12" HorizontalAlignment="Left"
+        <ComboBox Classes="dropdown-select" Grid.Column="1" Margin="4,0,0,0" Width="120" FontSize="12" HorizontalAlignment="Left"
                   ItemsSource="{Binding Camera.MoveModes}"
                   SelectedItem="{Binding Camera.MoveMode, Mode=TwoWay}"/>
       </Grid>
 
-      <Button x:Name="GetPositionBtn" Content="Get current position" Margin="0,8,0,0"
-              MinWidth="140" FontSize="12" HorizontalAlignment="Left"
-              HorizontalContentAlignment="Center" Click="OnGetPositionClick"/>
+      <Button x:Name="GetPositionBtn" Classes="form-action" Content="Get current position" Margin="0,8,0,0"
+              MinWidth="140" HorizontalAlignment="Left" Click="OnGetPositionClick"/>
 
-      <TextBlock Text="Capture size applies when camera is opened."
-                 FontSize="11" Opacity="0.75" TextWrapping="Wrap" Margin="0,4,0,0"/>
+      <TextBlock Classes="help-text" Text="Capture size applies when camera is opened."
+                 Opacity="0.75" Margin="0,4,0,0"/>
     </WrapPanel>
   </GroupBox>
 </UserControl>

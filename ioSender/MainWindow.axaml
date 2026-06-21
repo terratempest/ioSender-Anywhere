@@ -43,13 +43,10 @@
   </Window.Styles>
 
   <DockPanel VerticalAlignment="Stretch" HorizontalAlignment="Stretch">
-    <Border x:Name="TitleBar"
+    <Border x:Name="TitleBar" Classes="app-titlebar"
       DockPanel.Dock="Top"
       Height="36"
       Padding="4,0,4,0"
-      Background="{DynamicResource ThemeControlLowBrush}"
-      BorderBrush="{DynamicResource ThemeBorderLowBrush}"
-      BorderThickness="0,0,0,1"
       chrome:WindowDecorationProperties.ElementRole="TitleBar">
       <Grid ColumnDefinitions="Auto,Auto,*,Auto,Auto,Auto">
         <StackPanel Grid.Column="0" Orientation="Horizontal" Spacing="8"

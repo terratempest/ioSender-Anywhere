@@ -7,7 +7,7 @@
   <DockPanel Margin="8">
     <StackPanel DockPanel.Dock="Top" Orientation="Horizontal" Spacing="8" Margin="0,0,0,8">
       <TextBlock VerticalAlignment="Center" Text="Device"/>
-      <ComboBox x:Name="DeviceCombo" Width="120"/>
+      <ComboBox Classes="dropdown-select" x:Name="DeviceCombo" Width="120"/>
       <Button x:Name="RefreshBtn" Content="Refresh" Padding="10,4"/>
       <Button x:Name="StartBtn" Content="Start" Padding="10,4"/>
       <Button x:Name="StopBtn" Content="Stop" Padding="10,4" IsEnabled="False"/>

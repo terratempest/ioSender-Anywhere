@@ -21,10 +21,6 @@
 
   <UserControl.Resources>
     <ResourceDictionary>
-      <ResourceDictionary.MergedDictionaries>
-        <ResourceInclude Source="avares://CNC.Controls.Avalonia/Themes/Controls.axaml"/>
-      </ResourceDictionary.MergedDictionaries>
-      <conv:LogicalNotConverter x:Key="LogicalNotConverter"/>
       <conv:BoolToVisibleConverter x:Key="IsVisibleConverter"/>
       <conv:ActualRpmDisplayConverter x:Key="ActualRpmDisplayConverter"/>
       <conv:SpindleStateIsActiveConverter x:Key="SpindleStateIsActiveConverter"/>
@@ -33,7 +29,7 @@
   <Grid Margin="4" RowDefinitions="Auto,*,Auto,Auto,*,Auto"
         HorizontalAlignment="Stretch" VerticalAlignment="Stretch">
 
-    <ComboBox x:Name="cbxSpindle" Grid.Row="0" Height="24" HorizontalAlignment="Stretch"
+    <ComboBox Classes="dropdown-select compact" x:Name="cbxSpindle" Grid.Row="0" HorizontalAlignment="Stretch"
               ItemsSource="{Binding Spindles}" SelectedValue="{Binding SpindleNum, Mode=OneWay}"
               IsEnabled="{Binding GcodeCommandsAllowed}"
               IsVisible="{Binding MultiSpindle, Converter={StaticResource IsVisibleConverter}}">
@@ -80,15 +76,11 @@
       </Viewbox>
 
       <Border Grid.Column="1"
+              Classes="ui-input-surface"
               MinHeight="24"
               MinWidth="58"
               HorizontalAlignment="Stretch"
-              VerticalAlignment="Center"
-              Background="{DynamicResource ThemeControlLowBrush}"
-              BorderBrush="{DynamicResource ThemeBorderMidBrush}"
-              BorderThickness="1"
-              CornerRadius="2"
-              Padding="2,0">
+              VerticalAlignment="Center">
         <TextBox x:Name="txtRPM"
                 HorizontalAlignment="Stretch"
                 VerticalAlignment="Stretch"
